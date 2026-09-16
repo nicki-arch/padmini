@@ -139,11 +139,11 @@
       </div>
       <div class="campo">
         <label for="data">Data de nascimento</label>
-        <input id="data" name="data" type="date" min="1800-01-01" required>
+        <input id="data" name="data" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" maxlength="10" required>
       </div>
       <div class="campo">
         <label for="hora">Hora de nascimento</label>
-        <input id="hora" name="hora" type="time" required>
+        <input id="hora" name="hora" type="text" inputmode="numeric" autocomplete="off" placeholder="hh:mm" maxlength="5" required>
         <span class="dica">Use a hora da certidão. Ela define o Ascendente.</span>
       </div>
       <div class="campo largo">
@@ -181,7 +181,25 @@ const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const grau = (g) => { const d = Math.floor(g); let m = Math.round((g - d) * 60); return m === 60 ? `${d + 1}°00'` : `${d}°${String(m).padStart(2, "0")}'`; };
 const ano = (iso) => iso.slice(0, 4);
 
-$("#data").max = new Date().toISOString().slice(0, 10);
+// ---------- máscara de data e hora ----------
+// Campos de texto simples em vez de <input type=date/time>: esses componentes nativos
+// variam demais entre navegadores (no iPhone o campo de data aparece em branco, sem
+// nenhuma pista visual; no computador, o formato pode sair mm/dd/aaaa em vez de
+// dd/mm/aaaa). Com texto simples, o campo fica igual em qualquer aparelho.
+function aplicarMascara(el, tamanhos, separador) {
+  el.addEventListener("input", () => {
+    const digitos = el.value.replace(/\D/g, "").slice(0, tamanhos.reduce((a, b) => a + b, 0));
+    let pos = 0;
+    el.value = tamanhos.map((t) => digitos.slice(pos, (pos += t))).filter(Boolean).join(separador);
+  });
+}
+aplicarMascara($("#data"), [2, 2, 4], "/");
+aplicarMascara($("#hora"), [2, 2], ":");
+
+function dataParaISO(brasileira) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(brasileira.trim());
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
+}
 
 // ---------- autocomplete de cidade ----------
 let cidadeEscolhida = null, opcoes = [], ativa = -1, timer, ultimoPedido = null;
@@ -242,8 +260,9 @@ function mostrarErro(msg) { const el = $("#erro"); el.textContent = msg; el.hidd
 $("#form").addEventListener("submit", async (e) => {
   e.preventDefault();
   mostrarErro("");
-  const data = $("#data").value, hora = $("#hora").value;
-  if (!data || !hora) return mostrarErro("Preencha a data e a hora de nascimento.");
+  const data = dataParaISO($("#data").value), hora = $("#hora").value;
+  if (!data) return mostrarErro("Preencha a data de nascimento no formato dd/mm/aaaa.");
+  if (!/^\d{2}:\d{2}$/.test(hora)) return mostrarErro("Preencha a hora de nascimento no formato hh:mm.");
   if (!cidadeEscolhida) return mostrarErro("Escolha a cidade na lista de sugestões.");
 
   const botao = $("#enviar");
