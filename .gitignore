@@ -1,0 +1,11 @@
+.env
+.venv/
+.ferramentas/
+__pycache__/
+*.pyc
+# dados brutos do GeoNames: só servem pra reconstruir o índice (baixar_dados.py),
+# não são usados pelo site. O índice em si (cidades_index.tsv) fica versionado.
+data/cities1000.txt
+data/admin1CodesASCII.txt
+data/countryInfo.txt
+.e

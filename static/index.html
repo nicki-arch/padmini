@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Padmini — Mapa Védico</title>
+<meta name="description" content="Gere seu mapa védico (Jyotish) com Ascendente, nakshatra da Lua e fase de vida atual.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23c2410c'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e08a3c'/></svg>">
+<style>
+  :root {
+    --bg: #faf6ef;
+    --surface: #ffffff;
+    --surface-2: #f3ece0;
+    --ink: #1f1a2e;
+    --ink-soft: #5b5470;
+    --line: #e4dccd;
+    --accent: #c2410c;
+    --accent-soft: #fbe7d6;
+    --night: #2a2350;
+    --focus: #7c5cff;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14111f;
+      --surface: #1d1930;
+      --surface-2: #26213d;
+      --ink: #f1ecf9;
+      --ink-soft: #b3aac8;
+      --line: #342e50;
+      --accent: #f08a4b;
+      --accent-soft: #3a2a2a;
+      --night: #c9bdf5;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 Inter, system-ui, sans-serif;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 20px 0; }
+  .marca { display: flex; align-items: center; gap: 10px; font: 600 26px/1 "Cormorant Garamond", serif; color: var(--night); text-decoration: none; }
+  h1, h2, h3 { font-family: "Cormorant Garamond", serif; font-weight: 600; line-height: 1.15; color: var(--night); }
+  h1 { font-size: clamp(34px, 6vw, 48px); margin: 24px 0 8px; }
+  h2 { font-size: 28px; margin: 0 0 12px; }
+  .sub { color: var(--ink-soft); margin: 0 0 24px; max-width: 560px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  form { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+  .campo { display: grid; gap: 6px; }
+  .campo.largo { grid-column: 1 / -1; }
+  label { font-size: 14px; font-weight: 500; }
+  .dica { font-size: 13px; color: var(--ink-soft); }
+  input {
+    width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; min-height: 46px;
+  }
+  input:focus-visible, button:focus-visible, li[role=option]:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  button {
+    grid-column: 1 / -1; font: 600 16px Inter, sans-serif; color: #fff; background: var(--accent);
+    border: 0; border-radius: 10px; padding: 14px; min-height: 48px; cursor: pointer;
+  }
+  button:disabled { opacity: .6; cursor: wait; }
+  .erro { grid-column: 1 / -1; color: #b91c1c; font-size: 14px; margin: 0; }
+  @media (prefers-color-scheme: dark) { .erro { color: #fca5a5; } }
+
+  .auto { position: relative; }
+  .auto ul {
+    position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px;
+    list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / .12); max-height: 280px; overflow: auto;
+  }
+  .auto li { padding: 10px; border-radius: 8px; cursor: pointer; }
+  .auto li[aria-selected=true], .auto li:hover { background: var(--accent-soft); }
+
+  #resultado { margin: 32px 0; display: grid; gap: 20px; }
+  .resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .resumo div { background: var(--surface-2); border-radius: var(--radius); padding: 14px; }
+  .resumo small { display: block; color: var(--ink-soft); font-size: 13px; }
+  .resumo strong { font-size: 18px; }
+  .aviso { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 14px; font-size: 14px; }
+
+  .mapa-e-tabela { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .rasi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(96px, auto)); border: 2px solid var(--night); }
+  .casa { border: 1px solid var(--line); padding: 4px 5px; font-size: 12px; line-height: 1.35; position: relative; overflow-wrap: anywhere; }
+  .casa .signo { color: var(--ink-soft); font-size: 10px; display: block; }
+  .casa.lagna { background: var(--accent-soft); }
+  .casa.lagna::after { content: ""; position: absolute; top: 0; right: 0; border: 8px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); }
+  .centro { grid-column: 2 / 4; grid-row: 2 / 4; display: grid; place-items: center; text-align: center; font-family: "Cormorant Garamond", serif; font-size: 20px; color: var(--night); padding: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; color: var(--ink-soft); font-size: 13px; }
+  td.num { font-variant-numeric: tabular-nums; }
+
+  .relatorio h3 { font-size: 22px; margin: 24px 0 6px; }
+  .relatorio h3:first-child { margin-top: 0; }
+  .relatorio p { margin: 0 0 12px; }
+
+  .ia-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  button.secundario { grid-column: auto; background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 10px 14px; min-height: 44px; }
+  .relatorio hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
+  .dashas { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .dashas li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: 8px; font-variant-numeric: tabular-nums; }
+  .dashas li.atual { background: var(--accent-soft); font-weight: 600; }
+  .nota { font-size: 13px; color: var(--ink-soft); }
+  footer { padding: 32px 0; font-size: 12px; color: var(--ink-soft); }
+  footer a { color: inherit; }
+
+  @media (max-width: 640px) {
+    form { grid-template-columns: 1fr; }
+    .resumo { grid-template-columns: 1fr; }
+    .mapa-e-tabela { grid-template-columns: 1fr; }
+    .casa { font-size: 11px; }
+    .rasi { grid-template-rows: repeat(4, minmax(76px, auto)); }
+  }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <a class="marca" href="/">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#c2410c"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e08a3c"/><path d="M6 24h20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Padmini
+  </a>
+</header>
+
+<main class="wrap">
+  <h1>Seu mapa védico</h1>
+  <p class="sub">Com a data, a hora e a cidade de nascimento, calculamos seu Ascendente, a nakshatra da sua Lua e a fase de vida que você atravessa agora, pela tradição védica (Jyotish).</p>
+
+  <div class="card">
+    <form id="form" novalidate>
+      <div class="campo largo">
+        <label for="nome">Nome <span class="dica">(opcional)</span></label>
+        <input id="nome" name="nome" autocomplete="given-name" maxlength="80">
+      </div>
+      <div class="campo">
+        <label for="data">Data de nascimento</label>
+        <input id="data" name="data" type="date" min="1800-01-01" required>
+      </div>
+      <div class="campo">
+        <label for="hora">Hora de nascimento</label>
+        <input id="hora" name="hora" type="time" required>
+        <span class="dica">Use a hora da certidão. Ela define o Ascendente.</span>
+      </div>
+      <div class="campo largo">
+        <label for="cidade" id="cidade-label">Cidade de nascimento</label>
+        <div class="auto">
+          <input id="cidade" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cidades" autocomplete="off" placeholder="Comece a digitar, ex.: Porto Alegre" required>
+          <ul id="cidades" role="listbox" aria-labelledby="cidade-label" hidden></ul>
+        </div>
+      </div>
+      <p class="erro" id="erro" role="alert" hidden></p>
+      <button id="enviar" type="submit">Gerar meu mapa</button>
+    </form>
+  </div>
+
+  <section id="resultado" aria-live="polite" hidden></section>
+</main>
+
+<footer class="wrap">
+  Mapa sideral com ayanamsa Lahiri e casas por signo inteiro. Este mapa é uma ferramenta de autoconhecimento inspirada na tradição védica, não uma previsão nem substituto de orientação profissional.<br>
+  Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos astronômicos: Swiss Ephemeris.
+</footer>
+
+<script>
+const SUL_INDIANO = [
+  "Meena", "Mesha", "Vrishabha", "Mithuna",
+  "Kumbha", null, null, "Karka",
+  "Makara", null, null, "Simha",
+  "Dhanu", "Vrishchika", "Tula", "Kanya",
+];
+const ABREV = { Surya: "Sol", Chandra: "Lua", Mangala: "Mar", Budha: "Mer", Guru: "Júp", Shukra: "Vên", Shani: "Sat", Rahu: "Rah", Ketu: "Ket" };
+const SIGNO_PT = { Mesha: "Áries", Vrishabha: "Touro", Mithuna: "Gêmeos", Karka: "Câncer", Simha: "Leão", Kanya: "Virgem", Tula: "Libra", Vrishchika: "Escorpião", Dhanu: "Sagitário", Makara: "Capricórnio", Kumbha: "Aquário", Meena: "Peixes" };
+
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const grau = (g) => { const d = Math.floor(g); let m = Math.round((g - d) * 60); return m === 60 ? `${d + 1}°00'` : `${d}°${String(m).padStart(2, "0")}'`; };
+const ano = (iso) => iso.slice(0, 4);
+
+$("#data").max = new Date().toISOString().slice(0, 10);
+
+// ---------- autocomplete de cidade ----------
+let cidadeEscolhida = null, opcoes = [], ativa = -1, timer, ultimoPedido = null;
+const input = $("#cidade"), lista = $("#cidades");
+
+function fecharLista() { lista.hidden = true; input.setAttribute("aria-expanded", "false"); ativa = -1; }
+function desenharLista() {
+  lista.innerHTML = opcoes.map((c, i) =>
+    `<li role="option" id="op-${i}" aria-selected="${i === ativa}">${esc(c.rotulo)}</li>`).join("");
+  lista.hidden = opcoes.length === 0;
+  input.setAttribute("aria-expanded", String(!lista.hidden));
+  if (ativa >= 0) input.setAttribute("aria-activedescendant", `op-${ativa}`); else input.removeAttribute("aria-activedescendant");
+}
+function escolher(i) {
+  cidadeEscolhida = opcoes[i];
+  input.value = cidadeEscolhida.rotulo;
+  fecharLista();
+}
+input.addEventListener("input", () => {
+  cidadeEscolhida = null;
+  clearTimeout(timer);
+  const q = input.value.trim();
+  if (q.length < 2) { opcoes = []; fecharLista(); return; }
+  timer = setTimeout(async () => {
+    try {
+      const r = await fetch(`/api/cidades?q=${encodeURIComponent(q)}`);
+      opcoes = await r.json();
+      ativa = opcoes.length ? 0 : -1;
+      desenharLista();
+    } catch { opcoes = []; fecharLista(); }
+  }, 180);
+});
+input.addEventListener("keydown", (e) => {
+  if (lista.hidden) return;
+  if (e.key === "ArrowDown") { ativa = (ativa + 1) % opcoes.length; desenharLista(); e.preventDefault(); }
+  else if (e.key === "ArrowUp") { ativa = (ativa - 1 + opcoes.length) % opcoes.length; desenharLista(); e.preventDefault(); }
+  else if (e.key === "Enter" && ativa >= 0) { escolher(ativa); e.preventDefault(); }
+  else if (e.key === "Escape") fecharLista();
+});
+lista.addEventListener("mousedown", (e) => {
+  const li = e.target.closest("li");
+  if (li) { e.preventDefault(); escolher(Number(li.id.slice(3))); }
+});
+input.addEventListener("blur", () => setTimeout(fecharLista, 100));
+
+// ---------- envio ----------
+function mostrarErro(msg) { const el = $("#erro"); el.textContent = msg; el.hidden = !msg; }
+
+$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  mostrarErro("");
+  const data = $("#data").value, hora = $("#hora").value;
+  if (!data || !hora) return mostrarErro("Preencha a data e a hora de nascimento.");
+  if (!cidadeEscolhida) return mostrarErro("Escolha a cidade na lista de sugestões.");
+
+  const botao = $("#enviar");
+  botao.disabled = true; botao.textContent = "Calculando…";
+  try {
+    ultimoPedido = { nome: $("#nome").value, data, hora, lat: cidadeEscolhida.lat, lon: cidadeEscolhida.lon, cidade: cidadeEscolhida.rotulo };
+    const r = await fetch("/api/mapa", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(ultimoPedido),
+    });
+    const corpo = await r.json();
+    if (!r.ok) throw new Error(typeof corpo.detail === "string" ? corpo.detail : "Confira os dados informados.");
+    desenharResultado(corpo);
+  } catch (err) {
+    mostrarErro(err.message || "Não foi possível calcular o mapa. Tente de novo.");
+  } finally {
+    botao.disabled = false; botao.textContent = "Gerar meu mapa";
+  }
+});
+
+// ---------- resultado ----------
+function desenharRasi(d) {
+  const porSigno = {};
+  d.grahas.forEach((g) => (porSigno[g.signo] ||= []).push(`${ABREV[g.id]}${g.retrogrado ? " (R)" : ""} ${grau(g.grau)}`));
+  let centroFeito = false;
+  return `<div class="rasi" role="img" aria-label="Mapa no estilo sul-indiano. Ascendente em ${esc(d.lagna.signo_pt)}.">` +
+    SUL_INDIANO.map((s) => {
+      if (!s) {
+        if (centroFeito) return "";
+        centroFeito = true;
+        return `<div class="centro">Rashi<br>(D1)</div>`;
+      }
+      const lagna = s === d.lagna.signo;
+      const itens = [lagna ? `<strong>Asc ${grau(d.lagna.grau)}</strong>` : "", ...(porSigno[s] || [])].filter(Boolean);
+      return `<div class="casa${lagna ? " lagna" : ""}"><span class="signo">${SIGNO_PT[s]}</span>${itens.join("<br>")}</div>`;
+    }).join("") + `</div>`;
+}
+
+function desenharResultado(d) {
+  const atual = d.dashas.find((x) => x.atual);
+  const titulo = d.nome ? `Mapa de ${esc(d.nome)}` : "Seu mapa";
+  const lua = d.grahas.find((g) => g.id === "Chandra");
+  const offset = d.fuso.offset_horas_na_data;
+  const secoes = Object.entries(d.secoes).map(([t, c]) =>
+    `<h3>${esc(t)}</h3>` + (Array.isArray(c) ? c : [c]).map((p) => `<p>${esc(p)}</p>`).join("")).join("");
+
+  const res = $("#resultado");
+  res.innerHTML = `
+    <div>
+      <h2>${titulo}</h2>
+      <p class="nota">${esc(d.cidade)} · fuso ${esc(d.fuso.nome_iana)} (UTC${offset >= 0 ? "+" : ""}${offset}) na data do nascimento</p>
+    </div>
+    ${d.aviso_horario ? `<p class="aviso">${esc(d.aviso_horario)}</p>` : ""}
+    <div class="resumo">
+      <div><small>Ascendente</small><strong>${esc(d.lagna.signo_pt)}</strong></div>
+      <div><small>Lua</small><strong>${esc(lua.signo_pt)} · ${esc(d.nakshatra_lua.nome)}</strong></div>
+      <div><small>Fase atual</small><strong>${atual ? `${esc(atual.nome)} (${ano(atual.inicio)}–${ano(atual.fim)})` : "—"}</strong></div>
+    </div>
+    <div class="card mapa-e-tabela">
+      ${desenharRasi(d)}
+      <div>
+      <table>
+        <thead><tr><th scope="col">Planeta</th><th scope="col">Signo</th><th scope="col">Grau</th><th scope="col">Casa</th></tr></thead>
+        <tbody>${d.grahas.map((g) => `<tr><td>${esc(g.nome)}${g.retrogrado ? ' <abbr title="retrógrado">(R)</abbr>' : ''}</td><td>${esc(g.signo_pt)}</td><td class="num">${grau(g.grau)}</td><td class="num">${g.casa}</td></tr>`).join("")}</tbody>
+      </table>
+      ${d.grahas.some((g) => g.retrogrado) ? '<p class="nota">(R) = planeta retrógrado na data do nascimento.</p>' : ''}
+      </div>
+    </div>
+    <article class="card relatorio" id="relatorio">
+      ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="secundario">Ler versão escrita por IA</button><span class="nota" id="status-ia"></span></div>` : ""}
+      <div id="texto-relatorio">${secoes}</div>
+    </article>
+    <div class="card">
+      <h2>Fases da vida (Vimshottari)</h2>
+      <ul class="dashas">${d.dashas.map((x) => `<li class="${x.atual ? "atual" : ""}"><span>${esc(x.nome)}</span><span>${ano(x.inicio)} – ${ano(x.fim)}</span></li>`).join("")}</ul>
+      <p class="nota">A primeira fase começa no nascimento, com o tempo que restava dela nesse momento.</p>
+    </div>`;
+  res.hidden = false;
+  res.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (iaDisponivel) $("#botao-ia").addEventListener("click", () => pedirTextoIA(d));
+}
+
+// ---------- texto por IA ----------
+let iaDisponivel = false;
+fetch("/api/config").then((r) => r.json()).then((c) => { iaDisponivel = c.texto_ia_disponivel; }).catch(() => {});
+
+function markdownSimples(md) {
+  return md.split(/\n{2,}/).map((bloco) => {
+    const t = bloco.trim();
+    if (!t) return "";
+    if (t === "---") return "<hr>";
+    if (t.startsWith("## ")) return `<h3>${esc(t.slice(3))}</h3>`;
+    if (t.startsWith("# ")) return "";
+    return `<p>${esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>")}</p>`;
+  }).join("");
+}
+
+async function pedirTextoIA(d) {
+  const botao = $("#botao-ia"), status = $("#status-ia");
+  botao.disabled = true;
+  status.textContent = "Escrevendo… leva uns 20 segundos.";
+  try {
+    const r = await fetch("/api/mapa", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...ultimoPedido, texto_ia: true }),
+    });
+    const corpo = await r.json();
+    if (!r.ok) throw new Error(typeof corpo.detail === "string" ? corpo.detail : "Não foi possível gerar o texto.");
+    $("#texto-relatorio").innerHTML = markdownSimples(corpo.texto_ia);
+    botao.remove();
+    status.textContent = "Versão escrita por IA a partir dos dados do seu mapa.";
+  } catch (err) {
+    status.textContent = err.message;
+    botao.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
