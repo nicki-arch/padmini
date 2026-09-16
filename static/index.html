@@ -187,13 +187,22 @@ $("#data").max = new Date().toISOString().slice(0, 10);
 let cidadeEscolhida = null, opcoes = [], ativa = -1, timer, ultimoPedido = null;
 const input = $("#cidade"), lista = $("#cidades");
 
-function fecharLista() { lista.hidden = true; input.setAttribute("aria-expanded", "false"); ativa = -1; }
+function fecharLista() {
+  lista.hidden = true;
+  input.setAttribute("aria-expanded", "false");
+  ativa = -1;
+  input.closest(".auto").style.marginBottom = "";
+}
 function desenharLista() {
   lista.innerHTML = opcoes.map((c, i) =>
     `<li role="option" id="op-${i}" aria-selected="${i === ativa}">${esc(c.rotulo)}</li>`).join("");
   lista.hidden = opcoes.length === 0;
   input.setAttribute("aria-expanded", String(!lista.hidden));
   if (ativa >= 0) input.setAttribute("aria-activedescendant", `op-${ativa}`); else input.removeAttribute("aria-activedescendant");
+  // a lista flutua por cima do que vem depois (position: absolute) e não empurra o
+  // botão "Gerar meu mapa" para baixo sozinha; reservamos esse espaço à mão para que
+  // a lista nunca cubra o botão nem o rodapé do cartão.
+  input.closest(".auto").style.marginBottom = lista.hidden ? "" : `${Math.min(lista.scrollHeight, 280) + 4}px`;
 }
 function escolher(i) {
   cidadeEscolhida = opcoes[i];
