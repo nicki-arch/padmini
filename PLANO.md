@@ -1,11 +1,11 @@
 # Padmini — retrospectiva, estado atual e próximos passos
 
-Atualizado em 15/set/2026, ao fim da sessão de retomada.
+Atualizado em 17/set/2026 (site publicado, correções de interface e relatório em PDF). Versão anterior: 15/set.
 
 ## Resumo
 
 - Retomamos o Padmini com um objetivo duplo: ter uma ferramenta própria de mapa védico e usar o projeto para aprender a criar produto, usar IA e, depois, anunciar.
-- Construímos um site funcional: formulário, cálculo do mapa, regras clássicas, relatório em 4 seções e versão escrita por IA. Ele roda, mas **ainda não está no ar**.
+- Construímos um site funcional: formulário, cálculo do mapa, regras clássicas, relatório em 4 seções e versão escrita por IA. Desde 16/set ele **está no ar** em https://padmini.onrender.com (Render, plano grátis), com relatório completo em PDF desde 17/set.
 - A arquitetura ficou boa: o código calcula, as regras decidem os fatos, e a IA só reescreve o que recebeu.
 - Os maiores erros de percurso foram construir antes de olhar a concorrência e gastar tempo tentando rodar o site no Windows, quando o produto é 100% online.
 - A próxima decisão não é técnica: é **o que exatamente vamos vender**, já que a Cosmolica entrega um mapa védico completo de graça em português.
@@ -55,8 +55,26 @@ Cinco mapas conhecidos (Obama, Einstein, Churchill, JFK e Marilyn Monroe) foram 
   - ela só entende o nome da cidade;
   - "Blenheim Palace" leva a Blenheim, na Nova Zelândia (o certo é Woodstock, Inglaterra).
 
+### 2.2 Publicação, correções e PDF (16–17/set/2026)
+
+- **Publicação:** GitHub (`nicki-arch/padmini`, branch `master`) ligado ao Render (serviço `padmini`, região Ohio, plano grátis). Cada `git push` publica sozinho em 1 a 2 minutos. O `.gitignore` foi corrigido para o índice de cidades ir junto. Vercel e Cloudflare foram descartados: o plano grátis da Vercel proíbe uso comercial, e o Cloudflare não roda o `pyswisseph`.
+- **Fluxo de trabalho:** o Claude edita e faz o commit na pasta `Documentos\Padmini`; o Nicolas só roda `git push` no terminal da pasta (é o único passo que exige o login dele no GitHub). O conector do Render permite ao Claude acompanhar as publicações.
+- **Correções de interface:**
+  - a lista de sugestões de cidade cobria o botão "Gerar meu mapa";
+  - no iPhone, o campo de data aparecia em branco e, no computador, podia sair no formato americano. Data e hora viraram campos de texto com máscara (dd/mm/aaaa e hh:mm), iguais em qualquer aparelho.
+- **Relatório completo em PDF** (`gerar_pdf.py`, botão "Baixar relatório completo"), 6 a 8 páginas, sem IA e sem custo por download:
+  - capa com dados de nascimento, resumo e o mapa sul-indiano;
+  - planetas com grau, casa, nakshatra, pada e dignidade, e o que cada planeta representa;
+  - a leitura do site;
+  - as 12 casas com tema, signo, regente, onde o regente está e planetas presentes;
+  - fases Vimshottari com idades e os subperíodos (antardashas) da fase atual e da seguinte;
+  - glossário, método e aviso.
+  Testado com 43 mapas (incluindo recém-nascido, 1800 e 1850 e signo com todos os planetas).
+- **Atenção:** uma cópia antiga da chave real da Anthropic estava na área de trabalho do Claude e foi apagada. A chave antiga precisa ser revogada no painel da Anthropic, se ainda não foi.
+
 **Onde o código está:**
 - no projeto Padmini (cópia de todos os arquivos);
+- no GitHub (`nicki-arch/padmini`) e publicado no Render;
 - na pasta `Documentos\Padmini` do computador do Nicolas;
 - no meu ambiente de trabalho, que é temporário e some ao fim da sessão.
 
@@ -100,7 +118,7 @@ Cinco mapas conhecidos (Obama, Einstein, Churchill, JFK e Marilyn Monroe) foram 
 | **Validação do cálculo** | Um erro de Ascendente ou nakshatra destrói a credibilidade | Feito (seção 2.1); manter o teste automático |
 | **Conteúdo** | Textos sem revisão; risco de erro ou de texto genérico | Revisão por alguém que entenda de Jyotish antes de cobrar |
 | **Licença do Swiss Ephemeris (AGPL)** | Site público exige publicar o código, ou comprar a licença profissional | Decidir antes de abrir ao público (não sou advogado) |
-| **Custo da IA** | Visitantes gerando textos à vontade | Limitar uso por pessoa, ou liberar o texto por IA só no produto pago |
+| **Custo da IA** | O site já está no ar e o botão de texto por IA não tem limite | Limitar uso por pessoa, ou liberar o texto por IA só no produto pago, antes de divulgar o link |
 | **Chaves expostas** | Uso indevido | Apagar e criar novas (Anthropic e VedicAstroAPI) |
 | **LGPD** | Data e local de nascimento são dados pessoais | Não guardar nada por enquanto; ter aviso de privacidade antes de coletar e-mail |
 | **Regras simplificadas** | Raj Yoga só por conjunção; Mangal Dosha sem regras de cancelamento | Evoluir numa v2, com revisão |
@@ -119,9 +137,7 @@ Cinco mapas conhecidos (Obama, Einstein, Churchill, JFK e Marilyn Monroe) foram 
   - A astrologia védica tem uma camada diária própria: a nakshatra do dia, o Panchang e a fase de dasha de cada pessoa. É algo que a Cosmolica (uma calculadora) não entrega como hábito.
   - Pergunta a validar: **as pessoas voltam e pagam por uma experiência diária?**
 
-**2. Onde hospedar.**
-- **GitHub + Render:** mais barato, é o caminho mais comum, e o Nicolas envia as atualizações com um clique.
-- **Replit:** uns US$ 25/mês. Tem conector com o Claude e dá para editar tudo no navegador. Risco: o agente do Replit reescrever o código.
+**2. Onde hospedar.** Decidido em 16/set: GitHub + Render, no plano grátis (o site "dorme" sem uso e leva uns 30 s para acordar). Plano pago de US$ 7/mês quando for ao público.
 
 **3. Licença:** abrir o código (AGPL) ou comprar a licença profissional do Swiss Ephemeris.
 
@@ -132,9 +148,11 @@ Cinco mapas conhecidos (Obama, Einstein, Churchill, JFK e Marilyn Monroe) foram 
 ## 6. Próximos passos recomendados
 
 **Etapa 1 — deixar pronto para teste (1 a 2 sessões)**
-1. Apagar as chaves expostas e criar novas.
+1. Apagar as chaves expostas e criar novas (Anthropic: nova chave já está no Render; falta confirmar que a antiga foi revogada).
 2. ~~Conferir o cálculo~~ — feito em 15/set (seção 2.1).
-3. Escolher a hospedagem e publicar com link privado.
+3. ~~Escolher a hospedagem e publicar~~ — feito em 16/set (seção 2.2).
+4. ~~Relatório em PDF~~ — feito em 17/set (seção 2.2).
+5. Limitar o texto por IA antes de mandar o link para mais gente.
 
 **Etapa 2 — testar valor com gente real (1 a 2 semanas)**
 4. O Pedro manda o link para 5–10 clientes, no lugar do mapa feito à mão.
@@ -162,7 +180,8 @@ Cinco mapas conhecidos (Obama, Einstein, Churchill, JFK e Marilyn Monroe) foram 
 
 ## 7. Possibilidades futuras (backlog)
 
-- **Conteúdo:** 108 textos de planeta em cada casa; mapa D9; subperíodos de dasha; Sade Sati e trânsitos.
+- **Conteúdo:** 108 textos de planeta em cada casa (entram direto no PDF, na página das casas); mapa D9; textos para os subperíodos de dasha (as datas já estão no PDF); Sade Sati e trânsitos.
+- **PDF:** versão com o texto por IA; PDF como produto pago (opção d da seção 5).
 - **Novos produtos:** compatibilidade (Ashtakoot, 36 pontos); nome do bebê pela nakshatra; relatório anual; datas favoráveis (Muhurta e Panchang).
 - **Camada diária** (se o teste do ritual der certo): leitura do dia pelo trânsito da Lua sobre o mapa da pessoa, nakshatra do dia, momento da fase de dasha.
 - **Outras formas de interpretação,** como no plano original: tarot (sorteio + textos por carta e posição) e numerologia (cálculo + textos). As duas são simples de calcular; o trabalho está no conteúdo.
