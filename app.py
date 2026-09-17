@@ -8,12 +8,14 @@ e abrir http://127.0.0.1:8000
 """
 
 import os
+import re
+import unicodedata
 from datetime import date, datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -21,6 +23,7 @@ from base_significacoes import NOME_PT, SIGNO_PT
 from cidades import BuscaCidades
 from compute_chart import calcular_mapa
 from detectar_fatos import detectar_todos_os_fatos
+from gerar_pdf import gerar_pdf
 from montar_texto import dasha_atual, gerar_com_claude, montar_prompt, montar_secoes
 
 RAIZ = Path(__file__).parent
@@ -79,18 +82,23 @@ def config():
     return {"texto_ia_disponivel": bool(os.environ.get("ANTHROPIC_API_KEY"))}
 
 
-@app.post("/api/mapa")
-def mapa(pedido: PedidoMapa):
+def calcular_pedido(pedido: PedidoMapa):
+    """Valida o pedido e devolve (data/hora local, mapa, fatos, seções do relatório)."""
     hora, minuto = map(int, pedido.hora.split(":"))
     if not (0 <= hora < 24 and 0 <= minuto < 60):
         raise HTTPException(422, "Hora inválida.")
     dt = datetime(pedido.data.year, pedido.data.month, pedido.data.day, hora, minuto)
     if not (datetime(1800, 1, 1) <= dt <= datetime.now()):
         raise HTTPException(422, "A data de nascimento precisa estar entre 1800 e hoje.")
-
     resultado = calcular_mapa(dt_local_naive=dt, lat=pedido.lat, lon=pedido.lon)
     fatos = detectar_todos_os_fatos(resultado)
     secoes, _ = montar_secoes(resultado, fatos)
+    return dt, resultado, fatos, secoes
+
+
+@app.post("/api/mapa")
+def mapa(pedido: PedidoMapa):
+    dt, resultado, fatos, secoes = calcular_pedido(pedido)
 
     texto_ia = None
     if pedido.texto_ia:
@@ -117,3 +125,16 @@ def mapa(pedido: PedidoMapa):
         "secoes": secoes,
         "texto_ia": texto_ia,
     }
+
+
+@app.post("/api/pdf")
+def pdf(pedido: PedidoMapa):
+    """Relatório completo em PDF. Não usa IA (sem custo por download)."""
+    dt, resultado, fatos, secoes = calcular_pedido(pedido)
+    conteudo = gerar_pdf(resultado=resultado, fatos=fatos, secoes=secoes, nome=pedido.nome,
+                         cidade=pedido.cidade, nascimento=dt)
+    sem_acento = unicodedata.normalize("NFKD", pedido.nome).encode("ascii", "ignore").decode()
+    slug = re.sub(r"[^a-z0-9]+", "-", sem_acento.lower()).strip("-")[:40]
+    arquivo = f"mapa-vedico-{slug}.pdf" if slug else "mapa-vedico.pdf"
+    return Response(conteudo, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{arquivo}"'})

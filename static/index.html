@@ -102,6 +102,8 @@
 
   .ia-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
   button.secundario { grid-column: auto; background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 10px 14px; min-height: 44px; }
+  .acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 12px; }
+  .acoes button { grid-column: auto; width: auto; padding: 12px 18px; }
   .relatorio hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
   .dashas { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
   .dashas li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: 8px; font-variant-numeric: tabular-nums; }
@@ -116,6 +118,7 @@
     .mapa-e-tabela { grid-template-columns: 1fr; }
     .casa { font-size: 11px; }
     .rasi { grid-template-rows: repeat(4, minmax(76px, auto)); }
+    .acoes button { width: 100%; }
   }
 </style>
 </head>
@@ -315,6 +318,10 @@ function desenharResultado(d) {
     <div>
       <h2>${titulo}</h2>
       <p class="nota">${esc(d.cidade)} · fuso ${esc(d.fuso.nome_iana)} (UTC${offset >= 0 ? "+" : ""}${offset}) na data do nascimento</p>
+      <div class="acoes">
+        <button type="button" id="botao-pdf">Baixar relatório completo (PDF)</button>
+        <span class="nota" id="status-pdf">Mapa, planetas, leitura, as 12 casas, fases e subperíodos.</span>
+      </div>
     </div>
     ${d.aviso_horario ? `<p class="aviso">${esc(d.aviso_horario)}</p>` : ""}
     <div class="resumo">
@@ -343,7 +350,39 @@ function desenharResultado(d) {
     </div>`;
   res.hidden = false;
   res.scrollIntoView({ behavior: "smooth", block: "start" });
+  $("#botao-pdf").addEventListener("click", baixarPDF);
   if (iaDisponivel) $("#botao-ia").addEventListener("click", () => pedirTextoIA(d));
+}
+
+// ---------- PDF ----------
+async function baixarPDF() {
+  const botao = $("#botao-pdf"), status = $("#status-pdf");
+  const textoOriginal = status.textContent;
+  botao.disabled = true; botao.textContent = "Gerando PDF…";
+  try {
+    const r = await fetch("/api/pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...ultimoPedido, texto_ia: false }),
+    });
+    if (!r.ok) {
+      let msg = "Não foi possível gerar o PDF. Tente de novo.";
+      try { const c = await r.json(); if (typeof c.detail === "string") msg = c.detail; } catch {}
+      throw new Error(msg);
+    }
+    const blob = await r.blob();
+    const nome = (r.headers.get("Content-Disposition") || "").match(/filename="([^"]+)"/)?.[1] || "mapa-vedico.pdf";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    status.textContent = textoOriginal;
+  } catch (err) {
+    status.textContent = err.message;
+  } finally {
+    botao.disabled = false; botao.textContent = "Baixar relatório completo (PDF)";
+  }
 }
 
 // ---------- texto por IA ----------

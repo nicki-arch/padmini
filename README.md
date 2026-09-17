@@ -1,6 +1,10 @@
-# Padmini — Mapa Védico (v0.2)
+# Padmini — Mapa Védico (v0.3)
 
 Site com formulário (data, hora e cidade de nascimento) que calcula o mapa védico e mostra o relatório do Mapa Védico Essencial, com opção de versão escrita por IA (Claude).
+
+## Publicação
+
+O site roda no Render (https://padmini.onrender.com), ligado ao repositório do GitHub: cada `git push` na branch `master` publica a nova versão sozinho em 1 a 2 minutos. A chave da Anthropic fica nas variáveis de ambiente do serviço no Render.
 
 ## Rodar no Windows
 
@@ -30,8 +34,10 @@ A chave fica no arquivo `.env` (linha `ANTHROPIC_API_KEY=...`). O botão "Ler ve
 | `detectar_fatos.py` | Regras clássicas: dignidades, combustão, yogas, doshas |
 | `base_significacoes.py` | Textos interpretativos (rascunho por IA, precisa de revisão) |
 | `montar_texto.py` | Monta o relatório em seções e o pedido para o Claude |
+| `gerar_pdf.py` | Relatório completo em PDF (capa com mapa, planetas com nakshatra e dignidade, leitura, 12 casas, fases e subperíodos, glossário). Sem IA. Rodar `python gerar_pdf.py exemplo.pdf` gera um exemplo |
+| `fontes/` | Inter e Cormorant Garamond usadas no PDF (SIL Open Font License, licenças na pasta) |
 | `cidades.py` / `baixar_dados.py` | Busca local de cidades (GeoNames) |
-| `app.py` | Servidor web (FastAPI) |
+| `app.py` | Servidor web (FastAPI): `/api/mapa`, `/api/pdf`, `/api/cidades` |
 | `static/index.html` | A página |
 
 ## Testes
