@@ -21,6 +21,8 @@
     --accent-soft: #fbe7d6;
     --night: #2a2350;
     --focus: #7c5cff;
+    --on-accent: #ffffff;
+    --line-forte: #948a78;
     --radius: 14px;
   }
   @media (prefers-color-scheme: dark) {
@@ -34,6 +36,8 @@
       --accent: #f08a4b;
       --accent-soft: #3a2a2a;
       --night: #c9bdf5;
+      --on-accent: #1a1426;
+      --line-forte: #6f6794;
     }
   }
   * { box-sizing: border-box; }
@@ -42,8 +46,8 @@
     font: 16px/1.6 Inter, system-ui, sans-serif;
   }
   .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
-  header { padding: 20px 0; }
-  .marca { display: flex; align-items: center; gap: 10px; font: 600 26px/1 "Cormorant Garamond", serif; color: var(--night); text-decoration: none; }
+  header { padding: 12px 0; }
+  .marca { display: inline-flex; min-height: 44px; align-items: center; gap: 10px; font: 600 26px/1 "Cormorant Garamond", serif; color: var(--night); text-decoration: none; }
   h1, h2, h3 { font-family: "Cormorant Garamond", serif; font-weight: 600; line-height: 1.15; color: var(--night); }
   h1 { font-size: clamp(34px, 6vw, 48px); margin: 24px 0 8px; }
   h2 { font-size: 28px; margin: 0 0 12px; }
@@ -51,17 +55,17 @@
 
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
   form { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
-  .campo { display: grid; gap: 6px; }
+  .campo { display: grid; gap: 6px; align-content: start; }
   .campo.largo { grid-column: 1 / -1; }
   label { font-size: 14px; font-weight: 500; }
   .dica { font-size: 13px; color: var(--ink-soft); }
   input {
     width: 100%; font: inherit; color: var(--ink); background: var(--bg);
-    border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; min-height: 46px;
+    border: 1px solid var(--line-forte); border-radius: 10px; padding: 11px 12px; min-height: 46px;
   }
   input:focus-visible, button:focus-visible, li[role=option]:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
   button {
-    grid-column: 1 / -1; font: 600 16px Inter, sans-serif; color: #fff; background: var(--accent);
+    grid-column: 1 / -1; font: 600 16px Inter, sans-serif; color: var(--on-accent); background: var(--accent);
     border: 0; border-radius: 10px; padding: 14px; min-height: 48px; cursor: pointer;
   }
   button:disabled { opacity: .6; cursor: wait; }
@@ -77,7 +81,7 @@
   .auto li { padding: 10px; border-radius: 8px; cursor: pointer; }
   .auto li[aria-selected=true], .auto li:hover { background: var(--accent-soft); }
 
-  #resultado { margin: 32px 0; display: grid; gap: 20px; }
+  #resultado { margin: 32px 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .resumo div { background: var(--surface-2); border-radius: var(--radius); padding: 14px; }
   .resumo small { display: block; color: var(--ink-soft); font-size: 13px; }
@@ -86,8 +90,9 @@
 
   .mapa-e-tabela { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
   .rasi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(96px, auto)); border: 2px solid var(--night); }
-  .casa { border: 1px solid var(--line); padding: 4px 5px; font-size: 12px; line-height: 1.35; position: relative; overflow-wrap: anywhere; }
-  .casa .signo { color: var(--ink-soft); font-size: 10px; display: block; }
+  .casa { border: 1px solid var(--line); padding: 4px 5px; font-size: 12px; line-height: 1.35; position: relative; }
+  .casa .signo { color: var(--ink-soft); font-size: 11px; display: block; }
+  .casa .curto { display: none; }
   .casa.lagna { background: var(--accent-soft); }
   .casa.lagna::after { content: ""; position: absolute; top: 0; right: 0; border: 8px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); }
   .centro { grid-column: 2 / 4; grid-row: 2 / 4; display: grid; place-items: center; text-align: center; font-family: "Cormorant Garamond", serif; font-size: 20px; color: var(--night); padding: 8px; }
@@ -95,10 +100,12 @@
   th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
   th { font-weight: 600; color: var(--ink-soft); font-size: 13px; }
   td.num { font-variant-numeric: tabular-nums; }
+  .mapa-e-tabela td:first-child { white-space: nowrap; }
+  abbr[title] { text-decoration: none; cursor: help; }
 
   .relatorio h3 { font-size: 22px; margin: 24px 0 6px; }
   .relatorio h3:first-child { margin-top: 0; }
-  .relatorio p { margin: 0 0 12px; }
+  .relatorio p { margin: 0 0 12px; max-width: 62ch; }
 
   .ia-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
   button.secundario { grid-column: auto; background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 10px 14px; min-height: 44px; }
@@ -119,6 +126,13 @@
     .casa { font-size: 11px; }
     .rasi { grid-template-rows: repeat(4, minmax(76px, auto)); }
     .acoes button { width: 100%; }
+    .card { padding: 16px; }
+    th, td { padding: 8px 4px; }
+  }
+  @media (max-width: 400px) {
+    .casa { padding: 3px 4px; }
+    .casa .longo { display: none; }
+    .casa .curto { display: inline; }
   }
 </style>
 </head>
@@ -177,6 +191,7 @@ const SUL_INDIANO = [
   "Dhanu", "Vrishchika", "Tula", "Kanya",
 ];
 const ABREV = { Surya: "Sol", Chandra: "Lua", Mangala: "Mar", Budha: "Mer", Guru: "Júp", Shukra: "Vên", Shani: "Sat", Rahu: "Rah", Ketu: "Ket" };
+const SIGNO_CURTO = { Mesha: "Ári", Vrishabha: "Tou", Mithuna: "Gêm", Karka: "Cân", Simha: "Leão", Kanya: "Vir", Tula: "Lib", Vrishchika: "Esc", Dhanu: "Sag", Makara: "Cap", Kumbha: "Aqu", Meena: "Pei" };
 const SIGNO_PT = { Mesha: "Áries", Vrishabha: "Touro", Mithuna: "Gêmeos", Karka: "Câncer", Simha: "Leão", Kanya: "Virgem", Tula: "Libra", Vrishchika: "Escorpião", Dhanu: "Sagitário", Makara: "Capricórnio", Kumbha: "Aquário", Meena: "Peixes" };
 
 const $ = (s) => document.querySelector(s);
@@ -290,7 +305,7 @@ $("#form").addEventListener("submit", async (e) => {
 // ---------- resultado ----------
 function desenharRasi(d) {
   const porSigno = {};
-  d.grahas.forEach((g) => (porSigno[g.signo] ||= []).push(`${ABREV[g.id]}${g.retrogrado ? " (R)" : ""} ${grau(g.grau)}`));
+  d.grahas.forEach((g) => (porSigno[g.signo] ||= []).push(`${ABREV[g.id]}${g.retrogrado ? "\u00a0(R)" : ""} ${grau(g.grau)}`));
   let centroFeito = false;
   return `<div class="rasi" role="img" aria-label="Mapa no estilo sul-indiano. Ascendente em ${esc(d.lagna.signo_pt)}.">` +
     SUL_INDIANO.map((s) => {
@@ -301,7 +316,7 @@ function desenharRasi(d) {
       }
       const lagna = s === d.lagna.signo;
       const itens = [lagna ? `<strong>Asc ${grau(d.lagna.grau)}</strong>` : "", ...(porSigno[s] || [])].filter(Boolean);
-      return `<div class="casa${lagna ? " lagna" : ""}"><span class="signo">${SIGNO_PT[s]}</span>${itens.join("<br>")}</div>`;
+      return `<div class="casa${lagna ? " lagna" : ""}"><span class="signo"><span class="longo">${SIGNO_PT[s]}</span><span class="curto">${SIGNO_CURTO[s]}</span></span>${itens.join("<br>")}</div>`;
     }).join("") + `</div>`;
 }
 
@@ -334,7 +349,7 @@ function desenharResultado(d) {
       <div>
       <table>
         <thead><tr><th scope="col">Planeta</th><th scope="col">Signo</th><th scope="col">Grau</th><th scope="col">Casa</th></tr></thead>
-        <tbody>${d.grahas.map((g) => `<tr><td>${esc(g.nome)}${g.retrogrado ? ' <abbr title="retrógrado">(R)</abbr>' : ''}</td><td>${esc(g.signo_pt)}</td><td class="num">${grau(g.grau)}</td><td class="num">${g.casa}</td></tr>`).join("")}</tbody>
+        <tbody>${d.grahas.map((g) => `<tr><td>${esc(g.nome)}${g.retrogrado ? '&nbsp;<abbr title="retrógrado">(R)</abbr>' : ''}</td><td>${esc(g.signo_pt)}</td><td class="num">${grau(g.grau)}</td><td class="num">${g.casa}</td></tr>`).join("")}</tbody>
       </table>
       ${d.grahas.some((g) => g.retrogrado) ? '<p class="nota">(R) = planeta retrógrado na data do nascimento.</p>' : ''}
       </div>
