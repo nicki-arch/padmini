@@ -8,5 +8,22 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
-      - key: ANTHROPIC_API_KEY
+      # Valores definidos no dashboard da Render (sync: false = não versionado aqui).
+      - key: ANTHROPIC_API_KEY   # texto por IA (opcional)
+        sync: false
+      - key: PADMINI_SECRET      # obrigatório: assina os tokens do completo
+        sync: false
+      - key: PADMINI_SITE_URL    # base dos links de entrega
+        sync: false
+      - key: PADMINI_CAKTO_WEBHOOK_SECRET   # verifica a origem do webhook
+        sync: false
+      - key: PADMINI_CAKTO_PROD_MAPA        # id do produto mapa na Cakto
+        sync: false
+      - key: PADMINI_CAKTO_PROD_COMPAT      # id do produto compat na Cakto
+        sync: false
+      - key: RESEND_API_KEY      # envio do e-mail de entrega (opcional)
+        sync: false
+      - key: PADMINI_EMAIL_FROM  # remetente do e-mail
+        sync: false
+      - key: PADMINI_POSTHOG_KEY # métricas de funil (opcional; em branco = desligado)
         sync: false

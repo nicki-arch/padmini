@@ -1,7 +1,7 @@
 """
-Padmini — montagem do relatório (Mapa Védico Essencial).
+Padmini — montagem do relatório (Mapa Védico Essencial + Compatibilidade).
 
-Estrutura do relatório:
+Estrutura do relatório individual:
   1. Ascendente
   2. Lua e nakshatra natal
   3. Fase atual (Vimshottari Dasha)
@@ -11,6 +11,10 @@ Dois modos:
   - rascunho mecânico (padrão): junta os trechos da base, sem LLM.
   - prompt para LLM: monta o material que o Claude recebe para costurar a
     prosa final, com instrução de não acrescentar nada fora dele.
+
+A compatibilidade (Guna Milan) reusa o mesmo desenho: o motor
+(compatibilidade.py) já entrega os trechos selecionados; aqui só montamos o
+prompt de casal e o rascunho.
 """
 
 from datetime import date
@@ -110,6 +114,53 @@ Regras:
 
 def montar_prompt(secoes: dict) -> str:
     return INSTRUCAO_LLM + "\n\nMATERIAL:\n\n" + rascunho_mecanico(secoes)
+
+
+# ===========================================================================
+# COMPATIBILIDADE (Guna Milan) — rascunho e prompt de casal.
+# Recebe os `snippets` já montados por compatibilidade.montar_snippets_compatibilidade().
+# ===========================================================================
+INSTRUCAO_LLM_COMPAT = """Você escreve o relatório de Compatibilidade de casal da Padmini, em português do Brasil, baseado no Guna Milan (astrologia védica).
+
+Regras:
+- Use SOMENTE as informações do material abaixo (a nota, as oito dimensões e seus textos, os doshas e o Mangal). Não acrescente nenhum fato astrológico, previsão ou traço que não esteja nele.
+- Escreva sobre o casal usando os nomes fornecidos. Tom acolhedor e adulto, para um público majoritariamente feminino.
+- NUNCA condene o casal. Nota baixa é "ponto de atenção", nunca "não vai dar certo" nem "incompatível". A astrologia aqui é lente de autoconhecimento, não sentença.
+- Quando um ponto de atenção tiver alívio (cancelamento), apresente os dois juntos, deixando claro que a própria tradição o suaviza.
+- Estrutura: comece pela moldura (a nota e o que ela significa); depois as oito dimensões, uma a uma e sem parede de texto; depois os pontos de atenção clássicos (doshas/Mangal), se houver; encerre com uma síntese prática de "como fazer essa relação funcionar" — conselho concreto, nunca sentença.
+- Nada de promessas, garantias ou previsão de eventos, saúde ou dinheiro. Nada de frases que serviriam para qualquer casal.
+- Nunca mencione "o material", "os trechos" ou como o texto foi feito.
+- Termine com uma linha: "Esta leitura é uma ferramenta de autoconhecimento inspirada na tradição védica (Jyotish), não uma previsão nem substituto de uma conversa honesta entre vocês."
+"""
+
+
+def rascunho_compat(snippets: dict) -> str:
+    """Junta os trechos de compatibilidade em markdown (sem LLM)."""
+    nomes = snippets.get("nomes", {})
+    a, b = nomes.get("a", "Pessoa A"), nomes.get("b", "Pessoa B")
+    partes = [
+        f"# {a} & {b} — {snippets['total']}/36 ({snippets['categoria']})",
+        f"## Moldura\n\n{snippets['moldura']}",
+    ]
+    if snippets["nivel"] == "amostra":
+        pf, pa = snippets["ponto_forte"], snippets["ponto_atencao"]
+        partes.append(f"## Ponto mais forte — {pf['koota']} ({pf['tema']})\n\n{pf['texto']}")
+        partes.append(f"## Ponto de atenção — {pa['koota']} ({pa['tema']})\n\n{pa['texto']}")
+        return "\n\n".join(partes)
+    for k in snippets["kootas"]:
+        partes.append(f"## {k['nome']} — {k['tema']} ({k['obtido']}/{k['max']})\n\n{k['descricao']} {k['texto']}")
+    doshas = snippets.get("doshas", [])
+    if doshas:
+        linhas = []
+        for d in doshas:
+            txt = d["texto"] + (" " + d["alivio"] if d.get("alivio") else "")
+            linhas.append(f"- {txt}")
+        partes.append("## Pontos de atenção clássicos\n\n" + "\n".join(linhas))
+    return "\n\n".join(partes)
+
+
+def montar_prompt_compat(snippets: dict) -> str:
+    return INSTRUCAO_LLM_COMPAT + "\n\nMATERIAL:\n\n" + rascunho_compat(snippets)
 
 
 def gerar_com_claude(prompt: str, modelo: str | None = None) -> str:

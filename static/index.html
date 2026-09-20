@@ -2,151 +2,107 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Padmini — Mapa Védico</title>
 <meta name="description" content="Gere seu mapa védico (Jyotish) com Ascendente, nakshatra da Lua e fase de vida atual.">
+<link rel="canonical" href="https://padmini.com.br/mapa">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Padmini">
+<meta property="og:title" content="Seu mapa védico — Padmini">
+<meta property="og:description" content="Ascendente, nakshatra da Lua e a fase de vida que você atravessa agora. Amostra grátis.">
+<meta property="og:image" content="/static/og-mapa.png">
+<meta property="og:url" content="https://padmini.com.br/mapa">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23c2410c'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e08a3c'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<script src="/static/afiliado.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23e7a24a'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e2a89d'/></svg>">
 <style>
-  :root {
-    --bg: #faf6ef;
-    --surface: #ffffff;
-    --surface-2: #f3ece0;
-    --ink: #1f1a2e;
-    --ink-soft: #5b5470;
-    --line: #e4dccd;
-    --accent: #c2410c;
-    --accent-soft: #fbe7d6;
-    --night: #2a2350;
-    --focus: #7c5cff;
-    --on-accent: #ffffff;
-    --line-forte: #948a78;
-    --radius: 14px;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #14111f;
-      --surface: #1d1930;
-      --surface-2: #26213d;
-      --ink: #f1ecf9;
-      --ink-soft: #b3aac8;
-      --line: #342e50;
-      --accent: #f08a4b;
-      --accent-soft: #3a2a2a;
-      --night: #c9bdf5;
-      --on-accent: #1a1426;
-      --line-forte: #6f6794;
-    }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font: 16px/1.6 Inter, system-ui, sans-serif;
-  }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
-  header { padding: 12px 0; }
-  .marca { display: inline-flex; min-height: 44px; align-items: center; gap: 10px; font: 600 26px/1 "Cormorant Garamond", serif; color: var(--night); text-decoration: none; }
-  h1, h2, h3 { font-family: "Cormorant Garamond", serif; font-weight: 600; line-height: 1.15; color: var(--night); }
-  h1 { font-size: clamp(34px, 6vw, 48px); margin: 24px 0 8px; }
-  h2 { font-size: 28px; margin: 0 0 12px; }
-  .sub { color: var(--ink-soft); margin: 0 0 24px; max-width: 560px; }
+  /* específico do mapa individual — o resto vem de base.css */
+  h1{font-size:clamp(34px,6vw,48px);margin:24px 0 8px}
+  h2{font-size:28px;margin:0 0 12px}
 
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
-  form { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
-  .campo { display: grid; gap: 6px; align-content: start; }
-  .campo.largo { grid-column: 1 / -1; }
-  label { font-size: 14px; font-weight: 500; }
-  .dica { font-size: 13px; color: var(--ink-soft); }
-  input {
-    width: 100%; font: inherit; color: var(--ink); background: var(--bg);
-    border: 1px solid var(--line-forte); border-radius: 10px; padding: 11px 12px; min-height: 46px;
+  form{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+  button{grid-column:1/-1;font:600 16px Inter,sans-serif;color:var(--on-accent);background:var(--accent);border:0;border-radius:10px;padding:14px;min-height:48px;cursor:pointer}
+  button:hover{background:#efb161}
+  button:disabled{opacity:.6;cursor:wait}
+  .erro{grid-column:1/-1}
+
+  #resultado{margin:32px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+  .resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .resumo div{background:var(--surface-2);border-radius:var(--radius);padding:14px}
+  .resumo small{display:block;color:var(--ink-soft);font-size:13px}
+  .resumo strong{font-size:18px}
+
+  .mapa-e-tabela{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+  .rasi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(96px,auto));border:2px solid rgba(231,162,74,.5)}
+  .casa{border:1px solid var(--line);padding:4px 5px;font-size:12px;line-height:1.35;position:relative}
+  .casa .signo{color:var(--ink-soft);font-size:11px;display:block}
+  .casa .curto{display:none}
+  .casa.lagna{background:var(--accent-soft)}
+  .casa.lagna::after{content:"";position:absolute;top:0;right:0;border:8px solid transparent;border-top-color:var(--accent);border-right-color:var(--accent)}
+  .centro{grid-column:2/4;grid-row:2/4;display:grid;place-items:center;text-align:center;font-family:var(--serif);font-size:20px;color:var(--ink);padding:8px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+  th{font-weight:600;color:var(--ink-soft);font-size:13px}
+  td.num{font-variant-numeric:tabular-nums}
+  .mapa-e-tabela td:first-child{white-space:nowrap}
+  abbr[title]{text-decoration:none;cursor:help}
+
+  .relatorio h3{font-size:22px;margin:24px 0 6px}
+  .relatorio h3:first-child{margin-top:0}
+  .relatorio p{margin:0 0 12px;max-width:62ch}
+  .ia-barra{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+  button.secundario{grid-column:auto;background:transparent;color:var(--accent);border:1px solid var(--accent);padding:10px 14px;min-height:44px}
+  button.secundario:hover{background:var(--accent-soft)}
+  .acoes{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:12px}
+  .acoes button{grid-column:auto;width:auto;padding:12px 18px}
+  .relatorio hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+  .dashas{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+  .dashas li{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;border-radius:8px;font-variant-numeric:tabular-nums}
+  .dashas li.atual{background:var(--accent-soft);font-weight:600}
+
+  .oferta-ind{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid rgba(231,162,74,.32)}
+  .lista-completo{list-style:none;padding:0;margin:8px 0 16px;display:grid;gap:10px}
+  .lista-completo li{display:flex;gap:10px;color:var(--ink-soft);font-size:15px}
+  .lista-completo li::before{content:"✓";color:var(--accent);font-weight:700}
+  .preco-ind{font-family:var(--serif);font-size:34px;margin-bottom:8px}
+
+  @media(max-width:640px){
+    form{grid-template-columns:1fr}
+    .resumo{grid-template-columns:1fr}
+    .mapa-e-tabela{grid-template-columns:1fr}
+    .casa{font-size:11px}
+    .rasi{grid-template-rows:repeat(4,minmax(76px,auto))}
+    .acoes button{width:100%}
+    .card{padding:16px}
+    th,td{padding:8px 4px}
   }
-  input:focus-visible, button:focus-visible, li[role=option]:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
-  button {
-    grid-column: 1 / -1; font: 600 16px Inter, sans-serif; color: var(--on-accent); background: var(--accent);
-    border: 0; border-radius: 10px; padding: 14px; min-height: 48px; cursor: pointer;
-  }
-  button:disabled { opacity: .6; cursor: wait; }
-  .erro { grid-column: 1 / -1; color: #b91c1c; font-size: 14px; margin: 0; }
-  @media (prefers-color-scheme: dark) { .erro { color: #fca5a5; } }
-
-  .auto { position: relative; }
-  .auto ul {
-    position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px;
-    list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
-    box-shadow: 0 8px 24px rgb(0 0 0 / .12); max-height: 280px; overflow: auto;
-  }
-  .auto li { padding: 10px; border-radius: 8px; cursor: pointer; }
-  .auto li[aria-selected=true], .auto li:hover { background: var(--accent-soft); }
-
-  #resultado { margin: 32px 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
-  .resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .resumo div { background: var(--surface-2); border-radius: var(--radius); padding: 14px; }
-  .resumo small { display: block; color: var(--ink-soft); font-size: 13px; }
-  .resumo strong { font-size: 18px; }
-  .aviso { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 14px; font-size: 14px; }
-
-  .mapa-e-tabela { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-  .rasi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(96px, auto)); border: 2px solid var(--night); }
-  .casa { border: 1px solid var(--line); padding: 4px 5px; font-size: 12px; line-height: 1.35; position: relative; }
-  .casa .signo { color: var(--ink-soft); font-size: 11px; display: block; }
-  .casa .curto { display: none; }
-  .casa.lagna { background: var(--accent-soft); }
-  .casa.lagna::after { content: ""; position: absolute; top: 0; right: 0; border: 8px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); }
-  .centro { grid-column: 2 / 4; grid-row: 2 / 4; display: grid; place-items: center; text-align: center; font-family: "Cormorant Garamond", serif; font-size: 20px; color: var(--night); padding: 8px; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
-  th { font-weight: 600; color: var(--ink-soft); font-size: 13px; }
-  td.num { font-variant-numeric: tabular-nums; }
-  .mapa-e-tabela td:first-child { white-space: nowrap; }
-  abbr[title] { text-decoration: none; cursor: help; }
-
-  .relatorio h3 { font-size: 22px; margin: 24px 0 6px; }
-  .relatorio h3:first-child { margin-top: 0; }
-  .relatorio p { margin: 0 0 12px; max-width: 62ch; }
-
-  .ia-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
-  button.secundario { grid-column: auto; background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 10px 14px; min-height: 44px; }
-  .acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 12px; }
-  .acoes button { grid-column: auto; width: auto; padding: 12px 18px; }
-  .relatorio hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
-  .dashas { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-  .dashas li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: 8px; font-variant-numeric: tabular-nums; }
-  .dashas li.atual { background: var(--accent-soft); font-weight: 600; }
-  .nota { font-size: 13px; color: var(--ink-soft); }
-  footer { padding: 32px 0; font-size: 12px; color: var(--ink-soft); }
-  footer a { color: inherit; }
-
-  @media (max-width: 640px) {
-    form { grid-template-columns: 1fr; }
-    .resumo { grid-template-columns: 1fr; }
-    .mapa-e-tabela { grid-template-columns: 1fr; }
-    .casa { font-size: 11px; }
-    .rasi { grid-template-rows: repeat(4, minmax(76px, auto)); }
-    .acoes button { width: 100%; }
-    .card { padding: 16px; }
-    th, td { padding: 8px 4px; }
-  }
-  @media (max-width: 400px) {
-    .casa { padding: 3px 4px; }
-    .casa .longo { display: none; }
-    .casa .curto { display: inline; }
+  @media(max-width:400px){
+    .casa{padding:3px 4px}
+    .casa .longo{display:none}
+    .casa .curto{display:inline}
   }
 </style>
 </head>
 <body>
 <header class="wrap">
-  <a class="marca" href="/">
-    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#c2410c"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e08a3c"/><path d="M6 24h20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    Padmini
-  </a>
+  <div class="topbar">
+    <a class="marca" href="/">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+      Padmini
+    </a>
+    <a class="navlink" href="/compatibilidade">Compatibilidade do casal →</a>
+  </div>
 </header>
 
 <main class="wrap">
   <h1>Seu mapa védico</h1>
-  <p class="sub">Com a data, a hora e a cidade de nascimento, calculamos seu Ascendente, a nakshatra da sua Lua e a fase de vida que você atravessa agora, pela tradição védica (Jyotish).</p>
+  <p class="lede">Com a data, a hora e a cidade de nascimento, calculamos seu Ascendente, a nakshatra da sua Lua e a fase de vida que você atravessa agora, pela tradição védica (Jyotish).</p>
+  <p style="margin:-8px 0 24px"><a class="navlink destaque" href="/compatibilidade">✦ Novo: a compatibilidade de vocês dois →</a></p>
 
   <div class="card">
     <form id="form" novalidate>
@@ -176,11 +132,37 @@
   </div>
 
   <section id="resultado" aria-live="polite" hidden></section>
+
+  <section id="sobre-mapa">
+    <h2>O que vem no mapa completo</h2>
+    <p class="sub">A amostra é grátis. O completo (R$47) abre o mapa inteiro.</p>
+    <ul class="lista-completo">
+      <li>O mapa (rashi) e a posição dos 9 grahas, casa a casa</li>
+      <li>As 12 casas e os pontos de destaque (yogas, dignidades, doshas)</li>
+      <li>A leitura completa, escrita por IA a partir do seu mapa</li>
+      <li>O relatório em PDF para guardar</li>
+    </ul>
+    <div class="faq" style="margin-top:8px">
+      <details open><summary>É a mesma astrologia do meu horóscopo?</summary><p>Não. O horóscopo de jornal usa só o signo solar. Aqui é a astrologia védica (sideral), que parte da Lua e das nakshatras — mais pessoal e mais precisa.</p></details>
+      <details><summary>Preciso saber a hora exata de nascimento?</summary><p>Quanto mais exata, melhor — a hora define o Ascendente e afina a posição da Lua. Sem ela dá para fazer assim mesmo, e a leitura avisa onde a margem é maior.</p></details>
+      <details><summary>Preciso criar conta?</summary><p>Não. Você preenche os dados, vê a amostra e, se comprar, o completo chega no seu e-mail — sem cadastro nem senha.</p></details>
+      <details><summary>Como recebo o mapa completo?</summary><p>Por e-mail, com um link pessoal, logo após a confirmação do pagamento.</p></details>
+    </div>
+  </section>
+
+  <div class="cross" id="cross-fixo" style="margin-top:32px">
+    <div>
+      <h3>E a compatibilidade de vocês dois?</h3>
+      <p class="nota">A astrologia védica calcula o encaixe de um casal em 8 dimensões. Amostra grátis.</p>
+    </div>
+    <a class="navlink destaque" href="/compatibilidade">Ver nossa compatibilidade →</a>
+  </div>
 </main>
 
-<footer class="wrap">
+<footer>
   Mapa sideral com ayanamsa Lahiri e casas por signo inteiro. Este mapa é uma ferramenta de autoconhecimento inspirada na tradição védica, não uma previsão nem substituto de orientação profissional.<br>
-  Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos astronômicos: Swiss Ephemeris.
+  Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos astronômicos: Swiss Ephemeris.<br>
+  <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a>
 </footer>
 
 <script>
@@ -194,16 +176,15 @@ const ABREV = { Surya: "Sol", Chandra: "Lua", Mangala: "Mar", Budha: "Mer", Guru
 const SIGNO_CURTO = { Mesha: "Ári", Vrishabha: "Tou", Mithuna: "Gêm", Karka: "Cân", Simha: "Leão", Kanya: "Vir", Tula: "Lib", Vrishchika: "Esc", Dhanu: "Sag", Makara: "Cap", Kumbha: "Aqu", Meena: "Pei" };
 const SIGNO_PT = { Mesha: "Áries", Vrishabha: "Touro", Mithuna: "Gêmeos", Karka: "Câncer", Simha: "Leão", Kanya: "Virgem", Tula: "Libra", Vrishchika: "Escorpião", Dhanu: "Sagitário", Makara: "Capricórnio", Kumbha: "Aquário", Meena: "Peixes" };
 
+// Link do checkout do mapa individual (Cakto). Preencher quando o produto existir (checklist §D).
+const LINK_CHECKOUT_INDIVIDUAL = "";
+
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const grau = (g) => { const d = Math.floor(g); let m = Math.round((g - d) * 60); return m === 60 ? `${d + 1}°00'` : `${d}°${String(m).padStart(2, "0")}'`; };
 const ano = (iso) => iso.slice(0, 4);
 
 // ---------- máscara de data e hora ----------
-// Campos de texto simples em vez de <input type=date/time>: esses componentes nativos
-// variam demais entre navegadores (no iPhone o campo de data aparece em branco, sem
-// nenhuma pista visual; no computador, o formato pode sair mm/dd/aaaa em vez de
-// dd/mm/aaaa). Com texto simples, o campo fica igual em qualquer aparelho.
 function aplicarMascara(el, tamanhos, separador) {
   el.addEventListener("input", () => {
     const digitos = el.value.replace(/\D/g, "").slice(0, tamanhos.reduce((a, b) => a + b, 0));
@@ -235,9 +216,6 @@ function desenharLista() {
   lista.hidden = opcoes.length === 0;
   input.setAttribute("aria-expanded", String(!lista.hidden));
   if (ativa >= 0) input.setAttribute("aria-activedescendant", `op-${ativa}`); else input.removeAttribute("aria-activedescendant");
-  // a lista flutua por cima do que vem depois (position: absolute) e não empurra o
-  // botão "Gerar meu mapa" para baixo sozinha; reservamos esse espaço à mão para que
-  // a lista nunca cubra o botão nem o rodapé do cartão.
   input.closest(".auto").style.marginBottom = lista.hidden ? "" : `${Math.min(lista.scrollHeight, 280) + 4}px`;
 }
 function escolher(i) {
@@ -290,11 +268,11 @@ $("#form").addEventListener("submit", async (e) => {
     const r = await fetch("/api/mapa", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(ultimoPedido),
+      body: JSON.stringify({ ...ultimoPedido, nivel: "amostra" }),
     });
     const corpo = await r.json();
     if (!r.ok) throw new Error(typeof corpo.detail === "string" ? corpo.detail : "Confira os dados informados.");
-    desenharResultado(corpo);
+    (corpo.nivel === "amostra" ? desenharAmostra : desenharResultado)(corpo);
   } catch (err) {
     mostrarErro(err.message || "Não foi possível calcular o mapa. Tente de novo.");
   } finally {
@@ -305,7 +283,7 @@ $("#form").addEventListener("submit", async (e) => {
 // ---------- resultado ----------
 function desenharRasi(d) {
   const porSigno = {};
-  d.grahas.forEach((g) => (porSigno[g.signo] ||= []).push(`${ABREV[g.id]}${g.retrogrado ? "\u00a0(R)" : ""} ${grau(g.grau)}`));
+  d.grahas.forEach((g) => (porSigno[g.signo] ||= []).push(`${ABREV[g.id]}${g.retrogrado ? " (R)" : ""} ${grau(g.grau)}`));
   let centroFeito = false;
   return `<div class="rasi" role="img" aria-label="Mapa no estilo sul-indiano. Ascendente em ${esc(d.lagna.signo_pt)}.">` +
     SUL_INDIANO.map((s) => {
@@ -318,6 +296,59 @@ function desenharRasi(d) {
       const itens = [lagna ? `<strong>Asc ${grau(d.lagna.grau)}</strong>` : "", ...(porSigno[s] || [])].filter(Boolean);
       return `<div class="casa${lagna ? " lagna" : ""}"><span class="signo"><span class="longo">${SIGNO_PT[s]}</span><span class="curto">${SIGNO_CURTO[s]}</span></span>${itens.join("<br>")}</div>`;
     }).join("") + `</div>`;
+}
+
+function desenharAmostra(d) {
+  const titulo = d.nome ? `Mapa de ${esc(d.nome)}` : "Seu mapa";
+  const offset = d.fuso.offset_horas_na_data;
+  const fase = d.fase_atual;
+  const cta = LINK_CHECKOUT_INDIVIDUAL
+    ? linkCheckout(LINK_CHECKOUT_INDIVIDUAL, ultimoPedido ? { produto: "mapa", ...ultimoPedido } : null)
+    : "#";
+  const ctaNota = LINK_CHECKOUT_INDIVIDUAL
+    ? "Preço de fundador por tempo limitado · garantia de 7 dias."
+    : "Checkout da Cakto a configurar (checklist §D).";
+  const crossFixo = document.getElementById("cross-fixo");
+  if (crossFixo) crossFixo.hidden = true;  // evita CTA de compatibilidade duplicado
+  const res = $("#resultado");
+  res.innerHTML = `
+    <div>
+      <h2>${titulo}</h2>
+      <p class="nota">${esc(d.cidade)} · fuso ${esc(d.fuso.nome_iana)} (UTC${offset >= 0 ? "+" : ""}${offset}) na data do nascimento</p>
+    </div>
+    ${d.aviso_horario ? `<p class="aviso">${esc(d.aviso_horario)}</p>` : ""}
+    <div class="resumo">
+      <div><small>Ascendente</small><strong>${esc(d.lagna.signo_pt)}</strong></div>
+      <div><small>Lua</small><strong>${esc(d.lua.signo_pt)} · ${esc(d.lua.nakshatra.nome)}</strong></div>
+      <div><small>Fase atual</small><strong>${fase ? `${esc(fase.nome)} (${ano(fase.inicio)}–${ano(fase.fim)})` : "—"}</strong></div>
+    </div>
+    <article class="card relatorio">
+      <h3>Sua Lua</h3>
+      <p>${esc(d.lua_texto)}</p>
+    </article>
+    <div class="card oferta-ind">
+      <h2>Ver o mapa completo</h2>
+      <p class="nota" style="margin-bottom:12px">A amostra mostra o essencial. O completo abre o mapa inteiro.</p>
+      <ul class="lista-completo">
+        <li>O mapa (rashi) e a posição dos 9 grahas, casa a casa</li>
+        <li>As 12 casas e os pontos de destaque (yogas, dignidades)</li>
+        <li>A leitura completa, escrita por IA a partir do seu mapa</li>
+        <li>O relatório em PDF para guardar</li>
+      </ul>
+      <div class="preco-ind">R$47</div>
+      <a class="navlink destaque" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa'})">Quero o mapa completo →</a>
+      <p class="nota" style="margin-top:10px">${esc(ctaNota)}</p>
+    </div>
+    <div class="cross">
+      <div>
+        <h3>É um casal?</h3>
+        <p class="nota">A compatibilidade de vocês dois em 8 dimensões — também com amostra grátis.</p>
+      </div>
+      <a class="navlink destaque" href="/compatibilidade">Ver a compatibilidade →</a>
+    </div>`;
+  res.hidden = false;
+  if (window.padTrack) padTrack("amostra_gerada", { produto: "mapa" });
+  res.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function desenharResultado(d) {
@@ -362,8 +393,11 @@ function desenharResultado(d) {
       <h2>Fases da vida (Vimshottari)</h2>
       <ul class="dashas">${d.dashas.map((x) => `<li class="${x.atual ? "atual" : ""}"><span>${esc(x.nome)}</span><span>${ano(x.inicio)} – ${ano(x.fim)}</span></li>`).join("")}</ul>
       <p class="nota">A primeira fase começa no nascimento, com o tempo que restava dela nesse momento.</p>
-    </div>`;
+    </div>
+    <div class="card feedback" id="feedback-mapa"></div>`;
   res.hidden = false;
+  if (window.padTrack) padTrack("completo_aberto", { produto: "mapa" });
+  if (window.padFeedback) padFeedback("#feedback-mapa", "mapa");
   res.scrollIntoView({ behavior: "smooth", block: "start" });
   $("#botao-pdf").addEventListener("click", baixarPDF);
   if (iaDisponivel) $("#botao-ia").addEventListener("click", () => pedirTextoIA(d));
@@ -403,6 +437,33 @@ async function baixarPDF() {
 // ---------- texto por IA ----------
 let iaDisponivel = false;
 fetch("/api/config").then((r) => r.json()).then((c) => { iaDisponivel = c.texto_ia_disponivel; }).catch(() => {});
+
+// ---------- entrega do completo por link (pós-pagamento) ----------
+// O webhook manda por e-mail: /mapa?data=YYYY-MM-DD&hora=HH:MM&lat=..&lon=..&cidade=..&nome=..&token=..
+(function abrirCompletoPorLink() {
+  const p = new URLSearchParams(location.search);
+  const token = p.get("token");
+  const data = p.get("data"), hora = p.get("hora");
+  const lat = parseFloat(p.get("lat")), lon = parseFloat(p.get("lon"));
+  if (!token || !data || !hora || isNaN(lat) || isNaN(lon)) return;
+  ultimoPedido = { nome: p.get("nome") || "", data, hora, lat, lon, cidade: p.get("cidade") || "", token };
+  const _fc = document.querySelector("main > .card"); if (_fc) _fc.hidden = true;
+  const _sm = document.getElementById("sobre-mapa"); if (_sm) _sm.hidden = true;
+  const _cf = document.getElementById("cross-fixo"); if (_cf) _cf.hidden = true;
+  const res = $("#resultado");
+  res.hidden = false;
+  res.innerHTML = '<p class="nota">Abrindo seu mapa completo…</p>';
+  fetch("/api/mapa", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...ultimoPedido, nivel: "completo" }),
+  }).then(async (r) => {
+    const c = await r.json();
+    if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Link inválido.");
+    desenharResultado(c);
+  }).catch((e) => {
+    res.innerHTML = `<p class="aviso">Não foi possível abrir o mapa completo: ${esc(e.message)} Se você já pagou, confira o link do e-mail ou fale com a gente.</p>`;
+  });
+})();
 
 function markdownSimples(md) {
   return md.split(/\n{2,}/).map((bloco) => {

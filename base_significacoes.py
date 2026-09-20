@@ -6,10 +6,16 @@ nakshatra (27), fase atual de Vimshottari (9), dignidades dos 7 grahas
 clássicos, combustão, yogas e doshas detectados por detectar_fatos.py.
 Ainda NÃO cobre planeta×casa (108 combinações) — fica para a v2.
 
+Também cobre o produto de compatibilidade (Guna Milan): as 8 kootas por
+faixa de pontuação, os doshas de casal (Bhakoot, Nadi) com cancelamento,
+Mangal do casal e a moldura por faixa de nota total.
+
 Conteúdo redigido por IA como ponto de partida. Precisa de revisão por
 astrólogo antes de uso comercial. Regra de escrita: cada texto amarra um
 fato específico a uma consequência específica; nada que sirva para
-qualquer pessoa (anti-Barnum).
+qualquer pessoa (anti-Barnum). Em compatibilidade, uma regra a mais:
+nenhum texto condena o casal — nota baixa vira "ponto de atenção", nunca
+"não vai dar certo".
 """
 
 NOME_PT = {
@@ -172,4 +178,96 @@ YOGAS = {
 
 DOSHA = {
     "mangal_dosha": "Marte ocupa uma posição sensível em relação a {referencias} (Mangal Dosha). Na tradição, isso pede atenção à forma como a pessoa expressa assertividade nos relacionamentos. Não é uma sentença, e cerca de metade das pessoas tem alguma forma dessa configuração.",
+}
+
+# ===========================================================================
+# COMPATIBILIDADE (Guna Milan) — textos por koota, dosha de casal e faixa.
+#
+# Uso: o motor (compatibilidade.py) decide os pontos; a função banda_koota()
+# traduz obtido/max em "forte" | "medio" | "fraco"; aqui estão os trechos
+# correspondentes. Kootas binárias (Varna, Bhakoot, Nadi) só têm "forte" e
+# "fraco" — o seletor cai no mais próximo. Cada trecho é combinável (1-2
+# frases) e nunca condena o casal.
+# ===========================================================================
+KOOTA = {
+    "Varna": {
+        "tema": "postura diante da vida",
+        "descricao": "Varna fala da postura de fundo diante da vida — o ritmo interior com que cada um se coloca no mundo.",
+        "forte": "Vocês partem de uma postura de fundo parecida: o jeito de encarar responsabilidades e o próprio ritmo conversam, o que dá uma base silenciosa de entendimento no dia a dia.",
+        "fraco": "Vocês encaram a vida a partir de posturas diferentes — um mais movido pela ação, o outro pela reflexão ou pelo cuidado. É a koota de menor peso das oito: não define nada sozinha, só pede que cada um respeite o tempo do outro.",
+    },
+    "Vashya": {
+        "tema": "atração e influência mútua",
+        "descricao": "Vashya mede a atração e a influência natural de um sobre o outro — quem puxa quem, e com que facilidade.",
+        "forte": "A atração e a influência entre vocês fluem nos dois sentidos: vocês se puxam com naturalidade, sem que um precise se impor sobre o outro.",
+        "medio": "A atração existe, mas a influência não é totalmente simétrica — em alguns assuntos um tende a conduzir mais. Funciona bem quando isso é combinado, não assumido em silêncio.",
+        "fraco": "A influência entre vocês puxa mais para um lado. Não é um problema por si; só pede atenção para a relação não virar um conduzindo e o outro apenas seguindo.",
+    },
+    "Tara": {
+        "tema": "bem-estar e sorte da relação",
+        "descricao": "Tara olha o bem-estar da relação — se a convivência tende a somar energia aos dois ou a desgastar.",
+        "forte": "A convivência tende a somar: a presença de um faz bem ao outro, e a relação parece dar sorte aos dois. Bom presságio para a vida dividida no dia a dia.",
+        "medio": "O bem-estar flui mais num sentido do que no outro — um costuma ser mais 'porto seguro' na relação. Nada grave, mas vale revezar quem sustenta quem.",
+        "fraco": "A energia da convivência pede cuidado: em fases difíceis, vocês podem cansar um ao outro em vez de recarregar. Descanso e espaço individual ajudam mais aqui do que na média dos casais.",
+    },
+    "Yoni": {
+        "tema": "encaixe físico e instintivo",
+        "descricao": "Yoni fala do encaixe físico e instintivo — a química do corpo e o instinto de um diante do outro.",
+        "forte": "O encaixe físico e instintivo é um dos pontos fortes de vocês: há química natural e um conforto no corpo que não precisa ser forçado.",
+        "medio": "A química é boa, com ritmos que às vezes diferem — momentos de mais e de menos sintonia física. Falar de desejo abertamente rende mais do que esperar adivinhação.",
+        "fraco": "O instinto físico de vocês funciona em ritmos bem diferentes. Isso não impede intimidade boa, mas ela vem mais de comunicação e paciência do que de química automática.",
+    },
+    "Graha Maitri": {
+        "tema": "sintonia mental e amizade",
+        "descricao": "Graha Maitri mede a sintonia mental e a amizade de fundo — se, tirando a paixão, vocês seriam amigos.",
+        "forte": "Tirando o romance, vocês seriam amigos: há sintonia mental e um respeito que sustenta a relação nos dias sem paixão. É uma das bases mais sólidas que um casal pode ter.",
+        "medio": "A amizade existe, mas exige tradução: vocês pensam de formas diferentes e às vezes precisam de um esforço extra para se entender. Quando esse esforço vira hábito, funciona bem.",
+        "fraco": "As mentes de vocês seguem lógicas distintas, o que pode gerar desencontros em conversas comuns. Em compensação, diferença de pensamento também traz complementaridade — desde que os dois queiram entender o do outro.",
+    },
+    "Gana": {
+        "tema": "temperamento",
+        "descricao": "Gana compara o temperamento de fundo — o tipo de energia com que cada um reage ao mundo.",
+        "forte": "Os temperamentos de vocês combinam: reagem ao mundo com uma energia parecida, o que reduz o número de atritos bobos no dia a dia.",
+        "medio": "Os temperamentos são diferentes, mas conciliáveis — um mais suave, o outro mais intenso. Costuma dar certo quando cada um respeita o jeito do outro em vez de tentar corrigi-lo.",
+        "fraco": "Vocês têm temperamentos de naturezas distintas, e é normal a mesma situação ser lida de formas opostas. Aqui, nomear a diferença ('a gente reage diferente a isso') evita que ela vire briga.",
+    },
+    "Bhakoot": {
+        "tema": "vínculo emocional e prosperidade",
+        "descricao": "Bhakoot mede o vínculo emocional e a prosperidade que a relação tende a trazer para a vida dos dois.",
+        "forte": "O vínculo emocional entre vocês tende a fortalecer a vida dos dois — a relação soma em bem-estar e projetos, em vez de dividir energia.",
+        "fraco": "A posição das Luas de vocês marca um ponto de atenção clássico sobre o rumo comum (o Bhakoot dosha). Na prática, pede que vocês cuidem para caminhar na mesma direção nas decisões grandes. Veja abaixo se a tradição já o neutraliza no caso de vocês.",
+    },
+    "Nadi": {
+        "tema": "vitalidade e saúde a longo prazo",
+        "descricao": "Nadi olha a vitalidade da relação no longo prazo — a compatibilidade das energias mais profundas dos dois.",
+        "forte": "As energias de fundo de vocês são complementares, bom sinal para a vitalidade da relação no longo prazo. É a koota de maior peso, e vocês pontuam bem nela.",
+        "fraco": "As Luas de vocês compartilham a mesma Nadi (o Nadi dosha), a koota de maior peso. É o ponto de atenção mais citado em compatibilidade — e também um dos que mais têm regras de alívio. Veja abaixo se alguma se aplica a vocês.",
+    },
+}
+
+# Doshas de casal: texto quando presente e alívio quando cancelado (parihara).
+COMPAT_DOSHA = {
+    "bhakoot": {
+        "texto": "As Luas de vocês formam o Bhakoot dosha — um ponto de atenção sobre o vínculo emocional e o rumo comum da vida.",
+        "texto_cancelamento": "A própria tradição, porém, considera esse ponto neutralizado aqui: os regentes dos signos lunares de vocês se dão bem (ou são o mesmo planeta), o que dissolve boa parte do peso prático do dosha.",
+    },
+    "nadi": {
+        "texto": "As Luas de vocês estão na mesma Nadi — o Nadi dosha, o ponto de maior peso do sistema. Lido como atenção à vitalidade da relação; nunca como impedimento.",
+        "texto_cancelamento": "E aqui vem o alívio que a tradição prevê: a configuração de vocês cai numa das regras clássicas de cancelamento do Nadi dosha, o que reduz muito o seu peso prático.",
+    },
+}
+
+# Mangal (Manglik) do casal — por situação retornada por mangal_do_casal().
+MANGAL_CASAL = {
+    "anulado": "Os dois carregam a configuração de Marte chamada Manglik. Quando isso acontece nos dois, a tradição entende que o dosha se anula entre vocês — as intensidades se equilibram em vez de colidir.",
+    "atencao": "Um de vocês tem a configuração de Marte chamada Manglik. Sozinha, não impede nada; é um convite a lidar com assertividade e temperamento de forma consciente dentro da relação.",
+    "ausente": "Nenhum de vocês carrega a configuração Manglik de Marte — um fator a menos de atenção na leitura de casal.",
+}
+
+# Moldura pela nota total (usa {total}). Sempre não-fatalista.
+COMPAT_FAIXA = {
+    "excepcional": "Com {total} de 36 pontos, vocês estão numa faixa de encaixe rara: a maioria das dimensões que a tradição mede soma a favor da relação.",
+    "forte": "Com {total} de 36 pontos, vocês se encaixam onde mais importa. É uma base forte, com pontos de atenção que dá para trabalhar de olhos abertos.",
+    "boa com atencao": "Com {total} de 36 pontos, a base de vocês é boa e alguns pontos pedem cuidado. O número sozinho não conta a história: o que decide é quais dimensões pesam mais para vocês dois.",
+    "requer trabalho": "Com {total} de 36 pontos, vocês são diferentes em coisas que importam. Isso não quer dizer 'não vai dar certo' — quer dizer que a relação pede mais conversa e intenção do que a média. Muita gente com essa nota vive relações felizes; a diferença é escolher trabalhar os pontos abaixo.",
 }

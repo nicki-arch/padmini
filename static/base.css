@@ -1,0 +1,172 @@
+/* ==========================================================================
+   Padmini — Design System (base.css)
+   Fonte única de verdade da marca "Lótus à meia-luz" (full dark).
+   Todas as páginas do site linkam este arquivo:
+     <link rel="stylesheet" href="/static/base.css">
+   Regra: NÃO redefinir tokens nem componentes daqui dentro das páginas.
+   Cada página só acrescenta o CSS específico dela (ex.: o mapa rashi).
+   As fontes (Cormorant Garamond + Inter) são carregadas no <head> de cada
+   página via Google Fonts; aqui só usamos as famílias pelos tokens.
+   OBS: a página de vendas é um artifact (claude.ai) e não consome este
+   arquivo — ao mudar um token aqui, sincronizar lá à mão.
+   ========================================================================== */
+
+:root {
+  /* — Cores (canônicas) — */
+  --ground: #241522;      /* fundo */
+  --ground-2: #2f1c2c;    /* superfície */
+  --ground-3: #3a2436;    /* superfície elevada / campos */
+  --ink: #f4e9dc;         /* texto principal */
+  --muted: #c9b1a6;       /* texto secundário */
+  --faint: #8f7a76;       /* texto terciário / placeholder */
+  --saffron: #e7a24a;     /* acento primário */
+  --blush: #e2a89d;       /* acento secundário (destaque em serifa) */
+  --sage: #93a37e;        /* acento de apoio (ok/positivo) */
+  --line: rgba(244,233,220,.14);      /* borda padrão */
+  --line-2: rgba(244,233,220,.08);    /* borda sutil */
+  --line-forte: rgba(244,233,220,.22);/* borda de input */
+  --accent-soft: rgba(231,162,74,.14);/* preenchimento de acento suave */
+  --on-accent: #2a1608;   /* texto sobre botão açafrão */
+  --focus: #e7a24a;
+
+  /* — Tipografia — */
+  --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* — Métricas — */
+  --maxw: 960px;
+  --radius: 14px;
+
+  /* — Aliases retrocompatíveis (nomes antigos usados em páginas legadas) — */
+  --bg: var(--ground);
+  --surface: var(--ground-2);
+  --surface-2: var(--ground-3);
+  --ink-soft: var(--muted);
+  --accent: var(--saffron);
+  --night: var(--ink);
+}
+
+/* — Reset e base — */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 16px/1.62 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(120% 70% at 50% -8%, rgba(231,162,74,.10), transparent 58%);
+}
+a { color: inherit; }
+img { max-width: 100%; }
+
+/* — Layout — */
+.wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: 22px; }
+section { padding-block: 56px; }
+.rule { height: 1px; background: var(--line); border: 0; max-width: var(--maxw); margin: 0 auto; }
+
+/* — Tipografia (família/peso/cor compartilhados; tamanhos ficam por página) — */
+h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.12; color: var(--ink); text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 6vw, 3.4rem); margin: 0 0 18px; letter-spacing: -.01em; }
+h1 em { font-style: italic; color: var(--blush); }
+h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 0 0 12px; }
+h3 { font-weight: 600; font-size: 1.35rem; margin: 0; }
+p { max-width: 60ch; }
+.eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--saffron); font-weight: 600; margin: 0 0 16px; }
+.lede { font-size: clamp(1.05rem, 2.2vw, 1.24rem); color: var(--muted); line-height: 1.55; margin: 0 0 28px; }
+.sub { color: var(--faint); font-size: 13px; margin: -4px 0 26px; max-width: 56ch; }
+.mark { font-family: var(--serif); font-style: italic; }
+.nota { font-size: 13px; color: var(--muted); }
+
+/* — Cabeçalho / marca / navegação — */
+header { padding: 16px 0; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.marca { display: inline-flex; min-height: 44px; align-items: center; gap: 10px; font: 600 26px/1 var(--serif); color: var(--ink); text-decoration: none; }
+nav { display: flex; gap: 8px; flex-wrap: wrap; }
+.navlink { display: inline-flex; align-items: center; min-height: 40px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; border: 1px solid var(--line); padding: 8px 15px; border-radius: 999px; }
+.navlink:hover { border-color: var(--saffron); }
+.navlink.destaque { background: var(--saffron); color: var(--on-accent); border-color: transparent; font-weight: 600; }
+.navlink.destaque:hover { background: #efb161; }
+
+/* — Botões — */
+.btn { display: inline-flex; gap: 9px; align-items: center; justify-content: center; border: 0; cursor: pointer;
+  font-family: var(--sans); font-weight: 600; font-size: 15px; padding: 15px 26px; border-radius: 999px;
+  text-decoration: none; min-height: 48px; }
+.btn-primary { background: var(--saffron); color: var(--on-accent); }
+.btn-primary:hover { background: #efb161; }
+.btn-primary:disabled { opacity: .6; cursor: wait; }
+.btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-outline:hover { border-color: var(--saffron); }
+.cta-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 8px; }
+
+/* — Superfícies — */
+.card { background: var(--ground-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.aviso { background: var(--accent-soft); border: 1px solid var(--line); border-left: 3px solid var(--saffron);
+  border-radius: var(--radius); padding: 12px 14px; font-size: 14px; color: var(--muted); }
+
+/* — Formulário — */
+.campo { display: grid; gap: 6px; align-content: start; }
+.campo.largo { grid-column: 1 / -1; }
+label { font-size: 14px; font-weight: 500; }
+.dica { font-size: 13px; color: var(--faint); }
+input { width: 100%; font: inherit; color: var(--ink); background: var(--ground-3);
+  border: 1px solid var(--line-forte); border-radius: 10px; padding: 11px 12px; min-height: 46px; }
+input::placeholder { color: var(--faint); }
+input:focus-visible, button:focus-visible, a.btn:focus-visible, .navlink:focus-visible, li[role=option]:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 1px; }
+.erro { color: #f6a9a0; font-size: 14px; margin: 0; }
+
+/* — Autocomplete de cidade — */
+.auto { position: relative; }
+.auto ul { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px;
+  list-style: none; background: var(--ground-3); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 12px 30px rgb(0 0 0 / .5); max-height: 280px; overflow: auto; }
+.auto li { padding: 10px; border-radius: 8px; cursor: pointer; }
+.auto li[aria-selected=true], .auto li:hover { background: rgba(231,162,74,.16); }
+
+/* — Card compartilhável do casal — */
+.share { display: flex; justify-content: center; }
+.cardc { width: 300px; border-radius: 22px; padding: 30px 26px 26px; background: linear-gradient(165deg,#301d2d,#3f2740 70%);
+  border: 1px solid rgba(231,162,74,.32); box-shadow: 0 24px 60px -20px rgba(0,0,0,.6); position: relative; overflow: hidden; text-align: left; }
+.cardc::after { content: "पद्मिनी"; position: absolute; right: -6px; bottom: -14px; font-family: var(--serif); font-size: 4.4rem; color: rgba(231,162,74,.09); }
+.cardc .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.cardc .wm { font-family: var(--serif); font-size: 1rem; color: var(--saffron); }
+.cardc .who { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.cardc .score { font-family: var(--serif); font-size: 3.6rem; line-height: 1; font-weight: 500; }
+.cardc .score span { font-size: 1.4rem; color: var(--faint); }
+.cardc .scorelab { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--blush); margin-top: 6px; font-weight: 600; }
+.cardc .bar { height: 5px; border-radius: 3px; background: rgba(244,233,220,.14); margin: 18px 0; overflow: hidden; }
+.cardc .bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg,var(--blush),var(--saffron)); }
+.cardc .insight { font-family: var(--serif); font-style: italic; font-size: 1.12rem; line-height: 1.35; }
+
+/* — Faixa de cross-sell entre produtos — */
+.cross { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
+  background: linear-gradient(180deg, var(--ground-3), var(--ground-2)); border: 1px solid rgba(231,162,74,.32);
+  border-radius: var(--radius); padding: 20px 22px; }
+.cross p { margin: 0; }
+.cross h3 { margin: 0 0 4px; }
+.cross .navlink { white-space: nowrap; }
+
+/* — Grade das 8 dimensões — */
+.dims { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 2px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
+.dim { background: var(--ground-2); padding: 16px 15px; }
+.dim .dn { font-family: var(--serif); font-style: italic; color: var(--saffron); font-size: 1.1rem; }
+.dim .dt { font-weight: 600; font-size: 13px; margin: 3px 0 2px; }
+.dim .dd { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+
+/* — FAQ — */
+.faq details { border-bottom: 1px solid var(--line); padding: 16px 0; }
+.faq summary { font-family: var(--serif); font-size: 1.2rem; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--saffron); font-weight: 400; font-size: 1.3rem; }
+.faq details[open] summary::after { content: "–"; }
+.faq p { margin: 12px 0 2px; color: var(--muted); }
+
+/* — Rodapé — */
+footer { padding: 34px 0 60px; color: var(--faint); font-size: 12.5px; border-top: 1px solid var(--line); text-align: center; }
+footer a { color: inherit; }
+
+/* — Feedback "isso fez sentido?" — */
+.feedback { text-align: center; }
+.fb-pergunta { font-family: var(--serif); font-size: 1.15rem; color: var(--ink); margin: 0 0 12px; }
+.fb-botoes { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.fb-botoes .btn { flex: 0 1 auto; }
