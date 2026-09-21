@@ -10,15 +10,20 @@ Conforme a documentação oficial (docs.cakto.com.br/conceitos/webhooks):
   - Evento de pagamento aprovado: `purchase_approved` (ver APROVADOS).
   - Dados do comprador: objeto `customer` com `name`, `email`, `phone`, etc.
 
-⚠️ AINDA A CONFIRMAR na prática (a doc não cobre):
-  - COMO OS DADOS DE NASCIMENTO VOLTAM: nós os mandamos como parâmetros `pd_*`
-    no link do checkout (ver afiliado.js → linkCheckout). A documentação só
-    menciona o repasse de UTMs e identificadores do Meta (fbc/fbp), então o
-    repasse de parâmetros customizados precisa ser verificado com um pagamento
-    de teste. Este módulo varre o payload inteiro atrás de chaves `pd_*`, então
-    funciona esteja onde estiver — desde que a Cakto os repasse. Se ela não
-    repassar, será preciso outra ponte (ex.: guardar o pedido por um id, ou
-    usar os campos de UTM, que comprovadamente voltam).
+  - Campos de rastreamento repassados: `utm_source`, `utm_medium`,
+    `utm_campaign`, `utm_term`, `utm_content` e `sck`. NÃO existe campo livre
+    de metadata: qualquer parâmetro customizado na URL do checkout é
+    descartado.
+
+COMO OS DADOS DE NASCIMENTO VOLTAM: empacotados no `sck` (ver afiliado.js →
+padEmpacotar), já que era o único campo livre disponível. Uma tentativa
+anterior usava parâmetros `pd_*` soltos, que a Cakto descartaria — o
+`coletar_pd` abaixo desempacota o `sck` e ainda aceita `pd_*` como rede de
+segurança.
+
+⚠️ A CONFIRMAR com um pagamento de teste: que o `sck` informado na URL do
+checkout realmente chega ao webhook preenchido (a doc lista o campo no payload,
+mas não documenta explicitamente como defini-lo na URL).
 
 Como identificamos o produto: pelo `pd_produto` (mapa|compat) que mandamos, ou
 pelo id do produto da Cakto mapeado em PADMINI_CAKTO_PROD_MAPA/_COMPAT.
@@ -93,12 +98,51 @@ def is_aprovado(evento: dict) -> bool:
     return False
 
 
+CAMPOS_PESSOA = ("data", "hora", "lat", "lon", "nome", "cidade")
+
+
 def coletar_pd(evento: dict) -> dict:
-    """Junta todos os parâmetros pd_* que voltaram no payload."""
+    """
+    Recupera os dados de nascimento que mandamos no checkout.
+
+    A Cakto só repassa ao webhook os campos utm_* e `sck` — parâmetros
+    customizados na URL são descartados. Então os dados viajam empacotados no
+    `sck`, no formato montado por afiliado.js → padEmpacotar:
+        mapa:  m~data~hora~lat~lon~nome~cidade
+        casal: c~<pessoa A>~<pessoa B>
+    Devolve um dicionário no mesmo formato `pd_*` que o resto do módulo já usa,
+    para não espalhar a mudança. Mantém também os `pd_*` soltos, se um dia
+    chegarem (não custa nada e serve de rede de segurança).
+    """
     pd = {}
     for k, v in _iter_valores(evento):
         if k.lower().startswith("pd_"):
             pd[k.lower()] = v
+
+    sck = ""
+    for k, v in _iter_valores(evento):
+        if k.lower() == "sck" and isinstance(v, str) and v:
+            sck = v
+            break
+    if not sck:
+        return pd
+
+    partes = sck.split("~")
+    tipo = partes[0].strip().lower()
+    resto = partes[1:]
+    n = len(CAMPOS_PESSOA)
+
+    if tipo == "m" and len(resto) >= 4:
+        pd.setdefault("pd_produto", "mapa")
+        for i, campo in enumerate(CAMPOS_PESSOA):
+            if i < len(resto) and resto[i]:
+                pd.setdefault("pd_" + campo, resto[i])
+    elif tipo == "c" and len(resto) >= n + 4:
+        pd.setdefault("pd_produto", "compat")
+        for prefixo, bloco in (("a", resto[:n]), ("b", resto[n:n * 2])):
+            for i, campo in enumerate(CAMPOS_PESSOA):
+                if i < len(bloco) and bloco[i]:
+                    pd.setdefault(f"pd_{prefixo}_{campo}", bloco[i])
     return pd
 
 

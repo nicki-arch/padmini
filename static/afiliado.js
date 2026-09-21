@@ -51,24 +51,41 @@
     }
   };
 
-  // monta o link do checkout carregando os dados de nascimento (pd_*) + afiliado,
-  // para a Cakto repassá-los ao webhook e a gente gerar o completo depois.
+  // Empacota os dados de nascimento numa string compacta para o campo `sck`.
+  //
+  // POR QUE `sck`: a Cakto só repassa ao webhook os campos utm_source,
+  // utm_medium, utm_campaign, utm_term, utm_content e sck — não existe campo
+  // livre de metadata. Qualquer parâmetro customizado na URL do checkout é
+  // descartado. O `sck` é o campo de rastreamento livre, então é por ele que
+  // os dados viajam. (docs.cakto.com.br/conceitos/webhooks)
+  //
+  // Formato (separado por "~", campos na ordem):
+  //   mapa:   m~data~hora~lat~lon~nome~cidade
+  //   casal:  c~dataA~horaA~latA~lonA~nomeA~cidadeA~dataB~...~cidadeB
+  // Nome e cidade são cosméticos (o cálculo usa data/hora/lat/lon) e vão
+  // truncados para manter a URL curta.
+  function _t(v, n) {
+    return String(v == null ? "" : v).replace(/~/g, "-").slice(0, n || 24);
+  }
+  function _pessoa(p) {
+    p = p || {};
+    return [_t(p.data, 10), _t(p.hora, 5), _t(p.lat, 12), _t(p.lon, 12),
+            _t(p.nome, 20), _t(p.cidade, 24)].join("~");
+  }
+  window.padEmpacotar = function (dados) {
+    if (!dados) return "";
+    if (dados.produto === "mapa") return "m~" + _pessoa(dados);
+    if (dados.produto === "compat") return "c~" + _pessoa(dados.a) + "~" + _pessoa(dados.b);
+    return "";
+  };
+
+  // monta o link do checkout carregando os dados de nascimento (no `sck`) +
+  // a atribuição de afiliado/campanha, para a Cakto repassá-los ao webhook.
   window.linkCheckout = function (base, dados) {
     if (!base) return base;
     var extra = {};
-    if (dados && dados.produto === "mapa") {
-      extra.pd_produto = "mapa";
-      ["nome", "data", "hora", "lat", "lon", "cidade"].forEach(function (k) {
-        if (dados[k] != null && dados[k] !== "") extra["pd_" + k] = dados[k];
-      });
-    } else if (dados && dados.produto === "compat") {
-      extra.pd_produto = "compat";
-      var a = dados.a || {}, b = dados.b || {};
-      ["nome", "data", "hora", "lat", "lon", "cidade"].forEach(function (k) {
-        if (a[k] != null && a[k] !== "") extra["pd_a_" + k] = a[k];
-        if (b[k] != null && b[k] !== "") extra["pd_b_" + k] = b[k];
-      });
-    }
+    var pacote = window.padEmpacotar(dados);
+    if (pacote) extra.sck = pacote;
     var attr = window.padAtribuicao ? window.padAtribuicao() : {};
     var todos = Object.assign({}, attr, extra);
     var keys = Object.keys(todos);
