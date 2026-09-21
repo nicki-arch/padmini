@@ -119,3 +119,16 @@ def test_tabelas_com_rls_ligado():
     rows = _linhas("SELECT relname, relrowsecurity FROM pg_class "
                    "WHERE relname IN ('pedidos', 'textos_ia')")
     assert dict(rows) == {"pedidos": True, "textos_ia": True}
+
+
+def test_roles_da_api_publica_sem_acesso():
+    """Simula as roles do Supabase: depois do schema, anon/authenticated não leem nada."""
+    with db._conectar() as c:
+        for role in ("anon", "authenticated"):
+            c.execute(f"DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='{role}') "
+                      f"THEN CREATE ROLE {role} NOLOGIN; END IF; END $$")
+            c.execute(f"GRANT ALL ON TABLE pedidos, textos_ia TO {role}")
+    assert db.iniciar()
+    rows = _linhas("SELECT has_table_privilege('anon','pedidos','SELECT'), "
+                   "has_table_privilege('authenticated','textos_ia','INSERT')")
+    assert rows[0] == (False, False)

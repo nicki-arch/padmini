@@ -59,6 +59,20 @@ CREATE TABLE IF NOT EXISTS textos_ia (
 -- banco, que não é afetado pelo RLS.
 ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE textos_ia ENABLE ROW LEVEL SECURITY;
+
+-- Defesa em profundidade (só existe no Supabase): tira das roles da API
+-- pública qualquer permissão nas tabelas, além do RLS.
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+        REVOKE ALL ON TABLE pedidos, textos_ia FROM anon;
+        REVOKE ALL ON SEQUENCE pedidos_id_seq FROM anon;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+        REVOKE ALL ON TABLE pedidos, textos_ia FROM authenticated;
+        REVOKE ALL ON SEQUENCE pedidos_id_seq FROM authenticated;
+    END IF;
+END $$;
 """
 
 CAMPOS_RASTREIO = ("utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "sck")
