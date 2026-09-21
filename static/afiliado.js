@@ -86,8 +86,21 @@
     var extra = {};
     var pacote = window.padEmpacotar(dados);
     if (pacote) extra.sck = pacote;
+    // Só utm_* e sck sobrevivem até o webhook (o resto a Cakto descarta), então
+    // o `ref`/cupom é dobrado nos campos de utm para a origem não se perder.
     var attr = window.padAtribuicao ? window.padAtribuicao() : {};
-    var todos = Object.assign({}, attr, extra);
+    var repassar = {};
+    ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].forEach(function (k) {
+      if (attr[k]) repassar[k] = attr[k];
+    });
+    var ref = attr[PARAM_AFILIADO];
+    if (ref) {
+      if (!repassar.utm_source) repassar.utm_source = "afiliado";
+      if (!repassar.utm_campaign) repassar.utm_campaign = ref;
+    }
+    var cupom = attr.cupom || attr.coupon;
+    if (cupom && !repassar.utm_term) repassar.utm_term = cupom;
+    var todos = Object.assign({}, repassar, extra);
     var keys = Object.keys(todos);
     if (!keys.length) return base;
     try {
