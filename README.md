@@ -1,4 +1,4 @@
-# Padmini — Astrologia Védica (v0.6)
+# Padmini — Astrologia Védica (v0.7)
 
 Site com dois produtos de astrologia védica (Jyotish), em modelo **freemium** (amostra grátis → paga para ver o completo):
 
@@ -45,12 +45,13 @@ O completo e o PDF são pagos, então o servidor os bloqueia (HTTP 402) sem um *
 
 ## Webhook da Cakto (entrega automática)
 
-Fluxo: amostra → o botão de compra leva ao checkout da Cakto **carregando os dados de nascimento** como parâmetros `pd_*` (montados em `afiliado.js → linkCheckout`) → após o pagamento, a Cakto chama `POST /webhook/cakto` → o backend confere a origem, lê o produto/e-mail/dados, **emite o token** e **manda o e-mail** (`entrega.py`) com o link do completo (`/mapa?...&token=...` ou `/compatibilidade?...&token=...`). Abrir esse link renderiza o relatório completo.
+Fluxo: amostra → o botão de compra leva ao checkout hospedado da Cakto carregando os **dados de nascimento empacotados no campo `sck`** (`afiliado.js → padEmpacotar/linkCheckout`; afiliado e cupom vão dobrados em `utm_*`) → após o pagamento, a Cakto chama `POST /webhook/cakto` → o backend **confere a assinatura**, desempacota o `sck`, **emite o token** e **manda o e-mail** (`entrega.py`) com o link do completo. Abrir esse link renderiza o relatório completo.
 
-**⚠️ ADAPTAR À CAKTO** (ver comentários no topo de `cakto.py`) — três coisas a confirmar no painel/documentação da Cakto:
-1. **Assinatura do webhook** (header/segredo) — hoje conferimos `PADMINI_CAKTO_WEBHOOK_SECRET`.
-2. **Nomes de status** de "aprovado" (lista `APROVADOS` em `cakto.py`).
-3. **Repasse dos `pd_*`** ao webhook (custom params/metadata). Se a Cakto não repassar, será preciso outra ponte (ex.: guardar o pedido por um id).
+Por que `sck`: a Cakto só repassa ao webhook `utm_source/medium/campaign/term/content` e `sck` — qualquer outro parâmetro da URL é descartado (docs.cakto.com.br/conceitos/webhooks).
+
+**Assinatura:** header `X-Cakto-Signature: v1=<hmac-sha256>` sobre `{X-Cakto-Timestamp}.{corpo bruto}`, com `PADMINI_CAKTO_WEBHOOK_SECRET`; ou o campo `secret` no corpo. **Sem o segredo configurado, o webhook recusa tudo (401).**
+
+**Pendente:** confirmar com uma compra real que o `sck` chega preenchido.
 
 Sem `RESEND_API_KEY`, o webhook responde com o `link` no corpo — dá para copiar e enviar à mão no soft launch.
 
@@ -85,23 +86,27 @@ O índice de cidades (`data/cidades_index.tsv`) já vem pronto; para refazer, `p
 | `static/base.css` | Design system (tokens + componentes). Ver `design-system.md` |
 | `static/home.html` · `index.html` · `compatibilidade.html` | Páginas (home, mapa, casal) |
 | `static/privacidade.html` · `termos.html` | Páginas legais (modelo) |
-| `static/afiliado.js` | Atribuição de afiliado + montagem do link de checkout (`pd_*`) |
+| `static/afiliado.js` | Atribuição de afiliado + montagem do link de checkout (dados no `sck`) |
 | `static/analytics.js` | Métricas de funil (PostHog, opcional) + `window.padTrack` |
 | `static/og-*.png` | Imagens Open Graph (versionadas no repo) |
 
 ## Testes
 
 ```
-python testes/test_referencias.py        # 5 mapas conhecidos vs Cosmolica (tolerância 2')
-python testes/test_compatibilidade.py    # invariantes do motor + tabela de validação (5 casais)
+python -m pytest -q testes               # suíte inteira (roda também no GitHub Actions a cada push)
+python scripts/smoke_producao.py         # depois de cada deploy: confere o site publicado
 ```
+
+- `testes/test_app.py` — rotas, paywall (402), webhook (assinatura, compra ponta a ponta), contrato do `sck` entre `afiliado.js` e `cakto.py`, cidades e PDF não-stub.
+- `testes/test_referencias.py` — 5 mapas conhecidos vs Cosmolica (tolerância 2').
+- `testes/test_compatibilidade.py` — invariantes do motor + tabela de validação (5 casais).
 
 A validação de compatibilidade contra o Prokerala (`validacao-compatibilidade.md`) ainda está pendente — **gate antes de cobrar**.
 
 ## Pendências conhecidas
 
 - **Validar** as tabelas preliminares de compatibilidade (Vashya, meio de Yoni, direção de Gana) contra o Prokerala.
-- **Cakto:** confirmar os 3 pontos de `cakto.py` e configurar as variáveis de ambiente do webhook.
+- **Cakto:** registrar o webhook no painel, setar `PADMINI_CAKTO_WEBHOOK_SECRET` e confirmar com compra real que o `sck` chega.
 - **Páginas legais** são modelo — revisar com advogado e preencher os campos [entre colchetes].
 - Textos de planeta em cada casa (108) ainda não existem.
 - Raj Yoga só por conjunção; Neecha Bhanga só condição principal; Mangal Dosha (individual) sem cancelamento.
