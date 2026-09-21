@@ -293,14 +293,20 @@ async def webhook_cakto(request: Request):
     para envio manual no soft launch).
     """
     corpo = await request.body()
-    assinatura = request.headers.get("x-cakto-signature") or request.query_params.get("secret") or ""
-    if not cakto.verificar(assinatura, os.environ.get("PADMINI_CAKTO_WEBHOOK_SECRET", "")):
-        raise HTTPException(401, "assinatura inválida")
-
     try:
         evento = json.loads(corpo.decode("utf-8"))
     except Exception:
         raise HTTPException(400, "payload inválido")
+
+    # Assinatura: header `X-Cakto-Signature: v1=<hmac>` sobre '{timestamp}.{corpo}',
+    # ou o campo `secret` no corpo do evento (as duas formas são documentadas).
+    assinatura = request.headers.get("x-cakto-signature") or ""
+    timestamp = request.headers.get("x-cakto-timestamp") or ""
+    secret_do_corpo = evento.get("secret", "") if isinstance(evento, dict) else ""
+    if not cakto.verificar(assinatura, timestamp, corpo,
+                           os.environ.get("PADMINI_CAKTO_WEBHOOK_SECRET", ""),
+                           secret_do_corpo):
+        raise HTTPException(401, "assinatura inválida")
 
     if not cakto.is_aprovado(evento):
         return {"ok": True, "ignorado": "pagamento não aprovado"}

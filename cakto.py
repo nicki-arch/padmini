@@ -1,24 +1,30 @@
 """
 Padmini — glue com a Cakto (parsing do webhook).
 
-⚠️ ADAPTAR À CAKTO antes de ligar em produção — três coisas a confirmar na
-documentação/painel da Cakto:
-  1) COMO A CAKTO ASSINA O WEBHOOK: nome do header e esquema. Aqui conferimos
-     um segredo simples (header 'x-cakto-signature' ou ?secret=) contra
-     PADMINI_CAKTO_WEBHOOK_SECRET. Se a Cakto usar HMAC do corpo, trocar
-     `verificar()`.
-  2) NOMES DE STATUS de pagamento aprovado (ver APROVADOS).
-  3) COMO OS DADOS DE NASCIMENTO VOLTAM: nós os mandamos como parâmetros
-     `pd_*` no link do checkout (ver afiliado.js → linkCheckout). A Cakto
-     precisa repassá-los ao webhook (como custom params/metadata). Este módulo
-     varre o payload inteiro atrás de chaves `pd_*`, então funciona esteja
-     onde estiver — desde que a Cakto os repasse. Se ela não repassar, será
-     preciso outra ponte (ex.: guardar o pedido por um id).
+Conforme a documentação oficial (docs.cakto.com.br/conceitos/webhooks):
+  - Assinatura: header `X-Cakto-Signature` no formato `v1=<hmac-sha256>`, com o
+    digest calculado sobre `{timestamp}.{corpo bruto}` usando o webhook secret
+    como chave. O timestamp vem em `X-Cakto-Timestamp` (Unix, em segundos).
+    Alternativa documentada: um campo `secret` no próprio corpo do evento.
+    As duas formas são aceitas aqui (ver `verificar`).
+  - Evento de pagamento aprovado: `purchase_approved` (ver APROVADOS).
+  - Dados do comprador: objeto `customer` com `name`, `email`, `phone`, etc.
+
+⚠️ AINDA A CONFIRMAR na prática (a doc não cobre):
+  - COMO OS DADOS DE NASCIMENTO VOLTAM: nós os mandamos como parâmetros `pd_*`
+    no link do checkout (ver afiliado.js → linkCheckout). A documentação só
+    menciona o repasse de UTMs e identificadores do Meta (fbc/fbp), então o
+    repasse de parâmetros customizados precisa ser verificado com um pagamento
+    de teste. Este módulo varre o payload inteiro atrás de chaves `pd_*`, então
+    funciona esteja onde estiver — desde que a Cakto os repasse. Se ela não
+    repassar, será preciso outra ponte (ex.: guardar o pedido por um id, ou
+    usar os campos de UTM, que comprovadamente voltam).
 
 Como identificamos o produto: pelo `pd_produto` (mapa|compat) que mandamos, ou
 pelo id do produto da Cakto mapeado em PADMINI_CAKTO_PROD_MAPA/_COMPAT.
 """
 
+import hashlib
 import hmac
 import os
 
@@ -27,13 +33,43 @@ APROVADOS = ("paid", "approved", "aprovad", "complete", "concluid", "success")
 PROD_MAPA = os.environ.get("PADMINI_CAKTO_PROD_MAPA", "")
 PROD_COMPAT = os.environ.get("PADMINI_CAKTO_PROD_COMPAT", "")
 
+# Só libera webhook sem segredo configurado em staging (mesmo flag do gate).
+MODO_ABERTO = os.environ.get("PADMINI_MODO_ABERTO") == "1"
 
-def verificar(assinatura: str, secret: str) -> bool:
-    """True se a origem confere. Sem secret configurado, aceita (dev) — em
-    produção, SEMPRE configurar PADMINI_CAKTO_WEBHOOK_SECRET."""
+
+def assinatura_esperada(timestamp: str, corpo: bytes, secret: str) -> str:
+    """HMAC-SHA256 de '{timestamp}.{corpo}' com o webhook secret, em hex."""
+    if isinstance(corpo, str):
+        corpo = corpo.encode("utf-8")
+    base = f"{timestamp}.".encode("utf-8") + corpo
+    return hmac.new(secret.encode("utf-8"), base, hashlib.sha256).hexdigest()
+
+
+def verificar(assinatura: str, timestamp: str, corpo: bytes, secret: str,
+              secret_do_corpo: str = "") -> bool:
+    """
+    True se a origem confere. Aceita as duas formas documentadas pela Cakto:
+      1) header `X-Cakto-Signature: v1=<hmac>` sobre '{timestamp}.{corpo}';
+      2) campo `secret` dentro do corpo do evento.
+
+    Sem segredo configurado, REJEITA em produção (fail-closed) — um webhook
+    aberto permitiria forjar uma aprovação e sacar um token do relatório pago.
+    Só libera quando PADMINI_MODO_ABERTO=1 (staging).
+    """
     if not secret:
+        return MODO_ABERTO
+
+    # 2) segredo no corpo
+    if secret_do_corpo and hmac.compare_digest(str(secret_do_corpo), secret):
         return True
-    return hmac.compare_digest(assinatura or "", secret)
+
+    # 1) assinatura HMAC no header
+    if not assinatura:
+        return False
+    recebida = assinatura.strip()
+    if recebida.startswith("v1="):
+        recebida = recebida[3:]
+    return hmac.compare_digest(recebida, assinatura_esperada(timestamp or "", corpo, secret))
 
 
 def _iter_valores(obj):
