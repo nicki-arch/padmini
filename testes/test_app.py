@@ -223,3 +223,8 @@ def test_sck_do_front_e_lido_pelo_back(dados, esperado):
     assert produto == esperado
     assert cakto.dados_nascimento(pd, produto) is not None
     assert len(sck) <= 200  # URL curta: o sck não pode crescer sem controle
+
+
+def test_saude_sem_banco():
+    r = cliente.get("/api/saude")
+    assert r.status_code == 200 and r.json() == {"ok": True, "banco": None}

@@ -150,6 +150,14 @@ def cidades(q: str = Query("", max_length=80)):
     return busca.buscar(q)
 
 
+@app.get("/api/saude")
+def saude():
+    """Usado pelo keep-alive diário (GitHub Actions): acorda o site e faz uma
+    consulta no banco — o Supabase grátis pausa após uma semana sem uso."""
+    banco = db.saude()
+    return {"ok": banco is not False, "banco": banco}
+
+
 @app.get("/api/config")
 def config():
     return {

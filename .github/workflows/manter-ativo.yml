@@ -1,0 +1,22 @@
+# Uma vez por dia: acorda o site e faz uma consulta no banco.
+# Motivo: o Supabase grátis pausa o projeto após ~1 semana sem uso do banco.
+# Se falhar (site fora ou banco fora), o GitHub manda e-mail avisando.
+name: manter-ativo
+
+on:
+  schedule:
+    - cron: "17 11 * * *"   # 08:17 em Brasília
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acorda o site e testa o banco
+        run: |
+          for i in 1 2 3; do
+            r=$(curl -s --max-time 120 https://padmini.onrender.com/api/saude) && break
+            sleep 20
+          done
+          echo "$r"
+          echo "$r" | grep -q '"ok":true'

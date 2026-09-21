@@ -103,3 +103,12 @@ def test_sem_database_url_tudo_vira_no_op(monkeypatch):
     assert db.texto_ia("x") is None
     assert db.registrar_pedido({}, "mapa", {}, "", "", False) is False
     assert base._postar_webhook(evento_cakto("pedido-2")).status_code == 200
+
+
+def test_saude_com_banco():
+    assert base.cliente.get("/api/saude").json() == {"ok": True, "banco": True}
+
+
+def test_saude_com_banco_fora(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "postgresql://ninguem@127.0.0.1:1/nada")
+    assert base.cliente.get("/api/saude").json() == {"ok": False, "banco": False}

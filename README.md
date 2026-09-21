@@ -10,7 +10,7 @@ Visual "Lótus à meia-luz" (full dark), com design system compartilhado (`stati
 ## Rotas
 
 Páginas: `/` (home), `/mapa`, `/compatibilidade`, `/privacidade`, `/termos`.
-API: `POST /api/mapa`, `POST /api/compatibilidade`, `POST /api/pdf`, `GET /api/cidades`, `GET /api/config`, `POST /webhook/cakto`.
+API: `POST /api/mapa`, `POST /api/compatibilidade`, `POST /api/pdf`, `GET /api/cidades`, `GET /api/config`, `GET /api/saude`, `POST /webhook/cakto`.
 
 Cada endpoint de produto aceita `nivel: "amostra" | "completo"`. A **amostra é sempre grátis**; o **completo exige token** (ver "Acesso ao completo").
 

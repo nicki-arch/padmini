@@ -84,6 +84,19 @@ def iniciar() -> bool:
         return False
 
 
+def saude() -> bool | None:
+    """None = sem banco configurado; True/False = banco respondeu ou não."""
+    if not ativo():
+        return None
+    try:
+        with _conectar() as c:
+            c.execute("SELECT 1")
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha no teste de saúde")
+        return False
+
+
 def _dados(evento: dict) -> dict:
     d = evento.get("data") if isinstance(evento, dict) else None
     return d if isinstance(d, dict) else {}
