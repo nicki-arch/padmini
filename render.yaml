@@ -25,5 +25,7 @@ services:
         sync: false
       - key: PADMINI_EMAIL_FROM  # remetente do e-mail
         sync: false
+      - key: DATABASE_URL        # Postgres (Supabase ou Render). Em branco = sem banco
+        sync: false
       - key: PADMINI_POSTHOG_KEY # métricas de funil (opcional; em branco = desligado)
         sync: false

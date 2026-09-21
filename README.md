@@ -31,6 +31,7 @@ Roda no Render (https://padmini.onrender.com), ligado ao GitHub: cada `git push`
 | `PADMINI_CAKTO_PROD_MAPA` / `_COMPAT` | IDs dos produtos na Cakto (fallback p/ identificar o produto) |
 | `RESEND_API_KEY` | Envio do e-mail de entrega (via Resend). Sem ela, o webhook devolve o link para envio manual |
 | `PADMINI_EMAIL_FROM` | Remetente do e-mail (padrão `Padmini <nao-responda@padmini.com.br>`) |
+| `DATABASE_URL` | Postgres (Supabase ou Render). Guarda pedidos (sem CPF/cartão), evita e-mail duplicado e guarda o texto da IA (1 geração por mapa). Em branco = sem banco; o site funciona igual |
 | `PADMINI_POSTHOG_KEY` | Métricas de funil (PostHog). Em branco = desligado; nada é carregado |
 | `PADMINI_POSTHOG_HOST` | Host do PostHog (padrão `https://us.i.posthog.com`; use `https://eu.i.posthog.com` na região UE) |
 

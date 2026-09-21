@@ -7,6 +7,7 @@ Rodar localmente:
 e abrir http://127.0.0.1:8000
 """
 
+import contextlib
 import os
 import re
 import unicodedata
@@ -28,6 +29,7 @@ from detectar_fatos import detectar_todos_os_fatos
 from compatibilidade import calcular_compatibilidade, montar_snippets_compatibilidade
 import acesso
 import cakto
+import db
 import entrega
 from gerar_pdf import gerar_pdf
 from montar_texto import (
@@ -44,7 +46,14 @@ if _env.exists():
             _chave, _valor = _linha.split("=", 1)
             os.environ.setdefault(_chave.strip(), _valor.strip())
 
-app = FastAPI(title="Padmini")
+@contextlib.asynccontextmanager
+async def _ciclo_de_vida(_app):
+    # sem DATABASE_URL não faz nada; com erro, só registra no log (não derruba o site)
+    db.iniciar()
+    yield
+
+
+app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
 app.mount("/static", StaticFiles(directory=RAIZ / "static"), name="static")
 busca = BuscaCidades()
 
@@ -191,7 +200,12 @@ def mapa(pedido: PedidoMapa):
     if pedido.texto_ia:
         if not os.environ.get("ANTHROPIC_API_KEY"):
             raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
-        texto_ia = gerar_com_claude(montar_prompt(secoes))
+        # um texto por mapa: guardado no banco para não pagar a IA a cada clique
+        texto_ia = db.texto_ia(chave)
+        if texto_ia is None:
+            texto_ia = gerar_com_claude(montar_prompt(secoes))
+            db.guardar_texto_ia(chave, "mapa", texto_ia,
+                                os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
 
     atual = dasha_atual(resultado)
     return {
@@ -321,11 +335,17 @@ async def webhook_cakto(request: Request):
         # sem os dados de nascimento não dá para gerar; sinaliza para tratamento manual
         raise HTTPException(422, "dados de nascimento ausentes no payload (ver cakto.py)")
 
+    # a Cakto reenvia o webhook se não receber 200 a tempo: não mandar o e-mail duas vezes
+    cakto_id = str((evento.get("data") or {}).get("id") or "") if isinstance(evento, dict) else ""
+    if db.pedido_entregue(cakto_id):
+        return {"ok": True, "produto": produto, "duplicado": True}
+
     link = entrega.link_completo(produto, dados)
     email = cakto.email_do_evento(evento)
     enviado = entrega.enviar_email(
         email, "Seu relatório Padmini está pronto",
         entrega.email_completo_html(produto, link, dados.get("nome", "")))
+    db.registrar_pedido(evento, produto, dados, email, link, enviado)
     # se não enviou (Resend não configurado), devolve o link para envio manual
     return {"ok": True, "produto": produto, "email": email or None,
             "email_enviado": enviado, "link": None if enviado else link}

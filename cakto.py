@@ -147,7 +147,16 @@ def coletar_pd(evento: dict) -> dict:
 
 
 def email_do_evento(evento: dict) -> str:
+    # 1º o campo oficial (data.customer.email). A busca genérica abaixo é só
+    # fallback: o payload também traz `product.supportEmail` e e-mails em
+    # `commissions`, que não são do comprador.
+    dados = evento.get("data") if isinstance(evento, dict) else None
+    cliente = dados.get("customer") if isinstance(dados, dict) else None
+    if isinstance(cliente, dict) and isinstance(cliente.get("email"), str) and "@" in cliente["email"]:
+        return cliente["email"].strip()
     for k, v in _iter_valores(evento):
+        if k.lower() in ("supportemail", "user"):
+            continue
         if "email" in k.lower() and isinstance(v, str) and "@" in v:
             return v.strip()
     return ""

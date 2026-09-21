@@ -25,9 +25,11 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 | `static/afiliado.js` | Monta o link do checkout: dados no `sck`, afiliado/cupom dobrados em `utm_*` |
 | `cidades.py` + `data/cidades_index.tsv` | Autocomplete de cidades (GeoNames) |
 | `gerar_pdf.py` | PDF do completo |
+| `db.py` | Postgres opcional (`DATABASE_URL`): pedidos, cache do texto da IA. Erro no banco nunca impede entrega |
 
 ## Regras (cada uma vem de um erro real)
 1. **Rodar os testes antes de commitar:** `python -m pytest -q testes`. Tudo verde ou não sobe.
+   Os testes do banco precisam de `TEST_DATABASE_URL` (Postgres local); no CI rodam sempre.
 2. **Ler o diffstat antes de commitar.** Arquivo de produção encolhendo centenas de linhas = suspeito
    (parte 16: stubs de teste de `cidades.py`/`gerar_pdf.py` foram para produção e travaram o site).
 3. **Nunca sobrepor o repositório com outro diretório em bloco.** Copiar só o que mudou de propósito.
@@ -36,7 +38,8 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 5. **Integração externa: ler a doc oficial antes.** A Cakto só repassa `utm_*` e `sck` ao webhook.
 6. **Bug encontrado = teste novo** em `testes/` que falharia com o bug.
 7. **Depois de cada deploy:** `python scripts/smoke_producao.py`.
-8. `PADMINI_MODO_ABERTO=1` só em staging, **nunca** em produção.
+8. Não gravar CPF nem dados de cartão no banco (vêm no payload da Cakto).
+9. `PADMINI_MODO_ABERTO=1` só em staging, **nunca** em produção.
 
 ## Commits
 Mensagens em português, explicando o porquê. Sem force-push na `master`.
