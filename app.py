@@ -330,26 +330,47 @@ async def webhook_cakto(request: Request):
                            secret_do_corpo):
         raise HTTPException(401, "assinatura inválida")
 
+    # Webhook V1 manda um pedido por entrega (`data` = objeto); o V2 manda todos
+    # os pedidos da mesma cobrança numa lista. Tratamos os dois formatos.
+    pedidos = cakto.pedidos_do_evento(evento)
+    resultados = [_processar_pedido(p) for p in pedidos]
+    if len(resultados) == 1:
+        return resultados[0]
+    return {"ok": True, "pedidos": resultados}
+
+
+def _processar_pedido(evento: dict) -> dict:
     if not cakto.is_aprovado(evento):
         return {"ok": True, "ignorado": "pagamento não aprovado"}
+
+    # Por enquanto só existe o pedido principal. Order bump/upsell entram com os
+    # combos (roteiro, passo 4) — até lá, ignorar evita entregar o produto
+    # principal duas vezes (o `sck` do bump é o mesmo do principal).
+    tipo = str((evento.get("data") or {}).get("offer_type") or "main").lower()
+    if tipo != "main":
+        return {"ok": True, "ignorado": f"oferta {tipo} ainda não tratada"}
 
     pd = cakto.coletar_pd(evento)
     produto = cakto.produto_do_evento(evento, pd)
     if produto not in ("mapa", "compat"):
         return {"ok": True, "ignorado": "produto desconhecido"}
 
+    email = cakto.email_do_evento(evento)
     dados = cakto.dados_nascimento(pd, produto)
     if not dados:
-        # sem os dados de nascimento não dá para gerar; sinaliza para tratamento manual
-        raise HTTPException(422, "dados de nascimento ausentes no payload (ver cakto.py)")
+        # Pagou, mas o `sck` não trouxe os dados de nascimento: não dá para gerar.
+        # Grava o pedido sem link (aparece no banco para entrega manual) e responde
+        # 200 — a Cakto não reenvia respostas de erro, então 422 não ajudaria.
+        db.registrar_pedido(evento, produto, {}, email, None, False)
+        return {"ok": True, "produto": produto, "email": email or None,
+                "pendente": "dados de nascimento ausentes — entregar manualmente"}
 
-    # a Cakto reenvia o webhook se não receber 200 a tempo: não mandar o e-mail duas vezes
-    cakto_id = str((evento.get("data") or {}).get("id") or "") if isinstance(evento, dict) else ""
+    # a Cakto reenvia o webhook se não receber resposta a tempo: não mandar o e-mail duas vezes
+    cakto_id = str((evento.get("data") or {}).get("id") or "")
     if db.pedido_entregue(cakto_id):
         return {"ok": True, "produto": produto, "duplicado": True}
 
     link = entrega.link_completo(produto, dados)
-    email = cakto.email_do_evento(evento)
     enviado = entrega.enviar_email(
         email, "Seu relatório Padmini está pronto",
         entrega.email_completo_html(produto, link, dados.get("nome", "")))

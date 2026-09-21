@@ -90,6 +90,21 @@ def _iter_valores(obj):
             yield from _iter_valores(it)
 
 
+def pedidos_do_evento(evento) -> list:
+    """
+    Normaliza a entrega em uma lista de eventos de um pedido cada.
+    Webhook V1: `data` é um objeto (um pedido). Webhook V2 (só criável pelo
+    painel): `data` é uma lista com todos os pedidos da mesma cobrança —
+    principal, order bump, upsell. docs.cakto.com.br/conceitos/webhooks
+    """
+    if not isinstance(evento, dict):
+        return []
+    dados = evento.get("data")
+    if isinstance(dados, list):
+        return [{**evento, "data": item} for item in dados if isinstance(item, dict)]
+    return [evento]
+
+
 def is_aprovado(evento: dict) -> bool:
     for k, v in _iter_valores(evento):
         if k.lower() in ("status", "event", "type", "situacao", "payment_status") and isinstance(v, str):
@@ -162,18 +177,38 @@ def email_do_evento(evento: dict) -> str:
     return ""
 
 
+# Oferta de cada produto — é o código no link do checkout
+# (pay.cakto.com.br/39dhqty_1125341 → "39dhqty"). Serve de rede de segurança
+# para identificar o produto quando o `sck` não vier. A CONFIRMAR na 1ª compra real.
+OFERTA_MAPA = os.environ.get("PADMINI_CAKTO_OFERTA_MAPA", "39dhqty")
+OFERTA_COMPAT = os.environ.get("PADMINI_CAKTO_OFERTA_COMPAT", "qo8uskp")
+
+
 def produto_do_evento(evento: dict, pd: dict) -> str:
     p = str(pd.get("pd_produto", "")).lower()
     if p in ("mapa", "compat"):
         return p
-    # fallback: id do produto da Cakto
-    for k, v in _iter_valores(evento):
-        if k.lower() in ("product_id", "offer_id", "produto_id", "product", "offer", "sku"):
-            sv = str(v)
-            if PROD_MAPA and sv == PROD_MAPA:
-                return "mapa"
-            if PROD_COMPAT and sv == PROD_COMPAT:
-                return "compat"
+    # Fallback pelo que a Cakto manda no pedido: product.id / product.short_id
+    # (se configurados nas env vars) e offer.id / checkoutUrl (código da oferta).
+    d = evento.get("data") if isinstance(evento, dict) else None
+    if not isinstance(d, dict):
+        return ""
+    prod = d.get("product") if isinstance(d.get("product"), dict) else {}
+    oferta = d.get("offer") if isinstance(d.get("offer"), dict) else {}
+    ids_produto = {str(prod.get("id") or ""), str(prod.get("short_id") or "")} - {""}
+    if PROD_MAPA and PROD_MAPA in ids_produto:
+        return "mapa"
+    if PROD_COMPAT and PROD_COMPAT in ids_produto:
+        return "compat"
+    codigos = {str(oferta.get("id") or "")}
+    url = str(d.get("checkoutUrl") or "")
+    if url:
+        codigos.add(url.rstrip("/").rsplit("/", 1)[-1])
+    codigos = {c.split("_")[0] for c in codigos if c}
+    if OFERTA_MAPA and OFERTA_MAPA in codigos:
+        return "mapa"
+    if OFERTA_COMPAT and OFERTA_COMPAT in codigos:
+        return "compat"
     return ""
 
 

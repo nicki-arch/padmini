@@ -228,3 +228,44 @@ def test_sck_do_front_e_lido_pelo_back(dados, esperado):
 def test_saude_sem_banco():
     r = cliente.get("/api/saude")
     assert r.status_code == 200 and r.json() == {"ok": True, "banco": None}
+
+
+# ---------------------------------------------------------------- formatos de entrega da Cakto
+def test_webhook_v2_lista_entrega_so_o_principal():
+    """Webhook V2 manda todos os pedidos da cobrança numa lista (data = [...])."""
+    principal = _evento(SCK_MAPA)["data"] | {"id": "p-main", "offer_type": "main"}
+    bump = _evento(SCK_MAPA)["data"] | {"id": "p-bump", "offer_type": "orderbump"}
+    r = _postar_webhook({"event": "purchase_approved", "data": [principal, bump]})
+    assert r.status_code == 200, r.text
+    res = r.json()["pedidos"]
+    assert res[0]["produto"] == "mapa" and res[0]["link"]
+    assert "orderbump" in res[1]["ignorado"]
+
+
+def test_webhook_v1_orderbump_ignorado():
+    ev = _evento(SCK_MAPA)
+    ev["data"]["offer_type"] = "orderbump"
+    r = _postar_webhook(ev)
+    assert r.status_code == 200 and "orderbump" in r.json()["ignorado"]
+
+
+def test_pedido_pago_sem_sck_fica_pendente(monkeypatch):
+    """Pagou mas o sck não veio: não pode sumir — responde 200 marcando pendente."""
+    import cakto
+    monkeypatch.setattr(cakto, "PROD_MAPA", "prod-mapa-123")
+    ev = _evento("")
+    ev["data"]["product"] = {"id": "prod-mapa-123"}
+    r = _postar_webhook(ev)
+    assert r.status_code == 200, r.text
+    assert r.json()["produto"] == "mapa" and "pendente" in r.json()
+    assert not r.json().get("link")
+
+
+def test_produto_identificado_pela_oferta_do_checkout():
+    """Sem sck, o código da oferta (o do link do checkout) ainda diz qual é o produto."""
+    import cakto
+    for url, esperado in (("https://pay.cakto.com.br/39dhqty_1125341", "mapa"),
+                          ("https://pay.cakto.com.br/qo8uskp_1125345", "compat")):
+        ev = {"data": {"checkoutUrl": url, "offer": {"id": url.rsplit("/", 1)[-1]}}}
+        assert cakto.produto_do_evento(ev, {}) == esperado
+    assert cakto.produto_do_evento({"data": {"offer": {"id": "outra"}}}, {}) == ""

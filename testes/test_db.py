@@ -132,3 +132,12 @@ def test_roles_da_api_publica_sem_acesso():
     rows = _linhas("SELECT has_table_privilege('anon','pedidos','SELECT'), "
                    "has_table_privilege('authenticated','textos_ia','INSERT')")
     assert rows[0] == (False, False)
+
+
+def test_pedido_sem_dados_fica_gravado_para_entrega_manual(monkeypatch):
+    import cakto
+    monkeypatch.setattr(cakto, "PROD_MAPA", "p1")  # payload traz product.id = "p1"
+    r = base._postar_webhook(evento_cakto("pedido-sem-sck", sck=""))
+    assert r.status_code == 200 and "pendente" in r.json()
+    rows = _linhas("SELECT produto, email, link FROM pedidos WHERE cakto_id = 'pedido-sem-sck'")
+    assert rows == [("mapa", "ana@teste.com", None)]
