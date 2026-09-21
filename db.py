@@ -53,6 +53,12 @@ CREATE TABLE IF NOT EXISTS textos_ia (
     modelo     TEXT,
     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Supabase: a API pública (chave anon) enxerga o schema public. RLS ligado e
+-- sem políticas = ninguém lê nem grava por ela. O site conecta como dono do
+-- banco, que não é afetado pelo RLS.
+ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE textos_ia ENABLE ROW LEVEL SECURITY;
 """
 
 CAMPOS_RASTREIO = ("utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "sck")

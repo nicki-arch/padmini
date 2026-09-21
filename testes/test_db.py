@@ -112,3 +112,10 @@ def test_saude_com_banco():
 def test_saude_com_banco_fora(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "postgresql://ninguem@127.0.0.1:1/nada")
     assert base.cliente.get("/api/saude").json() == {"ok": False, "banco": False}
+
+
+def test_tabelas_com_rls_ligado():
+    """No Supabase, sem RLS a API pública (chave anon) leria os pedidos."""
+    rows = _linhas("SELECT relname, relrowsecurity FROM pg_class "
+                   "WHERE relname IN ('pedidos', 'textos_ia')")
+    assert dict(rows) == {"pedidos": True, "textos_ia": True}
