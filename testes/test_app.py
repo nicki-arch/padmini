@@ -269,3 +269,23 @@ def test_produto_identificado_pela_oferta_do_checkout():
         ev = {"data": {"checkoutUrl": url, "offer": {"id": url.rsplit("/", 1)[-1]}}}
         assert cakto.produto_do_evento(ev, {}) == esperado
     assert cakto.produto_do_evento({"data": {"offer": {"id": "outra"}}}, {}) == ""
+
+
+# ---------------------------------------------------------------- celular / busca (parte 21)
+@pytest.mark.parametrize("consulta,primeiro", [
+    ("Porto Alegre", "Porto Alegre, Rio Grande do Sul, Brasil"),
+    ("Belo", "Belo Horizonte, Minas Gerais, Brasil"),        # antes vinha Belo, Camarões
+    ("Rio", "Rio de Janeiro, Rio de Janeiro, Brasil"),
+    ("Santa Maria", "Santa Maria, Rio Grande do Sul, Brasil"),
+    ("Paris", "Paris, Île-de-France, França"),                # exterior continua achável
+    ("Lisboa", "Lisbon, Lisbon, Portugal"),
+])
+def test_busca_prioriza_brasil_sem_esconder_exterior(consulta, primeiro):
+    r = cliente.get("/api/cidades", params={"q": consulta})
+    assert r.json()[0]["rotulo"] == primeiro
+
+
+def test_atributo_hidden_sempre_esconde():
+    """Sem essa regra, `#resultado{display:grid}` deixava um bloco vazio no celular."""
+    css = (RAIZ / "static" / "base.css").read_text(encoding="utf-8")
+    assert "[hidden] { display: none !important; }" in css

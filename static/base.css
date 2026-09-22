@@ -58,6 +58,9 @@ body {
 }
 a { color: inherit; }
 img { max-width: 100%; }
+/* O atributo hidden sempre vence: sem isso, regras como `#resultado{display:grid}`
+   mantinham blocos "escondidos" ocupando espaço (buraco vazio no celular). */
+[hidden] { display: none !important; }
 
 /* — Layout — */
 .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: 22px; }
@@ -162,11 +165,18 @@ input:focus-visible, button:focus-visible, a.btn:focus-visible, .navlink:focus-v
 .faq p { margin: 12px 0 2px; color: var(--muted); }
 
 /* — Rodapé — */
-footer { padding: 34px 0 60px; color: var(--faint); font-size: 12.5px; border-top: 1px solid var(--line); text-align: center; }
+footer { margin-top: 40px; padding: 34px 22px calc(60px + env(safe-area-inset-bottom, 0px)); color: var(--faint); font-size: 12.5px; border-top: 1px solid var(--line); text-align: center; }
 footer a { color: inherit; }
+footer p, footer > div { max-width: 640px; margin-inline: auto; }
 
 /* — Feedback "isso fez sentido?" — */
 .feedback { text-align: center; }
 .fb-pergunta { font-family: var(--serif); font-size: 1.15rem; color: var(--ink); margin: 0 0 12px; }
 .fb-botoes { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 .fb-botoes .btn { flex: 0 1 auto; }
+
+/* — Celular — */
+@media (max-width: 480px) {
+  section { padding-block: 40px; }
+  .card { padding: 16px; }
+}
