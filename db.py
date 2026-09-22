@@ -12,6 +12,8 @@ O que guardamos (e o que NÃO guardamos):
   - pedidos: id do pedido na Cakto, produto, e-mail/nome/telefone, dados de
     nascimento, valor, taxas, forma de pagamento, utm/sck, link entregue.
   - NÃO guardamos CPF nem dados de cartão, mesmo vindo no payload da Cakto.
+  - leads: lista de espera do lançamento (nome, e-mail, WhatsApp opcional,
+    consentimentos separados por canal — LGPD — e a origem ref/utm).
   - textos_ia: o texto gerado pela IA para cada mapa, para gerar uma vez só
     (sem isso, cada clique no botão chama a API de novo).
 """
@@ -54,23 +56,38 @@ CREATE TABLE IF NOT EXISTS textos_ia (
     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS leads (
+    id                  BIGSERIAL PRIMARY KEY,
+    criado_em           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizado_em       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    nome                TEXT,
+    email               TEXT NOT NULL,
+    whatsapp            TEXT,
+    aceita_email        BOOLEAN NOT NULL DEFAULT false,
+    aceita_whatsapp     BOOLEAN NOT NULL DEFAULT false,
+    interesse           TEXT,
+    origem              JSONB
+);
+CREATE UNIQUE INDEX IF NOT EXISTS leads_email_idx ON leads (lower(email));
+
 -- Supabase: a API pública (chave anon) enxerga o schema public. RLS ligado e
 -- sem políticas = ninguém lê nem grava por ela. O site conecta como dono do
 -- banco, que não é afetado pelo RLS.
 ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE textos_ia ENABLE ROW LEVEL SECURITY;
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 
 -- Defesa em profundidade (só existe no Supabase): tira das roles da API
 -- pública qualquer permissão nas tabelas, além do RLS.
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
-        REVOKE ALL ON TABLE pedidos, textos_ia FROM anon;
-        REVOKE ALL ON SEQUENCE pedidos_id_seq FROM anon;
+        REVOKE ALL ON TABLE pedidos, textos_ia, leads FROM anon;
+        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq FROM anon;
     END IF;
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
-        REVOKE ALL ON TABLE pedidos, textos_ia FROM authenticated;
-        REVOKE ALL ON SEQUENCE pedidos_id_seq FROM authenticated;
+        REVOKE ALL ON TABLE pedidos, textos_ia, leads FROM authenticated;
+        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq FROM authenticated;
     END IF;
 END $$;
 """
@@ -201,4 +218,32 @@ def guardar_texto_ia(chave: str, produto: str, texto: str, modelo: str | None = 
         return True
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao guardar texto_ia")
+        return False
+
+
+def registrar_lead(nome: str, email: str, whatsapp: str, aceita_email: bool,
+                   aceita_whatsapp: bool, interesse: str, origem: dict) -> bool:
+    """Grava (ou atualiza, pelo e-mail) um inscrito da lista de espera."""
+    if not ativo():
+        return False
+    try:
+        with _conectar() as c:
+            c.execute(
+                """
+                INSERT INTO leads (nome, email, whatsapp, aceita_email, aceita_whatsapp, interesse, origem)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
+                ON CONFLICT (lower(email)) DO UPDATE SET
+                    nome = COALESCE(EXCLUDED.nome, leads.nome),
+                    whatsapp = COALESCE(EXCLUDED.whatsapp, leads.whatsapp),
+                    aceita_email = EXCLUDED.aceita_email,
+                    aceita_whatsapp = EXCLUDED.aceita_whatsapp,
+                    interesse = COALESCE(EXCLUDED.interesse, leads.interesse),
+                    atualizado_em = now()
+                """,
+                (nome or None, email, whatsapp or None, aceita_email, aceita_whatsapp,
+                 interesse or None, json.dumps(origem or {}, ensure_ascii=False)),
+            )
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao registrar lead")
         return False

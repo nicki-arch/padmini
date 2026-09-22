@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 import json
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -120,19 +120,91 @@ def _validar_datetime(d: date, hora: str) -> datetime:
     return dt
 
 
+# ---------------------------------------------------------------------------
+# Pré-lançamento: com PADMINI_CAPTURA=1 o site fica "trancado" — home, mapa e
+# compatibilidade mandam para a lista de espera (/lista). Continuam abrindo:
+#   - links de entrega (têm `token`), para quem já comprou;
+#   - quem tem a chave de prévia (PADMINI_PREVIA_CHAVE): abrir qualquer página
+#     com ?previa=CHAVE grava um cookie e libera o site nesse navegador.
+# Desligar = apagar a variável (ou pôr 0) na Render; não precisa de deploy.
+# ---------------------------------------------------------------------------
+def _captura_ligada() -> bool:
+    return os.environ.get("PADMINI_CAPTURA") == "1"
+
+
+def _pagina_ou_lista(request: Request, arquivo: str):
+    chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
+    previa_url = request.query_params.get("previa", "")
+    liberado = (not _captura_ligada()
+                or "token" in request.query_params
+                or (chave and (request.cookies.get("pad_previa") == chave or previa_url == chave)))
+    if not liberado:
+        destino = "/lista"
+        if request.url.query:
+            destino += "?" + request.url.query  # mantém ref/utm do afiliado
+        return RedirectResponse(destino, status_code=302)
+    resp = FileResponse(RAIZ / "static" / arquivo)
+    if chave and previa_url == chave:
+        resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
+                        secure=request.url.scheme == "https", samesite="lax")
+    return resp
+
+
 @app.get("/")
-def pagina_home():
-    return FileResponse(RAIZ / "static" / "home.html")
+def pagina_home(request: Request):
+    return _pagina_ou_lista(request, "home.html")
 
 
 @app.get("/mapa")
-def pagina_mapa():
-    return FileResponse(RAIZ / "static" / "index.html")
+def pagina_mapa(request: Request):
+    return _pagina_ou_lista(request, "index.html")
 
 
 @app.get("/compatibilidade")
-def pagina_compatibilidade():
-    return FileResponse(RAIZ / "static" / "compatibilidade.html")
+def pagina_compatibilidade(request: Request):
+    return _pagina_ou_lista(request, "compatibilidade.html")
+
+
+@app.get("/lista")
+def pagina_lista():
+    return FileResponse(RAIZ / "static" / "lista.html")
+
+
+class Inscricao(BaseModel):
+    nome: str = Field("", max_length=80)
+    email: str = Field(..., max_length=160)
+    whatsapp: str = Field("", max_length=30)
+    aceita_email: bool = False
+    aceita_whatsapp: bool = False
+    interesse: str = Field("", max_length=20)
+    origem: dict = Field(default_factory=dict)
+    site: str = Field("", max_length=200)  # honeypot: humanos não veem este campo
+
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+@app.post("/api/lista")
+def inscrever_na_lista(ins: Inscricao):
+    if ins.site:
+        return {"ok": True}  # robô preencheu o campo escondido: finge sucesso e descarta
+    email = ins.email.strip().lower()
+    if not _EMAIL_RE.match(email):
+        raise HTTPException(422, "Confira o e-mail.")
+    if not ins.aceita_email:
+        raise HTTPException(422, "Marque a autorização para receber o aviso por e-mail.")
+    zap = re.sub(r"\D", "", ins.whatsapp)
+    if zap and not (10 <= len(zap) <= 13):
+        raise HTTPException(422, "Confira o WhatsApp (com DDD).")
+    if zap and len(zap) in (10, 11):
+        zap = "55" + zap
+    origem = {k: str(v)[:80] for k, v in (ins.origem or {}).items()
+              if k in ("ref", "cupom", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term")}
+    interesse = ins.interesse if ins.interesse in ("mapa", "compat", "ambos") else ""
+    if not db.registrar_lead(ins.nome.strip()[:80], email, zap, True,
+                             bool(zap) and ins.aceita_whatsapp, interesse, origem):
+        raise HTTPException(503, "Não conseguimos salvar agora. Tente de novo em instantes.")
+    return {"ok": True}
 
 
 @app.get("/privacidade")
@@ -165,6 +237,8 @@ def config():
         # Métricas de funil (PostHog). Em branco = desligado (nada é carregado).
         "posthog_key": os.environ.get("PADMINI_POSTHOG_KEY", ""),
         "posthog_host": os.environ.get("PADMINI_POSTHOG_HOST", "https://us.i.posthog.com"),
+        # pré-lançamento (página /lista)
+        "data_abertura": os.environ.get("PADMINI_DATA_ABERTURA", ""),
     }
 
 
@@ -343,10 +417,13 @@ def _processar_pedido(evento: dict) -> dict:
     if not cakto.is_aprovado(evento):
         return {"ok": True, "ignorado": "pagamento não aprovado"}
 
-    # Por enquanto só existe o pedido principal. Order bump/upsell entram com os
-    # combos (roteiro, passo 4) — até lá, ignorar evita entregar o produto
-    # principal duas vezes (o `sck` do bump é o mesmo do principal).
+    # Combo "casal completo": order bump no checkout do casal que entrega o mapa
+    # individual de cada um. Chega como pedido próprio (offer_type=orderbump) com o
+    # mesmo `sck` do casal. Outros bumps/upsells ainda não existem: ignorar evita
+    # entregar o produto principal duas vezes.
     tipo = str((evento.get("data") or {}).get("offer_type") or "main").lower()
+    if tipo == "orderbump" and cakto.e_bump_mapas_do_casal(evento):
+        return _entregar_mapas_do_casal(evento)
     if tipo != "main":
         return {"ok": True, "ignorado": f"oferta {tipo} ainda não tratada"}
 
@@ -378,3 +455,25 @@ def _processar_pedido(evento: dict) -> dict:
     # se não enviou (Resend não configurado), devolve o link para envio manual
     return {"ok": True, "produto": produto, "email": email or None,
             "email_enviado": enviado, "link": None if enviado else link}
+
+
+def _entregar_mapas_do_casal(evento: dict) -> dict:
+    """Order bump do casal: um link de mapa individual para cada pessoa."""
+    produto = "mapas_casal"
+    email = cakto.email_do_evento(evento)
+    dados = cakto.dados_nascimento(cakto.coletar_pd(evento), "compat")
+    if not dados:
+        db.registrar_pedido(evento, produto, {}, email, None, False)
+        return {"ok": True, "produto": produto, "email": email or None,
+                "pendente": "dados de nascimento ausentes — entregar manualmente"}
+    cakto_id = str((evento.get("data") or {}).get("id") or "")
+    if db.pedido_entregue(cakto_id):
+        return {"ok": True, "produto": produto, "duplicado": True}
+    links = [(p.get("nome") or rotulo, entrega.link_completo("mapa", p))
+             for rotulo, p in (("Pessoa A", dados["a"]), ("Pessoa B", dados["b"]))]
+    enviado = entrega.enviar_email(
+        email, "Os mapas individuais de vocês estão prontos",
+        entrega.email_mapas_do_casal_html(links, dados["a"].get("nome", "")))
+    db.registrar_pedido(evento, produto, dados, email, "\n".join(l for _, l in links), enviado)
+    return {"ok": True, "produto": produto, "email": email or None, "email_enviado": enviado,
+            "links": None if enviado else [l for _, l in links]}

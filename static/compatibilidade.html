@@ -142,6 +142,10 @@
 <script>
 // Link do checkout (Cakto). Preencher quando o produto estiver cadastrado (checklist §D).
 const LINK_CHECKOUT = "https://pay.cakto.com.br/qo8uskp_1125345";
+// Combo "casal completo": order bump no checkout do casal com o mapa individual
+// de cada um. Preencher com o preço do bump (ex.: "R$40") quando ele existir na
+// Cakto — vazio = a linha do combo não aparece.
+const PRECO_BUMP_MAPAS = "";
 
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -392,6 +396,7 @@ function desenharAmostra(d) {
         <li>Como fazer essa relação funcionar, na prática</li>
       </ul>
       <div class="preco">R$97 <small>R$127</small></div>
+      ${PRECO_BUMP_MAPAS ? `<p class="sub" style="margin:4px 0 14px">No checkout, dá para incluir <b>o mapa individual de cada um</b> por mais ${esc(PRECO_BUMP_MAPAS)} — os dois chegam no mesmo e-mail.</p>` : ""}
       <div class="enviar-linha">
         <a class="btn btn-primary" href="${esc(ctaHref)}" id="cta-completo" onclick="window.padTrack&&padTrack('checkout_click',{produto:'compat'})">Quero o relatório completo →</a>
       </div>

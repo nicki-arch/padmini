@@ -212,6 +212,25 @@ def produto_do_evento(evento: dict, pd: dict) -> str:
     return ""
 
 
+# Oferta do order bump "mapas individuais do casal" (código da oferta na Cakto).
+# Vazio = qualquer order bump num pedido de casal é tratado como os 2 mapas —
+# vale enquanto este for o único bump. Ao criar outro bump, preencher.
+OFERTA_BUMP_MAPAS = os.environ.get("PADMINI_CAKTO_OFERTA_BUMP_MAPAS", "")
+
+
+def e_bump_mapas_do_casal(evento: dict) -> bool:
+    d = evento.get("data") if isinstance(evento, dict) else None
+    if not isinstance(d, dict):
+        return False
+    if coletar_pd(evento).get("pd_produto") != "compat":
+        return False  # o bump só existe no checkout do casal (sck "c~...")
+    if not OFERTA_BUMP_MAPAS:
+        return True
+    oferta = d.get("offer") if isinstance(d.get("offer"), dict) else {}
+    codigos = {str(oferta.get("id") or ""), str(d.get("checkoutUrl") or "").rstrip("/").rsplit("/", 1)[-1]}
+    return OFERTA_BUMP_MAPAS in {c.split("_")[0] for c in codigos if c}
+
+
 def dados_nascimento(pd: dict, produto: str):
     """Monta os dados de nascimento a partir dos pd_*. Retorna dict ou None se faltar o essencial."""
     def campo(nome):

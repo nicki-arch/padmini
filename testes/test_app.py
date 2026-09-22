@@ -289,3 +289,80 @@ def test_atributo_hidden_sempre_esconde():
     """Sem essa regra, `#resultado{display:grid}` deixava um bloco vazio no celular."""
     css = (RAIZ / "static" / "base.css").read_text(encoding="utf-8")
     assert "[hidden] { display: none !important; }" in css
+
+
+# ---------------------------------------------------------------- combo: mapas do casal (order bump)
+def test_bump_no_casal_entrega_os_dois_mapas():
+    ev = _evento(SCK_CASAL)
+    ev["data"] |= {"id": "bump-1", "offer_type": "orderbump"}
+    r = _postar_webhook(ev)
+    assert r.status_code == 200, r.text
+    corpo = r.json()
+    assert corpo["produto"] == "mapas_casal" and len(corpo["links"]) == 2
+    for link, nome in zip(corpo["links"], ("Ana", "Bruno")):
+        q = _params(link)
+        assert q["nome"] == nome
+        pedido = {"nome": q["nome"], "data": q["data"], "hora": q["hora"], "lat": float(q["lat"]),
+                  "lon": float(q["lon"]), "cidade": q["cidade"], "nivel": "completo", "token": q["token"]}
+        assert cliente.post("/api/mapa", json=pedido).status_code == 200
+
+
+def test_bump_de_outra_oferta_e_ignorado(monkeypatch):
+    import cakto
+    monkeypatch.setattr(cakto, "OFERTA_BUMP_MAPAS", "bumpmapas")
+    ev = _evento(SCK_CASAL)
+    ev["data"] |= {"offer_type": "orderbump", "offer": {"id": "outrobump"}}
+    assert "ignorado" in _postar_webhook(ev).json()
+    ev["data"]["offer"] = {"id": "bumpmapas"}
+    assert _postar_webhook(ev).json()["produto"] == "mapas_casal"
+
+
+# ---------------------------------------------------------------- pré-lançamento: lista de espera
+def test_lista_responde_e_fica_fora_da_trava():
+    assert cliente.get("/lista").status_code == 200
+
+
+def test_trava_desligada_por_padrao():
+    assert cliente.get("/mapa", follow_redirects=False).status_code == 200
+
+
+def test_trava_ligada_manda_para_a_lista_mantendo_o_ref(monkeypatch):
+    monkeypatch.setenv("PADMINI_CAPTURA", "1")
+    for rota in ("/", "/mapa", "/compatibilidade"):
+        r = cliente.get(rota + "?ref=PEDRO", follow_redirects=False)
+        assert r.status_code == 302 and r.headers["location"] == "/lista?ref=PEDRO"
+
+
+def test_trava_ligada_nao_bloqueia_link_de_entrega(monkeypatch):
+    monkeypatch.setenv("PADMINI_CAPTURA", "1")
+    assert cliente.get("/mapa?token=abc", follow_redirects=False).status_code == 200
+
+
+def test_chave_de_previa_libera_e_grava_cookie(monkeypatch):
+    monkeypatch.setenv("PADMINI_CAPTURA", "1")
+    monkeypatch.setenv("PADMINI_PREVIA_CHAVE", "segredo123")
+    c = TestClient(app_mod.app)
+    assert c.get("/?previa=errada", follow_redirects=False).status_code == 302
+    assert c.get("/?previa=segredo123", follow_redirects=False).status_code == 200
+    assert c.get("/compatibilidade", follow_redirects=False).status_code == 200  # cookie
+
+
+def test_inscricao_exige_email_valido_e_consentimento():
+    base = {"email": "ana@teste.com", "aceita_email": True}
+    assert cliente.post("/api/lista", json=base | {"email": "ana"}).status_code == 422
+    assert cliente.post("/api/lista", json=base | {"aceita_email": False}).status_code == 422
+    assert cliente.post("/api/lista", json=base | {"whatsapp": "123"}).status_code == 422
+
+
+def test_inscricao_sem_banco_avisa_em_vez_de_perder(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    r = cliente.post("/api/lista", json={"email": "ana@teste.com", "aceita_email": True})
+    assert r.status_code == 503
+
+
+def test_honeypot_finge_sucesso_sem_gravar(monkeypatch):
+    import db
+    chamadas = []
+    monkeypatch.setattr(db, "registrar_lead", lambda *a, **k: chamadas.append(a) or True)
+    r = cliente.post("/api/lista", json={"email": "bot@x.com", "aceita_email": True, "site": "http://spam"})
+    assert r.status_code == 200 and chamadas == []

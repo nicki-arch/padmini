@@ -9,8 +9,8 @@ Visual "Lótus à meia-luz" (full dark), com design system compartilhado (`stati
 
 ## Rotas
 
-Páginas: `/` (home), `/mapa`, `/compatibilidade`, `/privacidade`, `/termos`.
-API: `POST /api/mapa`, `POST /api/compatibilidade`, `POST /api/pdf`, `GET /api/cidades`, `GET /api/config`, `GET /api/saude`, `POST /webhook/cakto`.
+Páginas: `/` (home), `/mapa`, `/compatibilidade`, `/lista` (lista de espera), `/privacidade`, `/termos`.
+API: `POST /api/mapa`, `POST /api/compatibilidade`, `POST /api/pdf`, `GET /api/cidades`, `GET /api/config`, `GET /api/saude`, `POST /api/lista`, `POST /webhook/cakto`.
 
 Cada endpoint de produto aceita `nivel: "amostra" | "completo"`. A **amostra é sempre grátis**; o **completo exige token** (ver "Acesso ao completo").
 
@@ -32,6 +32,10 @@ Roda no Render (https://padmini.onrender.com), ligado ao GitHub: cada `git push`
 | `RESEND_API_KEY` | Envio do e-mail de entrega (via Resend). Sem ela, o webhook devolve o link para envio manual |
 | `PADMINI_EMAIL_FROM` | Remetente do e-mail (padrão `Padmini <nao-responda@padmini.com.br>`) |
 | `DATABASE_URL` | Postgres (Supabase ou Render). Guarda pedidos (sem CPF/cartão), evita e-mail duplicado e guarda o texto da IA (1 geração por mapa). Em branco = sem banco; o site funciona igual |
+| `PADMINI_CAPTURA` | `1` = pré-lançamento: home, mapa e compatibilidade redirecionam para a lista de espera (`/lista`). Links de entrega (com `token`) continuam abrindo |
+| `PADMINI_PREVIA_CHAVE` | Abre o site travado para quem acessar `/?previa=<chave>` (cookie de 60 dias) — para o Nicolas e o Pedro |
+| `PADMINI_DATA_ABERTURA` | Texto da data de abertura mostrado na lista (ex.: `10 de outubro`) |
+| `PADMINI_CAKTO_OFERTA_BUMP_MAPAS` | Código da oferta do order bump "mapa individual de cada um" no checkout do casal. Vazio = qualquer bump do casal entrega os 2 mapas |
 | `PADMINI_POSTHOG_KEY` | Métricas de funil (PostHog). Em branco = desligado; nada é carregado |
 | `PADMINI_POSTHOG_HOST` | Host do PostHog (padrão `https://us.i.posthog.com`; use `https://eu.i.posthog.com` na região UE) |
 

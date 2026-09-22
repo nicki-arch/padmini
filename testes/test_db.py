@@ -141,3 +141,20 @@ def test_pedido_sem_dados_fica_gravado_para_entrega_manual(monkeypatch):
     assert r.status_code == 200 and "pendente" in r.json()
     rows = _linhas("SELECT produto, email, link FROM pedidos WHERE cakto_id = 'pedido-sem-sck'")
     assert rows == [("mapa", "ana@teste.com", None)]
+
+
+def test_lead_gravado_com_consentimentos_e_origem():
+    with db._conectar() as c:
+        c.execute("TRUNCATE leads")
+    r = base.cliente.post("/api/lista", json={
+        "nome": "Ana", "email": "Ana@Teste.com", "whatsapp": "(51) 99999-8888",
+        "aceita_email": True, "aceita_whatsapp": True, "interesse": "compat",
+        "origem": {"ref": "PEDRO", "utm_source": "tiktok", "lixo": "x"}})
+    assert r.status_code == 200, r.text
+    # mesma pessoa de novo, sem WhatsApp: atualiza em vez de duplicar
+    base.cliente.post("/api/lista", json={"email": "ana@teste.com", "aceita_email": True})
+    rows = _linhas("SELECT email, whatsapp, aceita_email, aceita_whatsapp, interesse, origem FROM leads")
+    assert len(rows) == 1
+    email, zap, ae, aw, interesse, origem = rows[0]
+    assert (email, zap, ae, interesse) == ("ana@teste.com", "5551999998888", True, "compat")
+    assert origem == {"ref": "PEDRO", "utm_source": "tiktok"}

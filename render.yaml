@@ -27,5 +27,11 @@ services:
         sync: false
       - key: DATABASE_URL        # Postgres (Supabase ou Render). Em branco = sem banco
         sync: false
+      - key: PADMINI_CAPTURA       # 1 = site travado na lista de espera
+        sync: false
+      - key: PADMINI_PREVIA_CHAVE  # libera o site travado com ?previa=
+        sync: false
+      - key: PADMINI_DATA_ABERTURA # ex.: "10 de outubro"
+        sync: false
       - key: PADMINI_POSTHOG_KEY # métricas de funil (opcional; em branco = desligado)
         sync: false
