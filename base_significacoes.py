@@ -127,7 +127,7 @@ GRAHA_DIGNIDADE = {
     "Mangala": {
         "exaltado": "Marte exaltado em Capricórnio canaliza a energia com estratégia: a ação é disciplinada e tende a dar resultado concreto.",
         "debilitado": "Marte debilitado em Câncer faz a raiva e a assertividade passarem pelo filtro emocional. A pessoa pode reagir de forma indireta em vez de enfrentar abertamente.",
-        "proprio": "Marte em signo próprio (Áries ou Escorpião) dá coragem, iniciativa e capacidade de se defender sem hesitar.",
+        "proprio": "Marte em {signo}, seu próprio signo, dá coragem, iniciativa e capacidade de se defender sem hesitar.",
     },
     "Budha": {
         "exaltado": "Mercúrio exaltado em Virgem dá mente analítica, precisa e organizada, com talento para detalhes, números e linguagem.",
@@ -137,17 +137,17 @@ GRAHA_DIGNIDADE = {
     "Guru": {
         "exaltado": "Júpiter exaltado em Câncer amplia a capacidade de cuidar, ensinar e expandir pelo vínculo afetivo. A sabedoria dessa pessoa nasce da experiência, não só do estudo.",
         "debilitado": "Júpiter debilitado em Capricórnio gera cautela onde seria natural confiar e expandir. A expansão vem depois de testar a estrutura.",
-        "proprio": "Júpiter em signo próprio (Sagitário ou Peixes) dá fé e senso de propósito que sustentam a pessoa mesmo sem garantias externas.",
+        "proprio": "Júpiter em {signo}, seu próprio signo, dá fé e senso de propósito que sustentam a pessoa mesmo sem garantias externas.",
     },
     "Shukra": {
         "exaltado": "Vênus exaltada em Peixes dá amor generoso e sensibilidade artística refinada. A pessoa ama de forma idealista e às vezes pouco prática.",
         "debilitado": "Vênus debilitada em Virgem faz o afeto passar pelo crivo da crítica. A pessoa demonstra amor servindo, e pode ter dificuldade em relaxar no prazer.",
-        "proprio": "Vênus em signo próprio (Touro ou Libra) dá facilidade para relacionamentos, gosto estético e capacidade de criar harmonia ao redor.",
+        "proprio": "Vênus em {signo}, seu próprio signo, dá facilidade para relacionamentos, gosto estético e capacidade de criar harmonia ao redor.",
     },
     "Shani": {
         "exaltado": "Saturno exaltado em Libra dá senso de justiça, paciência e responsabilidade nas relações. A pessoa constrói autoridade pela imparcialidade.",
         "debilitado": "Saturno debilitado em Áries cria tensão entre pressa e disciplina. As lições de paciência chegam por frustração até a pessoa aprender a esperar.",
-        "proprio": "Saturno em signo próprio (Capricórnio ou Aquário) dá persistência e capacidade de construir estruturas duradouras.",
+        "proprio": "Saturno em {signo}, seu próprio signo, dá persistência e capacidade de construir estruturas duradouras.",
     },
 }
 
@@ -177,7 +177,7 @@ YOGAS = {
 }
 
 DOSHA = {
-    "mangal_dosha": "Marte ocupa uma posição sensível em relação a {referencias} (Mangal Dosha). Na tradição, isso pede atenção à forma como a pessoa expressa assertividade nos relacionamentos. Não é uma sentença, e cerca de metade das pessoas tem alguma forma dessa configuração.",
+    "mangal_dosha": "Marte ocupa uma posição sensível em relação {referencias} (Mangal Dosha). Na tradição, isso pede atenção à forma como a pessoa expressa assertividade nos relacionamentos. Não é uma sentença, e cerca de metade das pessoas tem alguma forma dessa configuração.",
 }
 
 # ===========================================================================

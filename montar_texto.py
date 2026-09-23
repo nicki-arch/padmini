@@ -23,7 +23,7 @@ from base_significacoes import (
     COMBUSTAO, CAZIMI, YOGAS, DOSHA,
 )
 
-REFERENCIA_PT = {"lagna": "o Ascendente", "lua": "a Lua", "venus": "Vênus"}
+REFERENCIA_PT = {"lagna": "ao Ascendente", "lua": "à Lua", "venus": "a Vênus"}
 
 
 def dasha_atual(mapa: dict, hoje: date | None = None) -> dict | None:
@@ -37,7 +37,10 @@ def dasha_atual(mapa: dict, hoje: date | None = None) -> dict | None:
 def trecho_do_fato(fato: dict) -> str | None:
     tipo = fato["tipo"]
     if tipo == "dignidade":
-        return GRAHA_DIGNIDADE.get(fato["planeta"], {}).get(fato["estado"])
+        modelo = GRAHA_DIGNIDADE.get(fato["planeta"], {}).get(fato["estado"])
+        if modelo and "{signo}" in modelo:
+            return modelo.format(signo=SIGNO_PT[fato["signo"]])
+        return modelo
     if tipo == "combustao":
         return COMBUSTAO.get(fato["planeta"])
     if tipo == "cazimi":

@@ -47,7 +47,8 @@ def detectar_dignidades(grahas: dict) -> list[dict]:
         elif signo_atual == signo_debil:
             fatos.append({"tipo": "dignidade", "planeta": nome, "estado": "debilitado"})
         elif signo_atual in regra["proprio"]:
-            fatos.append({"tipo": "dignidade", "planeta": nome, "estado": "proprio"})
+            fatos.append({"tipo": "dignidade", "planeta": nome, "estado": "proprio",
+                          "signo": signo_atual})
     return fatos
 
 
