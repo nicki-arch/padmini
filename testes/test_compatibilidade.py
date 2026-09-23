@@ -63,13 +63,12 @@ CASAIS = {
 # None em qualquer koota => aquela comparação é pulada (pendente).
 # 'total' opcional: se preenchido, também é conferido.
 # ---------------------------------------------------------------------------
-ESPERADO = {
-    "casal_1": {"Varna": None, "Vashya": None, "Tara": None, "Yoni": None,
-                "Graha Maitri": None, "Gana": None, "Bhakoot": None, "Nadi": None, "total": None},
-    "casal_2": {k: None for k in KOOTAS} | {"total": None},
-    "casal_3": {k: None for k in KOOTAS} | {"total": None},
-    "casal_4": {k: None for k in KOOTAS} | {"total": None},
-    "casal_5": {k: None for k in KOOTAS} | {"total": None},
+ESPERADO = {  # Prokerala (Guna Milan), 22/set/2026 — A = noiva (girl), B = noivo (boy)
+    "casal_1": {"Varna": 1.0, "Vashya": 1.0, "Tara": 1.5, "Yoni": 2.0, "Graha Maitri": 3.0, "Gana": 0.0, "Bhakoot": 7.0, "Nadi": 8.0, "total": 23.5},
+    "casal_2": {"Varna": 1.0, "Vashya": 2.0, "Tara": 3.0, "Yoni": 3.0, "Graha Maitri": 5.0, "Gana": 6.0, "Bhakoot": 0.0, "Nadi": 0.0, "total": 20.0},
+    "casal_3": {"Varna": 1.0, "Vashya": 1.0, "Tara": 1.5, "Yoni": 1.0, "Graha Maitri": 5.0, "Gana": 1.0, "Bhakoot": 0.0, "Nadi": 8.0, "total": 18.5},
+    "casal_4": {"Varna": 1.0, "Vashya": 0.5, "Tara": 3.0, "Yoni": 1.0, "Graha Maitri": 5.0, "Gana": 0.0, "Bhakoot": 7.0, "Nadi": 8.0, "total": 25.5},
+    "casal_5": {"Varna": 0.0, "Vashya": 1.0, "Tara": 1.5, "Yoni": 1.0, "Graha Maitri": 3.0, "Gana": 0.0, "Bhakoot": 0.0, "Nadi": 8.0, "total": 14.5},
 }
 
 
@@ -162,3 +161,23 @@ if __name__ == "__main__":
         print(f"REFERÊNCIA: OK — {feitas} comparações conferem ({pendentes} ainda pendentes).")
 
     sys.exit(1 if inv or ref_falhas else 0)
+
+
+# ===========================================================================
+# CAMADA 3 — 129 casais do Prokerala (todos os pares de Yoni, Vashya, Gana,
+# Bhakoot). Trava as tabelas: qualquer mudança que desalinhe da fonte falha.
+# ===========================================================================
+def test_129_casais_do_prokerala():
+    import json
+    dados = json.loads((Path(__file__).parent / "dados" / "prokerala_guna_milan.json").read_text(encoding="utf-8"))
+    divergencias = []
+    for c in dados["casais"]:
+        ma = calcular_mapa(datetime.fromisoformat(c["noiva"]), -23.5505, -46.6333)
+        mb = calcular_mapa(datetime.fromisoformat(c["noivo"]), -23.5505, -46.6333)
+        r = calcular_compatibilidade(ma, mb)
+        nosso = {k["nome"]: k["obtido"] for k in r["kootas"]}
+        for koota, esperado in c["pontos"].items():
+            if abs(nosso[koota] - esperado) > 1e-9:
+                divergencias.append(f"{c['id']} {koota}: nosso {nosso[koota]} x Prokerala {esperado}")
+    assert not divergencias, "\n".join(divergencias[:20])
+    assert len(dados["casais"]) >= 120

@@ -14,27 +14,18 @@ Do mapa de cada pessoa o motor usa apenas:
 Para Mangal, usa o mapa completo (Ascendente, Lua e Vênus).
 
 CONVENÇÃO DIRECIONAL (importante):
-  O Guna Milan clássico é contado da NOIVA para o NOIVO — Tara, Gana e Bhakoot
-  têm direção. Como o produto não pressupõe gênero, fixamos "pessoa A" e
-  "pessoa B" e contamos SEMPRE de A para B. Trocar a ordem pode mudar Tara/Gana
-  em casos de fronteira. Documentado e travado aqui.
+  O Guna Milan clássico é contado da NOIVA para o NOIVO — Varna, Vashya, Gana e
+  Bhakoot têm direção. Como o produto não pressupõe gênero, a "pessoa A" ocupa
+  a posição da noiva e a "pessoa B" a do noivo (mesma ordem do Prokerala:
+  girl = A, boy = B). Trocar a ordem pode mudar a nota. Documentado e travado.
 
 =============================================================================
-STATUS DAS TABELAS (honestidade de engenharia)
-  CONFIRMADAS (padrão clássico estável, baixa divergência entre fontes):
-    Varna, Tara (contagem por 9), Graha Maitri (amizade planetária),
-    Gana (Deva/Manushya/Rakshasa), Bhakoot (distância), Nadi (Aadi/Madhya/Antya),
-    Yoni (animal de cada nakshatra), inimigos mortais de Yoni.
-  PRELIMINARES (as fontes divergem — VALIDAR contra a fonte escolhida antes
-  de cobrar, ver spec §7):
-    - Vashya: classe por rashi em meio-signo (Dhanu, Makara) e a matriz de
-      pontuação parcial.
-    - Yoni: os valores intermediários 3 (amigo) e 1 (inimigo) — aqui o meio
-      cai em 2 (neutro) por padrão até a validação preencher os pares.
-    - Gana: o valor de Deva×Manushya (5 ou 6) e a direção de Deva×Rakshasa.
-    - Bhakoot: seguimos a spec (dosha só em 6-8 e 5-9; 2-12 tratado como
-      auspicioso). Algumas fontes penalizam 2-12 também.
-  Cada ponto PRELIMINAR está marcado com  # VALIDAR  no código.
+VALIDAÇÃO (22/set/2026) — fonte de referência: Prokerala (Guna Milan).
+  132 casais comparados koota a koota (todos os pares de Yoni, as 25
+  combinações de Vashya, os 9 pares de Gana e os 24 pares 6/8 de Bhakoot).
+  A Lua (rashi e nakshatra) bateu em 100% dos casos. As tabelas abaixo foram
+  ajustadas para reproduzir o Prokerala; o teste testes/test_compatibilidade.py
+  trava os 5 casais de referência koota a koota.
 =============================================================================
 """
 
@@ -78,7 +69,8 @@ def _idx_nak(nome: str) -> int:
 
 # ===========================================================================
 # 1. VARNA (1 ponto) — por rashi.  CONFIRMADA
-# Brâmane(4) > Kshatriya(3) > Vaishya(2) > Shudra(1). 1 ponto se varna(A) >= varna(B).
+# Brâmane(4) > Kshatriya(3) > Vaishya(2) > Shudra(1).
+# 1 ponto se o varna do noivo (B) é igual ou maior que o da noiva (A). [Prokerala]
 # ===========================================================================
 VARNA_POR_RASHI = {
     "Karka": 4, "Vrishchika": 4, "Meena": 4,      # água = Brâmane
@@ -89,11 +81,11 @@ VARNA_POR_RASHI = {
 
 
 def koota_varna(rashi_a: str, rashi_b: str) -> float:
-    return 1.0 if VARNA_POR_RASHI[rashi_a] >= VARNA_POR_RASHI[rashi_b] else 0.0
+    return 1.0 if VARNA_POR_RASHI[rashi_b] >= VARNA_POR_RASHI[rashi_a] else 0.0
 
 
 # ===========================================================================
-# 2. VASHYA (2 pontos) — por rashi.  PRELIMINAR (validar meio-signo + matriz)
+# 2. VASHYA (2 pontos) — por rashi, com meio-signo em Dhanu e Makara.  [Prokerala]
 # Classes: chatushpada (quadrúpede), nara (humano), jalachara (aquático),
 #          vanachara (selvagem), keeta (inseto).
 # ===========================================================================
@@ -101,35 +93,37 @@ VASHYA_POR_RASHI = {
     "Mesha": "chatushpada", "Vrishabha": "chatushpada",
     "Mithuna": "nara", "Karka": "jalachara", "Simha": "vanachara",
     "Kanya": "nara", "Tula": "nara", "Vrishchika": "keeta",
-    "Dhanu": "nara",       # VALIDAR: 2ª metade é chatushpada em algumas fontes
-    "Makara": "chatushpada",  # VALIDAR: 1ª metade chatushpada, 2ª jalachara
+    "Dhanu": "nara",          # 1ª metade (0–15°) humana; 2ª metade quadrúpede
+    "Makara": "chatushpada",  # 1ª metade quadrúpede; 2ª metade aquática
     "Kumbha": "nara", "Meena": "jalachara",
 }
+_VASHYA_2A_METADE = {"Dhanu": "chatushpada", "Makara": "jalachara"}
 
-# Matriz de pontuação entre classes (linha = A, coluna = B).  # VALIDAR (matriz)
-# Convenção comum: mesma classe = 2; combinações domésticas = 1; parciais = 0.5;
-# "presa/predador" = 0. Os valores fora da diagonal são preliminares.
+
+def classe_vashya(rashi: str, grau: float | None = None) -> str:
+    if grau is not None and grau >= 15 and rashi in _VASHYA_2A_METADE:
+        return _VASHYA_2A_METADE[rashi]
+    return VASHYA_POR_RASHI[rashi]
+
+
+# Matriz (linha = noiva/A, coluna = noivo/B), idêntica ao Prokerala nas 25 combinações.
 _VASHYA_PTS = {
-    ("chatushpada", "chatushpada"): 2, ("nara", "nara"): 2,
-    ("jalachara", "jalachara"): 2, ("vanachara", "vanachara"): 2,
-    ("keeta", "keeta"): 2,
-    ("nara", "chatushpada"): 1, ("chatushpada", "nara"): 1,
-    ("nara", "jalachara"): 1, ("jalachara", "nara"): 1,
-    ("chatushpada", "jalachara"): 1, ("jalachara", "chatushpada"): 1,
-    ("nara", "keeta"): 0.5, ("keeta", "nara"): 0.5,
-    ("jalachara", "keeta"): 1, ("keeta", "jalachara"): 1,
-    # vanachara (selvagem, Simha) domina: não é dominado por nara/quadrúpede
-    ("vanachara", "nara"): 1, ("nara", "vanachara"): 0,
-    ("vanachara", "chatushpada"): 1, ("chatushpada", "vanachara"): 0,
-    ("vanachara", "jalachara"): 1, ("jalachara", "vanachara"): 0.5,
-    ("vanachara", "keeta"): 1, ("keeta", "vanachara"): 0,
-    ("chatushpada", "keeta"): 0.5, ("keeta", "chatushpada"): 0.5,
+    ("chatushpada", "chatushpada"): 2, ("chatushpada", "nara"): 1, ("chatushpada", "jalachara"): 1,
+    ("chatushpada", "vanachara"): 0, ("chatushpada", "keeta"): 1,
+    ("nara", "chatushpada"): 1, ("nara", "nara"): 2, ("nara", "jalachara"): 0.5,
+    ("nara", "vanachara"): 0, ("nara", "keeta"): 1,
+    ("jalachara", "chatushpada"): 1, ("jalachara", "nara"): 0.5, ("jalachara", "jalachara"): 2,
+    ("jalachara", "vanachara"): 1, ("jalachara", "keeta"): 1,
+    ("vanachara", "chatushpada"): 0, ("vanachara", "nara"): 0, ("vanachara", "jalachara"): 1,
+    ("vanachara", "vanachara"): 2, ("vanachara", "keeta"): 0,
+    ("keeta", "chatushpada"): 1, ("keeta", "nara"): 0, ("keeta", "jalachara"): 1,
+    ("keeta", "vanachara"): 0, ("keeta", "keeta"): 2,
 }
 
 
-def koota_vashya(rashi_a: str, rashi_b: str) -> float:
-    ca, cb = VASHYA_POR_RASHI[rashi_a], VASHYA_POR_RASHI[rashi_b]
-    return float(_VASHYA_PTS.get((ca, cb), 1))
+def koota_vashya(rashi_a: str, rashi_b: str, grau_a: float | None = None,
+                 grau_b: float | None = None) -> float:
+    return float(_VASHYA_PTS[(classe_vashya(rashi_a, grau_a), classe_vashya(rashi_b, grau_b))])
 
 
 # ===========================================================================
@@ -164,34 +158,32 @@ YONI_POR_NAKSHATRA = {
     "Purva Bhadrapada": "leao", "Uttara Bhadrapada": "vaca", "Revati": "elefante",
 }
 
-# 7 pares de inimigos mortais (cobrem os 14 animais).  CONFIRMADOS -> 0 pontos
-_YONI_INIMIGOS_MORTAIS = {
-    frozenset({"cavalo", "bufalo"}),
-    frozenset({"elefante", "leao"}),
-    frozenset({"ovelha", "macaco"}),
-    frozenset({"cobra", "mangusto"}),
-    frozenset({"cao", "veado"}),
-    frozenset({"gato", "rato"}),
-    frozenset({"vaca", "tigre"}),
-}
-# VALIDAR: pares "amigos" (3 pts) e "inimigos não-mortais" (1 pt). Até a
-# validação preencher, o meio-termo cai em 2 (neutro).
-_YONI_AMIGOS = set()   # ex.: frozenset({"vaca","bufalo"}) — preencher na validação
-_YONI_INIMIGOS = set()  # inimigos não-mortais (1 pt) — preencher na validação
+# Matriz completa (simétrica), idêntica ao Prokerala nos 91 pares de animais.
+# 4 = mesmo animal · 0 = inimigos mortais · 1–3 = graus intermediários.
+_ANIMAIS = ["cavalo", "elefante", "ovelha", "cobra", "cao", "gato", "rato",
+            "vaca", "bufalo", "tigre", "veado", "macaco", "mangusto", "leao"]
+_YONI_MATRIZ = [
+    # cav ele ove cob cao gat rat vac buf tig vea mac man leo
+    [4, 2, 2, 3, 2, 2, 2, 1, 0, 1, 3, 3, 2, 1],  # cavalo
+    [2, 4, 3, 3, 2, 2, 2, 2, 3, 1, 2, 3, 2, 0],  # elefante
+    [2, 3, 4, 2, 1, 2, 1, 3, 3, 1, 2, 0, 3, 1],  # ovelha
+    [3, 3, 2, 4, 2, 1, 1, 1, 1, 2, 2, 2, 0, 2],  # cobra
+    [2, 2, 1, 2, 4, 2, 1, 2, 2, 1, 0, 2, 1, 1],  # cao
+    [2, 2, 2, 1, 2, 4, 0, 2, 2, 1, 3, 3, 2, 1],  # gato
+    [2, 2, 1, 1, 1, 0, 4, 2, 2, 2, 2, 2, 1, 2],  # rato
+    [1, 2, 3, 1, 2, 2, 2, 4, 3, 1, 3, 2, 2, 1],  # vaca
+    [0, 3, 3, 1, 2, 2, 2, 3, 4, 1, 2, 2, 2, 1],  # bufalo
+    [1, 1, 1, 2, 1, 1, 2, 1, 1, 4, 1, 1, 2, 1],  # tigre
+    [3, 2, 2, 2, 0, 3, 2, 3, 2, 1, 4, 2, 2, 1],  # veado
+    [3, 3, 0, 2, 2, 3, 2, 2, 2, 1, 2, 4, 3, 2],  # macaco
+    [2, 2, 3, 0, 1, 2, 1, 2, 2, 2, 2, 3, 4, 2],  # mangusto
+    [1, 0, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 2, 4],  # leao
+]
 
 
 def koota_yoni(nak_a: str, nak_b: str) -> float:
     ya, yb = YONI_POR_NAKSHATRA[nak_a], YONI_POR_NAKSHATRA[nak_b]
-    if ya == yb:
-        return 4.0
-    par = frozenset({ya, yb})
-    if par in _YONI_INIMIGOS_MORTAIS:
-        return 0.0
-    if par in _YONI_AMIGOS:
-        return 3.0
-    if par in _YONI_INIMIGOS:
-        return 1.0
-    return 2.0  # neutro (preliminar)
+    return float(_YONI_MATRIZ[_ANIMAIS.index(ya)][_ANIMAIS.index(yb)])
 
 
 # ===========================================================================
@@ -229,11 +221,11 @@ GANA_POR_NAKSHATRA = {
     "Dhanishta": "rakshasa", "Shatabhisha": "rakshasa",
 }
 
-# Matriz direcional (linha = A, coluna = B).  # VALIDAR (deva×manushya e direção)
+# Matriz direcional (linha = noiva/A, coluna = noivo/B).  [Prokerala]
 _GANA_PTS = {
     ("deva", "deva"): 6, ("manushya", "manushya"): 6, ("rakshasa", "rakshasa"): 6,
-    ("deva", "manushya"): 6, ("manushya", "deva"): 5,     # VALIDAR (5 ou 6)
-    ("deva", "rakshasa"): 1, ("rakshasa", "deva"): 1,     # VALIDAR (direção)
+    ("deva", "manushya"): 5, ("manushya", "deva"): 6,
+    ("deva", "rakshasa"): 1, ("rakshasa", "deva"): 0,
     ("manushya", "rakshasa"): 0, ("rakshasa", "manushya"): 0,
 }
 
@@ -244,9 +236,15 @@ def koota_gana(nak_a: str, nak_b: str) -> float:
 
 
 # ===========================================================================
-# 7. BHAKOOT (7 pontos) — distância entre rashis.  CONFIRMADA (segue a spec)
-# Dosha (0) em 6-8 e 5-9. Demais -> 7. (2-12 tratado como auspicioso; VALIDAR.)
+# 7. BHAKOOT (7 pontos) — distância entre rashis.  [Prokerala]
+# Dosha (0 ponto) nos pares 2/12, 5/9 e 6/8. Demais -> 7.
+# Única exceção observada no Prokerala: noiva em Kumbha e noivo em Karka (6/8)
+# recebe 7 — o inverso (Karka -> Kumbha) continua 0. Reproduzida para manter
+# a consistência com a fonte.
 # ===========================================================================
+_BHAKOOT_EXCECOES = {("Kumbha", "Karka")}
+
+
 def _distancia_rashi(a_idx: int, b_idx: int) -> tuple[int, int]:
     d_ab = ((b_idx - a_idx) % 12) + 1
     d_ba = ((a_idx - b_idx) % 12) + 1
@@ -255,10 +253,11 @@ def _distancia_rashi(a_idx: int, b_idx: int) -> tuple[int, int]:
 
 def koota_bhakoot(rashi_a: str, rashi_b: str) -> tuple[float, bool]:
     """Retorna (pontos, dosha_presente)."""
+    if (rashi_a, rashi_b) in _BHAKOOT_EXCECOES:
+        return 7.0, False
     a, b = _idx_rashi(rashi_a), _idx_rashi(rashi_b)
     d_ab, d_ba = _distancia_rashi(a, b)
-    par = {d_ab, d_ba}
-    if par in ({6, 8}, {5, 9}):
+    if {d_ab, d_ba} in ({6, 8}, {5, 9}, {2, 12}):
         return 0.0, True
     return 7.0, False
 
@@ -361,6 +360,7 @@ _MAX = {"Varna": 1, "Vashya": 2, "Tara": 3, "Yoni": 4,
 def _dados_lua(mapa: dict) -> dict:
     return {
         "rashi": mapa["grahas"]["Chandra"]["signo"],
+        "grau": mapa["grahas"]["Chandra"]["grau_no_signo"],
         "nak": mapa["nakshatra_lua"]["nome"],
         "pada": mapa["nakshatra_lua"]["pada"],
     }
@@ -371,7 +371,7 @@ def calcular_compatibilidade(mapa_a: dict, mapa_b: dict) -> dict:
     A, B = _dados_lua(mapa_a), _dados_lua(mapa_b)
 
     varna = koota_varna(A["rashi"], B["rashi"])
-    vashya = koota_vashya(A["rashi"], B["rashi"])
+    vashya = koota_vashya(A["rashi"], B["rashi"], A["grau"], B["grau"])
     tara = koota_tara(A["nak"], B["nak"])
     yoni = koota_yoni(A["nak"], B["nak"])
     maitri = koota_graha_maitri(A["rashi"], B["rashi"])

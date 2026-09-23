@@ -1,0 +1,1941 @@
+{
+"fonte": "Prokerala — Kundli Matching (Guna Milan), consultado em 22/set/2026",
+"local": "São Paulo (-23.5505, -46.6333) para as duas pessoas; horário local",
+"casais": [
+{
+"id": "bufalo-cao",
+"noiva": "1987-03-08T21:00:00",
+"noivo": "2003-02-21T11:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-cavalo",
+"noiva": "1999-07-07T09:00:00",
+"noivo": "1993-03-09T18:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bufalo-cobra",
+"noiva": "1989-04-21T07:00:00",
+"noivo": "2004-01-31T21:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bufalo-elefante",
+"noiva": "1987-10-23T00:00:00",
+"noivo": "1990-05-22T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 3.0,
+"Gana": 5.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-gato",
+"noiva": "2003-11-20T12:00:00",
+"noivo": "1989-10-20T16:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bufalo-leao",
+"noiva": "1988-10-22T03:00:00",
+"noivo": "1992-08-30T08:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bufalo-macaco",
+"noiva": "2000-06-20T14:00:00",
+"noivo": "1993-04-07T20:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bufalo-mangusto",
+"noiva": "2002-08-12T09:00:00",
+"noivo": "2000-05-23T01:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 4.0,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-ovelha",
+"noiva": "1991-06-20T01:00:00",
+"noivo": "2001-07-16T08:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 3.0,
+"Yoni": 3.0,
+"Graha Maitri": 5.0,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-rato",
+"noiva": "1997-10-26T14:00:00",
+"noivo": "2004-08-19T15:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-tigre",
+"noiva": "1988-02-10T13:00:00",
+"noivo": "1995-11-19T03:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-vaca",
+"noiva": "1997-01-31T03:00:00",
+"noivo": "1997-04-06T05:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 0.5,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-veado",
+"noiva": "1995-04-18T17:00:00",
+"noivo": "1993-07-24T10:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cao-cavalo",
+"noiva": "1998-09-09T08:00:00",
+"noivo": "1990-08-02T18:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cao-cobra",
+"noiva": "1998-04-17T06:00:00",
+"noivo": "1988-03-23T23:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-elefante",
+"noiva": "2004-03-24T01:00:00",
+"noivo": "1995-01-15T00:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-gato",
+"noiva": "1996-04-09T05:00:00",
+"noivo": "2002-10-29T18:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-leao",
+"noiva": "2003-07-26T17:00:00",
+"noivo": "1998-07-13T23:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cao-macaco",
+"noiva": "1988-05-08T09:00:00",
+"noivo": "1991-03-09T04:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 3.0,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-mangusto",
+"noiva": "1990-09-28T18:00:00",
+"noivo": "1997-10-21T03:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-ovelha",
+"noiva": "1990-12-03T20:00:00",
+"noivo": "1997-10-18T07:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-rato",
+"noiva": "2001-08-19T03:00:00",
+"noivo": "2001-05-10T14:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.0,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-tigre",
+"noiva": "1994-08-31T12:00:00",
+"noivo": "1991-09-10T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-vaca",
+"noiva": "2003-02-05T06:00:00",
+"noivo": "2002-06-11T23:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-veado",
+"noiva": "1991-07-10T17:00:00",
+"noivo": "1993-09-21T13:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cavalo-cobra",
+"noiva": "1992-04-27T06:00:00",
+"noivo": "1998-12-30T23:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cavalo-elefante",
+"noiva": "1997-12-10T04:00:00",
+"noivo": "1986-06-04T11:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 5.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cavalo-gato",
+"noiva": "1997-09-15T09:00:00",
+"noivo": "1997-06-07T17:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 4.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cavalo-leao",
+"noiva": "1992-06-19T19:00:00",
+"noivo": "2001-10-31T07:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cavalo-macaco",
+"noiva": "1997-11-12T20:00:00",
+"noivo": "1989-08-16T01:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cavalo-mangusto",
+"noiva": "1999-11-21T01:00:00",
+"noivo": "1989-01-08T07:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 5.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cavalo-ovelha",
+"noiva": "1988-12-14T17:00:00",
+"noivo": "1991-03-25T04:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cavalo-rato",
+"noiva": "1990-11-02T00:00:00",
+"noivo": "2001-12-07T10:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cavalo-tigre",
+"noiva": "1989-10-01T00:00:00",
+"noivo": "1990-08-11T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cavalo-vaca",
+"noiva": "1992-06-08T08:00:00",
+"noivo": "1993-10-29T16:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cavalo-veado",
+"noiva": "1987-12-25T03:00:00",
+"noivo": "2000-11-26T17:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cobra-elefante",
+"noiva": "2002-09-01T02:00:00",
+"noivo": "2000-04-06T11:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 3.0,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cobra-gato",
+"noiva": "2001-11-06T09:00:00",
+"noivo": "1989-09-20T15:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cobra-leao",
+"noiva": "1989-09-21T09:00:00",
+"noivo": "1993-04-18T04:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 5.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cobra-macaco",
+"noiva": "2003-02-11T02:00:00",
+"noivo": "1988-08-23T18:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cobra-mangusto",
+"noiva": "2003-09-06T16:00:00",
+"noivo": "1993-12-26T19:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 0.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cobra-ovelha",
+"noiva": "1990-07-19T09:00:00",
+"noivo": "1998-08-14T23:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 1.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cobra-rato",
+"noiva": "1992-11-17T14:00:00",
+"noivo": "1989-04-09T16:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cobra-tigre",
+"noiva": "1990-08-24T13:00:00",
+"noivo": "1989-07-28T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cobra-vaca",
+"noiva": "1999-10-07T20:00:00",
+"noivo": "1996-07-12T00:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cobra-veado",
+"noiva": "1997-02-03T04:00:00",
+"noivo": "2003-08-21T23:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 3.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "elefante-gato",
+"noiva": "1995-09-20T23:00:00",
+"noivo": "1989-04-07T16:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 4.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "elefante-leao",
+"noiva": "1991-06-05T19:00:00",
+"noivo": "1990-08-12T21:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "elefante-macaco",
+"noiva": "2002-11-11T02:00:00",
+"noivo": "1996-02-22T00:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 3.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "elefante-mangusto",
+"noiva": "1988-05-07T07:00:00",
+"noivo": "1988-05-14T18:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "elefante-ovelha",
+"noiva": "1989-08-23T07:00:00",
+"noivo": "1996-09-29T15:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 3.0,
+"Graha Maitri": 3.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "elefante-rato",
+"noiva": "1993-02-07T12:00:00",
+"noivo": "1994-01-18T12:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "elefante-tigre",
+"noiva": "2002-04-14T05:00:00",
+"noivo": "2000-09-30T21:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 3.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "elefante-vaca",
+"noiva": "1986-05-04T22:00:00",
+"noivo": "1986-02-15T08:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "elefante-veado",
+"noiva": "2000-02-27T14:00:00",
+"noivo": "1999-11-21T22:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "gato-leao",
+"noiva": "1993-06-23T06:00:00",
+"noivo": "1990-07-12T19:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "gato-macaco",
+"noiva": "1994-07-21T09:00:00",
+"noivo": "1987-03-10T00:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "gato-mangusto",
+"noiva": "1995-01-18T05:00:00",
+"noivo": "1991-03-11T13:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "gato-ovelha",
+"noiva": "1996-09-30T17:00:00",
+"noivo": "1993-01-10T05:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "gato-rato",
+"noiva": "1996-07-19T14:00:00",
+"noivo": "2001-05-26T06:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "gato-tigre",
+"noiva": "1986-02-20T21:00:00",
+"noivo": "1988-04-02T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 1.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "gato-vaca",
+"noiva": "1995-12-01T01:00:00",
+"noivo": "1988-10-30T14:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.5,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "gato-veado",
+"noiva": "2001-04-01T18:00:00",
+"noivo": "1990-02-18T23:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 0.5,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "leao-macaco",
+"noiva": "2002-11-14T03:00:00",
+"noivo": "1986-12-03T17:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 3.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "leao-mangusto",
+"noiva": "1990-11-22T10:00:00",
+"noivo": "1989-08-16T19:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "leao-ovelha",
+"noiva": "2003-12-01T10:00:00",
+"noivo": "2001-05-22T13:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "leao-rato",
+"noiva": "2002-09-20T14:00:00",
+"noivo": "2002-02-26T13:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "leao-tigre",
+"noiva": "1994-05-05T08:00:00",
+"noivo": "1992-05-15T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "leao-vaca",
+"noiva": "1988-08-28T05:00:00",
+"noivo": "1995-02-03T14:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 3.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "leao-veado",
+"noiva": "1996-06-06T10:00:00",
+"noivo": "1995-10-26T06:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "macaco-mangusto",
+"noiva": "2001-06-09T05:00:00",
+"noivo": "1989-12-28T10:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 3.0,
+"Graha Maitri": 3.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "macaco-ovelha",
+"noiva": "1995-09-06T12:00:00",
+"noivo": "2000-03-15T21:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "macaco-rato",
+"noiva": "2001-01-22T11:00:00",
+"noivo": "2000-03-18T17:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "macaco-tigre",
+"noiva": "1992-02-23T18:00:00",
+"noivo": "1988-04-11T03:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "macaco-vaca",
+"noiva": "2002-05-08T04:00:00",
+"noivo": "1997-04-30T01:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 3.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "macaco-veado",
+"noiva": "1986-09-10T22:00:00",
+"noivo": "2000-07-17T20:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "mangusto-ovelha",
+"noiva": "1996-03-01T16:00:00",
+"noivo": "1996-01-20T04:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 0.5,
+"Gana": 5.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "mangusto-rato",
+"noiva": "1992-12-15T17:00:00",
+"noivo": "1995-05-18T21:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 0.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "mangusto-tigre",
+"noiva": "2004-02-13T01:00:00",
+"noivo": "1999-06-03T02:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "mangusto-vaca",
+"noiva": "1995-12-01T01:00:00",
+"noivo": "1993-06-07T13:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 3.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "mangusto-veado",
+"noiva": "1999-02-13T20:00:00",
+"noivo": "1998-09-25T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "ovelha-rato",
+"noiva": "1999-09-08T09:00:00",
+"noivo": "1990-12-01T07:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "ovelha-tigre",
+"noiva": "2003-03-21T17:00:00",
+"noivo": "2001-07-20T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "ovelha-vaca",
+"noiva": "1994-07-27T10:00:00",
+"noivo": "1993-05-26T01:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 3.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "ovelha-veado",
+"noiva": "1991-02-07T15:00:00",
+"noivo": "2002-09-04T02:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "rato-tigre",
+"noiva": "2000-07-05T00:00:00",
+"noivo": "2003-04-18T02:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "rato-vaca",
+"noiva": "1988-06-21T20:00:00",
+"noivo": "1997-06-11T00:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 4.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "rato-veado",
+"noiva": "1999-07-15T15:00:00",
+"noivo": "2002-04-28T16:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "tigre-vaca",
+"noiva": "2001-06-03T20:00:00",
+"noivo": "1997-04-06T05:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "tigre-veado",
+"noiva": "1993-07-28T01:00:00",
+"noivo": "2000-08-05T02:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 1.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "vaca-veado",
+"noiva": "2001-10-19T09:00:00",
+"noivo": "1986-02-25T23:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 0.5,
+"Gana": 5.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-bufalo",
+"noiva": "2002-09-08T18:00:00",
+"noivo": "1993-02-12T00:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 4.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "cao-cao",
+"noiva": "1990-04-01T17:00:00",
+"noivo": "1989-12-27T09:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 4.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cavalo-cavalo",
+"noiva": "2000-03-09T05:00:00",
+"noivo": "1987-01-31T04:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 4.0,
+"Graha Maitri": 0.5,
+"Gana": 1.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "cobra-cobra",
+"noiva": "1990-04-27T10:00:00",
+"noivo": "1987-12-05T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 4.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-cao-inv",
+"noiva": "2003-02-21T11:00:00",
+"noivo": "1987-03-08T21:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-cavalo-inv",
+"noiva": "1993-03-09T18:00:00",
+"noivo": "1999-07-07T09:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bufalo-cobra-inv",
+"noiva": "2004-01-31T21:00:00",
+"noivo": "1989-04-21T07:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bufalo-elefante-inv",
+"noiva": "1990-05-22T22:00:00",
+"noivo": "1987-10-23T00:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 3.0,
+"Graha Maitri": 3.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bufalo-gato-inv",
+"noiva": "1989-10-20T16:00:00",
+"noivo": "2003-11-20T12:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bufalo-leao-inv",
+"noiva": "1992-08-30T08:00:00",
+"noivo": "1988-10-22T03:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 4.0,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "vashya-Karka-Simha",
+"noiva": "2000-10-20T04:00:00",
+"noivo": "2000-08-28T16:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 5.0,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "vashya-Vrishchika-Vrishchika",
+"noiva": "2004-04-08T04:00:00",
+"noivo": "2002-09-11T20:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 4.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "vashya-Vrishchika-Simha",
+"noiva": "1991-03-06T14:00:00",
+"noivo": "1995-03-14T18:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "vashya-Simha-Simha",
+"noiva": "2004-01-10T18:00:00",
+"noivo": "1987-10-17T14:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 4.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 7.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "vashya-Meena-Simha",
+"noiva": "2000-12-05T06:00:00",
+"noivo": "1991-10-04T08:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot6-Mesha-Kanya",
+"noiva": "2002-02-17T12:00:00",
+"noivo": "1987-04-11T22:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bhakoot8-Mesha-Vrishchika",
+"noiva": "1986-08-24T04:00:00",
+"noivo": "2000-10-28T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot6-Vrishabha-Tula",
+"noiva": "1992-09-17T08:00:00",
+"noivo": "1995-08-02T22:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Vrishabha-Dhanu",
+"noiva": "1988-09-01T22:00:00",
+"noivo": "1994-07-20T08:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot6-Mithuna-Vrishchika",
+"noiva": "1988-12-22T18:00:00",
+"noivo": "1996-05-04T08:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Mithuna-Makara",
+"noiva": "1995-01-14T08:00:00",
+"noivo": "2004-02-17T20:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 4.0,
+"Gana": 5.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Karka-Kumbha",
+"noiva": "1986-04-17T06:00:00",
+"noivo": "1987-09-06T10:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot6-Simha-Makara",
+"noiva": "1998-07-25T10:00:00",
+"noivo": "2004-11-17T00:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bhakoot8-Simha-Meena",
+"noiva": "1994-06-14T14:00:00",
+"noivo": "1995-06-19T16:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot6-Kanya-Kumbha",
+"noiva": "1999-02-05T06:00:00",
+"noivo": "1993-12-18T04:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 2.0,
+"Tara": 3.0,
+"Yoni": 1.0,
+"Graha Maitri": 4.0,
+"Gana": 1.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Kanya-Mesha",
+"noiva": "1986-01-29T18:00:00",
+"noivo": "2001-03-26T16:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bhakoot6-Tula-Meena",
+"noiva": "2003-04-16T16:00:00",
+"noivo": "2002-05-07T18:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Tula-Vrishabha",
+"noiva": "1990-07-28T16:00:00",
+"noivo": "1998-03-03T22:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot6-Vrishchika-Mesha",
+"noiva": "1999-04-04T14:00:00",
+"noivo": "1994-10-19T12:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Vrishchika-Mithuna",
+"noiva": "1986-04-25T22:00:00",
+"noivo": "1998-11-07T02:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot6-Dhanu-Vrishabha",
+"noiva": "2004-02-15T18:00:00",
+"noivo": "1990-04-26T12:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Dhanu-Karka",
+"noiva": "1994-02-06T08:00:00",
+"noivo": "1996-05-22T06:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 4.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bhakoot6-Makara-Mithuna",
+"noiva": "1988-02-15T10:00:00",
+"noivo": "1992-11-13T04:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 0.0,
+"Graha Maitri": 4.0,
+"Gana": 6.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Makara-Simha",
+"noiva": "1993-01-22T04:00:00",
+"noivo": "1997-07-08T04:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 0.0
+}
+},
+{
+"id": "bhakoot6-Kumbha-Karka",
+"noiva": "2000-03-31T22:00:00",
+"noivo": "2001-10-10T18:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 7.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Kumbha-Kanya",
+"noiva": "1998-03-25T06:00:00",
+"noivo": "1990-06-01T14:00:00",
+"pontos": {
+"Varna": 1.0,
+"Vashya": 2.0,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 4.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot6-Meena-Simha",
+"noiva": "1993-12-20T14:00:00",
+"noivo": "1991-12-25T04:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 1.0,
+"Tara": 1.5,
+"Yoni": 2.0,
+"Graha Maitri": 5.0,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+},
+{
+"id": "bhakoot8-Meena-Tula",
+"noiva": "2003-04-27T16:00:00",
+"noivo": "1998-08-26T16:00:00",
+"pontos": {
+"Varna": 0.0,
+"Vashya": 0.5,
+"Tara": 1.5,
+"Yoni": 1.0,
+"Graha Maitri": 0.5,
+"Gana": 0.0,
+"Bhakoot": 0.0,
+"Nadi": 8.0
+}
+}
+]
+}
