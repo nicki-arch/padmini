@@ -36,6 +36,7 @@ Roda no Render (https://padmini.onrender.com), ligado ao GitHub: cada `git push`
 | `PADMINI_PREVIA_CHAVE` | Abre o site travado para quem acessar `/?previa=<chave>` (cookie de 60 dias) — para o Nicolas e o Pedro |
 | `PADMINI_DATA_ABERTURA` | Texto da data de abertura mostrado na lista (ex.: `10 de outubro`) |
 | `PADMINI_CAKTO_OFERTA_BUMP_MAPAS` | Código da oferta do order bump "mapa individual de cada um" no checkout do casal. Vazio = qualquer bump do casal entrega os 2 mapas |
+| `PADMINI_LIVE_SENHA` | Senha do **modo live** (`/live`): gera o completo sem pagamento, para o Pedro ler ao vivo. Em branco = rota existe mas não deixa entrar |
 | `PADMINI_POSTHOG_KEY` | Métricas de funil (PostHog). Em branco = desligado; nada é carregado |
 | `PADMINI_POSTHOG_HOST` | Host do PostHog (padrão `https://us.i.posthog.com`; use `https://eu.i.posthog.com` na região UE) |
 

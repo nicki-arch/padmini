@@ -41,6 +41,30 @@ def emitir_token(produto: str, chave: str) -> str:
     return hmac.new(SEGREDO.encode("utf-8"), msg, hashlib.sha256).hexdigest()[:32]
 
 
+def emitir_sessao(papel: str, expira_em: int) -> str:
+    """Cookie assinado com prazo — usado pelo modo live (papel='live')."""
+    if not SEGREDO:
+        raise RuntimeError("PADMINI_SECRET não configurado — não é possível abrir sessão.")
+    msg = f"sessao|{papel}|{expira_em}".encode("utf-8")
+    return f"{expira_em}.{hmac.new(SEGREDO.encode('utf-8'), msg, hashlib.sha256).hexdigest()[:32]}"
+
+
+def sessao_valida(papel: str, valor: str | None, agora: int | None = None) -> bool:
+    """True se o cookie foi assinado por nós e ainda não venceu."""
+    import time
+    if not (SEGREDO and valor and "." in valor):
+        return False
+    expira, _, assinatura = valor.partition(".")
+    if not expira.isdigit():
+        return False
+    if int(expira) < (agora if agora is not None else int(time.time())):
+        return False
+    try:
+        return hmac.compare_digest(valor, emitir_sessao(papel, int(expira)))
+    except Exception:
+        return False
+
+
 def completo_liberado(produto: str, chave: str, token: str | None) -> bool:
     """True se o completo pode ser servido para este pedido."""
     if MODO_ABERTO:

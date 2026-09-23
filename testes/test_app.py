@@ -366,3 +366,71 @@ def test_honeypot_finge_sucesso_sem_gravar(monkeypatch):
     monkeypatch.setattr(db, "registrar_lead", lambda *a, **k: chamadas.append(a) or True)
     r = cliente.post("/api/lista", json={"email": "bot@x.com", "aceita_email": True, "site": "http://spam"})
     assert r.status_code == 200 and chamadas == []
+
+
+# ---------------------------------------------------------------- modo live (parte 22)
+SENHA_LIVE = "senha-do-pedro-123"
+
+
+def _cliente_live(monkeypatch, entrar=True):
+    """Cliente próprio: o cookie do live não pode vazar para os outros testes."""
+    monkeypatch.setenv("PADMINI_LIVE_SENHA", SENHA_LIVE)
+    c = TestClient(app_mod.app)
+    if entrar:
+        assert c.post("/api/live/entrar", json={"senha": SENHA_LIVE}).status_code == 200
+    return c
+
+
+def test_pagina_live_abre_e_nao_e_indexada():
+    r = cliente.get("/live")
+    assert r.status_code == 200
+    assert "noindex" in r.text and "Modo live" in r.text
+
+
+def test_live_sem_senha_configurada_nao_entra():
+    r = TestClient(app_mod.app).post("/api/live/entrar", json={"senha": "qualquer"})
+    assert r.status_code == 503
+
+
+def test_live_senha_errada_e_certa(monkeypatch):
+    c = _cliente_live(monkeypatch, entrar=False)
+    assert c.post("/api/live/entrar", json={"senha": "chute"}).status_code == 401
+    assert c.get("/api/live/sessao").json() == {"ativa": False, "configurado": True}
+    assert c.post("/api/live/entrar", json={"senha": SENHA_LIVE}).status_code == 200
+    assert c.get("/api/live/sessao").json()["ativa"] is True
+    c.post("/api/live/sair")
+    assert c.get("/api/live/sessao").json()["ativa"] is False
+
+
+def test_live_sem_sessao_nao_emite_token():
+    r = cliente.post("/api/live/token/mapa", json=PESSOA)
+    assert r.status_code == 401
+
+
+def test_live_gera_o_completo_dos_dois_produtos(monkeypatch):
+    c = _cliente_live(monkeypatch)
+    t = c.post("/api/live/token/mapa", json=PESSOA).json()["token"]
+    completo = c.post("/api/mapa", json={**PESSOA, "nivel": "completo", "token": t})
+    assert completo.status_code == 200 and completo.json()["nivel"] == "completo"
+
+    casal = {"a": PESSOA, "b": PESSOA_B}
+    t2 = c.post("/api/live/token/compat", json=casal).json()["token"]
+    r = c.post("/api/compatibilidade", json={**casal, "nivel": "completo", "token": t2})
+    assert r.status_code == 200 and "kootas" in r.json()
+
+
+def test_cookie_do_live_e_assinado_e_expira():
+    import acesso
+    valido = acesso.emitir_sessao("live", int(time.time()) + 60)
+    assert acesso.sessao_valida("live", valido)
+    assert not acesso.sessao_valida("live", acesso.emitir_sessao("live", int(time.time()) - 1))
+    assert not acesso.sessao_valida("live", valido[:-1] + ("0" if valido[-1] != "0" else "1"))
+    assert not acesso.sessao_valida("live", "9999999999.qualquercoisa")
+    assert not acesso.sessao_valida("live", None)
+
+
+def test_live_nao_abre_o_completo_de_outro_nascimento(monkeypatch):
+    c = _cliente_live(monkeypatch)
+    t = c.post("/api/live/token/mapa", json=PESSOA).json()["token"]
+    outro = {**PESSOA, "data": "1991-05-15"}
+    assert c.post("/api/mapa", json={**outro, "nivel": "completo", "token": t}).status_code == 402

@@ -158,3 +158,16 @@ def test_lead_gravado_com_consentimentos_e_origem():
     email, zap, ae, aw, interesse, origem = rows[0]
     assert (email, zap, ae, interesse) == ("ana@teste.com", "5551999998888", True, "compat")
     assert origem == {"ref": "PEDRO", "utm_source": "tiktok"}
+
+
+def test_modo_live_registra_cada_leitura(monkeypatch):
+    with db._conectar() as c:
+        c.execute("TRUNCATE live_geracoes")
+    import app as _app
+    from fastapi.testclient import TestClient
+    monkeypatch.setenv("PADMINI_LIVE_SENHA", "senha-do-pedro-123")
+    cl = TestClient(_app.app)
+    cl.post("/api/live/entrar", json={"senha": "senha-do-pedro-123"})
+    cl.post("/api/live/token/mapa", json=base.PESSOA)
+    rows = _linhas("SELECT produto, nome, cidade, nascimento FROM live_geracoes")
+    assert rows == [("mapa", "Ana", "São Paulo, SP", "1990-05-15 14:30")]

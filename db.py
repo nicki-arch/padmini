@@ -48,6 +48,15 @@ CREATE TABLE IF NOT EXISTS pedidos (
 );
 CREATE INDEX IF NOT EXISTS pedidos_email_idx ON pedidos (lower(email));
 
+CREATE TABLE IF NOT EXISTS live_geracoes (
+    id         BIGSERIAL PRIMARY KEY,
+    criado_em  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    produto    TEXT NOT NULL,
+    nome       TEXT,
+    cidade     TEXT,
+    nascimento TEXT
+);
+
 CREATE TABLE IF NOT EXISTS textos_ia (
     chave      TEXT PRIMARY KEY,
     produto    TEXT NOT NULL,
@@ -75,6 +84,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS leads_email_idx ON leads (lower(email));
 -- banco, que não é afetado pelo RLS.
 ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE textos_ia ENABLE ROW LEVEL SECURITY;
+ALTER TABLE live_geracoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 
 -- Defesa em profundidade (só existe no Supabase): tira das roles da API
@@ -82,12 +92,12 @@ ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
-        REVOKE ALL ON TABLE pedidos, textos_ia, leads FROM anon;
-        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq FROM anon;
+        REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes FROM anon;
+        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq FROM anon;
     END IF;
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
-        REVOKE ALL ON TABLE pedidos, textos_ia, leads FROM authenticated;
-        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq FROM authenticated;
+        REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes FROM authenticated;
+        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq FROM authenticated;
     END IF;
 END $$;
 """
@@ -246,4 +256,18 @@ def registrar_lead(nome: str, email: str, whatsapp: str, aceita_email: bool,
         return True
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao registrar lead")
+        return False
+
+
+def registrar_live(produto: str, nome: str, cidade: str, nascimento: str) -> bool:
+    """Log das leituras geradas no modo live (quem o Pedro leu, e quando)."""
+    if not ativo():
+        return False
+    try:
+        with _conectar() as c:
+            c.execute("INSERT INTO live_geracoes (produto, nome, cidade, nascimento) "
+                      "VALUES (%s,%s,%s,%s)", (produto, nome or None, cidade or None, nascimento or None))
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao registrar geração do modo live")
         return False

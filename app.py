@@ -8,7 +8,9 @@ e abrir http://127.0.0.1:8000
 """
 
 import contextlib
+import hmac
 import os
+import time
 import re
 import unicodedata
 from datetime import date, datetime, timezone
@@ -18,7 +20,7 @@ from zoneinfo import ZoneInfo
 import json
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -205,6 +207,88 @@ def inscrever_na_lista(ins: Inscricao):
                              bool(zap) and ins.aceita_whatsapp, interesse, origem):
         raise HTTPException(503, "Não conseguimos salvar agora. Tente de novo em instantes.")
     return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
+# MODO LIVE (só o Pedro) — /live gera o relatório completo sem pagamento, para
+# ler mapas ao vivo. Entra com senha (PADMINI_LIVE_SENHA) e fica um cookie
+# assinado de 12h; nada de token na URL, que apareceria na tela da transmissão.
+# Cada geração fica registrada no banco (live_geracoes).
+# ---------------------------------------------------------------------------
+HORAS_SESSAO_LIVE = 12
+
+
+def _senha_live() -> str:
+    return os.environ.get("PADMINI_LIVE_SENHA", "")
+
+
+def _live_liberado(request: Request) -> bool:
+    return acesso.sessao_valida("live", request.cookies.get("pad_live"))
+
+
+def _exigir_live(request: Request) -> None:
+    if not _live_liberado(request):
+        raise HTTPException(401, "Sessão do modo live expirada. Entre de novo.")
+
+
+class SenhaLive(BaseModel):
+    senha: str = Field("", max_length=200)
+
+
+@app.get("/live")
+def pagina_live():
+    return FileResponse(RAIZ / "static" / "live.html")
+
+
+@app.get("/api/live/sessao")
+def live_sessao(request: Request):
+    return {"ativa": _live_liberado(request), "configurado": bool(_senha_live())}
+
+
+@app.post("/api/live/entrar")
+def live_entrar(dados: SenhaLive, request: Request):
+    senha = _senha_live()
+    if not senha:
+        raise HTTPException(503, "Modo live não está configurado neste servidor.")
+    if not hmac.compare_digest(dados.senha, senha):
+        raise HTTPException(401, "Senha incorreta.")
+    expira = int(time.time()) + HORAS_SESSAO_LIVE * 3600
+    resp = JSONResponse({"ok": True, "expira_em": expira})
+    resp.set_cookie("pad_live", acesso.emitir_sessao("live", expira),
+                    max_age=HORAS_SESSAO_LIVE * 3600, httponly=True,
+                    secure=request.url.scheme == "https", samesite="lax")
+    return resp
+
+
+@app.post("/api/live/sair")
+def live_sair():
+    resp = JSONResponse({"ok": True})
+    resp.delete_cookie("pad_live")
+    return resp
+
+
+@app.post("/api/live/token/mapa")
+def live_token_mapa(pedido: PedidoMapa, request: Request):
+    """Devolve o token do completo daquele nascimento (sem pagamento) e registra a leitura."""
+    _exigir_live(request)
+    _validar_datetime(pedido.data, pedido.hora)
+    chave = acesso.chave_mapa(pedido.data.isoformat(), pedido.hora, pedido.lat, pedido.lon)
+    db.registrar_live("mapa", pedido.nome.strip(), pedido.cidade,
+                      f"{pedido.data.isoformat()} {pedido.hora}")
+    return {"token": acesso.emitir_token("mapa", chave)}
+
+
+@app.post("/api/live/token/compat")
+def live_token_compat(pedido: PedidoCompatibilidade, request: Request):
+    _exigir_live(request)
+    _validar_datetime(pedido.a.data, pedido.a.hora)
+    _validar_datetime(pedido.b.data, pedido.b.hora)
+    chave = acesso.chave_compat(
+        (pedido.a.data.isoformat(), pedido.a.hora, pedido.a.lat, pedido.a.lon),
+        (pedido.b.data.isoformat(), pedido.b.hora, pedido.b.lat, pedido.b.lon))
+    db.registrar_live("compat", f"{pedido.a.nome.strip()} & {pedido.b.nome.strip()}".strip(" &"),
+                      pedido.a.cidade, f"{pedido.a.data.isoformat()} / {pedido.b.data.isoformat()}")
+    return {"token": acesso.emitir_token("compat", chave)}
 
 
 @app.get("/privacidade")

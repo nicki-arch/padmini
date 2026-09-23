@@ -33,5 +33,7 @@ services:
         sync: false
       - key: PADMINI_DATA_ABERTURA # ex.: "10 de outubro"
         sync: false
+      - key: PADMINI_LIVE_SENHA   # senha do modo live (/live). Em branco = modo live desligado
+        sync: false
       - key: PADMINI_POSTHOG_KEY # métricas de funil (opcional; em branco = desligado)
         sync: false
