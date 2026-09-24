@@ -56,7 +56,8 @@ def test_paginas_respondem(rota):
 
 
 @pytest.mark.parametrize(
-    "rota", ["/", "/mapa", "/compatibilidade", "/lista", "/privacidade", "/termos", "/api/saude"])
+    "rota", ["/", "/mapa", "/compatibilidade", "/lista", "/privacidade", "/termos", "/api/saude",
+             "/robots.txt", "/sitemap.xml"])
 def test_head_nao_da_405(rota):
     """Parte 22: HEAD / voltava 405 (FastAPI/Starlette instalados aqui não geram HEAD
     sozinhos para @app.get). Monitores de uptime usam HEAD — sem isso, todo alarme dispara."""
@@ -70,6 +71,35 @@ def test_checkout_ligado_nos_dois_produtos():
     compat = cliente.get("/compatibilidade").text
     assert re.search(r'LINK_CHECKOUT_INDIVIDUAL = "https://pay\.cakto\.com\.br/[^"]+"', mapa)
     assert re.search(r'LINK_CHECKOUT = "https://pay\.cakto\.com\.br/[^"]+"', compat)
+
+
+# ------------------------------------------------- preço e link num lugar só (ofertas.yaml)
+@pytest.mark.parametrize("rota", ["/", "/mapa", "/compatibilidade", "/lista"])
+def test_nenhum_marcador_sobra_na_pagina(rota):
+    """Marcador não substituído vira 'R$__PRECO_COMPAT__' na cara do cliente."""
+    sobrou = re.search(r"__[A-Z][A-Z_]*__", cliente.get(rota).text)
+    assert not sobrou, f"{rota} ainda tem {sobrou.group(0) if sobrou else ''}"
+
+
+def test_preco_da_home_sai_do_ofertas_yaml():
+    """O preço anunciado e o preço cobrado precisam vir da mesma fonte: se o
+    YAML muda, a home muda junto — sem ninguém lembrar de editar o HTML."""
+    import ofertas
+    html = cliente.get("/").text
+    assert f"R${ofertas.preco('compat')}" in html
+    assert f"R${ofertas.preco('mapa')}" in html
+    assert f"−{ofertas.oferta('compat')['desconto']}%" in html
+    assert f"economiza R${ofertas.oferta('compat')['economia']}" in html
+
+
+def test_webhook_e_site_usam_o_mesmo_codigo_de_oferta():
+    """O código que o webhook usa para reconhecer o produto é o do próprio link
+    de checkout do site — não um segundo valor escrito no cakto.py."""
+    import cakto
+    import ofertas
+    assert cakto.OFERTA_MAPA == ofertas.codigo("mapa") != ""
+    assert cakto.OFERTA_COMPAT == ofertas.codigo("compat") != ""
+    assert ofertas.codigo("mapa") in ofertas.checkout("mapa")
 
 
 # ---------------------------------------------------------------- cidades (parte 16)
@@ -330,6 +360,50 @@ def test_paginas_legais_sem_placeholder():
             assert marca not in texto, f"{pagina} ainda tem {marca}"
         assert "55.428.936/0001-00" in texto
         assert "contato@pedrosperbmonteiro.com.br" in texto
+
+
+@pytest.mark.parametrize("pagina", ["home.html", "index.html", "compatibilidade.html", "lista.html"])
+def test_og_image_e_url_absoluta(pagina):
+    """WhatsApp e Facebook ignoram og:image com caminho relativo — o link vira
+    prévia sem imagem, que é justamente o canal onde o produto circula."""
+    texto = (RAIZ / "static" / pagina).read_text(encoding="utf-8")
+    achou = re.search(r'<meta property="og:image" content="([^"]+)"', texto)
+    assert achou, f"{pagina} sem og:image"
+    assert achou.group(1).startswith("https://"), f"{pagina} com og:image relativo"
+
+
+@pytest.mark.parametrize("pagina", ["home.html", "index.html", "compatibilidade.html", "lista.html"])
+def test_paginas_publicas_tem_canonical(pagina):
+    """Com o site respondendo em padmini.com.br e em padmini.onrender.com, sem
+    canonical o buscador trata os dois como páginas diferentes."""
+    texto = (RAIZ / "static" / pagina).read_text(encoding="utf-8")
+    assert re.search(r'<link rel="canonical" href="https://padmini\.com\.br', texto), \
+        f"{pagina} sem canonical"
+
+
+def test_robots_aponta_o_sitemap_e_esconde_o_live():
+    r = cliente.get("/robots.txt")
+    assert r.status_code == 200
+    assert "Sitemap: https://padmini.teste/sitemap.xml" in r.text
+    assert "Disallow: /live" in r.text
+    assert "Disallow: /*?token=" in r.text
+
+
+def test_sitemap_lista_as_paginas_do_produto():
+    r = cliente.get("/sitemap.xml")
+    assert r.status_code == 200
+    for caminho in ["https://padmini.teste/", "https://padmini.teste/mapa",
+                    "https://padmini.teste/compatibilidade"]:
+        assert f"<loc>{caminho}</loc>" in r.text
+
+
+def test_sitemap_com_captura_ligada_so_anuncia_a_lista(monkeypatch):
+    """Com a trava ligada as outras páginas redirecionam; anunciá-las faria o
+    buscador indexar redirecionamento."""
+    monkeypatch.setenv("PADMINI_CAPTURA", "1")
+    r = cliente.get("/sitemap.xml")
+    assert "<loc>https://padmini.teste/lista</loc>" in r.text
+    assert "<loc>https://padmini.teste/mapa</loc>" not in r.text
 
 
 def test_atributo_hidden_sempre_esconde():

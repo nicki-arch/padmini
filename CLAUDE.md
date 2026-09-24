@@ -9,8 +9,9 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
   Cópias de código em outros lugares (ex.: Claude Project) podem estar desatualizadas — não confiar nelas.
 - **Estado, decisões e pendências:** no Claude Project "Projeto Padmini":
   `claude/LEIA-PRIMEIRO.md` (ponto de entrada), `claude/decisoes.md`, `claude/checklist-de-lancamento.md`.
-- **Produção:** https://padmini.onrender.com (Render, serviço `srv-dalfcj3l550s73b38jmg`,
-  deploy automático a cada push na `master`).
+- **Produção:** https://padmini.com.br (Render, serviço `srv-dalfcj3l550s73b38jmg`,
+  deploy automático a cada push na `master`). O endereço `padmini.onrender.com`
+  continua respondendo e é usado pelo ping diário, que assim não depende de DNS.
 - **`base_significacoes.py` mora em um repositório PRIVADO separado**
   (`github.com/nicki-arch/padmini-conteudo`), não neste. Isso mantém o texto de
   interpretação — o diferencial do produto — fora de um repositório que precisa ser
@@ -31,6 +32,7 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 | `cakto.py` | Webhook: assinatura HMAC `v1=` sobre `{timestamp}.{corpo}`; dados de nascimento vêm no `sck` |
 | `entrega.py` | Link assinado + e-mail (Resend) |
 | `static/afiliado.js` | Monta o link do checkout: dados no `sck`, afiliado/cupom dobrados em `utm_*` |
+| `ofertas.py` + `conteudo/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML |
 | `cidades.py` + `data/cidades_index.tsv` | Autocomplete de cidades (GeoNames) |
 | `gerar_pdf.py` | PDF do completo |
 | `static/live.html` + rotas `/live`, `/api/live/*` | Modo live do Pedro: senha (`PADMINI_LIVE_SENHA`) → cookie assinado de 12h → token do completo sem pagamento, com log em `live_geracoes` |

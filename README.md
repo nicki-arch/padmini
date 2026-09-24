@@ -16,7 +16,7 @@ Cada endpoint de produto aceita `nivel: "amostra" | "completo"`. A **amostra é 
 
 ## Publicação
 
-Roda no Render (https://padmini.onrender.com), ligado ao GitHub: cada `git push` na `master` publica em 1–2 min.
+Roda no Render (https://padmini.com.br), ligado ao GitHub: cada `git push` na `master` publica em 1–2 min.
 
 **Variáveis de ambiente no Render:**
 

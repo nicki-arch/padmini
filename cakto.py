@@ -33,6 +33,8 @@ import hashlib
 import hmac
 import os
 
+import ofertas
+
 APROVADOS = ("paid", "approved", "aprovad", "complete", "concluid", "success")
 
 PROD_MAPA = os.environ.get("PADMINI_CAKTO_PROD_MAPA", "")
@@ -179,9 +181,11 @@ def email_do_evento(evento: dict) -> str:
 
 # Oferta de cada produto — é o código no link do checkout
 # (pay.cakto.com.br/39dhqty_1125341 → "39dhqty"). Serve de rede de segurança
-# para identificar o produto quando o `sck` não vier. A CONFIRMAR na 1ª compra real.
-OFERTA_MAPA = os.environ.get("PADMINI_CAKTO_OFERTA_MAPA", "39dhqty")
-OFERTA_COMPAT = os.environ.get("PADMINI_CAKTO_OFERTA_COMPAT", "qo8uskp")
+# para identificar o produto quando o `sck` não vier. Confirmado na 1ª compra real.
+# Vem de `conteudo/ofertas.yaml` (mesmo link que o site usa no botão de compra),
+# para não existir um código aqui e outro lá.
+OFERTA_MAPA = os.environ.get("PADMINI_CAKTO_OFERTA_MAPA") or ofertas.codigo("mapa")
+OFERTA_COMPAT = os.environ.get("PADMINI_CAKTO_OFERTA_COMPAT") or ofertas.codigo("compat")
 
 
 def produto_do_evento(evento: dict, pd: dict) -> str:
@@ -215,7 +219,8 @@ def produto_do_evento(evento: dict, pd: dict) -> str:
 # Oferta do order bump "mapas individuais do casal" (código da oferta na Cakto).
 # Vazio = qualquer order bump num pedido de casal é tratado como os 2 mapas —
 # vale enquanto este for o único bump. Ao criar outro bump, preencher.
-OFERTA_BUMP_MAPAS = os.environ.get("PADMINI_CAKTO_OFERTA_BUMP_MAPAS", "")
+OFERTA_BUMP_MAPAS = (os.environ.get("PADMINI_CAKTO_OFERTA_BUMP_MAPAS")
+                     or ofertas.codigo("bump_mapas_casal"))
 
 
 def e_bump_mapas_do_casal(evento: dict) -> bool:

@@ -11,7 +11,7 @@
 <meta property="og:site_name" content="Padmini">
 <meta property="og:title" content="Seu mapa védico — Padmini">
 <meta property="og:description" content="Ascendente, nakshatra da Lua e a fase de vida que você atravessa agora. Amostra grátis.">
-<meta property="og:image" content="/static/og-mapa.png">
+<meta property="og:image" content="https://padmini.com.br/static/og-mapa.png">
 <meta property="og:url" content="https://padmini.com.br/mapa">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -178,7 +178,8 @@ const SIGNO_CURTO = { Mesha: "Ári", Vrishabha: "Tou", Mithuna: "Gêm", Karka: "
 const SIGNO_PT = { Mesha: "Áries", Vrishabha: "Touro", Mithuna: "Gêmeos", Karka: "Câncer", Simha: "Leão", Kanya: "Virgem", Tula: "Libra", Vrishchika: "Escorpião", Dhanu: "Sagitário", Makara: "Capricórnio", Kumbha: "Aquário", Meena: "Peixes" };
 
 // Link do checkout do mapa individual (Cakto). Preencher quando o produto existir (checklist §D).
-const LINK_CHECKOUT_INDIVIDUAL = "https://pay.cakto.com.br/39dhqty_1125341";
+// Link vem de conteudo/ofertas.yaml (trocado no servidor). Não escrever à mão.
+const LINK_CHECKOUT_INDIVIDUAL = "__CHECKOUT_MAPA__";
 
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

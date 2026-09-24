@@ -1,8 +1,8 @@
 """
 Smoke test contra o site publicado. Rodar depois de CADA deploy.
 
-    python scripts/smoke_producao.py                      # padmini.onrender.com
-    python scripts/smoke_producao.py https://padmini.com.br
+    python scripts/smoke_producao.py                      # padmini.com.br
+    python scripts/smoke_producao.py https://padmini.onrender.com
 
 Não compra nada e não precisa de segredo: só confere que o site responde, que a
 busca de cidades funciona, que as amostras saem e que o pago continua trancado.
@@ -14,7 +14,9 @@ import time
 import urllib.error
 import urllib.request
 
-BASE = (sys.argv[1] if len(sys.argv) > 1 else "https://padmini.onrender.com").rstrip("/")
+# Padrão é o domínio de verdade: é por ele que o cliente chega, então o smoke
+# também confere DNS e certificado, não só o app.
+BASE = (sys.argv[1] if len(sys.argv) > 1 else "https://padmini.com.br").rstrip("/")
 PESSOA = {"nome": "Smoke", "data": "1990-05-15", "hora": "14:30",
           "lat": -23.5505, "lon": -46.6333, "cidade": "São Paulo"}
 PESSOA_B = {**PESSOA, "nome": "Smoke B", "data": "1992-03-10", "hora": "08:00"}

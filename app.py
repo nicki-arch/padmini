@@ -33,6 +33,7 @@ import acesso
 import cakto
 import db
 import entrega
+import ofertas
 from gerar_pdf import gerar_pdf
 from montar_texto import (
     dasha_atual, gerar_com_claude, montar_prompt, montar_prompt_compat, montar_secoes,
@@ -134,6 +135,24 @@ def _captura_ligada() -> bool:
     return os.environ.get("PADMINI_CAPTURA") == "1"
 
 
+_paginas_prontas: dict[str, str] = {}
+
+
+def _pagina(arquivo: str) -> Response:
+    """Serve uma página já com preço e link de checkout no lugar dos marcadores.
+
+    A troca é feita aqui, e não por JavaScript, para o preço sair pronto no HTML
+    (com fetch, o bloco de preço apareceria vazio até a resposta chegar). O
+    resultado fica em memória: o arquivo só muda em deploy, que reinicia o processo.
+    """
+    if arquivo not in _paginas_prontas:
+        html = (RAIZ / "static" / arquivo).read_text(encoding="utf-8")
+        for marcador, valor in ofertas.substituicoes().items():
+            html = html.replace(marcador, valor)
+        _paginas_prontas[arquivo] = html
+    return Response(_paginas_prontas[arquivo], media_type="text/html; charset=utf-8")
+
+
 def _pagina_ou_lista(request: Request, arquivo: str):
     chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
     previa_url = request.query_params.get("previa", "")
@@ -145,7 +164,7 @@ def _pagina_ou_lista(request: Request, arquivo: str):
         if request.url.query:
             destino += "?" + request.url.query  # mantém ref/utm do afiliado
         return RedirectResponse(destino, status_code=302)
-    resp = FileResponse(RAIZ / "static" / arquivo)
+    resp = _pagina(arquivo)
     if chave and previa_url == chave:
         resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
                         secure=request.url.scheme == "https", samesite="lax")
@@ -169,7 +188,7 @@ def pagina_compatibilidade(request: Request):
 
 @app.api_route("/lista", methods=["GET", "HEAD"])
 def pagina_lista():
-    return FileResponse(RAIZ / "static" / "lista.html")
+    return _pagina("lista.html")
 
 
 class Inscricao(BaseModel):
@@ -289,6 +308,32 @@ def live_token_compat(pedido: PedidoCompatibilidade, request: Request):
     db.registrar_live("compat", f"{pedido.a.nome.strip()} & {pedido.b.nome.strip()}".strip(" &"),
                       pedido.a.cidade, f"{pedido.a.data.isoformat()} / {pedido.b.data.isoformat()}")
     return {"token": acesso.emitir_token("compat", chave)}
+
+
+@app.api_route("/robots.txt", methods=["GET", "HEAD"])
+def robots():
+    # /live é a página do Pedro (senha), /api não é conteúdo, e os links de entrega
+    # carregam token na URL — nada disso deve entrar em buscador.
+    corpo = ("User-agent: *\n"
+             "Disallow: /live\n"
+             "Disallow: /api/\n"
+             "Disallow: /*?token=\n"
+             # /static serve os mesmos HTMLs crus, ainda com os marcadores de preço.
+             "Disallow: /static/*.html\n"
+             f"\nSitemap: {entrega.SITE_URL}/sitemap.xml\n")
+    return Response(corpo, media_type="text/plain; charset=utf-8")
+
+
+@app.api_route("/sitemap.xml", methods=["GET", "HEAD"])
+def sitemap():
+    # Com a captura ligada, home/mapa/compatibilidade redirecionam para /lista;
+    # anunciar as três no sitemap faria o buscador indexar redirecionamento.
+    caminhos = ["/lista"] if _captura_ligada() else ["/", "/mapa", "/compatibilidade"]
+    urls = "".join(f"  <url><loc>{entrega.SITE_URL}{c}</loc></url>\n" for c in caminhos)
+    corpo = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+             f"{urls}</urlset>\n")
+    return Response(corpo, media_type="application/xml")
 
 
 @app.api_route("/privacidade", methods=["GET", "HEAD"])

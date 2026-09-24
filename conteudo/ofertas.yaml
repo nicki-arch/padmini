@@ -1,0 +1,31 @@
+# Padmini — preços e links de checkout. FONTE ÚNICA.
+#
+# Mudou o preço ou criou outra oferta na Cakto? Muda aqui e mais nada:
+# o site (preço na home, botão de compra) e o webhook (que descobre qual
+# produto foi comprado) leem deste arquivo.
+#
+# `checkout` é o link que a Cakto dá em Produto → Checkout. O código da oferta
+# — o pedaço antes do "_" — é o mesmo que a Cakto manda no webhook, então ele
+# não é repetido em lugar nenhum: sai daqui.
+#
+# `preco_de` é opcional. Quando existe, a home mostra o riscado e calcula o
+# desconto sozinha (nada de "-24%" escrito na mão e esquecido depois).
+
+mapa:
+  nome: Mapa Védico completo
+  preco: 47
+  checkout: https://pay.cakto.com.br/39dhqty_1125341
+
+compat:
+  nome: Compatibilidade do casal
+  preco: 97
+  preco_de: 127
+  checkout: https://pay.cakto.com.br/qo8uskp_1125345
+
+# Order bump do checkout do casal (casal + os 2 mapas individuais).
+# Sem `checkout` enquanto a oferta não existir na Cakto: o webhook só reconhece
+# o bump quando houver um código aqui ou em PADMINI_CAKTO_OFERTA_BUMP_MAPAS.
+bump_mapas_casal:
+  nome: Casal completo (casal + 2 mapas)
+  preco: 167
+  checkout: ""
