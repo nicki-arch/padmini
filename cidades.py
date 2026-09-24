@@ -60,6 +60,21 @@ def construir_indice() -> None:
                     w.writerow([chave, rotulo, lat, lon, pop, fuso])
 
 
+def _nota(c: dict) -> float:
+    """Ordem dos resultados, pensada para quem digita o próprio local de nascimento.
+
+    Os pesos valem mais que a população, menos a diferença entre uma cidade grande e
+    uma pequena: por isso "porto" traz Porto Alegre (1,4 mi, começa assim) antes de
+    Porto/PI (12 mil, nome exato), mas "santa maria" traz Santa Maria/RS antes de
+    Santa Mariana/PR. Nome de verdade sempre ganha de apelido.
+    """
+    from math import log10
+    return (4000 * c["_principal"]
+            + 1200 * c["_exato"]
+            + 1500 * c["rotulo"].endswith(", Brasil")
+            + 1000 * log10(max(c["_pop"], 1)))
+
+
 class BuscaCidades:
     def __init__(self) -> None:
         if not INDICE.exists():
@@ -80,26 +95,19 @@ class BuscaCidades:
         achados = {}
         while i < len(self._chaves) and self._chaves[i].startswith(q):
             chave, rotulo, lat, lon, pop, fuso = self._linhas[i]
+            # O índice guarda também os apelidos das cidades grandes (Lisbon→"Lisboa"),
+            # e é por isso que "porto" trazia Santana/AP e Bordeaux, e "sao" trazia o Rio:
+            # os três têm apelido começando assim. Aqui recuperamos, do próprio rótulo,
+            # se a chave é o nome de verdade da cidade ou só um apelido.
+            principal = chave == normalizar(rotulo.split(",")[0])
             exato = chave == q
+            cand = {"rotulo": rotulo, "lat": lat, "lon": lon, "fuso": fuso,
+                    "_pop": pop, "_exato": exato, "_principal": principal}
             atual = achados.get(rotulo)
-            if atual is None or (exato and not atual["_exato"]):
-                achados[rotulo] = {"rotulo": rotulo, "lat": lat, "lon": lon, "fuso": fuso,
-                                   "_pop": pop, "_exato": exato}
+            if atual is None or _nota(cand) > _nota(atual):
+                achados[rotulo] = cand
             i += 1
-        # Público brasileiro. Faixas, e dentro de cada faixa por população:
-        #   0) nome exato no Brasil                       ("Santa Maria" → Santa Maria/RS)
-        #   1) cidade grande do Brasil que começa assim,  ("Belo" → Belo Horizonte antes de
-        #      ou nome exato fora do Brasil                Belo/Camarões; "Paris" → Paris/França)
-        #   2) demais cidades do Brasil que começam assim
-        #   3) demais do exterior
-        def faixa(x):
-            br = x["rotulo"].endswith(", Brasil")
-            if br and x["_exato"]:
-                return 0
-            if (br and x["_pop"] >= 100_000) or (not br and x["_exato"]):
-                return 1
-            return 2 if br else 3
-        ordenados = sorted(achados.values(), key=lambda x: (faixa(x), -x["_pop"]))
+        ordenados = sorted(achados.values(), key=lambda x: -_nota(x))
         return [{k: v for k, v in x.items() if not k.startswith("_")} for x in ordenados[:limite]]
 
 

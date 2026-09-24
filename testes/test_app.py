@@ -294,6 +294,44 @@ def test_busca_prioriza_brasil_sem_esconder_exterior(consulta, primeiro):
     assert r.json()[0]["rotulo"] == primeiro
 
 
+# ---------------------------------------------------------------- busca: apelidos (parte 23)
+@pytest.mark.parametrize("consulta,primeiro", [
+    ("porto", "Porto Alegre, Rio Grande do Sul, Brasil"),  # vinha Santana/AP, cujo apelido é "Porto"
+    ("sao", "São Paulo, São Paulo, Brasil"),               # vinha o Rio em 2º ("São Sebastião do Rio...")
+])
+def test_apelido_nao_ganha_do_nome_de_verdade(consulta, primeiro):
+    """O índice guarda apelidos das cidades grandes (Lisbon→"Lisboa"), e eles estavam
+    competindo de igual para igual com o nome real: quem digitava "porto" via Santana
+    do Amapá em primeiro, e quem digitava "sao" via o Rio de Janeiro."""
+    assert cliente.get("/api/cidades", params={"q": consulta}).json()[0]["rotulo"] == primeiro
+
+
+def test_cidade_grande_ganha_de_cidade_pequena_de_nome_exato():
+    """"porto" tem de trazer Porto Alegre (1,4 mi) antes de Porto/PI (12 mil), mesmo
+    o nome de Porto/PI sendo exato. Quem digita pouco quer a cidade conhecida."""
+    rotulos = [c["rotulo"] for c in cliente.get("/api/cidades", params={"q": "porto"}).json()]
+    assert rotulos.index("Porto Alegre, Rio Grande do Sul, Brasil") < rotulos.index("Porto, Piauí, Brasil")
+
+
+def test_apelido_continua_encontrando_a_cidade():
+    """A correção acima não pode desligar os apelidos: quem digita em português
+    "Lisboa" ou "Nova York" precisa achar Lisbon e New York."""
+    for consulta, esperado in [("Lisboa", "Lisbon, Lisbon, Portugal"),
+                               ("Nova York", "New York City, New York, Estados Unidos")]:
+        assert cliente.get("/api/cidades", params={"q": consulta}).json()[0]["rotulo"] == esperado
+
+
+def test_paginas_legais_sem_placeholder():
+    """As páginas legais ficaram um tempo com [RAZÃO SOCIAL] / [CNPJ] / [E-MAIL] no ar.
+    Página legal sem os dados de quem responde pelo serviço não pode ir a produção."""
+    for pagina in ["privacidade.html", "termos.html"]:
+        texto = (RAIZ / "static" / pagina).read_text(encoding="utf-8")
+        for marca in ["[RAZÃO SOCIAL]", "[CNPJ]", "[CIDADE/UF]", "[E-MAIL]"]:
+            assert marca not in texto, f"{pagina} ainda tem {marca}"
+        assert "55.428.936/0001-00" in texto
+        assert "contato@pedrosperbmonteiro.com.br" in texto
+
+
 def test_atributo_hidden_sempre_esconde():
     """Sem essa regra, `#resultado{display:grid}` deixava um bloco vazio no celular."""
     css = (RAIZ / "static" / "base.css").read_text(encoding="utf-8")
