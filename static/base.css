@@ -13,18 +13,21 @@
 
 :root {
   /* — Cores (canônicas) — */
-  --ground: #241522;      /* fundo */
-  --ground-2: #2f1c2c;    /* superfície */
-  --ground-3: #3a2436;    /* superfície elevada / campos */
-  --ink: #f4e9dc;         /* texto principal */
-  --muted: #c9b1a6;       /* texto secundário */
-  --faint: #8f7a76;       /* texto terciário / placeholder */
+  /* Contrastes conferidos contra --ground (WCAG). Ao mexer aqui, recalcular:
+     texto de corpo entre 10:1 e 13:1 (acima disso o claro "sangra" no escuro
+     e cansa a vista), e nada legível abaixo de 4.5:1. */
+  --ground: #2b1a29;      /* fundo */
+  --ground-2: #3a2438;    /* superfície */
+  --ground-3: #482d45;    /* superfície elevada / campos */
+  --ink: #ece2d8;         /* texto principal — 12.8:1 */
+  --muted: #cbb4aa;       /* texto secundário — 8.3:1 */
+  --faint: #a89089;       /* texto terciário / placeholder — 5.5:1 */
   --saffron: #e7a24a;     /* acento primário */
   --blush: #e2a89d;       /* acento secundário (destaque em serifa) */
   --sage: #93a37e;        /* acento de apoio (ok/positivo) */
-  --line: rgba(244,233,220,.14);      /* borda padrão */
-  --line-2: rgba(244,233,220,.08);    /* borda sutil */
-  --line-forte: rgba(244,233,220,.22);/* borda de input */
+  --line: rgba(236,226,216,.18);      /* borda padrão */
+  --line-2: rgba(236,226,216,.10);    /* borda sutil */
+  --line-forte: rgba(236,226,216,.26);/* borda de input */
   --accent-soft: rgba(231,162,74,.14);/* preenchimento de acento suave */
   --on-accent: #2a1608;   /* texto sobre botão açafrão */
   --focus: #e7a24a;
@@ -149,12 +152,16 @@ input:focus-visible, button:focus-visible, a.btn:focus-visible, .navlink:focus-v
 .cross h3 { margin: 0 0 4px; }
 .cross .navlink { white-space: nowrap; }
 
-/* — Grade das 8 dimensões — */
-.dims { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 2px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
+/* — Grade das 8 dimensões —
+   São sempre 8 itens, então o número de colunas é fixo e divide 8 (4+4 ou 2+2+2+2).
+   Com auto-fit a grade caía em 6 em cima + 2 embaixo, que ficava torto. */
+.dims { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
 .dim { background: var(--ground-2); padding: 16px 15px; }
+.dim .dico { color: var(--saffron); opacity: .75; margin-bottom: 8px; display: block; }
 .dim .dn { font-family: var(--serif); font-style: italic; color: var(--saffron); font-size: 1.1rem; }
 .dim .dt { font-weight: 600; font-size: 13px; margin: 3px 0 2px; }
 .dim .dd { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+@media (max-width: 900px) { .dims { grid-template-columns: repeat(2, 1fr); } }
 
 /* — FAQ — */
 .faq details { border-bottom: 1px solid var(--line); padding: 16px 0; }
