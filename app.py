@@ -19,6 +19,7 @@ from zoneinfo import ZoneInfo
 
 import json
 
+import jinja2
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -34,6 +35,7 @@ import cakto
 import db
 import entrega
 import ofertas
+import textos
 from gerar_pdf import gerar_pdf
 from montar_texto import (
     dasha_atual, gerar_com_claude, montar_prompt, montar_prompt_compat, montar_secoes,
@@ -137,19 +139,28 @@ def _captura_ligada() -> bool:
 
 _paginas_prontas: dict[str, str] = {}
 
+# As páginas são templates: o texto vem de `conteudo/<pagina>.yaml` e o preço de
+# `conteudo/ofertas.yaml`. Montado no servidor, e não por JavaScript, para o
+# conteúdo já sair no HTML (com fetch, o bloco de preço apareceria vazio até a
+# resposta chegar) e para o buscador ver a página inteira.
+# autoescape desligado: o texto é escrito por nós e pode ter <em>/<strong>
+# de propósito. Nada aqui vem de quem visita o site.
+_jinja = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(RAIZ / "static"),
+    autoescape=False,
+    undefined=jinja2.StrictUndefined,  # nome errado no template vira erro, não buraco na página
+    keep_trailing_newline=True,
+)
+
 
 def _pagina(arquivo: str) -> Response:
-    """Serve uma página já com preço e link de checkout no lugar dos marcadores.
-
-    A troca é feita aqui, e não por JavaScript, para o preço sair pronto no HTML
-    (com fetch, o bloco de preço apareceria vazio até a resposta chegar). O
-    resultado fica em memória: o arquivo só muda em deploy, que reinicia o processo.
-    """
+    """Serve uma página montada. O resultado fica em memória: os arquivos só
+    mudam em deploy, que reinicia o processo."""
     if arquivo not in _paginas_prontas:
-        html = (RAIZ / "static" / arquivo).read_text(encoding="utf-8")
-        for marcador, valor in ofertas.substituicoes().items():
-            html = html.replace(marcador, valor)
-        _paginas_prontas[arquivo] = html
+        _paginas_prontas[arquivo] = _jinja.get_template(arquivo).render(
+            t=textos.da_pagina(arquivo.removesuffix(".html")),
+            ofertas=ofertas.OFERTAS,
+        )
     return Response(_paginas_prontas[arquivo], media_type="text/html; charset=utf-8")
 
 

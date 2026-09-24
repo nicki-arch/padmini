@@ -1,10 +1,17 @@
+# ⚠️ ESTE ARQUIVO NÃO É A FONTE DE VERDADE (24/set/2026).
+# O serviço da Render foi criado pelo painel, não por Blueprint, então ele NÃO
+# lê este arquivo — serve de referência e de base caso um dia o serviço seja
+# recriado. Diferenças reais hoje: o serviço está no plano `starter` (pago) e
+# com buildCommand `pip install -r requirements.txt`. Mudança de configuração
+# tem que ser feita no painel; mudar só aqui não tem efeito nenhum.
 services:
   - type: web
     name: padmini
     env: python
-    plan: free
+    plan: starter
     buildCommand: bash build.sh
     startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/saude
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9

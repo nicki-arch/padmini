@@ -1,0 +1,154 @@
+# Padmini — texto da home. FONTE ÚNICA da copy desta página.
+#
+# Mexer aqui muda o site; não é preciso abrir HTML. O que NÃO está aqui é
+# estrutura (o desenho dos blocos, os ícones, o CSS) — isso fica no
+# `static/home.html`, que lê este arquivo.
+#
+# Preço e link de checkout NÃO estão aqui: ficam em `ofertas.yaml`, porque o
+# webhook também os usa.
+#
+# HTML simples (<em>, <strong>) é permitido nos textos e sai como HTML — é por
+# isso que o título tem <em>dois</em> em itálico. Nada de <script> (tem teste).
+
+# O <head> (title, description, og:*, canonical) fica no HTML de propósito:
+# é metadado de buscador, não a copy que se reescreve testando conversão, e
+# deixá-lo aqui criaria duas versões do mesmo texto.
+
+menu:
+  compatibilidade: Compatibilidade
+  mapa: Mapa individual
+
+hero:
+  eyebrow: Padmini · Astrologia védica
+  titulo: A compatibilidade de vocês <em>dois</em>, calculada de verdade.
+  lede: >-
+    Não é horóscopo de signo. A astrologia védica mede o encaixe do casal em
+    oito dimensões, do dia a dia ao vínculo emocional. Vejam a amostra agora,
+    de graça.
+  botao_principal: Ver nossa compatibilidade →
+  botao_secundario: Fazer meu mapa individual
+
+como_funciona:
+  titulo: Como funciona
+  sub: Três passos. Leva dois minutos.
+  passos:
+    - titulo: Os nascimentos
+      texto: Você preenche data, hora e cidade — de você, ou do casal.
+    - titulo: A amostra grátis
+      texto: >-
+        Na hora, a nota real e os pontos que mais importam — com um card para
+        compartilhar.
+    - titulo: O relatório completo
+      texto: Se quiser ir fundo, o completo abre tudo e chega no seu e-mail.
+
+dimensoes:
+  titulo: As oito dimensões do casal
+  sub: >-
+    O Guna Milan clássico mede 36 pontos em oito frentes. Cada uma é uma parte
+    real da relação.
+  # `icone` são os traços do desenho (atributo d de cada <path>/<ellipse> do SVG).
+  # Mexer neles muda o ícone; para só trocar o texto, ignore esta linha.
+  itens:
+    - nome: Varna
+      titulo: Propósito
+      texto: A postura diante da vida.
+      icone: '<path d="M12 3 4 20h16L12 3Z"/><path d="M8.6 13h6.8"/>'
+    - nome: Vashya
+      titulo: Atração
+      texto: A química e a influência mútua.
+      icone: '<circle cx="12" cy="12" r="3"/><path d="M3.5 12H7M17 12h3.5M5.5 10l-2 2 2 2M18.5 10l2 2-2 2"/>'
+    - nome: Tara
+      titulo: Bem-estar
+      texto: A saúde e a sorte da relação.
+      icone: '<path d="M12 3.5 14 9.6h6.2l-5 3.8 1.9 6-5.1-3.7L6.9 19.4l1.9-6-5-3.8H10L12 3.5Z"/>'
+    - nome: Yoni
+      titulo: Intimidade
+      texto: O encaixe físico e instintivo.
+      icone: '<path d="M12 4c3.6 0 6.5 3.6 6.5 8S15.6 20 12 20"/><path d="M12 4C8.4 4 5.5 7.6 5.5 12S8.4 20 12 20"/><path d="M12 4v16"/>'
+    - nome: Graha Maitri
+      titulo: Mente
+      texto: A sintonia mental e a amizade.
+      icone: '<path d="M4 9.5c2.7-2 5.3-2 8 0s5.3 2 8 0"/><path d="M4 15c2.7-2 5.3-2 8 0s5.3 2 8 0"/>'
+    - nome: Gana
+      titulo: Temperamento
+      texto: O jeito de ser de cada um.
+      icone: '<circle cx="12" cy="6" r="2.2"/><circle cx="6.5" cy="16" r="2.2"/><circle cx="17.5" cy="16" r="2.2"/><path d="M12 8.2 7.6 14M12 8.2 16.4 14M8.7 16h6.6"/>'
+    - nome: Bhakoot
+      titulo: Vínculo
+      texto: O laço emocional e a prosperidade.
+      icone: '<ellipse cx="12" cy="9.3" rx="4.4" ry="5"/><ellipse cx="12" cy="14.7" rx="4.4" ry="5"/>'
+    - nome: Nadi
+      titulo: Vitalidade
+      texto: A energia a longo prazo.
+      icone: '<path d="M3 12h3.4l2.3-6 3 13 2.6-9.4 1.9 4.4H21"/>'
+
+# O cartão de exemplo que aparece na home. É ilustração, não um cliente real —
+# por isso os nomes são inventados. Não usar depoimento inventado aqui.
+card_exemplo:
+  casal: Ana &amp; Rafael
+  nota: 28
+  total: 36
+  rotulo: Guna Milan · forte
+  barra_percentual: 78
+  frase: >-
+    "Vocês se entendem no dia a dia. O desafio é o dinheiro — e vocês sabem
+    disso."
+  legenda: >-
+    Toda análise termina num card assim — sobre vocês dois, feito para
+    compartilhar.
+
+produtos:
+  titulo: Escolha por onde começar
+  sub: Os dois têm amostra grátis. Você só paga se quiser o relatório completo.
+  compat:
+    etiqueta: Para o casal
+    titulo: Compatibilidade
+    texto: >-
+      As 8 dimensões, os pontos de atenção clássicos e como fazer a relação
+      funcionar.
+    botao: Ver nossa compatibilidade →
+  mapa:
+    etiqueta: Para você
+    titulo: Mapa individual
+    texto: >-
+      Seu Ascendente, a nakshatra da Lua, a fase de vida atual e o mapa
+      completo.
+    botao: Fazer meu mapa →
+
+tradicao:
+  titulo: Uma tradição de família
+  texto: >-
+    Quarenta anos de estudo de astrologia, passados adiante por quem hoje
+    conduz a leitura. Não é um app frio: é gente por trás de cada texto.
+
+faq:
+  titulo: Perguntas
+  itens:
+    - pergunta: É a mesma astrologia do meu horóscopo?
+      resposta: >-
+        Não. O horóscopo de jornal usa só o signo solar. Aqui é a astrologia
+        védica (sideral), que parte da Lua e das nakshatras — mais pessoal e
+        mais precisa, especialmente para relacionamentos.
+    - pergunta: Preciso saber a hora exata de nascimento?
+      resposta: >-
+        Quanto mais exata, melhor — a hora afina a posição da Lua, o coração do
+        cálculo. Sem ela dá para fazer assim mesmo, e a leitura avisa onde a
+        margem é maior.
+    - pergunta: Preciso criar conta?
+      resposta: >-
+        Não. Você preenche os dados, vê a amostra e, se comprar, o completo
+        chega no seu e-mail. Sem cadastro nem senha.
+    - pergunta: E se a nota der baixa?
+      resposta: >-
+        Nota baixa não condena nada. Ela mostra onde vocês são diferentes em
+        coisas que importam — e o completo explica como lidar com isso.
+
+fechamento:
+  titulo: Descubram juntos.
+  sub: Comecem pela amostra grátis. Leva dois minutos.
+  botao: Ver nossa compatibilidade →
+
+rodape:
+  linha1: Padmini — astrologia védica para autoconhecimento.
+  linha2: >-
+    O conteúdo tem fins de reflexão e não substitui aconselhamento profissional.

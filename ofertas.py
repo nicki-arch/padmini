@@ -7,6 +7,7 @@ o link do checkout no JavaScript de cada página e o código da oferta no
 preço na Cakto e esquecer um dos três é como o site passa a anunciar um valor e
 cobrar outro — ou o webhook deixa de reconhecer a compra.
 
+As páginas são templates (Jinja) e leem estes valores como `ofertas.compat.preco`.
 O código da oferta não é configurado: sai do próprio link do checkout
 (`https://pay.cakto.com.br/<codigo>_<numero>`), que é o mesmo identificador que
 a Cakto manda no webhook.
@@ -55,21 +56,3 @@ def codigo(chave: str) -> str:
 
 def checkout(chave: str) -> str:
     return oferta(chave).get("checkout", "")
-
-
-def substituicoes() -> dict[str, str]:
-    """Marcadores que o app troca no HTML antes de servir a página.
-
-    Feito no servidor, e não por JavaScript, para o preço já sair no HTML: com
-    fetch, a pessoa veria o bloco de preço vazio até a resposta chegar.
-    """
-    c, m = oferta("compat"), oferta("mapa")
-    return {
-        "__CHECKOUT_MAPA__": m.get("checkout", ""),
-        "__CHECKOUT_COMPAT__": c.get("checkout", ""),
-        "__PRECO_MAPA__": str(m.get("preco", "")),
-        "__PRECO_COMPAT__": str(c.get("preco", "")),
-        "__PRECO_COMPAT_DE__": str(c.get("preco_de", "")),
-        "__DESCONTO_COMPAT__": str(c.get("desconto", "")),
-        "__ECONOMIA_COMPAT__": str(c.get("economia", "")),
-    }

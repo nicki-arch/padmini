@@ -179,7 +179,7 @@ const SIGNO_PT = { Mesha: "Áries", Vrishabha: "Touro", Mithuna: "Gêmeos", Kark
 
 // Link do checkout do mapa individual (Cakto). Preencher quando o produto existir (checklist §D).
 // Link vem de conteudo/ofertas.yaml (trocado no servidor). Não escrever à mão.
-const LINK_CHECKOUT_INDIVIDUAL = "__CHECKOUT_MAPA__";
+const LINK_CHECKOUT_INDIVIDUAL = "{{ ofertas.mapa.checkout }}";
 
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

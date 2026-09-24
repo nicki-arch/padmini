@@ -76,9 +76,51 @@ def test_checkout_ligado_nos_dois_produtos():
 # ------------------------------------------------- preço e link num lugar só (ofertas.yaml)
 @pytest.mark.parametrize("rota", ["/", "/mapa", "/compatibilidade", "/lista"])
 def test_nenhum_marcador_sobra_na_pagina(rota):
-    """Marcador não substituído vira 'R$__PRECO_COMPAT__' na cara do cliente."""
-    sobrou = re.search(r"__[A-Z][A-Z_]*__", cliente.get(rota).text)
+    """Template não montado vira '{{ ofertas.compat.preco }}' na cara do cliente."""
+    sobrou = re.search(r"\{\{|\{%|__[A-Z][A-Z_]*__", cliente.get(rota).text)
     assert not sobrou, f"{rota} ainda tem {sobrou.group(0) if sobrou else ''}"
+
+
+# ------------------------------------------------- copy fora do HTML (conteudo/home.yaml)
+def test_texto_da_home_sai_do_yaml():
+    """O que muda na copy tem que mudar na página — senão são duas verdades."""
+    import textos
+    t = textos.da_pagina("home")
+    html = cliente.get("/").text
+    assert t["hero"]["titulo"] in html
+    assert t["faq"]["itens"][0]["pergunta"] in html
+    for d in t["dimensoes"]["itens"]:
+        assert d["nome"] in html and d["texto"] in html
+
+
+def test_copy_nao_carrega_script():
+    """Os textos entram na página como HTML (para permitir <em>). Por isso não
+    podem conter script — o dia em que alguém colar um, a página executa."""
+    import textos
+
+    def cada_texto(no):
+        if isinstance(no, str):
+            yield no
+        elif isinstance(no, dict):
+            for v in no.values():
+                yield from cada_texto(v)
+        elif isinstance(no, list):
+            for v in no:
+                yield from cada_texto(v)
+
+    for texto in cada_texto(textos.da_pagina("home")):
+        baixo = texto.lower()
+        for perigo in ["<script", "javascript:", "onerror=", "onload="]:
+            assert perigo not in baixo, f"conteudo/home.yaml tem {perigo}: {texto[:60]}"
+
+
+def test_nome_errado_no_template_quebra_no_teste_e_nao_no_ar():
+    """StrictUndefined: variável inexistente levanta erro aqui, em vez de sumir
+    silenciosamente e deixar um buraco na página em produção."""
+    import jinja2
+    import app as _app
+    with pytest.raises(jinja2.UndefinedError):
+        _app._jinja.from_string("{{ t.nao_existe.nada }}").render(t={}, ofertas={})
 
 
 def test_preco_da_home_sai_do_ofertas_yaml():

@@ -142,7 +142,7 @@
 <script>
 // Link do checkout (Cakto). Preencher quando o produto estiver cadastrado (checklist §D).
 // Link vem de conteudo/ofertas.yaml (trocado no servidor). Não escrever à mão.
-const LINK_CHECKOUT = "__CHECKOUT_COMPAT__";
+const LINK_CHECKOUT = "{{ ofertas.compat.checkout }}";
 // Combo "casal completo": order bump no checkout do casal com o mapa individual
 // de cada um. Preencher com o preço do bump (ex.: "R$40") quando ele existir na
 // Cakto — vazio = a linha do combo não aparece.
