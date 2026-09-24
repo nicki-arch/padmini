@@ -55,6 +55,15 @@ def test_paginas_respondem(rota):
     assert "<html" in r.text.lower()
 
 
+@pytest.mark.parametrize(
+    "rota", ["/", "/mapa", "/compatibilidade", "/lista", "/privacidade", "/termos", "/api/saude"])
+def test_head_nao_da_405(rota):
+    """Parte 22: HEAD / voltava 405 (FastAPI/Starlette instalados aqui não geram HEAD
+    sozinhos para @app.get). Monitores de uptime usam HEAD — sem isso, todo alarme dispara."""
+    r = cliente.head(rota)
+    assert r.status_code == 200
+
+
 def test_checkout_ligado_nos_dois_produtos():
     """Os botões de compra precisam apontar para a Cakto (constante vazia = botão morto)."""
     mapa = cliente.get("/mapa").text

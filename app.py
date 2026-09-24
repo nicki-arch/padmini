@@ -152,22 +152,22 @@ def _pagina_ou_lista(request: Request, arquivo: str):
     return resp
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def pagina_home(request: Request):
     return _pagina_ou_lista(request, "home.html")
 
 
-@app.get("/mapa")
+@app.api_route("/mapa", methods=["GET", "HEAD"])
 def pagina_mapa(request: Request):
     return _pagina_ou_lista(request, "index.html")
 
 
-@app.get("/compatibilidade")
+@app.api_route("/compatibilidade", methods=["GET", "HEAD"])
 def pagina_compatibilidade(request: Request):
     return _pagina_ou_lista(request, "compatibilidade.html")
 
 
-@app.get("/lista")
+@app.api_route("/lista", methods=["GET", "HEAD"])
 def pagina_lista():
     return FileResponse(RAIZ / "static" / "lista.html")
 
@@ -291,12 +291,12 @@ def live_token_compat(pedido: PedidoCompatibilidade, request: Request):
     return {"token": acesso.emitir_token("compat", chave)}
 
 
-@app.get("/privacidade")
+@app.api_route("/privacidade", methods=["GET", "HEAD"])
 def pagina_privacidade():
     return FileResponse(RAIZ / "static" / "privacidade.html")
 
 
-@app.get("/termos")
+@app.api_route("/termos", methods=["GET", "HEAD"])
 def pagina_termos():
     return FileResponse(RAIZ / "static" / "termos.html")
 
@@ -306,10 +306,11 @@ def cidades(q: str = Query("", max_length=80)):
     return busca.buscar(q)
 
 
-@app.get("/api/saude")
+@app.api_route("/api/saude", methods=["GET", "HEAD"])
 def saude():
-    """Usado pelo keep-alive diário (GitHub Actions): acorda o site e faz uma
-    consulta no banco — o Supabase grátis pausa após uma semana sem uso."""
+    """Usado pelo keep-alive diário (GitHub Actions) e por monitores de uptime
+    (que costumam usar HEAD): acorda o site e faz uma consulta no banco —
+    o Supabase grátis pausa após uma semana sem uso."""
     banco = db.saude()
     return {"ok": banco is not False, "banco": banco}
 
