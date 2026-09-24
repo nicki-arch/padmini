@@ -3,12 +3,14 @@ services:
     name: padmini
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: bash build.sh
     startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
       # Valores definidos no dashboard da Render (sync: false = não versionado aqui).
+      - key: PADMINI_CONTEUDO_TOKEN  # token de leitura do repo privado nicki-arch/padmini-conteudo (ver build.sh)
+        sync: false
       - key: ANTHROPIC_API_KEY   # texto por IA (opcional)
         sync: false
       - key: PADMINI_SECRET      # obrigatório: assina os tokens do completo

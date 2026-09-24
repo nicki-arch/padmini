@@ -21,6 +21,7 @@ jobs:
           --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     env:
       TEST_DATABASE_URL: postgresql://postgres:teste@localhost:5432/padmini_teste
+      PADMINI_CONTEUDO_TOKEN: ${{ secrets.CONTEUDO_REPO_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,5 +31,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      # base_significacoes.py mora em um repositório PRIVADO separado
+      # (nicki-arch/padmini-conteudo) para não expor o texto de interpretação
+      # no repositório público. Mesmo fallback do build.sh: sem o secret
+      # configurado, segue com o arquivo do checkout (fase de transição).
+      - name: Buscar conteúdo privado (significações)
+        if: ${{ env.PADMINI_CONTEUDO_TOKEN != '' }}
+        run: |
+          git clone --depth 1 "https://x-access-token:${PADMINI_CONTEUDO_TOKEN}@github.com/nicki-arch/padmini-conteudo.git" /tmp/padmini-conteudo
+          cp /tmp/padmini-conteudo/base_significacoes.py ./base_significacoes.py
       - run: pip install -r requirements.txt pytest httpx
       - run: python -m pytest -q testes

@@ -11,6 +11,14 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
   `claude/LEIA-PRIMEIRO.md` (ponto de entrada), `claude/decisoes.md`, `claude/checklist-de-lancamento.md`.
 - **Produção:** https://padmini.onrender.com (Render, serviço `srv-dalfcj3l550s73b38jmg`,
   deploy automático a cada push na `master`).
+- **`base_significacoes.py` mora em um repositório PRIVADO separado**
+  (`github.com/nicki-arch/padmini-conteudo`), não neste. Isso mantém o texto de
+  interpretação — o diferencial do produto — fora de um repositório que precisa ser
+  público (ver regra 10). `build.sh` (Render) e o passo equivalente em
+  `.github/workflows/testes.yml` buscam o arquivo de lá na hora do build/CI, usando
+  `PADMINI_CONTEUDO_TOKEN` / secret `CONTEUDO_REPO_TOKEN` (token de leitura, só
+  daquele repo). Se você está numa sessão nova e o arquivo não existe no checkout,
+  é isso — não é regressão. Para editar o conteúdo, mexa no repo `padmini-conteudo`.
 
 ## Mapa do código
 | Arquivo | Papel |
@@ -42,6 +50,10 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 7. **Depois de cada deploy:** `python scripts/smoke_producao.py`.
 8. Não gravar CPF nem dados de cartão no banco (vêm no payload da Cakto).
 9. `PADMINI_MODO_ABERTO=1` só em staging, **nunca** em produção.
+10. **O repositório público é o que cumpre a licença AGPL do Swiss Ephemeris** (publicar
+    o código é a via gratuita, em vez de comprar a licença comercial). Por isso o
+    conteúdo proprietário (significações) foi para fora dele — ver acima — em vez de
+    o repositório inteiro virar privado.
 
 ## Commits
 Mensagens em português, explicando o porquê. Sem force-push na `master`.
