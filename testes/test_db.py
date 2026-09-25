@@ -38,7 +38,7 @@ def banco_limpo(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", TEST_URL)
     assert db.iniciar()
     with db._conectar() as c:
-        c.execute("TRUNCATE pedidos, textos_ia")
+        c.execute("TRUNCATE pedidos, textos_ia, amostras_email, abandonos, email_optout")
     yield
 
 
@@ -106,12 +106,12 @@ def test_sem_database_url_tudo_vira_no_op(monkeypatch):
 
 
 def test_saude_com_banco():
-    assert base.cliente.get("/api/saude").json() == {"ok": True, "banco": True}
+    assert base.cliente.get("/api/saude").json()["banco"] is True
 
 
 def test_saude_com_banco_fora(monkeypatch):
     monkeypatch.setenv("DATABASE_URL", "postgresql://ninguem@127.0.0.1:1/nada")
-    assert base.cliente.get("/api/saude").json() == {"ok": False, "banco": False}
+    assert base.cliente.get("/api/saude").json() | {"versao": ""} == {"ok": False, "banco": False, "versao": ""}
 
 
 def test_tabelas_com_rls_ligado():
@@ -195,3 +195,72 @@ def test_modo_live_registra_cada_leitura(monkeypatch):
     cl.post("/api/live/token/mapa", json=base.PESSOA)
     rows = _linhas("SELECT produto, nome, cidade, nascimento FROM live_geracoes")
     assert rows == [("mapa", "Ana", "São Paulo, SP", "1990-05-15 14:30")]
+
+
+# ---------------------------------------------------------------- amostra por e-mail / lembrete / abandono
+def _amostra(email, horas_atras, aceita=True, produto="mapa"):
+    db.registrar_amostra_email(email, produto, base.PESSOA, aceita, {})
+    with db._conectar() as c:
+        c.execute("UPDATE amostras_email SET criado_em = now() - make_interval(hours => %s) "
+                  "WHERE id = (SELECT max(id) FROM amostras_email)", (horas_atras,))
+
+
+def test_novas_tabelas_com_rls_ligado():
+    rows = _linhas("SELECT relname, relrowsecurity FROM pg_class "
+                   "WHERE relname IN ('amostras_email', 'abandonos', 'email_optout')")
+    assert dict(rows) == {"amostras_email": True, "abandonos": True, "email_optout": True}
+
+
+def test_lembrete_so_para_quem_autorizou_na_janela_e_nao_comprou():
+    _amostra("ok@t.com", 30)                     # entra
+    _amostra("cedo@t.com", 2)                    # ainda não fez 24h
+    _amostra("velho@t.com", 100)                 # passou de 72h
+    _amostra("naoquis@t.com", 30, aceita=False)  # não autorizou
+    _amostra("comprou@t.com", 30)
+    ev = evento_cakto("pedido-comprou")
+    ev["data"]["customer"]["email"] = "comprou@t.com"
+    base._postar_webhook(ev)                      # comprou depois da amostra
+    _amostra("saiu@t.com", 30)
+    db.descadastrar("SAIU@t.com")
+    emails = [x["email"] for x in db.lembretes_pendentes()]
+    assert emails == ["ok@t.com"]
+
+
+def test_lembrete_sai_uma_vez_so_por_email():
+    _amostra("ok@t.com", 30)
+    _amostra("ok@t.com", 40)
+    pend = db.lembretes_pendentes()
+    assert len(pend) == 1
+    db.marcar_lembrete_enviado(pend[0]["id"])
+    assert db.lembretes_pendentes() == []
+
+
+def test_lembretes_ponta_a_ponta(monkeypatch):
+    enviados = []
+    monkeypatch.setenv("PADMINI_TAREFAS_CHAVE", "k")
+    monkeypatch.setattr(entrega, "enviar_email", lambda d, a, h: enviados.append(d) or True)
+    _amostra("ok@t.com", 30)
+    r = base.cliente.post("/api/tarefas/lembretes", headers={"Authorization": "Bearer k"})
+    assert r.json()["enviados"] == 1 and enviados == ["ok@t.com"]
+    r = base.cliente.post("/api/tarefas/lembretes", headers={"Authorization": "Bearer k"})
+    assert r.json()["enviados"] == 0
+
+
+def test_limite_de_amostras_por_endereco_conta_24h():
+    for _ in range(3):
+        _amostra("muito@t.com", 1)
+    _amostra("muito@t.com", 30)
+    assert db.amostras_enviadas_hoje("MUITO@t.com") == 3
+
+
+def test_abandono_uma_recuperacao_por_oferta():
+    assert db.abandono_ja_tratado("a@t.com", "qo8uskp") is False
+    db.registrar_abandono("a@t.com", "Ana", "qo8uskp", "https://pay.cakto.com.br/qo8uskp", True)
+    assert db.abandono_ja_tratado("A@t.com", "qo8uskp") is True
+    assert db.abandono_ja_tratado("a@t.com", "39dhqty") is False
+
+
+def test_descadastro_bloqueia_marketing():
+    assert db.descadastrado("x@t.com") is False
+    assert db.descadastrar("X@t.com")
+    assert db.descadastrado("x@T.com") is True

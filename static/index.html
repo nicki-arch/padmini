@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="/static/base.css">
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/analytics.js" defer></script>
+<script src="/static/amostra-email.js" defer></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23e7a24a'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e2a89d'/></svg>">
 <style>
   /* específico do mapa individual — o resto vem de base.css */
@@ -136,7 +137,7 @@
 
   <section id="sobre-mapa">
     <h2>O que vem no mapa completo</h2>
-    <p class="sub">A amostra é grátis. O completo (R$47) abre o mapa inteiro.</p>
+    <p class="sub">A amostra é grátis. O completo (R${{ ofertas.mapa.preco }}) abre o mapa inteiro.</p>
     <ul class="lista-completo">
       <li>O mapa (rashi) e a posição dos 9 grahas, casa a casa</li>
       <li>As 12 casas e os pontos de destaque (yogas, dignidades, doshas)</li>
@@ -337,7 +338,7 @@ function desenharAmostra(d) {
         <li>A leitura completa, escrita por IA a partir do seu mapa</li>
         <li>O relatório em PDF para guardar</li>
       </ul>
-      <div class="preco-ind">R$47</div>
+      <div class="preco-ind">R${{ ofertas.mapa.preco }}</div>
       <a class="navlink destaque" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa'})">Quero o mapa completo →</a>
       <p class="nota" style="margin-top:10px">${esc(ctaNota)}</p>
     </div>
@@ -347,9 +348,14 @@ function desenharAmostra(d) {
         <p class="nota">A compatibilidade de vocês dois em 8 dimensões — também com amostra grátis.</p>
       </div>
       <a class="navlink destaque" href="/compatibilidade">Ver a compatibilidade →</a>
-    </div>`;
+    </div>
+    <div class="card amostra-email" id="amostra-email" hidden></div>`;
   res.hidden = false;
   if (window.padTrack) padTrack("amostra_gerada", { produto: "mapa" });
+  if (window.padAmostraEmail && ultimoPedido) {
+    const pessoa = ultimoPedido;
+    padAmostraEmail("#amostra-email", "mapa", () => ({ pessoa }));
+  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 

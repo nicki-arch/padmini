@@ -104,6 +104,8 @@ PDF = Limite("pdf", maximo=20, janela=60)
 TEXTO_IA = Limite("texto_ia", maximo=20, janela=60 * 60)
 CIDADES = Limite("cidades", maximo=300, janela=60)
 LISTA = Limite("lista", maximo=20, janela=10 * 60)
+# "receber a amostra por e-mail": cada chamada manda um e-mail de verdade.
+AMOSTRA_EMAIL = Limite("amostra_email", maximo=10, janela=10 * 60)
 # Login do live: conta só as FALHAS. 5 por IP a cada 15 min, e 30 no total por
 # hora (um atacante trocando de IP ainda esbarra no teto global). Efeito
 # colateral aceito: sob ataque, o login fica travado por até 1h para todos — por
@@ -111,7 +113,7 @@ LISTA = Limite("lista", maximo=20, janela=10 * 60)
 LIVE_FALHAS_IP = Limite("live_falhas_ip", maximo=5, janela=15 * 60)
 LIVE_FALHAS_GLOBAL = Limite("live_falhas_global", maximo=30, janela=60 * 60)
 
-TODOS = (CALCULO, PDF, TEXTO_IA, CIDADES, LISTA, LIVE_FALHAS_IP, LIVE_FALHAS_GLOBAL)
+TODOS = (CALCULO, PDF, TEXTO_IA, CIDADES, LISTA, AMOSTRA_EMAIL, LIVE_FALHAS_IP, LIVE_FALHAS_GLOBAL)
 
 
 def limpar_todos() -> None:

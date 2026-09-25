@@ -108,6 +108,9 @@
 </main>
 
 <script>
+// 14 → "14", 14.5 → "14,5"
+function nota(v) { return String(Math.round(Number(v) * 10) / 10).replace(".", ","); }
+
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const grau = (g) => { const d = Math.floor(g); const m = Math.round((g - d) * 60); return m === 60 ? `${d + 1}°00'` : `${d}°${String(m).padStart(2, "0")}'`; };
@@ -284,12 +287,12 @@ function pessoa(x) { return { nome: x.nome, data: x.data, hora: x.hora, lat: x.c
 function desenharCasal(d) {
   const s = d.snippets || {};
   const kootas = (s.kootas || []).map((k) =>
-    `<div class="koota"><span><b>${esc(k.nome)}</b> — ${esc(k.tema)}<br><span class="sub">${esc(k.texto)}</span></span><b>${k.obtido}/${k.max}</b></div>`).join("");
+    `<div class="koota"><span><b>${esc(k.nome)}</b> — ${esc(k.tema)}<br><span class="sub">${esc(k.texto)}</span></span><b>${nota(k.obtido)}/${k.max}</b></div>`).join("");
   const doshas = (s.doshas || []).map((x) => `<p>${esc(typeof x === "string" ? x : (x.texto || x.nome || ""))}</p>`).join("");
   $("#resultado").innerHTML = `
     <h2 class="grande">${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2>
     <div class="destaques">
-      <div><span>Guna Milan</span><b>${d.total} / ${d.maximo}</b></div>
+      <div><span>Guna Milan</span><b>${nota(d.total)} / ${d.maximo}</b></div>
       <div><span>Categoria</span><b>${esc(d.categoria)}</b></div>
     </div>
     <p>${esc(s.moldura || "")}</p>

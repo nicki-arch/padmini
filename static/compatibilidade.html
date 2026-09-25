@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="/static/base.css">
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/analytics.js" defer></script>
+<script src="/static/amostra-email.js" defer></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23e7a24a'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e2a89d'/></svg>">
 <style>
   /* específico da compatibilidade — o resto vem de base.css */
@@ -124,7 +125,7 @@
       <p class="erro" id="erro" role="alert" hidden></p>
       <div class="enviar-linha">
         <button id="enviar" type="submit" class="btn btn-primary">Ver nossa compatibilidade →</button>
-        <span class="price-note">Amostra <b>grátis</b> · relatório completo por <b>R$127</b></span>
+        <span class="price-note">Amostra <b>grátis</b> · relatório completo por <b>R${{ ofertas.compat.preco }}</b></span>
       </div>
     </form>
   </div>
@@ -144,9 +145,9 @@
 // Link vem de conteudo/ofertas.yaml (trocado no servidor). Não escrever à mão.
 const LINK_CHECKOUT = "{{ ofertas.compat.checkout }}";
 // Combo "casal completo": order bump no checkout do casal com o mapa individual
-// de cada um. Preencher com o preço do bump (ex.: "R$40") quando ele existir na
-// Cakto — vazio = a linha do combo não aparece.
-const PRECO_BUMP_MAPAS = "";
+// de cada um. Sai do ofertas.yaml (bump_mapas_casal): enquanto o bump não tiver
+// `checkout` lá, fica vazio e a linha do combo não aparece.
+const PRECO_BUMP_MAPAS = "{% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.checkout %}R${{ ofertas.bump_mapas_casal.preco - ofertas.compat.preco }}{% endif %}";
 
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -280,13 +281,16 @@ const CATEGORIA_LABEL = {
 };
 
 // ---------- relatório completo (pós-pagamento) ----------
+// 14 → "14", 14.5 → "14,5" (vírgula, como o leitor brasileiro escreve)
+function nota(v) { return String(Math.round(Number(v) * 10) / 10).replace(".", ","); }
+
 function desenharCompleto(d) {
   const s = d.snippets;
   const a = esc(s.nomes.a), b = esc(s.nomes.b);
   const pct = Math.round((d.total / 36) * 100);
   const cat = CATEGORIA_LABEL[d.categoria] || d.categoria;
   const kootas = (s.kootas || []).map((k) =>
-    `<div class="ponto"><div class="rot">${esc(k.nome)} · ${esc(k.tema)} — ${k.obtido}/${k.max}</div>
+    `<div class="ponto"><div class="rot">${esc(k.nome)} · ${esc(k.tema)} — ${nota(k.obtido)}/${k.max}</div>
      <p>${esc(k.descricao)} ${esc(k.texto)}</p></div>`).join("");
   const doshas = (s.doshas || []).map((x) =>
     `<li style="margin-bottom:8px">${esc(x.texto)}${x.alivio ? " " + esc(x.alivio) : ""}</li>`).join("");
@@ -299,7 +303,7 @@ function desenharCompleto(d) {
       <div class="cardc">
         <div class="top"><span class="wm">padmini</span></div>
         <div class="who">${a} &amp; ${b}</div>
-        <div class="score">${d.total}<span> / 36</span></div>
+        <div class="score">${nota(d.total)}<span> / 36</span></div>
         <div class="scorelab">Guna Milan · ${esc(cat)}</div>
         <div class="bar"><i style="width:${pct}%"></i></div>
       </div>
@@ -368,12 +372,12 @@ function desenharAmostra(d) {
           </svg>
         </div>
         <div class="who">${a} &amp; ${b}</div>
-        <div class="score">${d.total}<span> / 36</span></div>
+        <div class="score">${nota(d.total)}<span> / 36</span></div>
         <div class="scorelab">Guna Milan · ${esc(catLabel)}</div>
         <div class="bar"><i style="width:${pct}%"></i></div>
         <div class="insight">"${esc(s.moldura.split(". ").slice(-1)[0] || s.moldura)}"</div>
       </div>
-      <button type="button" class="btn btn-outline" id="baixar-card">Baixar card ↓</button>
+      <button type="button" class="btn btn-outline" id="baixar-card">${navigator.canShare ? "Compartilhar card ↗" : "Baixar card ↓"}</button>
     </div>
     <div class="pontos">
       <div class="ponto forte">
@@ -396,16 +400,21 @@ function desenharAmostra(d) {
         <li>A leitura de Marte do casal (o "mangal")</li>
         <li>Como fazer essa relação funcionar, na prática</li>
       </ul>
-      <div class="preco">R$97 <small>R$127</small></div>
+      <div class="preco">R${{ ofertas.compat.preco }}{% if ofertas.compat.preco_de %} <small>R${{ ofertas.compat.preco_de }}</small>{% endif %}</div>
       ${PRECO_BUMP_MAPAS ? `<p class="sub" style="margin:4px 0 14px">No checkout, dá para incluir <b>o mapa individual de cada um</b> por mais ${esc(PRECO_BUMP_MAPAS)} — os dois chegam no mesmo e-mail.</p>` : ""}
       <div class="enviar-linha">
         <a class="btn btn-primary" href="${esc(ctaHref)}" id="cta-completo" onclick="window.padTrack&&padTrack('checkout_click',{produto:'compat'})">Quero o relatório completo →</a>
       </div>
       <p class="honesty">${esc(ctaNota)} Nenhuma nota é uma sentença: nota baixa é onde vocês precisam de atenção, não "não vai dar certo".</p>
-    </div>`;
+    </div>
+    <div class="card amostra-email" id="amostra-email" hidden></div>`;
   const res = $("#resultado");
   res.hidden = false;
   if (window.padTrack) padTrack("amostra_gerada", { produto: "compat" });
+  if (window.padAmostraEmail && ultimoCasal) {
+    const casal = ultimoCasal;
+    padAmostraEmail("#amostra-email", "compat", () => ({ a: casal.a, b: casal.b }));
+  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
   const bc = document.getElementById("baixar-card");
   if (bc) bc.addEventListener("click", () => { if (window.padTrack) padTrack("card_baixado", { produto: "compat" }); baixarCard(d); });
@@ -533,10 +542,13 @@ async function montarCanvasCard(d) {
   x.fillStyle = "#f4e9dc";
   _wrap(x, "“" + insight + "”", PX, 850, barW, 70);
 
-  // rodapé
-  x.font = '400 28px "Inter", sans-serif';
-  x.fillStyle = "#8f7a76";
-  x.fillText("padmini.com.br", PX, H - 90);
+  // rodapé: quem vê o card no story precisa saber onde fazer o seu
+  x.font = '400 30px "Inter", sans-serif';
+  x.fillStyle = "#c9b1a6";
+  x.fillText("Façam o teste de vocês, de graça:", PX, H - 150);
+  x.font = '600 52px "Inter", sans-serif';
+  x.fillStyle = "#e7a24a";
+  x.fillText("padmini.com.br", PX, H - 85);
 
   return c;
 }
@@ -548,13 +560,28 @@ async function baixarCard(d) {
   try {
     const c = await montarCanvasCard(d);
     const nome = "padmini-" + _slug(d.snippets.nomes.a) + "-" + _slug(d.snippets.nomes.b) + ".png";
-    c.toBlob((blob) => {
+    const blob = await new Promise((ok) => c.toBlob(ok, "image/png"));
+    // No celular, abre o "compartilhar" do sistema (Instagram, WhatsApp…) direto
+    // com a imagem; onde não dá, baixa o arquivo como antes.
+    const arquivo = new File([blob], nome, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+      try {
+        await navigator.share({ files: [arquivo],
+          text: "Nossa compatibilidade pela astrologia védica — façam a de vocês em https://padmini.com.br/?utm_source=card" });
+        if (window.padTrack) padTrack("card_compartilhado", { via: "share" });
+        return;
+      } catch (e) {
+        if (e && e.name === "AbortError") return;  // a pessoa fechou o menu: não baixa nada
+      }
+    }
+    {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = nome;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
-    }, "image/png");
+      if (window.padTrack) padTrack("card_compartilhado", { via: "download" });
+    }
   } catch (e) {
     if (bc) bc.textContent = "Não deu — tente de novo";
   } finally {
