@@ -1,43 +1,47 @@
-# Confere o site de verdade depois de cada deploy (e uma vez por dia).
+# Confere o site de verdade, de hora em hora.
 #
-# A Render publica sozinha depois que os testes passam na master, mas ninguém
-# rodava o scripts/smoke_producao.py depois (regra 7 do CLAUDE.md). Aqui:
-#   1. espera o /api/saude mostrar a versão (commit) nova no ar;
-#   2. roda o smoke contra padmini.com.br.
-# Se falhar, o GitHub manda e-mail para o dono do repositório (é o padrão de
+# NÃO roda no push de propósito: a Render está em "Auto-Deploy: After CI
+# Checks Pass" e espera TODAS as verificações do commit passarem. Um workflow
+# de push que esperasse o deploy travaria o próprio deploy (aconteceu em
+# 25/set: um esperava o outro).
+#
+# Em cada rodada:
+#   1. se o commit mais novo da master tem mais de 30 min e ainda não está no ar
+#      (/api/saude → versao), falha: o deploy travou ou quebrou na Render;
+#   2. roda o scripts/smoke_producao.py contra padmini.com.br.
+# Se falhar, o GitHub manda e-mail para o dono do repositório (padrão de
 # notificação de workflow com falha — confira em github.com/settings/notifications).
 name: pos-deploy
 
 on:
-  push:
-    branches: [master]
   schedule:
-    - cron: "43 12 * * *"   # 09:43 em Brasília
+    - cron: "43 * * * *"   # de hora em hora, no minuto 43
   workflow_dispatch:
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Esperar a versão nova entrar no ar
-        if: github.event_name == 'push'
+      - name: A versão mais nova da master está no ar?
         run: |
           alvo="${GITHUB_SHA::7}"
-          # CI (~1 min) + build e troca de instância na Render (~2 min); margem larga.
-          for i in $(seq 1 50); do
-            versao=$(curl -s --max-time 60 https://padmini.onrender.com/api/saude \
-                     | python -c "import sys,json; print(json.load(sys.stdin).get('versao',''))" 2>/dev/null || true)
-            echo "tentativa $i: no ar = '${versao}', esperado = '${alvo}'"
-            if [ "$versao" = "$alvo" ]; then exit 0; fi
-            sleep 30
+          idade=$(( $(date +%s) - $(git log -1 --format=%ct) ))
+          versao=""
+          for i in 1 2 3; do
+            versao=$(curl -s --max-time 90 https://padmini.onrender.com/api/saude \
+                     | python -c "import sys,json; print(json.load(sys.stdin).get('versao',''))" 2>/dev/null) && break
+            sleep 20
           done
-          echo "::error::A versão $alvo não entrou no ar em 25 minutos. Veja o deploy na Render."
-          exit 1
+          echo "no ar: '${versao}' · master: '${alvo}' · commit tem $((idade / 60)) min"
+          if [ "$versao" != "$alvo" ] && [ "$idade" -gt 1800 ]; then
+            echo "::error::A master ($alvo) tem mais de 30 min e o site ainda roda '$versao'. Veja o deploy na Render."
+            exit 1
+          fi
       - name: Smoke de produção
         run: |
           pip install -q pyyaml

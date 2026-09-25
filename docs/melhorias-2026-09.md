@@ -95,11 +95,14 @@ O Supabase está no plano **grátis**, que não tem backup para baixar (conferid
   baixaria os e-mails dos clientes.
 - Como restaurar: veja o comentário no topo do arquivo.
 
-### 5c. Conferência depois de cada deploy (`.github/workflows/pos-deploy.yml`)
-- A cada push na `master`, o workflow espera o `/api/saude` mostrar a versão nova (campo
-  `versao`, vindo de `RENDER_GIT_COMMIT`). Depois roda `scripts/smoke_producao.py` contra
-  padmini.com.br.
-- Também roda todo dia às 9h43.
+### 5c. Conferência do site de hora em hora (`.github/workflows/pos-deploy.yml`)
+- De hora em hora, o workflow confere se o commit mais novo da `master` está no ar (campo
+  `versao` do `/api/saude`, vindo de `RENDER_GIT_COMMIT`). Se o commit tiver mais de 30 min e
+  ainda não estiver no ar, falha: o deploy travou. Depois roda `scripts/smoke_producao.py`
+  contra padmini.com.br.
+- **Não roda no push, de propósito.** A Render só publica depois que *todas* as verificações
+  do commit passam. A 1ª versão deste workflow rodava no push e esperava o deploy: um esperou
+  o outro e o deploy travou (25/set, destravado à mão).
 - Se falhar, o GitHub manda e-mail para o dono do repositório.
 - O smoke ganhou 3 checagens: a chave das tarefas, o link de descadastro falso e o preço da
   página do casal.

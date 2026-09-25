@@ -14,7 +14,7 @@
   carrinho abandonado e venda cruzada no e-mail de entrega. Todos têm link de descadastro.
 - Card compartilhável com o endereço em destaque e botão de compartilhar no celular.
 - Operação: alertas por e-mail para a equipe, backup semanal criptografado e conferência
-  automática depois de cada deploy.
+  automática do site de hora em hora.
 - Cada peça fica desligada até ser configurada (ver checklist).
 
 ---
@@ -51,7 +51,7 @@ criptografa com senha (o repositório é público) e guarda 90 dias no GitHub.
 
 ## → `claude/checklist-de-lancamento.md`
 
-- [ ] Fazer o merge do PR de melhorias e conferir o workflow `pos-deploy` verde no GitHub
+- [x] PR de melhorias publicado (25/set). Conferir de vez em quando o workflow `pos-deploy` verde no GitHub
       (aba Actions).
 - [ ] Render → Environment: `PADMINI_ALERTA_EMAIL` (e-mails da equipe, separados por vírgula).
 - [ ] Render → Environment e GitHub → Secrets: `PADMINI_TAREFAS_CHAVE`, com o **mesmo**
