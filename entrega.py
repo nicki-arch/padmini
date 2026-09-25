@@ -8,6 +8,7 @@ E-mail: envia via Resend se RESEND_API_KEY estiver setado; caso contrário,
 não envia e devolve False (o chamador registra o link para envio manual).
 """
 
+import html
 import json
 import os
 import urllib.parse
@@ -39,9 +40,17 @@ def link_completo(produto: str, dados: dict) -> str:
     raise ValueError(f"produto inválido: {produto}")
 
 
+def _ola(nome: str) -> str:
+    # O nome vem do `sck`, que o comprador escreve (dá para editar na URL do
+    # checkout): escapado para não virar HTML/link falso no e-mail com a nossa marca.
+    nome = html.escape(str(nome or "").strip()[:40])
+    return f"Olá{(' ' + nome) if nome else ''},"
+
+
 def email_completo_html(produto: str, link: str, nome: str = "") -> str:
     titulo = "seu relatório de compatibilidade" if produto == "compat" else "seu mapa completo"
-    ola = f"Olá{(' ' + nome) if nome else ''},"
+    ola = _ola(nome)
+    link = html.escape(link, quote=True)
     return f"""<div style="font-family:Arial,Helvetica,sans-serif;background:#241522;color:#f4e9dc;padding:32px;border-radius:12px;max-width:520px;margin:auto">
   <p style="font-family:Georgia,serif;font-size:24px;color:#e7a24a;margin:0 0 18px">Padmini</p>
   <p style="margin:0 0 12px">{ola}</p>
@@ -55,7 +64,8 @@ def email_completo_html(produto: str, link: str, nome: str = "") -> str:
 
 def email_mapas_do_casal_html(links: list, nome: str = "") -> str:
     """links: [(nome da pessoa, link do mapa completo), ...]"""
-    ola = f"Olá{(' ' + nome) if nome else ''},"
+    ola = _ola(nome)
+    links = [(html.escape(str(pessoa)[:40]), html.escape(l, quote=True)) for pessoa, l in links]
     botoes = "".join(
         f'<p style="margin:18px 0"><a href="{l}" style="background:#e7a24a;color:#2a1608;text-decoration:none;'
         f'padding:14px 26px;border-radius:999px;font-weight:bold;display:inline-block">Mapa de {pessoa} →</a></p>'

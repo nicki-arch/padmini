@@ -30,6 +30,10 @@ services:
         sync: false
       - key: PADMINI_CAKTO_PROD_COMPAT      # id do produto compat na Cakto
         sync: false
+      - key: PADMINI_CAKTO_OFERTA_BUMP_MAPAS  # código da oferta do bump "casal + 2 mapas" (ou no ofertas.yaml)
+        sync: false
+      - key: PADMINI_CAKTO_EXIGIR_ASSINATURA  # 1 = só aceita webhook com assinatura no header (ver docs/seguranca.md)
+        sync: false
       - key: RESEND_API_KEY      # envio do e-mail de entrega (opcional)
         sync: false
       - key: PADMINI_EMAIL_FROM  # remetente do e-mail

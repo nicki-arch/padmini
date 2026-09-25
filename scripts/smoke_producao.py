@@ -89,6 +89,22 @@ def _():
     return req("/webhook/cakto", {"event": "purchase_approved", "data": {"status": "paid"}})[0] == 401
 
 
+@checar("IA não sai na amostra grátis do casal (402)")
+def _():
+    return req("/api/compatibilidade",
+               {"a": PESSOA, "b": PESSOA_B, "nivel": "amostra", "texto_ia": True})[0] == 402
+
+
+@checar("cabeçalhos de segurança presentes (CSP, HSTS, anti-iframe, Referrer-Policy)")
+def _():
+    with urllib.request.urlopen(BASE + "/", timeout=60) as r:
+        h = {k.lower(): v for k, v in r.headers.items()}
+    return ("frame-ancestors 'none'" in h.get("content-security-policy", "")
+            and h.get("strict-transport-security", "").startswith("max-age=")
+            and h.get("x-frame-options") == "DENY"
+            and h.get("referrer-policy") == "strict-origin-when-cross-origin")
+
+
 def main():
     # o plano grátis "dorme": a primeira chamada acorda o servidor
     for _ in range(3):
