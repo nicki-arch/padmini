@@ -9,6 +9,7 @@ e abrir http://127.0.0.1:8000
 
 import contextlib
 import hmac
+import logging
 import os
 import time
 import re
@@ -34,7 +35,9 @@ import acesso
 import cakto
 import db
 import entrega
+import limites
 import ofertas
+import seguranca
 import textos
 from gerar_pdf import gerar_pdf
 from montar_texto import (
@@ -58,7 +61,11 @@ async def _ciclo_de_vida(_app):
     yield
 
 
+log = logging.getLogger("padmini.app")
+
 app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
+# Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy) em toda resposta.
+app.middleware("http")(seguranca.cabecalhos_de_seguranca)
 app.mount("/static", StaticFiles(directory=RAIZ / "static"), name="static")
 busca = BuscaCidades()
 
@@ -217,7 +224,8 @@ _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 @app.post("/api/lista")
-def inscrever_na_lista(ins: Inscricao):
+def inscrever_na_lista(ins: Inscricao, request: Request):
+    limites.exigir(limites.LISTA, request)
     if ins.site:
         return {"ok": True}  # robô preencheu o campo escondido: finge sucesso e descarta
     email = ins.email.strip().lower()
@@ -280,7 +288,17 @@ def live_entrar(dados: SenhaLive, request: Request):
     senha = _senha_live()
     if not senha:
         raise HTTPException(503, "Modo live não está configurado neste servidor.")
-    if not hmac.compare_digest(dados.senha, senha):
+    # Força bruta: só as tentativas ERRADAS contam, por IP e no total.
+    ip = limites.ip_do_cliente(request)
+    if (limites.LIVE_FALHAS_IP.estourado(ip)
+            or limites.LIVE_FALHAS_GLOBAL.estourado("todos")):
+        raise HTTPException(429, "Muitas tentativas erradas. Espere e tente de novo mais tarde.",
+                            headers={"Retry-After": "900"})
+    # bytes: compare_digest com str não-ASCII levantaria erro (500) em vez de 401
+    if not hmac.compare_digest(dados.senha.encode("utf-8"), senha.encode("utf-8")):
+        limites.LIVE_FALHAS_IP.registrar(ip)
+        limites.LIVE_FALHAS_GLOBAL.registrar("todos")
+        log.warning("live: senha incorreta (ip %s)", ip)
         raise HTTPException(401, "Senha incorreta.")
     expira = int(time.time()) + HORAS_SESSAO_LIVE * 3600
     resp = JSONResponse({"ok": True, "expira_em": expira})
@@ -358,7 +376,8 @@ def pagina_termos():
 
 
 @app.get("/api/cidades")
-def cidades(q: str = Query("", max_length=80)):
+def cidades(request: Request, q: str = Query("", max_length=80)):
+    limites.exigir(limites.CIDADES, request)
     return busca.buscar(q)
 
 
@@ -393,7 +412,8 @@ def calcular_pedido(pedido: PedidoMapa):
 
 
 @app.post("/api/mapa")
-def mapa(pedido: PedidoMapa):
+def mapa(pedido: PedidoMapa, request: Request):
+    limites.exigir(limites.CALCULO, request)
     dt, resultado, fatos, secoes = calcular_pedido(pedido)
 
     # Amostra grátis: só o gancho (Ascendente + Lua/nakshatra + fase atual).
@@ -426,6 +446,7 @@ def mapa(pedido: PedidoMapa):
         # um texto por mapa: guardado no banco para não pagar a IA a cada clique
         texto_ia = db.texto_ia(chave)
         if texto_ia is None:
+            limites.exigir(limites.TEXTO_IA, request)
             texto_ia = gerar_com_claude(montar_prompt(secoes))
             db.guardar_texto_ia(chave, "mapa", texto_ia,
                                 os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
@@ -453,7 +474,7 @@ def mapa(pedido: PedidoMapa):
 
 
 @app.post("/api/compatibilidade")
-def compatibilidade(pedido: PedidoCompatibilidade):
+def compatibilidade(pedido: PedidoCompatibilidade, request: Request):
     """
     Compatibilidade de casal (Guna Milan). Corte do paywall:
       - nivel='amostra': só a nota, a categoria, o ponto forte e o de atenção
@@ -461,13 +482,19 @@ def compatibilidade(pedido: PedidoCompatibilidade):
       - nivel='completo': as 8 kootas, doshas e Mangal. Em produção, liberar só
         após pagamento confirmado.
     """
+    limites.exigir(limites.CALCULO, request)
     dt_a = _validar_datetime(pedido.a.data, pedido.a.hora)
     dt_b = _validar_datetime(pedido.b.data, pedido.b.hora)
+    # Texto por IA custa dinheiro a cada chamada: só no completo (pago). Antes a
+    # amostra grátis aceitava texto_ia=true e qualquer script gerava custo em loop.
+    if pedido.texto_ia and pedido.nivel != "completo":
+        raise HTTPException(402, "O texto por IA faz parte do relatório completo.")
     mapa_a = calcular_mapa(dt_local_naive=dt_a, lat=pedido.a.lat, lon=pedido.a.lon)
     mapa_b = calcular_mapa(dt_local_naive=dt_b, lat=pedido.b.lat, lon=pedido.b.lon)
 
     resultado = calcular_compatibilidade(mapa_a, mapa_b)
 
+    chave = None
     if pedido.nivel == "completo":
         chave = acesso.chave_compat(
             (pedido.a.data.isoformat(), pedido.a.hora, pedido.a.lat, pedido.a.lon),
@@ -483,7 +510,13 @@ def compatibilidade(pedido: PedidoCompatibilidade):
     if pedido.texto_ia:
         if not os.environ.get("ANTHROPIC_API_KEY"):
             raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
-        texto_ia = gerar_com_claude(montar_prompt_compat(snippets))
+        # um texto por casal, guardado no banco (como no mapa): não paga a IA a cada clique
+        texto_ia = db.texto_ia(chave)
+        if texto_ia is None:
+            limites.exigir(limites.TEXTO_IA, request)
+            texto_ia = gerar_com_claude(montar_prompt_compat(snippets))
+            db.guardar_texto_ia(chave, "compat", texto_ia,
+                                os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
 
     resposta = {
         "nivel": pedido.nivel,
@@ -506,8 +539,9 @@ def compatibilidade(pedido: PedidoCompatibilidade):
 
 
 @app.post("/api/pdf")
-def pdf(pedido: PedidoMapa):
+def pdf(pedido: PedidoMapa, request: Request):
     """Relatório completo em PDF. Não usa IA (sem custo por download). Requer pagamento."""
+    limites.exigir(limites.PDF, request)
     chave = acesso.chave_mapa(pedido.data.isoformat(), pedido.hora, pedido.lat, pedido.lon)
     if not acesso.completo_liberado("mapa", chave, pedido.token):
         raise HTTPException(402, "O PDF completo requer pagamento.")
@@ -540,10 +574,15 @@ async def webhook_cakto(request: Request):
     assinatura = request.headers.get("x-cakto-signature") or ""
     timestamp = request.headers.get("x-cakto-timestamp") or ""
     secret_do_corpo = evento.get("secret", "") if isinstance(evento, dict) else ""
-    if not cakto.verificar(assinatura, timestamp, corpo,
-                           os.environ.get("PADMINI_CAKTO_WEBHOOK_SECRET", ""),
-                           secret_do_corpo):
+    metodo = cakto.metodo_de_verificacao(assinatura, timestamp, corpo,
+                                         os.environ.get("PADMINI_CAKTO_WEBHOOK_SECRET", ""),
+                                         secret_do_corpo)
+    if not metodo:
+        log.warning("webhook: origem NÃO provada (assinatura %s, timestamp %r) — recusado",
+                    "presente" if assinatura else "ausente", timestamp[:20])
         raise HTTPException(401, "assinatura inválida")
+    # Serve para decidir quando ligar PADMINI_CAKTO_EXIGIR_ASSINATURA=1 (docs/seguranca.md).
+    log.info("webhook: origem provada por %s", metodo)
 
     # Webhook V1 manda um pedido por entrega (`data` = objeto); o V2 manda todos
     # os pedidos da mesma cobrança numa lista. Tratamos os dois formatos.
@@ -570,10 +609,19 @@ def _processar_pedido(evento: dict) -> dict:
 
     pd = cakto.coletar_pd(evento)
     produto = cakto.produto_do_evento(evento, pd)
-    if produto not in ("mapa", "compat"):
-        return {"ok": True, "ignorado": "produto desconhecido"}
-
     email = cakto.email_do_evento(evento)
+    if produto not in ("mapa", "compat"):
+        # Pagou, mas não dá para entregar com segurança: a oferta paga não foi
+        # reconhecida, ou o `sck` pede outro produto (ex.: pagou o mapa e o sck
+        # traz um casal — tentativa de levar o produto mais caro). Não emite
+        # token; grava para a equipe olhar e entregar à mão o que foi pago.
+        pago = cakto.produto_pago(evento) or "desconhecido"
+        log.warning("webhook: pedido %s sem entrega automática (pago=%s, sck=%s)",
+                    (evento.get("data") or {}).get("id"), pago, pd.get("pd_produto"))
+        db.registrar_pedido(evento, pago, {}, email, None, False)
+        return {"ok": True, "produto": pago, "email": email or None,
+                "pendente": "produto pago não confere com os dados enviados — conferir e entregar manualmente"}
+
     dados = cakto.dados_nascimento(pd, produto)
     if not dados:
         # Pagou, mas o `sck` não trouxe os dados de nascimento: não dá para gerar.

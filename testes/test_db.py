@@ -143,6 +143,30 @@ def test_pedido_sem_dados_fica_gravado_para_entrega_manual(monkeypatch):
     assert rows == [("mapa", "ana@teste.com", None)]
 
 
+def test_sck_de_outro_produto_fica_gravado_sem_link():
+    """Pagou o mapa (oferta 39dhqty) mas o sck traz um casal: não entrega nada
+    automaticamente, mas o pedido fica no banco para a equipe entregar o que foi pago."""
+    r = base._postar_webhook(evento_cakto("pedido-troca", sck=base.SCK_CASAL))
+    assert r.status_code == 200 and "pendente" in r.json()
+    rows = _linhas("SELECT produto, link, email_enviado FROM pedidos WHERE cakto_id = 'pedido-troca'")
+    assert rows == [("mapa", None, False)]
+
+
+def test_texto_ia_do_casal_gerado_uma_vez(monkeypatch):
+    import acesso
+    chamadas = []
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "teste")
+    monkeypatch.setattr(app_mod, "gerar_com_claude", lambda p: chamadas.append(p) or "Texto do casal.")
+    a, b = base.PESSOA, base.PESSOA_B
+    token = acesso.emitir_token("compat", acesso.chave_compat(
+        (a["data"], a["hora"], a["lat"], a["lon"]), (b["data"], b["hora"], b["lat"], b["lon"])))
+    pedido = {"a": a, "b": b, "nivel": "completo", "texto_ia": True, "token": token}
+    for _ in range(3):
+        r = base.cliente.post("/api/compatibilidade", json=pedido)
+        assert r.status_code == 200 and r.json()["texto_ia"] == "Texto do casal."
+    assert len(chamadas) == 1
+
+
 def test_lead_gravado_com_consentimentos_e_origem():
     with db._conectar() as c:
         c.execute("TRUNCATE leads")

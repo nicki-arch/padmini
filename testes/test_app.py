@@ -191,10 +191,21 @@ def _assinar(corpo: bytes, ts: str, segredo: str = SEGREDO_WEBHOOK) -> str:
     return "v1=" + hmac.new(segredo.encode(), f"{ts}.".encode() + corpo, hashlib.sha256).hexdigest()
 
 
-def _evento(sck: str, email: str = "compradora@teste.com") -> dict:
+def _oferta_do_sck(sck: str) -> dict:
+    """Numa entrega real a Cakto sempre diz qual oferta foi paga (offer.id)."""
+    import ofertas
+    if sck.startswith("c~"):
+        return {"offer": {"id": ofertas.codigo("compat")}}
+    if sck.startswith("m~"):
+        return {"offer": {"id": ofertas.codigo("mapa")}}
+    return {}
+
+
+def _evento(sck: str, email: str = "compradora@teste.com", oferta: dict | None = None) -> dict:
     return {"event": "purchase_approved",
             "data": {"status": "paid", "customer": {"name": "Ana", "email": email},
-                     "sck": sck, "utm_source": "afiliado", "utm_campaign": "PEDRO"}}
+                     "sck": sck, "utm_source": "afiliado", "utm_campaign": "PEDRO",
+                     **(_oferta_do_sck(sck) if oferta is None else oferta)}}
 
 
 def _postar_webhook(evento: dict, assinar=True, segredo=SEGREDO_WEBHOOK):
@@ -299,8 +310,9 @@ def test_sck_do_front_e_lido_pelo_back(dados, esperado):
     )
     sck = subprocess.run(["node", "-e", js], capture_output=True, text=True, check=True).stdout
     import cakto
-    pd = cakto.coletar_pd({"data": {"sck": sck}})
-    produto = cakto.produto_do_evento({}, pd)
+    ev = {"data": {"sck": sck, **_oferta_do_sck(sck)}}
+    pd = cakto.coletar_pd(ev)
+    produto = cakto.produto_do_evento(ev, pd)
     assert produto == esperado
     assert cakto.dados_nascimento(pd, produto) is not None
     assert len(sck) <= 200  # URL curta: o sck não pode crescer sem controle
@@ -455,9 +467,11 @@ def test_atributo_hidden_sempre_esconde():
 
 
 # ---------------------------------------------------------------- combo: mapas do casal (order bump)
-def test_bump_no_casal_entrega_os_dois_mapas():
+def test_bump_no_casal_entrega_os_dois_mapas(monkeypatch):
+    import cakto
+    monkeypatch.setattr(cakto, "OFERTA_BUMP_MAPAS", "bumpmapas")
     ev = _evento(SCK_CASAL)
-    ev["data"] |= {"id": "bump-1", "offer_type": "orderbump"}
+    ev["data"] |= {"id": "bump-1", "offer_type": "orderbump", "offer": {"id": "bumpmapas"}}
     r = _postar_webhook(ev)
     assert r.status_code == 200, r.text
     corpo = r.json()

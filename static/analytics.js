@@ -24,13 +24,33 @@
   // API pública: sempre disponível, mesmo antes de o PostHog carregar.
   window.padTrack = function (evento, props) {
     if (!evento) return;
-    var dados = Object.assign({}, atribuicao(), props || {});
+    var dados = limpar(Object.assign({}, atribuicao(), props || {}), 0);
     if (pronto && ligado && window.posthog) {
       try { window.posthog.capture(evento, dados); } catch (e) {}
     } else if (!pronto) {
       fila.push([evento, dados]); // guarda até saber se está ligado
     }
   };
+
+  // ---- privacidade: nada de token nem dado de nascimento no PostHog ----
+  // O link de entrega (/mapa?data=..&hora=..&lat=..&nome=..&token=..) e o link
+  // do checkout (…?sck=m~data~hora~lat~lon~nome~cidade) carregam o token do
+  // relatório pago e dados pessoais. O PostHog manda a URL da página em todo
+  // evento ($current_url, $referrer…) e o href dos links clicados (autocapture).
+  // Antes de sair do navegador, o valor desses parâmetros vira "[removido]" em
+  // QUALQUER texto do evento. utm_*/ref/cupom continuam (são a atribuição).
+  var PARAMS_SENSIVEIS = /([?&#](?:token|previa|sck|data|hora|lat|lon|nome|cidade|email|whatsapp|[ab]_[a-z]+)=)[^&#\s"'<>]*/gi;
+  function limparTexto(v) {
+    return typeof v === "string" && v.indexOf("=") >= 0 ? v.replace(PARAMS_SENSIVEIS, "$1[removido]") : v;
+  }
+  function limpar(obj, prof) {
+    if (prof > 6 || obj == null) return obj;
+    if (typeof obj === "string") return limparTexto(obj);
+    if (Array.isArray(obj)) { for (var i = 0; i < obj.length; i++) obj[i] = limpar(obj[i], prof + 1); return obj; }
+    if (typeof obj === "object") { for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj, k)) obj[k] = limpar(obj[k], prof + 1); }
+    return obj;
+  }
+  window.padLimparParaAnalytics = limpar;  // exposto para o teste automatizado
 
   function iniciar(key, host) {
     // Snippet oficial do PostHog (carrega a lib do CDN deles de forma assíncrona).
@@ -40,6 +60,9 @@
         api_host: host || "https://us.i.posthog.com",
         capture_pageview: true,
         persistence: "localStorage+cookie",
+        // versões atuais da lib usam before_send; sanitize_properties é o nome antigo
+        before_send: function (ev) { return limpar(ev, 0); },
+        sanitize_properties: function (props) { return limpar(props, 0); },
       });
       ligado = true;
     } catch (e) { ligado = false; }

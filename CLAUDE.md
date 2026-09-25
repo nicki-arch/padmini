@@ -37,6 +37,9 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 | `gerar_pdf.py` | PDF do completo |
 | `static/live.html` + rotas `/live`, `/api/live/*` | Modo live do Pedro: senha (`PADMINI_LIVE_SENHA`) → cookie assinado de 12h → token do completo sem pagamento, com log em `live_geracoes` |
 | `db.py` | Postgres opcional (`DATABASE_URL`): pedidos, lista de espera (`leads`), cache do texto da IA. Erro no banco nunca impede entrega |
+| `limites.py` | Limite de requisições por IP (429): cálculo, PDF, IA, cidades, lista, senha do live |
+| `seguranca.py` | Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy). Serviço externo novo → incluir na CSP |
+| `docs/seguranca.md` | **Revisão de segurança (25/set/2026)**: o que foi corrigido, limites, pendências |
 | `static/lista.html` + `/api/lista` | Lista de espera do lançamento. `PADMINI_CAPTURA=1` trava home/mapa/compat e manda para `/lista` (links de entrega com `token` e quem tem `?previa=<PADMINI_PREVIA_CHAVE>` passam) |
 
 ## Regras (cada uma vem de um erro real)
@@ -56,6 +59,9 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
     o código é a via gratuita, em vez de comprar a licença comercial). Por isso o
     conteúdo proprietário (significações) foi para fora dele — ver acima — em vez de
     o repositório inteiro virar privado.
+
+11. **O `sck` é dado do comprador, não prova de pagamento.** Qual produto entregar sai só da
+    oferta paga que a Cakto informa (`cakto.produto_pago`). Ver `docs/seguranca.md`.
 
 ## Commits
 Mensagens em português, explicando o porquê. Sem force-push na `master`.

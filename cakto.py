@@ -7,7 +7,7 @@ Conforme a documentação oficial (docs.cakto.com.br/conceitos/webhooks):
     como chave. O timestamp vem em `X-Cakto-Timestamp` (Unix, em segundos).
     Alternativa documentada: um campo `secret` no próprio corpo do evento.
     As duas formas são aceitas aqui (ver `verificar`).
-  - Evento de pagamento aprovado: `purchase_approved` (ver APROVADOS).
+  - Evento de pagamento aprovado: `purchase_approved` (ver is_aprovado).
   - Dados do comprador: objeto `customer` com `name`, `email`, `phone`, etc.
 
   - Campos de rastreamento repassados: `utm_source`, `utm_medium`,
@@ -25,17 +25,18 @@ segurança.
 checkout realmente chega ao webhook preenchido (a doc lista o campo no payload,
 mas não documenta explicitamente como defini-lo na URL).
 
-Como identificamos o produto: pelo `pd_produto` (mapa|compat) que mandamos, ou
-pelo id do produto da Cakto mapeado em PADMINI_CAKTO_PROD_MAPA/_COMPAT.
+Como identificamos o produto: pelo que a Cakto diz que foi pago — código da
+oferta (offer.id / checkoutUrl, vindo de conteudo/ofertas.yaml) ou id do produto
+mapeado em PADMINI_CAKTO_PROD_MAPA/_COMPAT. O `sck` NÃO decide o produto (o
+comprador pode editá-lo); se ele disser outra coisa, o pedido vira entrega manual.
 """
 
 import hashlib
 import hmac
 import os
+import time
 
 import ofertas
-
-APROVADOS = ("paid", "approved", "aprovad", "complete", "concluid", "success")
 
 PROD_MAPA = os.environ.get("PADMINI_CAKTO_PROD_MAPA", "")
 PROD_COMPAT = os.environ.get("PADMINI_CAKTO_PROD_COMPAT", "")
@@ -52,31 +53,71 @@ def assinatura_esperada(timestamp: str, corpo: bytes, secret: str) -> str:
     return hmac.new(secret.encode("utf-8"), base, hashlib.sha256).hexdigest()
 
 
-def verificar(assinatura: str, timestamp: str, corpo: bytes, secret: str,
-              secret_do_corpo: str = "") -> bool:
+# Tolerância do X-Cakto-Timestamp, a mesma do exemplo oficial da Cakto. Cada
+# (re)envio é assinado com o horário do envio, então retentativas passam.
+TOLERANCIA_TIMESTAMP = 5 * 60
+
+
+def timestamp_recente(timestamp: str, agora: float | None = None) -> bool:
+    try:
+        ts = int(str(timestamp).strip())
+    except (TypeError, ValueError):
+        return False
+    agora = time.time() if agora is None else agora
+    return abs(agora - ts) <= TOLERANCIA_TIMESTAMP
+
+
+def _iguais(a: str, b: str) -> bool:
+    # compare_digest com str exige ASCII: texto estranho no header viraria 500
+    return hmac.compare_digest(a.encode("utf-8"), b.encode("utf-8"))
+
+
+def exigir_assinatura() -> bool:
+    """PADMINI_CAKTO_EXIGIR_ASSINATURA=1 desliga a validação pelo `secret` do corpo.
+    Ligar depois de ver no log da Render que as entregas reais chegam com
+    "webhook: origem provada por assinatura" (ver docs/seguranca.md)."""
+    return os.environ.get("PADMINI_CAKTO_EXIGIR_ASSINATURA") == "1"
+
+
+def metodo_de_verificacao(assinatura: str, timestamp: str, corpo: bytes, secret: str,
+                          secret_do_corpo: str = "", agora: float | None = None) -> str:
     """
-    True se a origem confere. Aceita as duas formas documentadas pela Cakto:
-      1) header `X-Cakto-Signature: v1=<hmac>` sobre '{timestamp}.{corpo}';
-      2) campo `secret` dentro do corpo do evento.
+    Como a origem foi provada: "assinatura", "corpo", "aberto" ou "" (rejeitado).
+
+    Aceita as duas formas documentadas pela Cakto:
+      1) header `X-Cakto-Signature: v1=<hmac>` sobre '{timestamp}.{corpo}', com
+         `X-Cakto-Timestamp` de no máximo 5 min de diferença (anti-replay, como no
+         exemplo oficial);
+      2) campo `secret` dentro do corpo — a Cakto manda nas duas formas em toda
+         entrega. Esta não tem proteção contra replay (quem captura um corpo leva
+         junto o segredo), por isso pode ser desligada com
+         PADMINI_CAKTO_EXIGIR_ASSINATURA=1 quando a 1 estiver confirmada em produção.
 
     Sem segredo configurado, REJEITA em produção (fail-closed) — um webhook
     aberto permitiria forjar uma aprovação e sacar um token do relatório pago.
     Só libera quando PADMINI_MODO_ABERTO=1 (staging).
     """
     if not secret:
-        return MODO_ABERTO
+        return "aberto" if MODO_ABERTO else ""
 
-    # 2) segredo no corpo
-    if secret_do_corpo and hmac.compare_digest(str(secret_do_corpo), secret):
-        return True
+    recebida = (assinatura or "").strip()
+    if recebida and timestamp_recente(timestamp, agora):
+        # "v1=abc" ou, numa transição futura de versão, "v1=abc,v2=def"
+        v1 = [p.strip()[3:] for p in recebida.split(",") if p.strip().startswith("v1=")]
+        esperada = assinatura_esperada(str(timestamp).strip(), corpo, secret)
+        if any(_iguais(a, esperada) for a in v1):
+            return "assinatura"
 
-    # 1) assinatura HMAC no header
-    if not assinatura:
-        return False
-    recebida = assinatura.strip()
-    if recebida.startswith("v1="):
-        recebida = recebida[3:]
-    return hmac.compare_digest(recebida, assinatura_esperada(timestamp or "", corpo, secret))
+    if (not exigir_assinatura() and secret_do_corpo
+            and _iguais(str(secret_do_corpo), secret)):
+        return "corpo"
+    return ""
+
+
+def verificar(assinatura: str, timestamp: str, corpo: bytes, secret: str,
+              secret_do_corpo: str = "", agora: float | None = None) -> bool:
+    """True se a origem confere (ver `metodo_de_verificacao`)."""
+    return bool(metodo_de_verificacao(assinatura, timestamp, corpo, secret, secret_do_corpo, agora))
 
 
 def _iter_valores(obj):
@@ -107,12 +148,28 @@ def pedidos_do_evento(evento) -> list:
     return [evento]
 
 
+EVENTOS_APROVADOS = ("purchase_approved",)
+STATUS_APROVADOS = ("paid", "approved")
+
+
 def is_aprovado(evento: dict) -> bool:
-    for k, v in _iter_valores(evento):
-        if k.lower() in ("status", "event", "type", "situacao", "payment_status") and isinstance(v, str):
-            if any(s in v.lower() for s in APROVADOS):
-                return True
-    return False
+    """
+    Pagamento aprovado = `event` purchase_approved (quando vier) e `data.status`
+    paid. Olha só esses dois campos oficiais (docs.cakto.com.br/conceitos/webhooks).
+
+    Antes procurava "paid"/"approved"/... em QUALQUER campo status/type do
+    payload, inclusive dentro do bloco do meio de pagamento, cujo conteúdo vem
+    cru da adquirente — um `refund` com `pix.status = "approved"` lá dentro
+    passaria como pagamento aprovado.
+    """
+    if not isinstance(evento, dict):
+        return False
+    nome = str(evento.get("event") or "").strip().lower()
+    if nome and nome not in EVENTOS_APROVADOS:
+        return False
+    d = evento.get("data")
+    status = str(d.get("status") or "").strip().lower() if isinstance(d, dict) else ""
+    return status in STATUS_APROVADOS
 
 
 CAMPOS_PESSOA = ("data", "hora", "lat", "lon", "nome", "cidade")
@@ -188,12 +245,14 @@ OFERTA_MAPA = os.environ.get("PADMINI_CAKTO_OFERTA_MAPA") or ofertas.codigo("map
 OFERTA_COMPAT = os.environ.get("PADMINI_CAKTO_OFERTA_COMPAT") or ofertas.codigo("compat")
 
 
-def produto_do_evento(evento: dict, pd: dict) -> str:
-    p = str(pd.get("pd_produto", "")).lower()
-    if p in ("mapa", "compat"):
-        return p
-    # Fallback pelo que a Cakto manda no pedido: product.id / product.short_id
-    # (se configurados nas env vars) e offer.id / checkoutUrl (código da oferta).
+def produto_pago(evento: dict) -> str:
+    """
+    Produto que a Cakto diz que foi PAGO ('mapa' | 'compat' | '').
+
+    Só olha campos que a Cakto preenche (product.id/short_id, offer.id,
+    checkoutUrl) — nunca o `sck`, que é montado no navegador do comprador e
+    pode ser editado na URL do checkout.
+    """
     d = evento.get("data") if isinstance(evento, dict) else None
     if not isinstance(d, dict):
         return ""
@@ -207,7 +266,8 @@ def produto_do_evento(evento: dict, pd: dict) -> str:
     codigos = {str(oferta.get("id") or "")}
     url = str(d.get("checkoutUrl") or "")
     if url:
-        codigos.add(url.rstrip("/").rsplit("/", 1)[-1])
+        # ex.: https://pay.cakto.com.br/39dhqty_1125341?callback=... → "39dhqty"
+        codigos.add(url.split("?", 1)[0].rstrip("/").rsplit("/", 1)[-1])
     codigos = {c.split("_")[0] for c in codigos if c}
     if OFERTA_MAPA and OFERTA_MAPA in codigos:
         return "mapa"
@@ -216,23 +276,43 @@ def produto_do_evento(evento: dict, pd: dict) -> str:
     return ""
 
 
+def produto_do_evento(evento: dict, pd: dict) -> str:
+    """
+    Produto a entregar. Quem manda é o que foi pago (`produto_pago`); o `sck`
+    só diz em que formato vieram os dados de nascimento.
+
+    Antes o `sck` tinha prioridade: bastava pagar o mapa (R$47) com um
+    `sck=c~...` na URL para receber a compatibilidade (R$97). Agora:
+      - pago identificado e `sck` do mesmo tipo (ou sem `sck`) → o produto pago;
+      - pago identificado e `sck` de outro tipo → "" (vira entrega manual);
+      - pago NÃO identificado → "" (falha fechada: não entrega no escuro).
+    """
+    pago = produto_pago(evento)
+    declarado = str(pd.get("pd_produto", "")).lower()
+    if not pago:
+        return ""
+    if declarado in ("mapa", "compat") and declarado != pago:
+        return ""
+    return pago
+
+
 # Oferta do order bump "mapas individuais do casal" (código da oferta na Cakto).
-# Vazio = qualquer order bump num pedido de casal é tratado como os 2 mapas —
-# vale enquanto este for o único bump. Ao criar outro bump, preencher.
+# Vazio = o bump não é reconhecido (falha fechada). Antes, vazio fazia QUALQUER
+# order bump com `sck` de casal virar os 2 mapas — um bump barato criado no
+# futuro, somado a um `sck=c~...` editado na URL, entregaria dois mapas.
 OFERTA_BUMP_MAPAS = (os.environ.get("PADMINI_CAKTO_OFERTA_BUMP_MAPAS")
                      or ofertas.codigo("bump_mapas_casal"))
 
 
 def e_bump_mapas_do_casal(evento: dict) -> bool:
     d = evento.get("data") if isinstance(evento, dict) else None
-    if not isinstance(d, dict):
+    if not isinstance(d, dict) or not OFERTA_BUMP_MAPAS:
         return False
     if coletar_pd(evento).get("pd_produto") != "compat":
         return False  # o bump só existe no checkout do casal (sck "c~...")
-    if not OFERTA_BUMP_MAPAS:
-        return True
     oferta = d.get("offer") if isinstance(d.get("offer"), dict) else {}
-    codigos = {str(oferta.get("id") or ""), str(d.get("checkoutUrl") or "").rstrip("/").rsplit("/", 1)[-1]}
+    url = str(d.get("checkoutUrl") or "").split("?", 1)[0]
+    codigos = {str(oferta.get("id") or ""), url.rstrip("/").rsplit("/", 1)[-1]}
     return OFERTA_BUMP_MAPAS in {c.split("_")[0] for c in codigos if c}
 
 
