@@ -23,6 +23,8 @@ compat:
   checkout: https://pay.cakto.com.br/qo8uskp_1125345
 
 # Order bump do checkout do casal (casal + os 2 mapas individuais).
+# `preco` é o TOTAL do combo; a página do casal anuncia a diferença para o
+# preço do casal ("por mais R$X") assim que o `checkout` for preenchido.
 # Sem `checkout` enquanto a oferta não existir na Cakto: o webhook só reconhece
 # o bump quando houver um código aqui ou em PADMINI_CAKTO_OFERTA_BUMP_MAPAS.
 bump_mapas_casal:

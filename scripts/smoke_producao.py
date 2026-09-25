@@ -105,6 +105,26 @@ def _():
             and h.get("referrer-policy") == "strict-origin-when-cross-origin")
 
 
+@checar("tarefas agendadas recusam chamada sem chave (401/503)")
+def _():
+    return req("/api/tarefas/lembretes", {})[0] in (401, 503)
+
+
+@checar("descadastro recusa link sem assinatura")
+def _():
+    st, corpo = req("/descadastrar?e=x%40y.com&t=errado")
+    return st == 200 and "inválido".encode() in corpo
+
+
+@checar("página do casal mostra o preço do ofertas.yaml")
+def _():
+    import pathlib
+    import yaml
+    raiz = pathlib.Path(__file__).resolve().parents[1]
+    preco = yaml.safe_load((raiz / "conteudo" / "ofertas.yaml").read_text(encoding="utf-8"))["compat"]["preco"]
+    return f"relatório completo por <b>R${preco}</b>".encode() in req("/compatibilidade")[1]
+
+
 def main():
     # o plano grátis "dorme": a primeira chamada acorda o servidor
     for _ in range(3):

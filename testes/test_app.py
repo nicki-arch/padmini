@@ -320,7 +320,7 @@ def test_sck_do_front_e_lido_pelo_back(dados, esperado):
 
 def test_saude_sem_banco():
     r = cliente.get("/api/saude")
-    assert r.status_code == 200 and r.json() == {"ok": True, "banco": None}
+    assert r.status_code == 200 and r.json() == {"ok": True, "banco": None, "versao": ""}
 
 
 # ---------------------------------------------------------------- formatos de entrega da Cakto

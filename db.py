@@ -79,6 +79,41 @@ CREATE TABLE IF NOT EXISTS leads (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS leads_email_idx ON leads (lower(email));
 
+-- Quem pediu a amostra grátis por e-mail. `aceita_lembrete` = autorizou UM
+-- lembrete depois (marketing: só com consentimento). `dados` são os dados de
+-- nascimento da amostra, para o lembrete e o link do checkout saírem prontos.
+CREATE TABLE IF NOT EXISTS amostras_email (
+    id                  BIGSERIAL PRIMARY KEY,
+    criado_em           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    email               TEXT NOT NULL,
+    produto             TEXT NOT NULL,
+    dados               JSONB NOT NULL,
+    aceita_lembrete     BOOLEAN NOT NULL DEFAULT false,
+    origem              JSONB,
+    lembrete_enviado_em TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS amostras_email_idx ON amostras_email (lower(email));
+
+-- Carrinho abandonado (evento checkout_abandonment da Cakto): um e-mail de
+-- recuperação por pessoa e oferta.
+CREATE TABLE IF NOT EXISTS abandonos (
+    id          BIGSERIAL PRIMARY KEY,
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    email       TEXT NOT NULL,
+    nome        TEXT,
+    oferta_id   TEXT,
+    checkout    TEXT,
+    email_enviado BOOLEAN NOT NULL DEFAULT false
+);
+CREATE INDEX IF NOT EXISTS abandonos_email_idx ON abandonos (lower(email));
+
+-- Quem clicou em "não quero mais receber": nenhum e-mail de marketing
+-- (lembrete, recuperação) sai para este endereço. E-mail de entrega de compra sai.
+CREATE TABLE IF NOT EXISTS email_optout (
+    email      TEXT PRIMARY KEY,
+    criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Supabase: a API pública (chave anon) enxerga o schema public. RLS ligado e
 -- sem políticas = ninguém lê nem grava por ela. O site conecta como dono do
 -- banco, que não é afetado pelo RLS.
@@ -86,18 +121,25 @@ ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE textos_ia ENABLE ROW LEVEL SECURITY;
 ALTER TABLE live_geracoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE amostras_email ENABLE ROW LEVEL SECURITY;
+ALTER TABLE abandonos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE email_optout ENABLE ROW LEVEL SECURITY;
 
 -- Defesa em profundidade (só existe no Supabase): tira das roles da API
 -- pública qualquer permissão nas tabelas, além do RLS.
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
-        REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes FROM anon;
-        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq FROM anon;
+        REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes,
+            amostras_email, abandonos, email_optout FROM anon;
+        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq,
+            amostras_email_id_seq, abandonos_id_seq FROM anon;
     END IF;
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
-        REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes FROM authenticated;
-        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq FROM authenticated;
+        REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes,
+            amostras_email, abandonos, email_optout FROM authenticated;
+        REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq,
+            amostras_email_id_seq, abandonos_id_seq FROM authenticated;
     END IF;
 END $$;
 """
@@ -270,4 +312,140 @@ def registrar_live(produto: str, nome: str, cidade: str, nascimento: str) -> boo
         return True
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao registrar geração do modo live")
+        return False
+
+
+# ---------------------------------------------------------------------------
+# Amostra por e-mail, lembrete, carrinho abandonado, descadastro
+# ---------------------------------------------------------------------------
+def descadastrado(email: str) -> bool:
+    """True se a pessoa pediu para não receber mais e-mails de marketing.
+    Sem banco, ou com erro, responde True: na dúvida, não manda marketing."""
+    if not ativo():
+        return True
+    try:
+        with _conectar() as c:
+            row = c.execute("SELECT 1 FROM email_optout WHERE email = lower(%s)", (email,)).fetchone()
+        return row is not None
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao consultar descadastro")
+        return True
+
+
+def descadastrar(email: str) -> bool:
+    if not ativo():
+        return False
+    try:
+        with _conectar() as c:
+            c.execute("INSERT INTO email_optout (email) VALUES (lower(%s)) ON CONFLICT DO NOTHING", (email,))
+            c.execute("UPDATE amostras_email SET aceita_lembrete = false WHERE lower(email) = lower(%s)",
+                      (email,))
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao descadastrar")
+        return False
+
+
+def amostras_enviadas_hoje(email: str) -> int:
+    """Quantas amostras este e-mail recebeu nas últimas 24h (anti-spam)."""
+    if not ativo():
+        return 0
+    try:
+        with _conectar() as c:
+            row = c.execute("SELECT count(*) FROM amostras_email WHERE lower(email) = lower(%s) "
+                            "AND criado_em > now() - interval '24 hours'", (email,)).fetchone()
+        return int(row[0])
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao contar amostras")
+        return 0
+
+
+def registrar_amostra_email(email: str, produto: str, dados: dict, aceita_lembrete: bool,
+                            origem: dict) -> bool:
+    if not ativo():
+        return False
+    try:
+        with _conectar() as c:
+            c.execute("INSERT INTO amostras_email (email, produto, dados, aceita_lembrete, origem) "
+                      "VALUES (%s,%s,%s,%s,%s)",
+                      (email, produto, json.dumps(dados, ensure_ascii=False), aceita_lembrete,
+                       json.dumps(origem or {}, ensure_ascii=False)))
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao registrar amostra por e-mail")
+        return False
+
+
+def lembretes_pendentes(limite: int = 50) -> list[dict]:
+    """
+    Amostras com lembrete autorizado, pedidas entre 24h e 72h atrás, que ainda
+    não receberam lembrete, cujo e-mail não comprou nada depois e não se
+    descadastrou. Um lembrete por e-mail (o mais recente).
+    """
+    if not ativo():
+        return []
+    try:
+        with _conectar() as c:
+            rows = c.execute(
+                """
+                SELECT DISTINCT ON (lower(a.email)) a.id, a.email, a.produto, a.dados
+                FROM amostras_email a
+                WHERE a.aceita_lembrete AND a.lembrete_enviado_em IS NULL
+                  AND a.criado_em < now() - interval '24 hours'
+                  AND a.criado_em > now() - interval '72 hours'
+                  AND NOT EXISTS (SELECT 1 FROM email_optout o WHERE o.email = lower(a.email))
+                  AND NOT EXISTS (SELECT 1 FROM pedidos p WHERE lower(p.email) = lower(a.email)
+                                  AND p.criado_em > a.criado_em)
+                  AND NOT EXISTS (SELECT 1 FROM amostras_email b WHERE lower(b.email) = lower(a.email)
+                                  AND b.lembrete_enviado_em IS NOT NULL)
+                ORDER BY lower(a.email), a.criado_em DESC
+                LIMIT %s
+                """, (limite,)).fetchall()
+        return [{"id": r[0], "email": r[1], "produto": r[2], "dados": r[3]} for r in rows]
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao buscar lembretes")
+        return []
+
+
+def marcar_lembrete_enviado(amostra_id: int) -> None:
+    if not ativo():
+        return
+    try:
+        with _conectar() as c:
+            c.execute("UPDATE amostras_email SET lembrete_enviado_em = now() WHERE id = %s", (amostra_id,))
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao marcar lembrete")
+
+
+def abandono_ja_tratado(email: str, oferta_id: str) -> bool:
+    """True se esta pessoa já recebeu recuperação desta oferta nos últimos 7 dias,
+    ou já comprou depois. Sem banco, True (não arrisca mandar repetido)."""
+    if not ativo():
+        return True
+    try:
+        with _conectar() as c:
+            row = c.execute(
+                """
+                SELECT 1 FROM abandonos WHERE lower(email) = lower(%s) AND oferta_id IS NOT DISTINCT FROM %s
+                  AND email_enviado AND criado_em > now() - interval '7 days'
+                UNION ALL
+                SELECT 1 FROM pedidos WHERE lower(email) = lower(%s) AND criado_em > now() - interval '1 day'
+                LIMIT 1
+                """, (email, oferta_id or None, email)).fetchone()
+        return row is not None
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao consultar abandono")
+        return True
+
+
+def registrar_abandono(email: str, nome: str, oferta_id: str, checkout: str, enviado: bool) -> bool:
+    if not ativo():
+        return False
+    try:
+        with _conectar() as c:
+            c.execute("INSERT INTO abandonos (email, nome, oferta_id, checkout, email_enviado) "
+                      "VALUES (%s,%s,%s,%s,%s)", (email, nome or None, oferta_id or None, checkout or None, enviado))
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao registrar abandono")
         return False

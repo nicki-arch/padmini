@@ -47,7 +47,8 @@ def _ola(nome: str) -> str:
     return f"Olá{(' ' + nome) if nome else ''},"
 
 
-def email_completo_html(produto: str, link: str, nome: str = "") -> str:
+def email_completo_html(produto: str, link: str, nome: str = "", extra: str = "") -> str:
+    """`extra`: HTML já pronto (e escapado) a acrescentar, ex.: a venda cruzada."""
     titulo = "seu relatório de compatibilidade" if produto == "compat" else "seu mapa completo"
     ola = _ola(nome)
     link = html.escape(link, quote=True)
@@ -58,6 +59,7 @@ def email_completo_html(produto: str, link: str, nome: str = "") -> str:
   <p style="margin:26px 0"><a href="{link}" style="background:#e7a24a;color:#2a1608;text-decoration:none;padding:14px 26px;border-radius:999px;font-weight:bold;display:inline-block">Ver meu relatório completo →</a></p>
   <p style="color:#c9b1a6;font-size:13px;margin:0 0 4px">Se o botão não abrir, copie e cole este link no navegador:</p>
   <p style="color:#c9b1a6;font-size:12px;word-break:break-all;margin:0">{link}</p>
+  {extra}
   <p style="color:#8f7a76;font-size:12px;margin-top:26px">Padmini — astrologia védica para autoconhecimento. Este link é pessoal; não o compartilhe.</p>
 </div>"""
 

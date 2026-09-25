@@ -34,6 +34,10 @@ services:
         sync: false
       - key: PADMINI_CAKTO_EXIGIR_ASSINATURA  # 1 = só aceita webhook com assinatura no header (ver docs/seguranca.md)
         sync: false
+      - key: PADMINI_ALERTA_EMAIL  # e-mail(s) da equipe para alertas (vírgula separa)
+        sync: false
+      - key: PADMINI_TAREFAS_CHAVE  # chave das tarefas agendadas (mesmo valor no secret do GitHub)
+        sync: false
       - key: RESEND_API_KEY      # envio do e-mail de entrega (opcional)
         sync: false
       - key: PADMINI_EMAIL_FROM  # remetente do e-mail

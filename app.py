@@ -30,12 +30,14 @@ from base_significacoes import NOME_PT, SIGNO_PT
 from cidades import BuscaCidades
 from compute_chart import calcular_mapa
 from detectar_fatos import detectar_todos_os_fatos
-from compatibilidade import calcular_compatibilidade, montar_snippets_compatibilidade
+from compatibilidade import calcular_compatibilidade, montar_snippets_compatibilidade, nota_br
 import acesso
+import alertas
 import cakto
 import db
 import entrega
 import limites
+import marketing
 import ofertas
 import seguranca
 import textos
@@ -66,6 +68,17 @@ log = logging.getLogger("padmini.app")
 app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
 # Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy) em toda resposta.
 app.middleware("http")(seguranca.cabecalhos_de_seguranca)
+
+
+@app.middleware("http")
+async def _avisar_erro_500(request: Request, call_next):
+    """Erro não tratado = e-mail para a equipe (no máximo 1 a cada 15 min)."""
+    try:
+        return await call_next(request)
+    except Exception as erro:
+        alertas.alertar("Erro 500 no site", f"{request.method} {request.url.path}\n{erro!r}",
+                        chave="erro500", intervalo=15 * 60)
+        raise
 app.mount("/static", StaticFiles(directory=RAIZ / "static"), name="static")
 busca = BuscaCidades()
 
@@ -387,7 +400,10 @@ def saude():
     (que costumam usar HEAD): acorda o site e faz uma consulta no banco —
     o Supabase grátis pausa após uma semana sem uso."""
     banco = db.saude()
-    return {"ok": banco is not False, "banco": banco}
+    # versao = commit no ar (a Render define RENDER_GIT_COMMIT): o workflow
+    # pos-deploy espera esta versão aparecer antes de rodar o smoke.
+    return {"ok": banco is not False, "banco": banco,
+            "versao": os.environ.get("RENDER_GIT_COMMIT", "")[:7]}
 
 
 @app.get("/api/config")
@@ -399,6 +415,8 @@ def config():
         "posthog_host": os.environ.get("PADMINI_POSTHOG_HOST", "https://us.i.posthog.com"),
         # pré-lançamento (página /lista)
         "data_abertura": os.environ.get("PADMINI_DATA_ABERTURA", ""),
+        # "receber a amostra por e-mail" só aparece se o envio estiver configurado
+        "amostra_email": bool(os.environ.get("RESEND_API_KEY")),
     }
 
 
@@ -580,9 +598,16 @@ async def webhook_cakto(request: Request):
     if not metodo:
         log.warning("webhook: origem NÃO provada (assinatura %s, timestamp %r) — recusado",
                     "presente" if assinatura else "ausente", timestamp[:20])
+        alertas.alertar("Webhook da Cakto recusado (assinatura inválida)",
+                        "Se foi uma venda real, o segredo do webhook na Render pode estar errado "
+                        "(PADMINI_CAKTO_WEBHOOK_SECRET). Se não, é alguém testando o endereço.",
+                        chave="webhook401", intervalo=60 * 60)
         raise HTTPException(401, "assinatura inválida")
     # Serve para decidir quando ligar PADMINI_CAKTO_EXIGIR_ASSINATURA=1 (docs/seguranca.md).
     log.info("webhook: origem provada por %s", metodo)
+
+    if isinstance(evento, dict) and str(evento.get("event") or "").lower() == "checkout_abandonment":
+        return _tratar_abandono(evento)
 
     # Webhook V1 manda um pedido por entrega (`data` = objeto); o V2 manda todos
     # os pedidos da mesma cobrança numa lista. Tratamos os dois formatos.
@@ -619,6 +644,7 @@ def _processar_pedido(evento: dict) -> dict:
         log.warning("webhook: pedido %s sem entrega automática (pago=%s, sck=%s)",
                     (evento.get("data") or {}).get("id"), pago, pd.get("pd_produto"))
         db.registrar_pedido(evento, pago, {}, email, None, False)
+        _alertar_pendente(evento, pago, email, "produto pago não confere com o sck (ou oferta desconhecida)", pd)
         return {"ok": True, "produto": pago, "email": email or None,
                 "pendente": "produto pago não confere com os dados enviados — conferir e entregar manualmente"}
 
@@ -628,6 +654,7 @@ def _processar_pedido(evento: dict) -> dict:
         # Grava o pedido sem link (aparece no banco para entrega manual) e responde
         # 200 — a Cakto não reenvia respostas de erro, então 422 não ajudaria.
         db.registrar_pedido(evento, produto, {}, email, None, False)
+        _alertar_pendente(evento, produto, email, "sck sem os dados de nascimento", pd)
         return {"ok": True, "produto": produto, "email": email or None,
                 "pendente": "dados de nascimento ausentes — entregar manualmente"}
 
@@ -637,10 +664,18 @@ def _processar_pedido(evento: dict) -> dict:
         return {"ok": True, "produto": produto, "duplicado": True}
 
     link = entrega.link_completo(produto, dados)
+    try:
+        extra = marketing.bloco_venda_cruzada(produto, dados)
+    except Exception:  # noqa: BLE001  (a oferta extra nunca pode travar a entrega)
+        log.exception("venda cruzada: falha ao montar o bloco")
+        extra = ""
     enviado = entrega.enviar_email(
         email, "Seu relatório Padmini está pronto",
-        entrega.email_completo_html(produto, link, dados.get("nome", "")))
+        entrega.email_completo_html(produto, link, dados.get("nome", ""), extra))
     db.registrar_pedido(evento, produto, dados, email, link, enviado)
+    if not enviado:
+        alertas.alertar("E-mail de entrega NÃO saiu — mandar o link à mão",
+                        f"pedido {cakto_id} · {produto} · {email or '(sem e-mail)'}\nlink: {link}")
     # se não enviou (Resend não configurado), devolve o link para envio manual
     return {"ok": True, "produto": produto, "email": email or None,
             "email_enviado": enviado, "link": None if enviado else link}
@@ -653,6 +688,7 @@ def _entregar_mapas_do_casal(evento: dict) -> dict:
     dados = cakto.dados_nascimento(cakto.coletar_pd(evento), "compat")
     if not dados:
         db.registrar_pedido(evento, produto, {}, email, None, False)
+        _alertar_pendente(evento, produto, email, "sck sem os dados de nascimento (bump)", {})
         return {"ok": True, "produto": produto, "email": email or None,
                 "pendente": "dados de nascimento ausentes — entregar manualmente"}
     cakto_id = str((evento.get("data") or {}).get("id") or "")
@@ -664,5 +700,224 @@ def _entregar_mapas_do_casal(evento: dict) -> dict:
         email, "Os mapas individuais de vocês estão prontos",
         entrega.email_mapas_do_casal_html(links, dados["a"].get("nome", "")))
     db.registrar_pedido(evento, produto, dados, email, "\n".join(l for _, l in links), enviado)
+    if not enviado:
+        alertas.alertar("E-mail dos mapas do casal NÃO saiu — mandar à mão",
+                        f"pedido {cakto_id} · {email or '(sem e-mail)'}\n" + "\n".join(l for _, l in links))
     return {"ok": True, "produto": produto, "email": email or None, "email_enviado": enviado,
             "links": None if enviado else [l for _, l in links]}
+
+
+def _alertar_pendente(evento: dict, produto: str, email: str, motivo: str, pd: dict) -> None:
+    d = evento.get("data") if isinstance(evento.get("data"), dict) else {}
+    alertas.alertar(
+        "Pedido PAGO sem entrega automática — entregar à mão",
+        f"motivo: {motivo}\npedido: {d.get('id')} (ref {d.get('refId')})\nproduto pago: {produto}\n"
+        f"e-mail: {email or '(sem e-mail)'}\nsck: {d.get('sck')!r}\n\n"
+        "Veja docs/seguranca.md → Pedidos pendentes.")
+
+
+# ---------------------------------------------------------------------------
+# Carrinho abandonado (evento checkout_abandonment da Cakto)
+# ---------------------------------------------------------------------------
+def _tratar_abandono(evento: dict) -> dict:
+    """
+    A pessoa chegou ao checkout, deixou o e-mail e não pagou. Um e-mail de
+    recuperação por pessoa e oferta (7 dias), nunca para quem se descadastrou ou
+    já comprou. Sempre responde 200: a Cakto não reenvia erro e não há o que refazer.
+    `data` aqui tem outra forma (customerEmail, customerName, offer, checkoutUrl);
+    no webhook V2 vem numa lista de um elemento.
+    """
+    d = evento.get("data")
+    if isinstance(d, list):
+        d = d[0] if d and isinstance(d[0], dict) else {}
+    if not isinstance(d, dict):
+        return {"ok": True, "ignorado": "abandono sem dados"}
+    email = str(d.get("customerEmail") or "").strip()
+    if not _EMAIL_RE.match(email.lower()):
+        return {"ok": True, "ignorado": "abandono sem e-mail"}
+    produto = cakto.produto_pago({"data": d})
+    if produto not in ("mapa", "compat"):
+        return {"ok": True, "ignorado": "abandono de oferta desconhecida"}
+    oferta_id = str((d.get("offer") or {}).get("id") or "") if isinstance(d.get("offer"), dict) else ""
+    if db.descadastrado(email) or db.abandono_ja_tratado(email, oferta_id):
+        return {"ok": True, "ignorado": "já tratado, comprou ou descadastrado"}
+    # O link do próprio checkout só serve se ainda carregar os dados de
+    # nascimento (sck); sem eles a compra viraria entrega manual. Aí manda
+    # para a página do produto, que refaz a amostra e monta o link certo.
+    checkout = str(d.get("checkoutUrl") or "")
+    if checkout.startswith("https://pay.cakto.com.br/") and "sck=" in checkout:
+        link = checkout
+    else:
+        link = marketing.link_site(produto, "abandono")
+    nome = str(d.get("customerName") or "").split(" ")[0]
+    enviado = entrega.enviar_email(email, "Seu pedido na Padmini ficou pela metade",
+                                   marketing.email_abandono_html(produto, nome, link, email))
+    db.registrar_abandono(email, nome, oferta_id, checkout, enviado)
+    return {"ok": True, "abandono": produto, "email_enviado": enviado}
+
+
+# ---------------------------------------------------------------------------
+# Amostra por e-mail + lembrete
+# ---------------------------------------------------------------------------
+class PedidoAmostraEmail(BaseModel):
+    email: str = Field(..., max_length=160)
+    produto: str = Field(..., pattern=r"^(mapa|compat)$")
+    pessoa: PessoaCompat | None = None          # produto = mapa
+    a: PessoaCompat | None = None               # produto = compat
+    b: PessoaCompat | None = None
+    aceita_lembrete: bool = False
+    origem: dict = Field(default_factory=dict)
+
+
+def _dados_pessoa(p: PessoaCompat) -> dict:
+    return {"nome": p.nome.strip()[:80], "data": p.data.isoformat(), "hora": p.hora,
+            "lat": p.lat, "lon": p.lon, "cidade": p.cidade[:200]}
+
+
+def _amostra_mapa(p: PessoaCompat) -> dict:
+    """O mesmo conteúdo da amostra grátis do site, no formato do e-mail."""
+    pedido = PedidoMapa(nome=p.nome, data=p.data, hora=p.hora, lat=p.lat, lon=p.lon,
+                        cidade=p.cidade, nivel="amostra")
+    _, resultado, _, secoes = calcular_pedido(pedido)
+    lua = resultado["grahas"]["Chandra"]
+    atual = dasha_atual(resultado)
+    return {
+        "ascendente": SIGNO_PT[resultado["lagna"]["signo"]],
+        "lua": f'{SIGNO_PT[lua["signo"]]} · {resultado["nakshatra_lua"]["nome"]}',
+        "fase": (f'{NOME_PT[atual["regente"]]} ({atual["inicio"][:4]}–{atual["fim"][:4]})'
+                 if atual else ""),
+        "lua_texto": secoes.get("Lua e nakshatra", ""),
+    }
+
+
+def _amostra_compat(a: PessoaCompat, b: PessoaCompat) -> dict:
+    dt_a = _validar_datetime(a.data, a.hora)
+    dt_b = _validar_datetime(b.data, b.hora)
+    resultado = calcular_compatibilidade(calcular_mapa(dt_local_naive=dt_a, lat=a.lat, lon=a.lon),
+                                         calcular_mapa(dt_local_naive=dt_b, lat=b.lat, lon=b.lon))
+    nome_a, nome_b = a.nome.strip() or "Pessoa A", b.nome.strip() or "Pessoa B"
+    s = montar_snippets_compatibilidade(resultado, "amostra", nome_a, nome_b)
+    return {"nomes": {"a": nome_a, "b": nome_b}, "nota": nota_br(resultado["total"]),
+            "categoria": resultado["categoria"], "moldura": s.get("moldura", ""),
+            "ponto_forte": s.get("ponto_forte"), "ponto_atencao": s.get("ponto_atencao")}
+
+
+def _montar_amostra(produto: str, dados: dict) -> dict:
+    if produto == "compat":
+        return _amostra_compat(PessoaCompat(**dados["a"]), PessoaCompat(**dados["b"]))
+    return _amostra_mapa(PessoaCompat(**dados))
+
+
+MAX_AMOSTRAS_POR_EMAIL_DIA = 3
+
+
+@app.post("/api/amostra/email")
+def amostra_por_email(pedido: PedidoAmostraEmail, request: Request):
+    limites.exigir(limites.AMOSTRA_EMAIL, request)
+    if not os.environ.get("RESEND_API_KEY"):
+        raise HTTPException(503, "O envio por e-mail não está disponível agora.")
+    email = pedido.email.strip().lower()
+    if not _EMAIL_RE.match(email):
+        raise HTTPException(422, "Confira o e-mail.")
+    if pedido.produto == "mapa":
+        if not pedido.pessoa:
+            raise HTTPException(422, "Faltam os dados de nascimento.")
+        _validar_datetime(pedido.pessoa.data, pedido.pessoa.hora)
+        dados = _dados_pessoa(pedido.pessoa)
+        nome = dados["nome"]
+    else:
+        if not (pedido.a and pedido.b):
+            raise HTTPException(422, "Faltam os dados de nascimento do casal.")
+        dados = {"a": _dados_pessoa(pedido.a), "b": _dados_pessoa(pedido.b)}
+        nome = dados["a"]["nome"]
+    # Anti-spam: o formulário não pode virar um jeito de mandar e-mail em massa
+    # com a nossa marca para endereços de terceiros.
+    if db.amostras_enviadas_hoje(email) >= MAX_AMOSTRAS_POR_EMAIL_DIA:
+        raise HTTPException(429, "Este e-mail já recebeu várias amostras hoje. Tente amanhã.")
+    amostra = _montar_amostra(pedido.produto, dados)
+    enviado = entrega.enviar_email(
+        email, "Sua amostra da Padmini" if pedido.produto == "mapa" else "A amostra de vocês na Padmini",
+        marketing.email_amostra_html(pedido.produto, amostra, dados, email, nome))
+    if not enviado:
+        raise HTTPException(503, "Não conseguimos enviar agora. Tente de novo em instantes.")
+    origem = {k: str(v)[:80] for k, v in (pedido.origem or {}).items()
+              if k in ("ref", "cupom", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term")}
+    db.registrar_amostra_email(email, pedido.produto, dados, pedido.aceita_lembrete, origem)
+    return {"ok": True}
+
+
+def _chave_tarefas_ok(request: Request) -> None:
+    """Rotas de tarefa agendada: só com PADMINI_TAREFAS_CHAVE (falha fechada)."""
+    chave = os.environ.get("PADMINI_TAREFAS_CHAVE", "")
+    if not chave:
+        raise HTTPException(503, "Tarefas agendadas não configuradas.")
+    recebida = request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+    if not hmac.compare_digest(recebida.encode("utf-8"), chave.encode("utf-8")):
+        raise HTTPException(401, "Chave inválida.")
+
+
+@app.post("/api/tarefas/lembretes")
+def enviar_lembretes(request: Request):
+    """Chamado 1x por dia pelo GitHub Actions (.github/workflows/tarefas.yml)."""
+    _chave_tarefas_ok(request)
+    enviados, falhas = 0, 0
+    for item in db.lembretes_pendentes():
+        try:
+            amostra = _montar_amostra(item["produto"], item["dados"])
+            ok = entrega.enviar_email(
+                item["email"], "Faltou uma parte do seu mapa" if item["produto"] == "mapa"
+                else "O resto da compatibilidade de vocês",
+                marketing.email_lembrete_html(item["produto"], amostra, item["dados"], item["email"]))
+        except Exception:  # noqa: BLE001
+            log.exception("lembrete: falha na amostra %s", item["id"])
+            ok = False
+        if ok:
+            db.marcar_lembrete_enviado(item["id"])
+            enviados += 1
+        else:
+            falhas += 1
+    if falhas:
+        alertas.alertar("Lembretes com falha", f"{falhas} lembrete(s) não saíram; {enviados} saíram.",
+                        chave="lembretes", intervalo=6 * 3600)
+    return {"ok": True, "enviados": enviados, "falhas": falhas}
+
+
+# ---------------------------------------------------------------------------
+# Descadastro (link em todo e-mail de marketing)
+# ---------------------------------------------------------------------------
+def _pagina_simples(titulo: str, corpo: str) -> Response:
+    import html as _html
+    pagina = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Padmini — {_html.escape(titulo)}</title><link rel="stylesheet" href="/static/base.css"></head>
+<body><main style="max-width:520px;margin:12vh auto;padding:0 16px"><h1>{_html.escape(titulo)}</h1>{corpo}
+<p><a href="/">Voltar para a Padmini</a></p></main></body></html>"""
+    return Response(pagina, media_type="text/html; charset=utf-8")
+
+
+@app.get("/descadastrar")
+def descadastrar_confirmar(e: str = Query("", max_length=160), t: str = Query("", max_length=64)):
+    # GET só mostra o botão: leitores de e-mail abrem links sozinhos (antivírus,
+    # pré-visualização) e não podem descadastrar ninguém por engano.
+    import html as _html
+    if not marketing.descadastro_valido(e, t):
+        return _pagina_simples("Link inválido", "<p>Este link de descadastro não é válido.</p>")
+    corpo = (f'<p>Parar de receber e-mails da Padmini em <b>{_html.escape(e)}</b>?</p>'
+             f'<form method="post" action="/descadastrar">'
+             f'<input type="hidden" name="e" value="{_html.escape(e, quote=True)}">'
+             f'<input type="hidden" name="t" value="{_html.escape(t, quote=True)}">'
+             f'<button type="submit" class="btn btn-primary">Sim, descadastrar</button></form>'
+             f'<p style="font-size:13px">E-mails de compras que você fizer (o link do relatório) continuam chegando.</p>')
+    return _pagina_simples("Descadastrar", corpo)
+
+
+@app.post("/descadastrar")
+async def descadastrar(request: Request):
+    from urllib.parse import parse_qs
+    campos = parse_qs((await request.body()).decode("utf-8", "replace")[:1000])
+    e, t = (campos.get("e") or [""])[0], (campos.get("t") or [""])[0]
+    if not marketing.descadastro_valido(e, t):
+        return _pagina_simples("Link inválido", "<p>Este link de descadastro não é válido.</p>")
+    if not db.descadastrar(e):
+        return _pagina_simples("Tente de novo", "<p>Não conseguimos registrar agora. Tente em instantes.</p>")
+    return _pagina_simples("Pronto", "<p>Você não vai mais receber e-mails de novidades da Padmini.</p>")

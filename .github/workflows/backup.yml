@@ -1,0 +1,60 @@
+# Backup semanal do banco (pedidos, lista de espera, amostras por e-mail).
+#
+# O Supabase no plano grátis não guarda backup que dê para baixar. Aqui um
+# pg_dump sai toda semana, CRIPTOGRAFADO com uma senha (o repositório é
+# público: sem criptografia, qualquer um baixaria e-mails de clientes), e
+# fica 90 dias como artefato do workflow.
+#
+# Secrets necessários (Settings → Secrets and variables → Actions):
+#   BACKUP_DATABASE_URL — a connection string "Session pooler" do Supabase
+#       (Project Settings → Database → Connection string → Session pooler).
+#       A "Direct connection" não funciona: ela é só IPv6, e o GitHub não tem.
+#   BACKUP_SENHA — senha longa, guardada também FORA do GitHub (gerenciador de
+#       senhas). Sem ela o backup não abre.
+# Sem os dois, o passo avisa e não faz nada.
+#
+# Para restaurar: baixar o artefato, e
+#   gpg --batch --passphrase "<BACKUP_SENHA>" -d padmini-AAAA-MM-DD.sql.gz.gpg | gunzip > backup.sql
+name: backup
+
+on:
+  schedule:
+    - cron: "23 6 * * 1"   # segunda, 03:23 em Brasília
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conferir configuração
+        id: conf
+        env:
+          URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          SENHA: ${{ secrets.BACKUP_SENHA }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$SENHA" ]; then
+            echo "::warning::Secrets BACKUP_DATABASE_URL/BACKUP_SENHA não configurados — backup desligado."
+            echo "pular=1" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Dump criptografado
+        if: steps.conf.outputs.pular != '1'
+        env:
+          URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          SENHA: ${{ secrets.BACKUP_SENHA }}
+        run: |
+          set -o pipefail
+          arquivo="padmini-$(date -u +%F).sql.gz.gpg"
+          # imagem do Postgres 17 = mesma versão do servidor do Supabase
+          docker run --rm -e URL postgres:17 sh -c 'pg_dump --no-owner --no-privileges "$URL"' \
+            | gzip -9 \
+            | gpg --batch --yes --pinentry-mode loopback --symmetric --cipher-algo AES256 \
+                  --passphrase "$SENHA" -o "$arquivo"
+          test -s "$arquivo"
+          ls -lh "$arquivo"
+          echo "ARQUIVO=$arquivo" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        if: steps.conf.outputs.pular != '1'
+        with:
+          name: ${{ env.ARQUIVO }}
+          path: ${{ env.ARQUIVO }}
+          retention-days: 90

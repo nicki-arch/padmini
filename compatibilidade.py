@@ -432,7 +432,7 @@ def montar_amostra(resultado: dict, nome_a: str = "Pessoa A", nome_b: str = "Pes
 
 
 def payload_completo(resultado: dict) -> dict:
-    """Completo (R$127): tudo. Aqui é o resultado inteiro; a prosa das 8 kootas
+    """Completo (preço em conteudo/ofertas.yaml): tudo. Aqui é o resultado inteiro; a prosa das 8 kootas
     e a síntese prática vêm da base de significações + IA, fora deste motor."""
     return resultado
 
@@ -442,6 +442,12 @@ def payload_completo(resultado: dict) -> dict:
 # O código escolhe a faixa de cada koota e busca o trecho exato na base.
 # A IA (fora daqui) só costura os trechos retornados — não inventa.
 # ===========================================================================
+def nota_br(valor: float) -> str:
+    """Nota do jeito que o leitor brasileiro escreve: 14.0 → '14', 14.5 → '14,5'."""
+    v = round(float(valor), 1)
+    return str(int(v)) if v == int(v) else f"{v:.1f}".replace(".", ",")
+
+
 def banda_koota(obtido: float, maximo: int) -> str:
     """Traduz a pontuação de uma koota em 'forte' | 'medio' | 'fraco'."""
     p = obtido / maximo
@@ -472,7 +478,7 @@ def montar_snippets_compatibilidade(resultado: dict, nivel: str = "completo",
     """
     import base_significacoes as B
 
-    moldura = B.COMPAT_FAIXA[resultado["categoria"]].format(total=resultado["total"])
+    moldura = B.COMPAT_FAIXA[resultado["categoria"]].format(total=nota_br(resultado["total"]))
     amostra = montar_amostra(resultado, nome_a, nome_b)
 
     saida = {

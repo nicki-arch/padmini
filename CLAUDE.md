@@ -39,6 +39,10 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 | `db.py` | Postgres opcional (`DATABASE_URL`): pedidos, lista de espera (`leads`), cache do texto da IA. Erro no banco nunca impede entrega |
 | `limites.py` | Limite de requisições por IP (429): cálculo, PDF, IA, cidades, lista, senha do live |
 | `seguranca.py` | Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy). Serviço externo novo → incluir na CSP |
+| `marketing.py` + `static/amostra-email.js` | Amostra por e-mail, lembrete (`/api/tarefas/lembretes`), carrinho abandonado, venda cruzada, descadastro (`/descadastrar`) |
+| `alertas.py` | E-mail para a equipe (`PADMINI_ALERTA_EMAIL`): pedido pago sem entrega, e-mail que não saiu, erro 500 |
+| `.github/workflows/` | `testes` (CI), `pos-deploy` (smoke depois de cada deploy), `tarefas` (lembretes diários), `backup` (semanal, criptografado), `manter-ativo` |
+| `docs/melhorias-2026-09.md` | O que entrou em 25/set (preços, e-mails de venda, alertas, backup) e a configuração pendente |
 | `docs/seguranca.md` | **Revisão de segurança (25/set/2026)**: o que foi corrigido, limites, pendências |
 | `static/lista.html` + `/api/lista` | Lista de espera do lançamento. `PADMINI_CAPTURA=1` trava home/mapa/compat e manda para `/lista` (links de entrega com `token` e quem tem `?previa=<PADMINI_PREVIA_CHAVE>` passam) |
 
@@ -62,6 +66,11 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 
 11. **O `sck` é dado do comprador, não prova de pagamento.** Qual produto entregar sai só da
     oferta paga que a Cakto informa (`cakto.produto_pago`). Ver `docs/seguranca.md`.
+
+12. **Preço nunca escrito à mão em HTML** (a página do casal anunciou R$127 em vez de R$97):
+    sempre `{{ ofertas.<produto>.preco }}`. Há teste que procura "R$" + número nos HTML.
+13. **E-mail de marketing só com consentimento e com descadastro** (`marketing.py`); na
+    dúvida (sem banco), não manda.
 
 ## Commits
 Mensagens em português, explicando o porquê. Sem force-push na `master`.
