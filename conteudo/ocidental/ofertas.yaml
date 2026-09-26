@@ -13,7 +13,13 @@ mapa:
   preco: 47
   checkout: ""
 
+# `preco` é o de tabela, o que a página mostra por padrão e o que a oferta
+# cobra na Cakto (o smoke confere). `preco_cupom` só aparece para quem chega
+# com cupom de afiliado no link (?cupom=CODIGO); a página manda o código para
+# a Cakto no parâmetro `coupon`, que aplica o desconto no checkout. O cupom
+# (R$30 fixo) precisa existir na Cakto com o mesmo código.
 compat:
   nome: Sinastria do casal
   preco: 127
+  preco_cupom: 97
   checkout: ""

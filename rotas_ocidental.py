@@ -154,3 +154,76 @@ def live_token_mapa_ocidental(p: PedidoMapaOcidental, request: Request):
         validar_data(p.data)
     db.registrar_live(f"{VERSAO}:mapa", p.nome.strip(), p.cidade, f"{p.data.isoformat()} {p.hora}".strip())
     return {"token": acesso.emitir_token("mapa", chave_do_pedido(p), VERSAO)}
+
+
+# --------------------------------------------------------------------------
+# SINASTRIA (o casal) — /compatibilidade na versão ocidental
+# --------------------------------------------------------------------------
+class PessoaOcidental(BaseModel):
+    nome: str = Field("", max_length=80)
+    data: date
+    hora: str = Field("", pattern=r"^(\d{2}:\d{2})?$")
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    cidade: str = Field("", max_length=200)
+
+
+class PedidoSinastria(BaseModel):
+    a: PessoaOcidental
+    b: PessoaOcidental
+    nivel: str = Field("amostra", pattern=r"^(amostra|completo)$")
+    texto_ia: bool = False
+    token: str | None = Field(None, max_length=64)
+
+
+def chave_do_casal(p: PedidoSinastria) -> str:
+    return acesso.chave_compat((p.a.data.isoformat(), p.a.hora, p.a.lat, p.a.lon),
+                               (p.b.data.isoformat(), p.b.hora, p.b.lat, p.b.lon))
+
+
+def _calcular_pessoa(x: PessoaOcidental):
+    return calcular(PedidoMapaOcidental(**x.model_dump()))
+
+
+@rotas.post("/api/ocidental/sinastria")
+def sinastria_ocidental(p: PedidoSinastria, request: Request):
+    """Amostra: Índice Padmini + ponto forte e de atenção (o card). Completo:
+    as 8 dimensões, aspectos cruzados e casas — com token."""
+    import sinastria as si
+    limites.exigir(limites.CALCULO, request)
+    if p.texto_ia and p.nivel != "completo":
+        raise HTTPException(402, "O texto por IA faz parte do relatório completo.")
+    (ma, aviso_a), (mb, aviso_b) = _calcular_pessoa(p.a), _calcular_pessoa(p.b)
+    chave = None
+    if p.nivel == "completo":
+        chave = chave_do_casal(p)
+        if not acesso.completo_liberado("compat", chave, p.token, VERSAO):
+            raise HTTPException(402, "O relatório completo requer pagamento.")
+    nome_a, nome_b = p.a.nome.strip() or "Pessoa A", p.b.nome.strip() or "Pessoa B"
+    rel = mt.montar_sinastria(si.calcular_sinastria(ma, mb), ma, mb, nome_a, nome_b, p.nivel)
+
+    texto_ia = None
+    if p.texto_ia:
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
+        from montar_texto import gerar_com_claude
+        chave_cache = f"{VERSAO}|{chave}"
+        texto_ia = db.texto_ia(chave_cache)
+        if texto_ia is None:
+            limites.exigir(limites.TEXTO_IA, request)
+            texto_ia = gerar_com_claude(mt.montar_prompt_sinastria(rel, nome_a, nome_b))
+            db.guardar_texto_ia(chave_cache, f"{VERSAO}:compat", texto_ia,
+                                os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
+    return {"nivel": p.nivel, "sistema": VERSAO, "nomes": {"a": nome_a, "b": nome_b},
+            "maximo": 100, **rel, "avisos_horario": {"a": aviso_a, "b": aviso_b}, "texto_ia": texto_ia}
+
+
+@rotas.post("/api/live/ocidental/token/sinastria")
+def live_token_sinastria_ocidental(p: PedidoSinastria, request: Request):
+    if not acesso.sessao_valida("live", request.cookies.get("pad_live")):
+        raise HTTPException(401, "Sessão do modo live expirada. Entre de novo.")
+    for x in (p.a, p.b):
+        validar_datetime(x.data, x.hora) if x.hora else validar_data(x.data)
+    db.registrar_live(f"{VERSAO}:compat", f"{p.a.nome.strip()} & {p.b.nome.strip()}".strip(" &"),
+                      p.a.cidade, f"{p.a.data.isoformat()} / {p.b.data.isoformat()}")
+    return {"token": acesso.emitir_token("compat", chave_do_casal(p), VERSAO)}

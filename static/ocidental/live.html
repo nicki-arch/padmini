@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#241522">
 <meta name="robots" content="noindex, nofollow">
 <title>Modo live — Padmini</title>
-{# Versão ocidental do modo live. A sinastria entra na Fase 2. #}
+{# Versão ocidental do modo live (mapa natal e sinastria). #}
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
 <style>
@@ -63,7 +63,7 @@
     <div class="barra">
       <div class="abas" role="tablist">
         <button class="aba" id="aba-mapa" role="tab" aria-selected="true">Mapa individual</button>
-        <button class="aba" id="aba-casal" role="tab" aria-selected="false" hidden>Sinastria</button>
+        <button class="aba" id="aba-casal" role="tab" aria-selected="false">Sinastria</button>
       </div>
       <button class="aba" id="botao-sair" type="button">Sair</button>
     </div>
@@ -101,7 +101,7 @@
         </div>
       </fieldset>
       <p class="erro" id="erro-casal" role="alert" hidden></p>
-      <button class="acao" id="gerar-casal" type="submit">Gerar compatibilidade</button>
+      <button class="acao" id="gerar-casal" type="submit">Gerar sinastria</button>
     </form>
 
     <section id="resultado" aria-live="polite" hidden></section>
@@ -255,45 +255,49 @@ function desenharMapa(d) {
   $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-// ---------- casal ----------
+// ---------- casal (sinastria) ----------
 $("#form-casal").addEventListener("submit", async (e) => {
   e.preventDefault(); erro("#erro-casal", "");
   const pessoas = [["a", cidadeA], ["b", cidadeB]].map(([p, cid]) => {
-    const data = dataISO($(`#${p}-data`).value), hora = $(`#${p}-hora`).value;
+    const data = dataISO($(`#${p}-data`).value), hora = $(`#${p}-hora`).value.trim();
     return { p, data, hora, cid, nome: $(`#${p}-nome`).value.trim() };
   });
   for (const x of pessoas) {
     const quem = x.p === "a" ? "Pessoa A" : "Pessoa B";
     if (!x.data) return erro("#erro-casal", `Data da ${quem} no formato dd/mm/aaaa.`);
-    if (!/^\d{2}:\d{2}$/.test(x.hora)) return erro("#erro-casal", `Hora da ${quem} no formato hh:mm.`);
+    if (x.hora && !/^\d{2}:\d{2}$/.test(x.hora)) return erro("#erro-casal", `Hora da ${quem} no formato hh:mm (ou vazio).`);
     if (!x.cid.escolhida) return erro("#erro-casal", `Escolha a cidade da ${quem} na lista.`);
   }
   const corpo = { a: pessoa(pessoas[0]), b: pessoa(pessoas[1]) };
   const botao = $("#gerar-casal"); botao.disabled = true; botao.textContent = "Gerando…";
   try {
-    const t = await pedir("/api/live/token/compat", corpo);
-    const r = await pedir("/api/compatibilidade", { ...corpo, nivel: "completo", token: t.token, texto_ia: false });
+    const t = await pedir("/api/live/ocidental/token/sinastria", corpo);
+    const r = await pedir("/api/ocidental/sinastria", { ...corpo, nivel: "completo", token: t.token, texto_ia: false });
     desenharCasal(r);
   } catch (err) { erro("#erro-casal", err.message); }
-  finally { botao.disabled = false; botao.textContent = "Gerar compatibilidade"; }
+  finally { botao.disabled = false; botao.textContent = "Gerar sinastria"; }
 });
 function pessoa(x) { return { nome: x.nome, data: x.data, hora: x.hora, lat: x.cid.escolhida.lat, lon: x.cid.escolhida.lon, cidade: x.cid.escolhida.rotulo }; }
 
 function desenharCasal(d) {
-  const s = d.snippets || {};
-  const kootas = (s.kootas || []).map((k) =>
-    `<div class="koota"><span><b>${esc(k.nome)}</b> — ${esc(k.tema)}<br><span class="sub">${esc(k.texto)}</span></span><b>${nota(k.obtido)}/${k.max}</b></div>`).join("");
-  const doshas = (s.doshas || []).map((x) => `<p>${esc(typeof x === "string" ? x : (x.texto || x.nome || ""))}</p>`).join("");
+  const bloco = (titulo, texto) => `<div class="koota"><span><b>${esc(titulo)}</b><br><span class="sub">${esc(texto)}</span></span></div>`;
   $("#resultado").innerHTML = `
     <h2 class="grande">${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2>
+    ${(d.avisos || []).map((a) => `<p class="aviso">${esc(a)}</p>`).join("")}
+    <p class="faixa gratis">Amostra grátis</p>
     <div class="destaques">
-      <div><span>Guna Milan</span><b>${nota(d.total)} / ${d.maximo}</b></div>
-      <div><span>Categoria</span><b>${esc(d.categoria)}</b></div>
+      <div><span>Índice Padmini (método próprio)</span><b>${d.indice} / 100</b></div>
+      <div><span>Ponto mais forte</span><b>${esc(d.ponto_forte.titulo)}</b></div>
+      <div><span>Ponto de atenção</span><b>${esc(d.ponto_atencao.titulo)}</b></div>
     </div>
-    <p>${esc(s.moldura || "")}</p>
+    <p>${esc(d.indice_texto)}</p>
+    <div class="secao"><h3>${esc(d.ponto_forte.titulo)}</h3><p>${esc(d.ponto_forte.texto)}</p>
+      <h3>${esc(d.ponto_atencao.titulo)}</h3><p>${esc(d.ponto_atencao.texto)}</p></div>
     ${DIVISOR}
-    ${kootas}
-    ${doshas ? `<div class="secao"><h3>Doshas e Mangal</h3>${doshas}</div>` : ""}`;
+    ${d.dimensoes.map((x) => `<div class="koota"><span><b>${esc(x.titulo)}</b><br><span class="sub">${esc(x.texto)}</span></span><b>${x.nota === null ? "—" : x.nota + "/100"}</b></div>`).join("")}
+    <div class="secao"><h3>Aspectos entre vocês</h3></div>
+    ${d.aspectos.map((x) => bloco(x.titulo, x.texto)).join("")}
+    ${d.casas.length ? `<div class="secao"><h3>Os planetas de um nas casas do outro</h3></div>${d.casas.map((x) => bloco(x.titulo, x.texto)).join("")}` : ""}`;
   $("#resultado").hidden = false;
   $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
 }

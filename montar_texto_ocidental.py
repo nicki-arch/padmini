@@ -19,7 +19,7 @@ import yaml
 import mapa_ocidental as mo
 
 PASTA = Path(__file__).parent / "conteudo" / "ocidental" / "textos"
-ARQUIVOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais", "pecas")
+ARQUIVOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais", "pecas", "sinastria")
 
 # Aspectos só entre planetas lentos são de geração, não da pessoa: ficam fora
 # da lista de "aspectos principais" do completo.
@@ -231,3 +231,114 @@ def rascunho(secoes: dict) -> str:
 
 def montar_prompt(secoes: dict) -> str:
     return INSTRUCAO_LLM + "\n\nMATERIAL:\n\n" + rascunho(secoes)
+
+
+# --------------------------------------------------------------------------
+# Sinastria (o casal) — textos de conteudo/ocidental/textos/sinastria.yaml
+# --------------------------------------------------------------------------
+def _cap(t: str) -> str:
+    return t[:1].upper() + t[1:]
+
+
+def _nomes(texto: str, a: str, b: str) -> str:
+    return texto.replace("{a}", a).replace("{b}", b)
+
+
+def texto_dimensao(chave: str, nota, a: str, b: str) -> str:
+    import sinastria as si
+    sb = base("sinastria")
+    if nota is None:
+        return _t(sb["sem_dados"])
+    return _nomes(_t(sb["dimensoes"][chave][si.faixa(nota)]), a, b)
+
+
+def descricao_dimensao(chave: str) -> str:
+    return _t(base("sinastria")["dimensoes"][chave]["descricao"])
+
+
+def texto_indice(indice: int, a: str, b: str) -> str:
+    import sinastria as si
+    return _nomes(_t(base("sinastria")["indice"][si.faixa(indice)]), a, b)
+
+
+def texto_metodo() -> str:
+    return _t(base("sinastria")["metodo"])
+
+
+def texto_aspecto_cruzado(asp: dict, a: str, b: str) -> str:
+    """asp["a"] é ponto de `a`, asp["b"] ponto de `b` (nomes das pessoas)."""
+    sb = base("sinastria")
+    tema_a = _t(sb["temas"][asp["a"]]).replace("{nome}", a)
+    tema_b = _t(sb["temas"][asp["b"]]).replace("{nome}", b)
+    dinamica = _t(sb["dinamica"][asp["tipo"]]).replace("{a}", tema_a).replace("{b}", tema_b)
+    return _cap(dinamica) + " " + _t(sb["conselho"][asp["tipo"]])
+
+
+def titulo_aspecto_cruzado(asp: dict, a: str, b: str) -> str:
+    return (f"{mo.PONTO_PT[asp['a']]} de {a} em {mo.ASPECTO_PT[asp['tipo']]} com "
+            f"{mo.PONTO_PT[asp['b']]} de {b} (orbe {mo.grau_minuto(asp['orbe'])})")
+
+
+def texto_casa_sinastria(casa: int, quem: str, de_quem: str) -> str:
+    return _t(base("sinastria")["casas"][casa]).replace("{quem}", quem).replace("{de_quem}", de_quem)
+
+
+MAX_ASPECTOS_SINASTRIA = 12
+
+
+def montar_sinastria(sin: dict, ma: dict, mb: dict, a: str, b: str, nivel: str) -> dict:
+    """Amostra: índice, faixa e os pontos forte e de atenção. Completo: tudo."""
+    import sinastria as si
+    forte, atencao = si.ponto_forte_e_de_atencao(sin)
+    dims = sin["dimensoes"]
+
+    def dim(k):
+        return {"chave": k, "titulo": dims[k]["titulo"], "nota": dims[k]["nota"],
+                "descricao": descricao_dimensao(k), "texto": texto_dimensao(k, dims[k]["nota"], a, b)}
+
+    avisos = []
+    for nome, m in ((a, ma), (b, mb)):
+        if not m["tem_hora"]:
+            avisos.append(f"{nome}: sem hora de nascimento — sem Ascendente e sem casas no cruzamento.")
+        elif m["casas"]["sistema"] == "porfirio":
+            avisos.append(f"{nome}: nascimento perto de um polo — casas pelo sistema de Porfírio.")
+    r = {"indice": sin["indice"], "indice_texto": texto_indice(sin["indice"], a, b),
+         "metodo": texto_metodo(), "ponto_forte": dim(forte), "ponto_atencao": dim(atencao),
+         "avisos": avisos}
+    if nivel != "completo":
+        return r
+    r["dimensoes"] = [dim(k) for k in dims]
+    r["aspectos"] = [{**x, "titulo": titulo_aspecto_cruzado(x, a, b), "texto": texto_aspecto_cruzado(x, a, b)}
+                     for x in sin["aspectos"][:MAX_ASPECTOS_SINASTRIA]]
+    casas = []
+    for quem, de_quem, lista in ((a, b, sin["casas_a_em_b"]), (b, a, sin["casas_b_em_a"])):
+        por_casa = {}
+        for c in lista:
+            por_casa.setdefault(c["casa"], []).append(mo.PONTO_PT[c["planeta"]])
+        for casa in sorted(por_casa):
+            casas.append({"quem": quem, "de_quem": de_quem, "casa": casa, "planetas": por_casa[casa],
+                          "titulo": f"{', '.join(por_casa[casa])} de {quem} na casa {casa} de {de_quem}",
+                          "texto": texto_casa_sinastria(casa, quem, de_quem)})
+    r["casas"] = casas
+    return r
+
+
+INSTRUCAO_LLM_SINASTRIA = """Você escreve a Sinastria de casal da Padmini (astrologia ocidental), em português do Brasil.
+
+Regras:
+- Use SOMENTE as informações do material abaixo (o Índice Padmini, as oito dimensões, os aspectos e as casas). Não acrescente nenhum fato astrológico, previsão ou traço que não esteja nele.
+- O Índice Padmini é um método próprio da Padmini, não uma regra tradicional: nunca o apresente como tradição astrológica.
+- Escreva sobre o casal usando os nomes fornecidos. Tom acolhedor e adulto. NUNCA condene o casal: nota baixa é "ponto de atenção", nunca "não vai dar certo".
+- Estrutura: o índice e o que ele significa; as oito dimensões, uma a uma; os aspectos mais marcantes; as casas; uma síntese prática de como fazer a relação funcionar.
+- Nada de promessas, garantias ou previsão de eventos, saúde ou dinheiro. Nunca mencione "o material" ou como o texto foi feito.
+- Termine com uma linha: "Esta leitura é uma ferramenta de autoconhecimento, não uma previsão nem substituto de uma conversa honesta entre vocês."
+"""
+
+
+def montar_prompt_sinastria(rel: dict, a: str, b: str) -> str:
+    partes = [f"# {a} & {b} — Índice Padmini {rel['indice']}/100", rel["indice_texto"], rel["metodo"]]
+    for d in rel["dimensoes"]:
+        partes.append(f"## {d['titulo']} ({d['nota'] if d['nota'] is not None else 'sem dados'}/100)\n\n{d['texto']}")
+    partes += [f"## {x['titulo']}\n\n{x['texto']}" for x in rel["aspectos"]]
+    partes += [f"## {c['titulo']}\n\n{c['texto']}" for c in rel["casas"]]
+    return INSTRUCAO_LLM_SINASTRIA + "\n\nMATERIAL:\n\n" + "\n\n".join(partes)

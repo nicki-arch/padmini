@@ -1,0 +1,454 @@
+# Sinastria (o casal) — rascunho; revisar e trocar `revisado` para true (ver LEIA.md).
+# {a} e {b} são os nomes (ou "Pessoa A"/"Pessoa B"). Falar com o casal: "vocês".
+# Tom: nota baixa é ponto de atenção, NUNCA "não vai dar certo".
+
+# ---------------------------------------------------------------- dimensões
+# alta: nota 65+ · media: 40 a 64 · baixa: abaixo de 40
+dimensoes:
+  atracao:
+    descricao: {revisado: false, texto: A química e o desejo entre vocês.}
+    alta:
+      revisado: false
+      texto: >-
+        A atração entre {a} e {b} tem força: os planetas do desejo e do afeto
+        de um conversam bem com os do outro. Na prática, isso costuma aparecer
+        como vontade de estar perto, facilidade para o flerte e uma química que
+        volta mesmo depois de uma briga. O cuidado é não deixar a atração fazer
+        todo o trabalho: combinar o que cada um precisa no dia a dia mantém essa
+        chama num lugar que aquece, e não só num lugar que agita.
+    media:
+      revisado: false
+      texto: >-
+        A atração entre {a} e {b} existe, mas não é o que mais sustenta o
+        vínculo. Pode haver fases de muito interesse e fases mais mornas, e
+        tudo bem: a química costuma crescer com intimidade e com experiências
+        novas a dois. Um programa fora da rotina, uma viagem curta ou simplesmente
+        conversar sobre o que desperta o desejo de cada um tende a reacender o
+        que já está ali.
+    baixa:
+      revisado: false
+      texto: >-
+        Na atração, os ritmos de {a} e {b} são diferentes: o que desperta o
+        desejo de um nem sempre é o que o outro oferece espontaneamente. Isso
+        não quer dizer falta de amor — muitas relações longas têm essa marca.
+        Quer dizer que a química pede cuidado consciente: perguntar, sem
+        vergonha, o que o outro gosta, e criar momentos em que o encontro seja
+        prioridade, e não sobra do dia.
+  emocoes:
+    descricao: {revisado: false, texto: Como os sentimentos de um tocam os do outro.}
+    alta:
+      revisado: false
+      texto: >-
+        No campo das emoções, {a} e {b} se entendem com pouca explicação. A Lua
+        de um conversa bem com a Lua ou o Sol do outro, o que costuma trazer a
+        sensação de estar em casa um com o outro. Em dia difícil, um percebe o
+        humor do outro sem precisar ouvir. O cuidado é não contar só com essa
+        intuição: dizer em voz alta o que sentem evita que o entendimento
+        silencioso vire suposição.
+    media:
+      revisado: false
+      texto: >-
+        Nas emoções, {a} e {b} têm pontos de encontro e pontos de diferença. Em
+        algumas situações, o conforto vem fácil; em outras, um precisa de
+        colo e o outro de espaço, ou um quer conversar e o outro quer resolver.
+        Conhecer o jeito de cada um se acalmar — e combinar como cuidar um do
+        outro quando o dia pesa — transforma essa diferença em complemento.
+    baixa:
+      revisado: false
+      texto: >-
+        Nas emoções, {a} e {b} funcionam de jeitos diferentes: o que acalma um
+        pode agitar o outro, e mal-entendidos tendem a surgir justamente nos
+        momentos sensíveis. Isso é um ponto de atenção, não uma sentença. Ajuda
+        muito perguntar diretamente "do que você precisa agora?", em vez de
+        oferecer o cuidado que você gostaria de receber. Com o tempo, vocês
+        aprendem a língua emocional um do outro.
+  comunicacao:
+    descricao: {revisado: false, texto: O jeito de conversar, discutir e decidir juntos.}
+    alta:
+      revisado: false
+      texto: >-
+        A conversa flui entre {a} e {b}. Mercúrio de um se liga bem aos pontos
+        pessoais do outro, e isso costuma aparecer como papo que atravessa a
+        madrugada, piadas internas e facilidade para decidir coisas práticas
+        juntos. O cuidado é usar essa facilidade também nas conversas difíceis
+        — justamente nelas, o costume de se entender ajuda a chegar a um acordo
+        sem machucar.
+    media:
+      revisado: false
+      texto: >-
+        Na comunicação, {a} e {b} se entendem bem em alguns assuntos e esbarram
+        em outros. Pode ser que um pense em voz alta e o outro precise de
+        silêncio antes de falar, ou que um seja direto e o outro prefira rodeios.
+        Combinar como vocês discutem — sem interromper, com tempo para cada um —
+        faz as conversas importantes renderem mais.
+    baixa:
+      revisado: false
+      texto: >-
+        Na comunicação, {a} e {b} têm estilos bem diferentes, e o que um diz
+        nem sempre é o que o outro ouve. Isso pede método, não desistência:
+        repetir com as próprias palavras o que entendeu ("você está dizendo
+        que…?"), escolher a hora certa para assuntos sérios e evitar decidir
+        coisas grandes por mensagem ajudam a transformar o desencontro em
+        diálogo.
+  afeto:
+    descricao: {revisado: false, texto: O jeito de dar carinho e o que cada um valoriza.}
+    alta:
+      revisado: false
+      texto: >-
+        No afeto, {a} e {b} falam uma língua parecida. O que um valoriza — um
+        gesto, um presente, um tempo junto — tende a ser o que o outro gosta de
+        oferecer. Isso costuma trazer uma sensação de ser cuidado do jeito
+        certo. O cuidado é não deixar o carinho ficar no automático: variar os
+        gestos e agradecer o que o outro faz mantém esse encaixe vivo.
+    media:
+      revisado: false
+      texto: >-
+        No afeto, {a} e {b} se encontram em parte. Um pode demonstrar amor
+        com palavras e o outro com atitudes, ou valorizar coisas diferentes
+        no tempo livre. Descobrir a forma preferida de carinho de cada um —
+        e oferecer, de vez em quando, na língua do outro e não na sua —
+        costuma aproximar muito vocês dois. Um exemplo: se um sente amor
+        quando recebe atenção e o outro quando recebe ajuda, os dois podem
+        estar dando muito sem perceber.
+    baixa:
+      revisado: false
+      texto: >-
+        No afeto, {a} e {b} têm gostos e valores diferentes, e pode acontecer de
+        um sentir que dá muito e recebe pouco, quando na verdade o carinho vem
+        em outro formato. É um ponto de atenção comum e bem trabalhável:
+        conversar sobre o que faz cada um se sentir amado, com exemplos
+        concretos, dá ao outro a chance de acertar.
+  identidade:
+    descricao: {revisado: false, texto: Como o jeito de ser de um combina com o do outro.}
+    alta:
+      revisado: false
+      texto: >-
+        Na identidade, {a} e {b} se reconhecem. O Sol de um se liga bem ao Sol
+        ou ao Ascendente do outro, e isso costuma trazer admiração mútua e a
+        sensação de que um apoia o outro a ser quem é. O cuidado é manter
+        espaço para as diferenças: parecidos demais, vocês podem reforçar os
+        mesmos excessos. Um amigo sincero de fora ajuda a enxergar.
+    media:
+      revisado: false
+      texto: >-
+        Na identidade, {a} e {b} têm afinidades e diferenças de
+        temperamento. Em algumas coisas vocês se reconhecem; em outras, um
+        estranha o jeito do outro. Essa mistura pode ser ótima: cada um
+        mostra ao outro um lado da vida que sozinho não veria. O segredo é
+        tratar a diferença como curiosidade, e não como defeito a ser
+        corrigido. Um pode ser mais expansivo e o outro mais reservado, e os
+        dois ganham com isso.
+    baixa:
+      revisado: false
+      texto: >-
+        Na identidade, {a} e {b} são bem diferentes, e cada um pode, às
+        vezes, sentir que o outro não entende o seu jeito. Isso não impede
+        uma boa relação; pede respeito ativo. Ajuda combinar áreas em que
+        cada um tem autonomia, e celebrar as conquistas do outro mesmo
+        quando são de um tipo que você não buscaria. Com o tempo, essa
+        diferença costuma virar admiração pelo que o outro tem e você não
+        tem.
+  crescimento:
+    descricao: {revisado: false, texto: O quanto um faz o outro se expandir.}
+    alta:
+      revisado: false
+      texto: >-
+        No crescimento, {a} e {b} tendem a fazer bem um ao outro. Júpiter de um
+        toca os pontos pessoais do outro, o que costuma aparecer como incentivo,
+        otimismo e vontade de fazer planos juntos. Um acredita no outro em fases
+        de dúvida. O cuidado é não exagerar no entusiasmo: sonhos grandes a dois
+        rendem mais com um passo concreto por vez.
+    media:
+      revisado: false
+      texto: >-
+        No crescimento, {a} e {b} se incentivam em algumas áreas mais do que
+        em outras. Pode ser que um puxe o outro para viagens e estudos, mas
+        que em outros campos cada um cresça mais sozinho. Conversar sobre
+        planos pessoais e encontrar um projeto comum — uma viagem, um curso,
+        uma mudança — dá à relação um horizonte compartilhado. Sonhar junto,
+        com metas concretas, é um bom exercício.
+    baixa:
+      revisado: false
+      texto: >-
+        No crescimento, os planos de {a} e {b} nem sempre apontam na mesma
+        direção, e o otimismo de um pode parecer exagero para o outro, ou
+        vice- versa. É um ponto de atenção útil: ajuda cada um a checar a
+        realidade. Separar sonhos individuais dos sonhos do casal, e apoiar
+        os dois tipos, evita que alguém se sinta freado. Um calendário de
+        metas de cada um, conversado a dois, ajuda muito.
+  compromisso:
+    descricao: {revisado: false, texto: Estabilidade, responsabilidade e o longo prazo.}
+    alta:
+      revisado: false
+      texto: >-
+        No compromisso, {a} e {b} têm uma base firme. Saturno de um se liga de
+        forma harmônica aos pontos pessoais do outro, o que costuma trazer
+        seriedade, lealdade e a sensação de que dá para construir algo que dura.
+        O cuidado é não deixar a responsabilidade engolir a leveza: casal que
+        só resolve problemas também precisa de tempo para brincar.
+    media:
+      revisado: false
+      texto: >-
+        No compromisso, {a} e {b} têm ingredientes de estabilidade, mas
+        também pontos em que um pode sentir o outro como cobrança ou limite.
+        Isso é comum em relações duradouras. Deixar claros os combinados —
+        quem cuida do quê, o que é inegociável para cada um — transforma a
+        cobrança em parceria. Um exemplo prático: sentar uma vez por mês
+        para revisar as contas da casa e os planos do ano, com calma,
+        costuma diminuir as cobranças do dia a dia.
+    baixa:
+      revisado: false
+      texto: >-
+        No compromisso, a relação entre {a} e {b} tem tensões de Saturno: um
+        pode sentir o outro como crítico, frio ou exigente em certas fases.
+        É o tipo de desafio que, bem conversado, amadurece o casal. Ajuda
+        nomear as expectativas em voz alta, dar crédito ao esforço do outro
+        e evitar o tom de cobrança em assuntos sensíveis. Com o tempo, essa
+        seriedade pode virar a maior força de vocês.
+  dia_a_dia:
+    descricao: {revisado: false, texto: A convivência, a rotina e a parceria prática.}
+    alta:
+      revisado: false
+      texto: >-
+        No dia a dia, {a} e {b} tendem a funcionar bem como parceiros. O
+        Ascendente de um conversa com os pontos do outro, ou planetas de um caem
+        nas casas da rotina e da parceria do outro — o que costuma se traduzir
+        em convivência fácil e divisão natural de tarefas. O cuidado é não
+        tomar essa facilidade como garantida: agradecer o que funciona também
+        é manutenção.
+    media:
+      revisado: false
+      texto: >-
+        No dia a dia, {a} e {b} se ajustam em algumas coisas e precisam
+        negociar outras — horários, arrumação, tempo sozinho, vida social.
+        Nada fora do comum. Uma conversa franca sobre a rotina ideal de cada
+        um, e um acordo simples sobre quem cuida do quê, evita que pequenas
+        irritações se acumulem. Por exemplo: se um gosta da casa cheia e o
+        outro de silêncio, combinar dias de visita e dias de sossego resolve
+        boa parte das tensões antes que elas apareçam.
+    baixa:
+      revisado: false
+      texto: >-
+        No dia a dia, {a} e {b} têm ritmos e jeitos de viver diferentes, o
+        que pode gerar atrito nas pequenas coisas da convivência. É um ponto
+        de atenção prático, não amoroso. Combinados claros, espaço
+        individual em casa e paciência com os hábitos do outro costumam
+        fazer muita diferença — mais do que a gente imagina. Um exemplo:
+        decidir juntos como fica a casa no fim de semana evita a briga de
+        segunda-feira.
+
+sem_dados:
+  revisado: false
+  texto: >-
+    Esta dimensão precisa da hora de nascimento de pelo menos um de vocês (ela
+    depende do Ascendente e das casas). Com a hora, ela aparece aqui.
+
+# ---------------------------------------------------------------- o índice
+indice:
+  alta:
+    revisado: false
+    texto: >-
+      Um índice alto quer dizer que, pelo nosso método, os mapas de {a} e
+      {b} têm muitos pontos de encontro e poucos atritos fortes. É um bom
+      ponto de partida — e, como em toda relação, o que vocês fazem com ele
+      importa mais do que o número. Use as dimensões abaixo para entender de
+      onde vem essa facilidade e como protegê-la nas fases difíceis.
+  media:
+    revisado: false
+    texto: >-
+      Um índice nessa faixa quer dizer que os mapas de {a} e {b} misturam
+      facilidades e desafios, como a maioria dos casais. As dimensões abaixo
+      mostram onde vocês se encontram naturalmente e onde vale colocar
+      atenção. Nenhuma relação tem todos os encaixes; o que faz diferença é
+      saber onde estão os de vocês e cuidar dos pontos sensíveis antes que
+      eles virem briga.
+  baixa:
+    revisado: false
+    texto: >-
+      Um índice nessa faixa quer dizer que os mapas de {a} e {b} têm
+      diferenças marcantes. Diferença não é incompatibilidade: muitos casais
+      que duram têm exatamente isso, e crescem justamente por aprender com o
+      outro. As dimensões abaixo mostram onde colocar mais cuidado. Leiam
+      juntos, conversem sobre o que faz sentido e usem como ponto de
+      partida. O número não decide nada por vocês.
+
+metodo:
+  revisado: false
+  texto: >-
+    O Índice Padmini é um método próprio, não uma regra da astrologia: a
+    sinastria tradicional compara os mapas aspecto por aspecto e não tem uma
+    nota única. Nós somamos os aspectos entre os planetas de vocês em oito
+    dimensões — aspectos harmônicos somam, os tensos pesam conforme o par —,
+    damos a cada dimensão uma nota de 0 a 100 (50 é neutro) e tiramos a média.
+    Serve para organizar a leitura, não para julgar a relação.
+
+# ---------------------------------------------------------------- aspectos cruzados
+# Montados assim: "<dinamica com os temas>" + " " + "<conselho>".
+# {a} = tema do ponto da primeira pessoa (ex.: "a Vênus de Ana, o jeito de amar")
+temas:
+  sol: {revisado: false, texto: "o Sol de {nome}, o jeito de ser"}
+  lua: {revisado: false, texto: "a Lua de {nome}, o mundo emocional"}
+  mercurio: {revisado: false, texto: "o Mercúrio de {nome}, o jeito de pensar e falar"}
+  venus: {revisado: false, texto: "a Vênus de {nome}, o jeito de amar"}
+  marte: {revisado: false, texto: "o Marte de {nome}, o desejo e a iniciativa"}
+  jupiter: {revisado: false, texto: "o Júpiter de {nome}, a confiança e a generosidade"}
+  saturno: {revisado: false, texto: "o Saturno de {nome}, a seriedade e os limites"}
+  ascendente: {revisado: false, texto: "o Ascendente de {nome}, o jeito de se apresentar"}
+
+dinamica:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Quando {a}, encontra {b}, os dois se fundem: um sente com intensidade o
+      que o outro faz nessa área, para o bem e para o exagero.
+  sextil:
+    revisado: false
+    texto: >-
+      Entre {a}, e {b}, há uma porta aberta: vocês se ajudam com facilidade
+      nessa área quando decidem usar isso.
+  quadratura:
+    revisado: false
+    texto: >-
+      Entre {a}, e {b}, há atrito: o que um faz nessa área pode incomodar ou
+      desafiar o outro, e é aí que costumam surgir as discussões — e também o
+      crescimento.
+  trigono:
+    revisado: false
+    texto: >-
+      Entre {a}, e {b}, as coisas fluem: nessa área vocês se entendem quase
+      sem esforço.
+  oposicao:
+    revisado: false
+    texto: >-
+      {a}, e {b}, ficam em lados opostos: vocês se atraem e se completam, mas
+      também podem puxar a corda cada um para o seu lado.
+
+conselho:
+  conjuncao:
+    revisado: false
+    texto: Dosar essa intensidade juntos faz dela uma força do casal.
+  sextil:
+    revisado: false
+    texto: É um recurso para usar de propósito, especialmente em fases difíceis.
+  quadratura:
+    revisado: false
+    texto: >-
+      Reconhecer esse ponto sensível e combinar como lidar com ele tira muito
+      do peso das brigas.
+  trigono:
+    revisado: false
+    texto: Vale valorizar esse encaixe e não tomá-lo como garantido.
+  oposicao:
+    revisado: false
+    texto: O equilíbrio vem de enxergar a diferença como complemento, não como disputa.
+
+# ---------------------------------------------------------------- sobreposição de casas
+# "Os planetas de {quem} caem na casa N de {de_quem}". Um texto por casa.
+casas:
+  1:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 1 de {de_quem}, {quem} tende a
+      mexer diretamente com a forma como {de_quem} se vê e se mostra. A
+      presença de {quem} é notada de imediato e pode despertar em {de_quem}
+      um jeito novo de se apresentar ao mundo. O cuidado é {quem} não querer
+      moldar {de_quem} à sua imagem. Um exemplo: {de_quem} pode começar a se
+      vestir ou a se colocar de um jeito que {quem} inspirou.
+  2:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 2 de {de_quem}, a relação toca o
+      senso de segurança e os valores de {de_quem}. {quem} pode influenciar o
+      que {de_quem} considera importante e o jeito de cuidar do que é seu.
+      Conversas claras sobre prioridades e sobre o que é de cada um fazem
+      essa troca ser boa para os dois.
+  3:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 3 de {de_quem}, a conversa é um
+      ponto forte da relação. {quem} estimula as ideias de {de_quem}, e os
+      dois tendem a trocar mensagens, indicações de leitura e opiniões com
+      frequência. O cuidado é não deixar a troca virar só debate: ouvir
+      tanto quanto falar. Um exemplo comum: vocês descobrem juntos um
+      assunto novo e não param de falar dele.
+  4:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 4 de {de_quem}, {de_quem} tende
+      a sentir {quem} como família, como casa. A relação mexe com raízes,
+      memórias e a vontade de construir um lar. É um encaixe acolhedor, que
+      pede atenção para não repetir sem perceber padrões antigos da família
+      de cada um. Um exemplo: {de_quem} pode sentir vontade de apresentar
+      {quem} à família logo cedo.
+  5:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 5 de {de_quem}, a relação tem
+      muito de romance, diversão e criatividade. {quem} desperta em
+      {de_quem} o lado brincalhão e apaixonado. É uma posição clássica de
+      namoro gostoso. O cuidado é manter essa leveza também quando a rotina
+      e as responsabilidades apertarem. Programas de lazer, hobbies em comum
+      e até projetos criativos a dois costumam dar certo aqui.
+  6:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 6 de {de_quem}, a relação se
+      expressa muito no cotidiano: rotina, tarefas, cuidados práticos.
+      {quem} tende a influenciar os hábitos de {de_quem} e a ajudar de forma
+      concreta. O cuidado é o cuidado virar cobrança: combinar a divisão das
+      tarefas evita o desgaste. Um exemplo: {quem} pode ajudar {de_quem} a
+      criar uma rotina de exercícios ou organizar a agenda.
+  7:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 7 de {de_quem}, {de_quem} tende
+      a ver em {quem} um parceiro, alguém com quem faz sentido formar uma
+      dupla. É uma das posições mais associadas a relações sérias. O cuidado
+      é não projetar em {quem} expectativas que ele ou ela não combinou de
+      cumprir. Conversar sobre o que cada um espera da parceria ajuda muito.
+  8:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 8 de {de_quem}, a relação tem
+      intensidade e profundidade. {quem} mexe com as camadas mais íntimas de
+      {de_quem}, e o vínculo pode ser transformador. O cuidado é com o ciúme
+      e com disputas de controle; confiança construída aos poucos é o que dá
+      segurança a essa intensidade. Conversas francas sobre intimidade e
+      sobre o que é compartilhado são especialmente importantes aqui.
+  9:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 9 de {de_quem}, {quem} amplia
+      os horizontes de {de_quem}: viagens, estudos, novas ideias e novas
+      formas de ver a vida. A relação tem um quê de aventura e de
+      aprendizado. O cuidado é respeitar as crenças de cada um, mesmo quando
+      elas diferem. Uma viagem a dois ou um curso feito juntos costuma
+      aproximar muito.
+  10:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 10 de {de_quem}, a relação toca
+      a carreira e a vida pública de {de_quem}. {quem} pode incentivar os
+      planos profissionais de {de_quem} ou influenciar como {de_quem} é
+      visto. O cuidado é o apoio não virar pressão por resultados. Um
+      exemplo: {quem} pode ser quem encoraja {de_quem} a pedir aquela
+      promoção ou mudar de área. Comemorar as conquistas de {de_quem}
+      fortalece a parceria.
+  11:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 11 de {de_quem}, a amizade é
+      uma base forte da relação. Os dois tendem a compartilhar amigos,
+      projetos e sonhos para o futuro, e {quem} se sente como um parceiro de
+      caminhada. O cuidado é reservar também tempo só a dois, longe do
+      grupo. Um exemplo: vocês podem ter se conhecido num grupo de amigos ou
+      num projeto em comum.
+  12:
+    revisado: false
+    texto: >-
+      Quando planetas de {quem} caem na casa 12 de {de_quem}, a ligação tem
+      algo de sutil, quase difícil de explicar. {quem} toca o mundo interior
+      de {de_quem}, às vezes despertando empatia profunda, às vezes
+      confusão. O cuidado é conversar abertamente sobre o que é sentido,
+      para que nada fique no não dito. Momentos de silêncio compartilhado,
+      música ou espiritualidade podem ser especialmente fortes para vocês.
