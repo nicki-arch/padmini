@@ -16,6 +16,8 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       # Valores definidos no dashboard da Render (sync: false = não versionado aqui).
+      - key: PADMINI_SISTEMA  # versão no ar: vedica (padrão) ou ocidental — ver sistema.py
+        sync: false
       - key: PADMINI_CONTEUDO_TOKEN  # token de leitura do repo privado nicki-arch/padmini-conteudo (ver build.sh)
         sync: false
       - key: ANTHROPIC_API_KEY   # texto por IA (opcional)

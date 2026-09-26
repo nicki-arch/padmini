@@ -40,6 +40,7 @@ import limites
 import marketing
 import ofertas
 import seguranca
+import sistema
 import textos
 from gerar_pdf import gerar_pdf
 from montar_texto import (
@@ -64,6 +65,12 @@ async def _ciclo_de_vida(_app):
 
 
 log = logging.getLogger("padmini.app")
+
+# Qual versão do site está no ar (PADMINI_SISTEMA, ver sistema.py). Lido aqui,
+# na subida: valor desconhecido derruba a subida com erro claro, em vez de pôr
+# no ar um site meio montado.
+SISTEMA_NA_SUBIDA = sistema.ativo()
+log.info("Padmini subindo com PADMINI_SISTEMA=%s", SISTEMA_NA_SUBIDA)
 
 app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
 # Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy) em toda resposta.
@@ -157,10 +164,10 @@ def _captura_ligada() -> bool:
     return os.environ.get("PADMINI_CAPTURA") == "1"
 
 
-_paginas_prontas: dict[str, str] = {}
+_paginas_prontas: dict[tuple[str, str], str] = {}
 
 # As páginas são templates: o texto vem de `conteudo/<pagina>.yaml` e o preço de
-# `conteudo/ofertas.yaml`. Montado no servidor, e não por JavaScript, para o
+# `conteudo/<versão>/ofertas.yaml`. Montado no servidor, e não por JavaScript, para o
 # conteúdo já sair no HTML (com fetch, o bloco de preço apareceria vazio até a
 # resposta chegar) e para o buscador ver a página inteira.
 # autoescape desligado: o texto é escrito por nós e pode ter <em>/<strong>
@@ -173,18 +180,33 @@ _jinja = jinja2.Environment(
 )
 
 
-def _pagina(arquivo: str) -> Response:
-    """Serve uma página montada. O resultado fica em memória: os arquivos só
-    mudam em deploy, que reinicia o processo."""
-    if arquivo not in _paginas_prontas:
-        _paginas_prontas[arquivo] = _jinja.get_template(arquivo).render(
-            t=textos.da_pagina(arquivo.removesuffix(".html")),
-            ofertas=ofertas.OFERTAS,
+def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:
+    """Serve uma página montada de uma versão do site. O resultado fica em
+    memória: os arquivos só mudam em deploy, que reinicia o processo."""
+    if (versao, arquivo) not in _paginas_prontas:
+        _paginas_prontas[(versao, arquivo)] = _jinja.get_template(arquivo).render(
+            t=textos.da_pagina(pagina, versao),
+            ofertas=ofertas.do_sistema(versao),
         )
-    return Response(_paginas_prontas[arquivo], media_type="text/html; charset=utf-8")
+    return Response(_paginas_prontas[(versao, arquivo)], media_type="text/html; charset=utf-8")
 
 
-def _pagina_ou_lista(request: Request, arquivo: str):
+def _pagina(rota: str, versao: str | None = None) -> Response:
+    """A página de `rota` ("/", "/mapa"...) na versão pedida (padrão: a do ar)."""
+    versao = versao or sistema.ativo()
+    arquivo, pagina = sistema.pagina(rota, versao)
+    return _pagina_montada(arquivo, versao, pagina)
+
+
+def _versao_do_pedido(request: Request) -> str:
+    """Link de entrega (com `token`) abre na versão do token, qualquer que seja a
+    versão no ar: quem comprou a védica continua lendo a védica, e vice-versa."""
+    if "token" in request.query_params:
+        return acesso.sistema_do_token(request.query_params.get("token"))
+    return sistema.ativo()
+
+
+def _pagina_ou_lista(request: Request, rota: str):
     chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
     previa_url = request.query_params.get("previa", "")
     liberado = (not _captura_ligada()
@@ -195,7 +217,7 @@ def _pagina_ou_lista(request: Request, arquivo: str):
         if request.url.query:
             destino += "?" + request.url.query  # mantém ref/utm do afiliado
         return RedirectResponse(destino, status_code=302)
-    resp = _pagina(arquivo)
+    resp = _pagina(rota, _versao_do_pedido(request))
     if chave and previa_url == chave:
         resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
                         secure=request.url.scheme == "https", samesite="lax")
@@ -204,22 +226,22 @@ def _pagina_ou_lista(request: Request, arquivo: str):
 
 @app.api_route("/", methods=["GET", "HEAD"])
 def pagina_home(request: Request):
-    return _pagina_ou_lista(request, "home.html")
+    return _pagina_ou_lista(request, "/")
 
 
 @app.api_route("/mapa", methods=["GET", "HEAD"])
 def pagina_mapa(request: Request):
-    return _pagina_ou_lista(request, "index.html")
+    return _pagina_ou_lista(request, "/mapa")
 
 
 @app.api_route("/compatibilidade", methods=["GET", "HEAD"])
 def pagina_compatibilidade(request: Request):
-    return _pagina_ou_lista(request, "compatibilidade.html")
+    return _pagina_ou_lista(request, "/compatibilidade")
 
 
 @app.api_route("/lista", methods=["GET", "HEAD"])
 def pagina_lista():
-    return _pagina("lista.html")
+    return _pagina("/lista")
 
 
 class Inscricao(BaseModel):
@@ -288,7 +310,10 @@ class SenhaLive(BaseModel):
 
 @app.get("/live")
 def pagina_live():
-    return FileResponse(RAIZ / "static" / "live.html")
+    versao = sistema.ativo()
+    if versao == "vedica":
+        return FileResponse(RAIZ / "static" / sistema.LIVE[versao])
+    return _pagina_montada(sistema.LIVE[versao], versao, "live")
 
 
 @app.get("/api/live/sessao")
@@ -334,9 +359,10 @@ def live_token_mapa(pedido: PedidoMapa, request: Request):
     _exigir_live(request)
     _validar_datetime(pedido.data, pedido.hora)
     chave = acesso.chave_mapa(pedido.data.isoformat(), pedido.hora, pedido.lat, pedido.lon)
-    db.registrar_live("mapa", pedido.nome.strip(), pedido.cidade,
+    versao = sistema.ativo()
+    db.registrar_live(_rotulo_produto("mapa", versao), pedido.nome.strip(), pedido.cidade,
                       f"{pedido.data.isoformat()} {pedido.hora}")
-    return {"token": acesso.emitir_token("mapa", chave)}
+    return {"token": acesso.emitir_token("mapa", chave, versao)}
 
 
 @app.post("/api/live/token/compat")
@@ -347,9 +373,17 @@ def live_token_compat(pedido: PedidoCompatibilidade, request: Request):
     chave = acesso.chave_compat(
         (pedido.a.data.isoformat(), pedido.a.hora, pedido.a.lat, pedido.a.lon),
         (pedido.b.data.isoformat(), pedido.b.hora, pedido.b.lat, pedido.b.lon))
-    db.registrar_live("compat", f"{pedido.a.nome.strip()} & {pedido.b.nome.strip()}".strip(" &"),
+    versao = sistema.ativo()
+    db.registrar_live(_rotulo_produto("compat", versao),
+                      f"{pedido.a.nome.strip()} & {pedido.b.nome.strip()}".strip(" &"),
                       pedido.a.cidade, f"{pedido.a.data.isoformat()} / {pedido.b.data.isoformat()}")
-    return {"token": acesso.emitir_token("compat", chave)}
+    return {"token": acesso.emitir_token("compat", chave, versao)}
+
+
+def _rotulo_produto(produto: str, versao: str) -> str:
+    """Como o produto vai para o banco: 'mapa' na védica (como sempre foi),
+    'ocidental:mapa' na ocidental."""
+    return produto if versao == "vedica" else f"{versao}:{produto}"
 
 
 @app.api_route("/robots.txt", methods=["GET", "HEAD"])
@@ -409,6 +443,7 @@ def saude():
 @app.get("/api/config")
 def config():
     return {
+        "sistema": sistema.ativo(),
         "texto_ia_disponivel": bool(os.environ.get("ANTHROPIC_API_KEY")),
         # Métricas de funil (PostHog). Em branco = desligado (nada é carregado).
         "posthog_key": os.environ.get("PADMINI_POSTHOG_KEY", ""),
@@ -634,6 +669,9 @@ def _processar_pedido(evento: dict) -> dict:
 
     pd = cakto.coletar_pd(evento)
     produto = cakto.produto_do_evento(evento, pd)
+    # versão do site da oferta paga (não a que está no ar): uma compra feita
+    # antes da troca de PADMINI_SISTEMA é entregue na versão comprada
+    versao = cakto.sistema_pago(evento) or "vedica"
     email = cakto.email_do_evento(evento)
     if produto not in ("mapa", "compat"):
         # Pagou, mas não dá para entregar com segurança: a oferta paga não foi
@@ -653,8 +691,9 @@ def _processar_pedido(evento: dict) -> dict:
         # Pagou, mas o `sck` não trouxe os dados de nascimento: não dá para gerar.
         # Grava o pedido sem link (aparece no banco para entrega manual) e responde
         # 200 — a Cakto não reenvia respostas de erro, então 422 não ajudaria.
-        db.registrar_pedido(evento, produto, {}, email, None, False)
-        _alertar_pendente(evento, produto, email, "sck sem os dados de nascimento", pd)
+        db.registrar_pedido(evento, _rotulo_produto(produto, versao), {}, email, None, False)
+        _alertar_pendente(evento, _rotulo_produto(produto, versao), email,
+                          "sck sem os dados de nascimento", pd)
         return {"ok": True, "produto": produto, "email": email or None,
                 "pendente": "dados de nascimento ausentes — entregar manualmente"}
 
@@ -663,19 +702,20 @@ def _processar_pedido(evento: dict) -> dict:
     if db.pedido_entregue(cakto_id):
         return {"ok": True, "produto": produto, "duplicado": True}
 
-    link = entrega.link_completo(produto, dados)
+    link = entrega.link_completo(produto, dados, versao)
     try:
-        extra = marketing.bloco_venda_cruzada(produto, dados)
+        extra = marketing.bloco_venda_cruzada(produto, dados, versao)
     except Exception:  # noqa: BLE001  (a oferta extra nunca pode travar a entrega)
         log.exception("venda cruzada: falha ao montar o bloco")
         extra = ""
     enviado = entrega.enviar_email(
         email, "Seu relatório Padmini está pronto",
-        entrega.email_completo_html(produto, link, dados.get("nome", ""), extra))
-    db.registrar_pedido(evento, produto, dados, email, link, enviado)
+        entrega.email_completo_html(produto, link, dados.get("nome", ""), extra, versao))
+    db.registrar_pedido(evento, _rotulo_produto(produto, versao), dados, email, link, enviado)
     if not enviado:
         alertas.alertar("E-mail de entrega NÃO saiu — mandar o link à mão",
-                        f"pedido {cakto_id} · {produto} · {email or '(sem e-mail)'}\nlink: {link}")
+                        f"pedido {cakto_id} · {_rotulo_produto(produto, versao)} · "
+                        f"{email or '(sem e-mail)'}\nlink: {link}")
     # se não enviou (Resend não configurado), devolve o link para envio manual
     return {"ok": True, "produto": produto, "email": email or None,
             "email_enviado": enviado, "link": None if enviado else link}

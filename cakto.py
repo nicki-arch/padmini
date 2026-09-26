@@ -26,7 +26,9 @@ checkout realmente chega ao webhook preenchido (a doc lista o campo no payload,
 mas não documenta explicitamente como defini-lo na URL).
 
 Como identificamos o produto: pelo que a Cakto diz que foi pago — código da
-oferta (offer.id / checkoutUrl, vindo de conteudo/ofertas.yaml) ou id do produto
+oferta (offer.id / checkoutUrl, vindo de conteudo/<versão>/ofertas.yaml; as
+ofertas das duas versões do site são reconhecidas, e a oferta diz também de
+qual versão entregar) ou id do produto
 mapeado em PADMINI_CAKTO_PROD_MAPA/_COMPAT. O `sck` NÃO decide o produto (o
 comprador pode editá-lo); se ele disser outra coisa, o pedido vira entrega manual.
 """
@@ -239,15 +241,34 @@ def email_do_evento(evento: dict) -> str:
 # Oferta de cada produto — é o código no link do checkout
 # (pay.cakto.com.br/39dhqty_1125341 → "39dhqty"). Serve de rede de segurança
 # para identificar o produto quando o `sck` não vier. Confirmado na 1ª compra real.
-# Vem de `conteudo/ofertas.yaml` (mesmo link que o site usa no botão de compra),
+# Vem de `conteudo/vedica/ofertas.yaml` (mesmo link que o site usa no botão de compra),
 # para não existir um código aqui e outro lá.
 OFERTA_MAPA = os.environ.get("PADMINI_CAKTO_OFERTA_MAPA") or ofertas.codigo("mapa")
 OFERTA_COMPAT = os.environ.get("PADMINI_CAKTO_OFERTA_COMPAT") or ofertas.codigo("compat")
 
 
-def produto_pago(evento: dict) -> str:
+def _codigos_das_ofertas() -> dict:
+    """{código da oferta: (versão, produto)} das DUAS versões do site.
+
+    O webhook reconhece as ofertas de todas as versões, qualquer que seja a
+    que está no ar: uma compra feita minutos antes da troca de PADMINI_SISTEMA
+    precisa ser entregue (e na versão que foi comprada). As variáveis
+    PADMINI_CAKTO_OFERTA_MAPA/_COMPAT continuam valendo para a védica."""
+    tabela = {}
+    for sistema, chave, oferta in ofertas.todas_as_ofertas():
+        if chave in ("mapa", "compat") and oferta.get("codigo"):
+            tabela[oferta["codigo"]] = (sistema, chave)
+    if OFERTA_MAPA:
+        tabela[OFERTA_MAPA] = ("vedica", "mapa")
+    if OFERTA_COMPAT:
+        tabela[OFERTA_COMPAT] = ("vedica", "compat")
+    return tabela
+
+
+def oferta_paga(evento: dict) -> tuple[str, str]:
     """
-    Produto que a Cakto diz que foi PAGO ('mapa' | 'compat' | '').
+    (versão, produto) que a Cakto diz que foi PAGO — ex.: ('vedica', 'mapa').
+    ('', '') se não reconhecer.
 
     Só olha campos que a Cakto preenche (product.id/short_id, offer.id,
     checkoutUrl) — nunca o `sck`, que é montado no navegador do comprador e
@@ -255,25 +276,37 @@ def produto_pago(evento: dict) -> str:
     """
     d = evento.get("data") if isinstance(evento, dict) else None
     if not isinstance(d, dict):
-        return ""
+        return "", ""
     prod = d.get("product") if isinstance(d.get("product"), dict) else {}
     oferta = d.get("offer") if isinstance(d.get("offer"), dict) else {}
     ids_produto = {str(prod.get("id") or ""), str(prod.get("short_id") or "")} - {""}
     if PROD_MAPA and PROD_MAPA in ids_produto:
-        return "mapa"
+        return "vedica", "mapa"
     if PROD_COMPAT and PROD_COMPAT in ids_produto:
-        return "compat"
+        return "vedica", "compat"
     codigos = {str(oferta.get("id") or "")}
     url = str(d.get("checkoutUrl") or "")
     if url:
         # ex.: https://pay.cakto.com.br/39dhqty_1125341?callback=... → "39dhqty"
         codigos.add(url.split("?", 1)[0].rstrip("/").rsplit("/", 1)[-1])
     codigos = {c.split("_")[0] for c in codigos if c}
-    if OFERTA_MAPA and OFERTA_MAPA in codigos:
-        return "mapa"
-    if OFERTA_COMPAT and OFERTA_COMPAT in codigos:
-        return "compat"
-    return ""
+    tabela = _codigos_das_ofertas()
+    # ordem fixa (a do código da oferta, depois o do link) para o resultado não
+    # depender da ordem de um set
+    for codigo in sorted(codigos, key=lambda c: c != str(oferta.get("id") or "").split("_")[0]):
+        if codigo in tabela:
+            return tabela[codigo]
+    return "", ""
+
+
+def produto_pago(evento: dict) -> str:
+    """Produto que a Cakto diz que foi PAGO ('mapa' | 'compat' | ''), de qualquer versão."""
+    return oferta_paga(evento)[1]
+
+
+def sistema_pago(evento: dict) -> str:
+    """Versão do site da oferta paga ('vedica' | 'ocidental' | '')."""
+    return oferta_paga(evento)[0]
 
 
 def produto_do_evento(evento: dict, pd: dict) -> str:

@@ -116,12 +116,25 @@ def _():
     return st == 200 and "inválido".encode() in corpo
 
 
+def _raiz():
+    import pathlib
+    return pathlib.Path(__file__).resolve().parents[1]
+
+
+def _ofertas_do_yaml(versao: str) -> dict:
+    import yaml
+    return yaml.safe_load((_raiz() / "conteudo" / versao / "ofertas.yaml").read_text(encoding="utf-8")) or {}
+
+
+def _versao_no_ar() -> str:
+    """PADMINI_SISTEMA do site publicado (vedica | ocidental), via /api/config."""
+    st, corpo = req("/api/config")
+    return (json.loads(corpo).get("sistema") if st == 200 else "") or "vedica"
+
+
 @checar("página do casal mostra o preço do ofertas.yaml")
 def _():
-    import pathlib
-    import yaml
-    raiz = pathlib.Path(__file__).resolve().parents[1]
-    preco = yaml.safe_load((raiz / "conteudo" / "ofertas.yaml").read_text(encoding="utf-8"))["compat"]["preco"]
+    preco = _ofertas_do_yaml(_versao_no_ar())["compat"]["preco"]
     return f"relatório completo por <b>R${preco}</b>".encode() in req("/compatibilidade")[1]
 
 
@@ -177,16 +190,11 @@ def conferir_precos_na_cakto(ofertas: dict, baixar=None) -> list:
     return falhas
 
 
-def _ofertas_do_yaml() -> dict:
-    import pathlib
-    import yaml
-    raiz = pathlib.Path(__file__).resolve().parents[1]
-    return yaml.safe_load((raiz / "conteudo" / "ofertas.yaml").read_text(encoding="utf-8")) or {}
-
-
-@checar("preço do ofertas.yaml bate com o que a Cakto cobra")
+@checar("preço do ofertas.yaml bate com o que a Cakto cobra (as duas versões)")
 def _():
-    falhas = conferir_precos_na_cakto(_ofertas_do_yaml())
+    falhas = []
+    for versao in ("vedica", "ocidental"):
+        falhas += [f"[{versao}] {f}" for f in conferir_precos_na_cakto(_ofertas_do_yaml(versao))]
     for f in falhas:
         print("      ", f)
     return not falhas

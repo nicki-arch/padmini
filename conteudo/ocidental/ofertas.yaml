@@ -1,0 +1,19 @@
+# Padmini (versão OCIDENTAL) — preços e links de checkout. FONTE ÚNICA.
+#
+# Mesmo formato do conteudo/vedica/ofertas.yaml. Estas ofertas são OUTRAS na
+# Cakto (o código no link é o que diz ao webhook que a compra foi da versão
+# ocidental). Enquanto `checkout` estiver vazio, o botão de compra fica
+# desativado ("em breve") e o webhook não reconhece nada desta versão.
+#
+# Para ligar: criar a oferta na Cakto, colar aqui o link de Produto → Checkout
+# e fazer o deploy (é um PR comum). Só depois trocar PADMINI_SISTEMA.
+
+mapa:
+  nome: Mapa Natal completo
+  preco: 47
+  checkout: ""
+
+compat:
+  nome: Sinastria do casal
+  preco: 127
+  checkout: ""
