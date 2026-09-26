@@ -42,3 +42,48 @@ def test_cakto_fora_do_ar_avisa_sem_reprovar():
     ofertas = {"compat": {"preco": 127, "checkout": "https://pay.cakto.com.br/x_1"}}
     assert smoke.conferir_precos_na_cakto(ofertas, baixar=fora) == []
     assert smoke.AVISOS and "não respondeu" in smoke.AVISOS[0]
+
+
+# ---------------------------------------------------------------------------
+# O smoke inteiro contra o app local, nas duas versões (sem rede: a conferência
+# com a Cakto e os cabeçalhos HTTPS ficam de fora).
+# ---------------------------------------------------------------------------
+import pytest  # noqa: E402
+
+from test_app import app_mod, cliente  # noqa: E402
+
+SEM_REDE = ("preço do ofertas.yaml bate", "cabeçalhos de segurança")
+# Com a ocidental no ar e sem links de checkout (hoje), os botões ficam "em breve":
+# o smoke acusa — é exatamente o bloqueio que precisa sumir antes da virada.
+SO_COM_LINKS = ("botões de compra",)
+
+
+def _req_local(caminho, corpo=None, timeout=90):
+    r = cliente.post(caminho, json=corpo) if corpo is not None else cliente.get(caminho)
+    return r.status_code, r.content
+
+
+@pytest.mark.parametrize("versao", ["vedica", "ocidental"])
+def test_smoke_passa_no_app_local(versao, monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", versao)
+    monkeypatch.setattr(smoke, "req", _req_local)
+    app_mod._paginas_prontas.clear()
+    falhas = []
+    try:
+        for nome, f in smoke.CHECAGENS:
+            if any(t in nome for t in SEM_REDE):
+                continue
+            if versao == "ocidental" and any(t in nome for t in SO_COM_LINKS):
+                assert not f(), f"{nome}: deveria acusar a falta de link de checkout"
+                continue
+            if not f():
+                falhas.append(nome)
+    finally:
+        app_mod._paginas_prontas.clear()
+    assert falhas == []
+
+
+def test_smoke_cobre_os_4_produtos():
+    nomes = " ".join(n for n, _ in smoke.CHECAGENS)
+    for trecho in ("amostras dos 4 produtos", "completos e PDFs dos 4 produtos", "numerologia e tarot"):
+        assert trecho in nomes

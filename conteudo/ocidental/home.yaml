@@ -1,21 +1,23 @@
 # Padmini (versão OCIDENTAL) — texto da home. FONTE ÚNICA da copy desta página,
 # inclusive o <head> (título e descrição para buscador e redes).
 # Mesma estrutura do conteudo/vedica/home.yaml; o desenho está em
-# static/ocidental/home.html. Rodada 1: mapa natal + sinastria. A home com os
-# quatro produtos (mapa, casal, numerologia, tarot) é a Fase 5.
+# static/ocidental/home.html. Quatro produtos: sinastria, mapa natal,
+# numerologia e tarot (rodada 2).
 # Preço NÃO fica aqui: conteudo/ocidental/ofertas.yaml.
 
 seo:
   titulo: Padmini — Astrologia para autoconhecimento
   descricao: >-
-    Seu mapa natal e a sinastria do casal: Sol, Lua, Ascendente, planetas e
-    aspectos, cruzados em 8 dimensões. Amostra grátis.
+    Sinastria do casal, mapa natal, numerologia e tarot. Astrologia para
+    autoconhecimento, com amostra grátis em todos.
   og_titulo: A sinastria de vocês dois — Padmini
   og_descricao: Os dois mapas natais cruzados em 8 dimensões. Amostra grátis.
 
 menu:
   compatibilidade: Sinastria do casal
   mapa: Mapa natal
+  numerologia: Numerologia
+  tarot: Tarot
 
 hero:
   eyebrow: Padmini · Astrologia para autoconhecimento
@@ -95,7 +97,7 @@ card_exemplo:
 
 produtos:
   titulo: Escolha por onde começar
-  sub: Os dois têm amostra grátis. Você só paga se quiser o relatório completo.
+  sub: Todos têm amostra grátis. Você só paga se quiser o relatório completo.
   compat:
     etiqueta: Para o casal
     titulo: Sinastria
@@ -110,7 +112,22 @@ produtos:
       Sol, Lua e Ascendente, todos os planetas em signos e casas, os aspectos
       e o PDF para guardar.
     botao: Fazer meu mapa →
-
+  numerologia:
+    etiqueta: Pelo seu nome
+    titulo: Numerologia
+    texto: >-
+      Caminho de Vida, Expressão, Alma, Personalidade, o talento do dia de
+      nascimento e o seu Ano Pessoal. Só precisa do nome e da data.
+    botao: Ver meus números →
+  tarot:
+    etiqueta: Para agora
+    titulo: Tarot
+    texto: >-
+      Três cartas — Situação, Desafio e Conselho — para pensar no que você
+      está vivendo. Com uma pergunta, se quiser.
+    botao: Tirar as cartas →
+  combo: >-
+    Sinastria com os mapas natais dos dois:
 # Texto confirmado pelo Nicolas em 26/set/2026.
 tradicao:
   titulo: Uma tradição de família
@@ -140,6 +157,14 @@ faq:
       resposta: >-
         Índice baixo não condena nada. Ele mostra onde vocês são diferentes em
         coisas que importam — e o completo explica como lidar com isso.
+    - pergunta: Qual nome eu uso na numerologia?
+      resposta: >-
+        O nome completo de registro, como está na certidão de nascimento, mesmo
+        que hoje você use outro. Cada letra entra na conta.
+    - pergunta: O tarot prevê o futuro?
+      resposta: >-
+        Não. As cartas são um espelho para pensar no momento: mostram o cenário,
+        o que pede atenção e uma direção possível. Quem decide é você.
 
 fechamento:
   titulo: Descubram juntos.

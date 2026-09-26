@@ -134,8 +134,58 @@ def _versao_no_ar() -> str:
 
 @checar("página do casal mostra o preço do ofertas.yaml")
 def _():
+    import re
     preco = _ofertas_do_yaml(_versao_no_ar())["compat"]["preco"]
-    return f"relatório completo por <b>R${preco}</b>".encode() in req("/compatibilidade")[1]
+    return re.search(rf"relatório completo por <b[^>]*>R\${preco}</b>".encode(), req("/compatibilidade")[1]) is not None
+
+
+# ---------------------------------------------------------------------------
+# Versão ocidental. A API dela fica publicada qualquer que seja a versão no ar
+# (links já entregues nunca quebram), então é conferida SEMPRE; as páginas de
+# numerologia e tarot só existem com a ocidental no ar (com a védica, 404).
+# ---------------------------------------------------------------------------
+NUMEROLOGIA = {"nome": "Smoke da Silva", "data": "1990-05-15"}
+
+
+@checar("[ocidental] amostras dos 4 produtos saem grátis")
+def _():
+    tiragem = req("/api/ocidental/tarot/tirar", {})
+    return (req("/api/ocidental/mapa", {**PESSOA, "nivel": "amostra"})[0] == 200
+            and req("/api/ocidental/sinastria", {"a": PESSOA, "b": PESSOA_B, "nivel": "amostra"})[0] == 200
+            and req("/api/ocidental/numerologia", {**NUMEROLOGIA, "nivel": "amostra"})[0] == 200
+            and tiragem[0] == 200 and len(json.loads(tiragem[1])["cartas"]) == 3)
+
+
+@checar("[ocidental] completos e PDFs dos 4 produtos trancados sem token (402)")
+def _():
+    t = json.loads(req("/api/ocidental/tarot/tirar", {})[1])["tiragem"]
+    return all(req(c, corpo)[0] == 402 for c, corpo in [
+        ("/api/ocidental/mapa", {**PESSOA, "nivel": "completo"}),
+        ("/api/ocidental/pdf", {**PESSOA, "nivel": "completo"}),
+        ("/api/ocidental/sinastria", {"a": PESSOA, "b": PESSOA_B, "nivel": "completo"}),
+        ("/api/ocidental/numerologia", {**NUMEROLOGIA, "nivel": "completo"}),
+        ("/api/ocidental/numerologia/pdf", {**NUMEROLOGIA, "nivel": "completo"}),
+        ("/api/ocidental/tarot", {"tiragem": t, "nivel": "completo"}),
+        ("/api/ocidental/tarot/pdf", {"tiragem": t, "nivel": "completo"}),
+    ])
+
+
+@checar("[ocidental] tiragem de tarot inventada é recusada (422)")
+def _():
+    return req("/api/ocidental/tarot", {"tiragem": "AAAAAAAAAAAAAAAA"})[0] == 422
+
+
+@checar("páginas de numerologia e tarot: 200 com a ocidental no ar, 404 com a védica")
+def _():
+    esperado = 200 if _versao_no_ar() == "ocidental" else 404
+    return req("/numerologia")[0] == esperado and req("/tarot")[0] == esperado
+
+
+@checar("[ocidental no ar] botões de compra dos 4 produtos apontam para a Cakto")
+def _():
+    if _versao_no_ar() != "ocidental":
+        return True  # só vale com a ocidental no ar (a védica é conferida acima)
+    return all(b"pay.cakto.com.br" in req(p)[1] for p in ("/mapa", "/compatibilidade", "/numerologia", "/tarot"))
 
 
 # ---------------------------------------------------------------------------
