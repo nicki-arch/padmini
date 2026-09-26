@@ -1,0 +1,1557 @@
+{
+ "_leia": "Mapas de referência da versão ocidental (Fase 1). Valores COPIADOS da fonte, não calculados por nós: horoscopes.astro-seek.com (Birth Chart Calculator), consultado em 26/set/2026 com: zodíaco tropical, casas Placidus, 'Lunar Nodes (True)', fuso 'Auto' (a fonte resolve o fuso e o horário de verão pelas coordenadas). A URL exata de cada mapa está em `fonte` — abrir a URL mostra os mesmos números. `fonte_mostra` é o que a página diz sobre hora local, UT e fuso. Graus no formato da fonte (graus, minutos, segundos dentro do signo). Teste: testes/test_mapa_ocidental.py (tolerância de 1 minuto de arco).",
+ "consultado_em": "2026-09-26",
+ "mapas": [
+  {
+   "id": "sp-1990",
+   "cidade": "Sao Paulo, Brazil",
+   "data": "1990-05-15",
+   "hora": "14:30",
+   "lat_gm": [
+    23,
+    33,
+    "S"
+   ],
+   "lon_gm": [
+    46,
+    38,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=15&narozeni_mesic=5&narozeni_rok=1990&narozeni_hodina=14&narozeni_minuta=30&narozeni_sekunda=00&narozeni_city=Sao+Paulo%2C+Brazil&narozeni_sirka_stupne=23&narozeni_sirka_minuty=33&narozeni_sirka_smer=1&narozeni_delka_stupne=46&narozeni_delka_minuty=38&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "14:30 (-03)",
+    "ut": "15 May 1990 - 17:30 (+3:00:0h)",
+    "fuso": "America/Sao_Paulo - -03"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Taurus",
+     "grau": "24°37’01’’",
+     "casa": "8",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Capricorn",
+     "grau": "29°59’58’’",
+     "casa": "5",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Taurus",
+     "grau": "7°59’12’’",
+     "casa": "8",
+     "movimento": "Retrograde"
+    },
+    "Venus": {
+     "signo": "Aries",
+     "grau": "13°04’47’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Pisces",
+     "grau": "18°30’14’’",
+     "casa": "6",
+     "movimento": "Direct"
+    },
+    "Jupiter": {
+     "signo": "Cancer",
+     "grau": "9°35’06’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Saturn": {
+     "signo": "Capricorn",
+     "grau": "25°14’43’’",
+     "casa": "5",
+     "movimento": "Retrograde"
+    },
+    "Uranus": {
+     "signo": "Capricorn",
+     "grau": "9°10’41’’",
+     "casa": "4",
+     "movimento": "Retrograde"
+    },
+    "Neptune": {
+     "signo": "Capricorn",
+     "grau": "14°20’58’’",
+     "casa": "4",
+     "movimento": "Retrograde"
+    },
+    "Pluto": {
+     "signo": "Scorpio",
+     "grau": "16°09’39’’",
+     "casa": "2",
+     "movimento": "Retrograde"
+    },
+    "Node": {
+     "signo": "Aquarius",
+     "grau": "10°15’12’’",
+     "casa": "5",
+     "movimento": "Retrograde"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Virgo",
+     "grau": "28°43’17’’"
+    },
+    "2": {
+     "signo": "Scorpio",
+     "grau": "5°16’36’’"
+    },
+    "3": {
+     "signo": "Sagittarius",
+     "grau": "4°14’26’’"
+    },
+    "4": {
+     "signo": "Sagittarius",
+     "grau": "29°07’37’’"
+    },
+    "5": {
+     "signo": "Capricorn",
+     "grau": "23°54’08’’"
+    },
+    "6": {
+     "signo": "Aquarius",
+     "grau": "22°32’07’’"
+    },
+    "7": {
+     "signo": "Pisces",
+     "grau": "28°43’17’’"
+    },
+    "8": {
+     "signo": "Taurus",
+     "grau": "5°16’36’’"
+    },
+    "9": {
+     "signo": "Gemini",
+     "grau": "4°14’26’’"
+    },
+    "10": {
+     "signo": "Gemini",
+     "grau": "29°07’37’’"
+    },
+    "11": {
+     "signo": "Cancer",
+     "grau": "23°54’08’’"
+    },
+    "12": {
+     "signo": "Leo",
+     "grau": "22°32’07’’"
+    }
+   },
+   "horario_de_verao": false
+  },
+  {
+   "id": "sp-1987",
+   "cidade": "Sao Paulo, Brazil",
+   "data": "1987-12-25",
+   "hora": "08:15",
+   "lat_gm": [
+    23,
+    33,
+    "S"
+   ],
+   "lon_gm": [
+    46,
+    38,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=25&narozeni_mesic=12&narozeni_rok=1987&narozeni_hodina=08&narozeni_minuta=15&narozeni_sekunda=00&narozeni_city=Sao+Paulo%2C+Brazil&narozeni_sirka_stupne=23&narozeni_sirka_minuty=33&narozeni_sirka_smer=1&narozeni_delka_stupne=46&narozeni_delka_minuty=38&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "08:15 (-02, DST)",
+    "ut": "25 December 1987 - 10:15 (+2:00:0h)",
+    "fuso": "America/Sao_Paulo - -02"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Capricorn",
+     "grau": "3°04’39’’",
+     "casa": "12",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Pisces",
+     "grau": "7°15’08’’",
+     "casa": "2",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Capricorn",
+     "grau": "4°16’36’’",
+     "casa": "12",
+     "movimento": "Direct"
+    },
+    "Venus": {
+     "signo": "Aquarius",
+     "grau": "3°54’08’’",
+     "casa": "1",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Scorpio",
+     "grau": "20°34’19’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Jupiter": {
+     "signo": "Aries",
+     "grau": "19°56’07’’",
+     "casa": "3",
+     "movimento": "Direct"
+    },
+    "Saturn": {
+     "signo": "Sagittarius",
+     "grau": "24°41’49’’",
+     "casa": "11",
+     "movimento": "Direct"
+    },
+    "Uranus": {
+     "signo": "Sagittarius",
+     "grau": "27°16’05’’",
+     "casa": "end of 11",
+     "movimento": "Direct"
+    },
+    "Neptune": {
+     "signo": "Capricorn",
+     "grau": "7°32’14’’",
+     "casa": "12",
+     "movimento": "Direct"
+    },
+    "Pluto": {
+     "signo": "Scorpio",
+     "grau": "11°49’15’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Node": {
+     "signo": "Pisces",
+     "grau": "27°04’17’’",
+     "casa": "3",
+     "movimento": "Retrograde"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Capricorn",
+     "grau": "27°51’07’’"
+    },
+    "2": {
+     "signo": "Aquarius",
+     "grau": "22°20’07’’"
+    },
+    "3": {
+     "signo": "Pisces",
+     "grau": "20°17’08’’"
+    },
+    "4": {
+     "signo": "Aries",
+     "grau": "22°11’10’’"
+    },
+    "5": {
+     "signo": "Taurus",
+     "grau": "25°45’11’’"
+    },
+    "6": {
+     "signo": "Gemini",
+     "grau": "27°57’15’’"
+    },
+    "7": {
+     "signo": "Cancer",
+     "grau": "27°51’07’’"
+    },
+    "8": {
+     "signo": "Leo",
+     "grau": "22°20’07’’"
+    },
+    "9": {
+     "signo": "Virgo",
+     "grau": "20°17’08’’"
+    },
+    "10": {
+     "signo": "Libra",
+     "grau": "22°11’10’’"
+    },
+    "11": {
+     "signo": "Scorpio",
+     "grau": "25°45’11’’"
+    },
+    "12": {
+     "signo": "Sagittarius",
+     "grau": "27°57’15’’"
+    }
+   },
+   "horario_de_verao": true
+  },
+  {
+   "id": "rio-1995",
+   "cidade": "Rio de Janeiro, Brazil",
+   "data": "1995-01-10",
+   "hora": "21:40",
+   "lat_gm": [
+    22,
+    54,
+    "S"
+   ],
+   "lon_gm": [
+    43,
+    12,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=10&narozeni_mesic=1&narozeni_rok=1995&narozeni_hodina=21&narozeni_minuta=40&narozeni_sekunda=00&narozeni_city=Rio+de+Janeiro%2C+Brazil&narozeni_sirka_stupne=22&narozeni_sirka_minuty=54&narozeni_sirka_smer=1&narozeni_delka_stupne=43&narozeni_delka_minuty=12&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "21:40 (-02, DST)",
+    "ut": "10 January 1995 - 23:40 (+2:00:0h)",
+    "fuso": "America/Sao_Paulo - -02"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Capricorn",
+     "grau": "20°16’12’’",
+     "casa": "5",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Taurus",
+     "grau": "15°37’38’’",
+     "casa": "9",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Aquarius",
+     "grau": "6°22’06’’",
+     "casa": "6",
+     "movimento": "Direct"
+    },
+    "Venus": {
+     "signo": "Sagittarius",
+     "grau": "3°26’07’’",
+     "casa": "end of 3",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Virgo",
+     "grau": "2°14’20’’",
+     "casa": "1",
+     "movimento": "Retrograde"
+    },
+    "Jupiter": {
+     "signo": "Sagittarius",
+     "grau": "6°40’49’’",
+     "casa": "4",
+     "movimento": "Direct"
+    },
+    "Saturn": {
+     "signo": "Pisces",
+     "grau": "8°52’44’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Uranus": {
+     "signo": "Capricorn",
+     "grau": "26°03’16’’",
+     "casa": "6",
+     "movimento": "Direct"
+    },
+    "Neptune": {
+     "signo": "Capricorn",
+     "grau": "22°56’38’’",
+     "casa": "end of 5",
+     "movimento": "Direct"
+    },
+    "Pluto": {
+     "signo": "Scorpio",
+     "grau": "29°49’37’’",
+     "casa": "3",
+     "movimento": "Direct"
+    },
+    "Node": {
+     "signo": "Scorpio",
+     "grau": "12°27’47’’",
+     "casa": "3",
+     "movimento": "Stationary => R"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Leo",
+     "grau": "23°36’31’’"
+    },
+    "2": {
+     "signo": "Libra",
+     "grau": "2°15’40’’"
+    },
+    "3": {
+     "signo": "Scorpio",
+     "grau": "6°05’05’’"
+    },
+    "4": {
+     "signo": "Sagittarius",
+     "grau": "3°49’32’’"
+    },
+    "5": {
+     "signo": "Sagittarius",
+     "grau": "28°26’42’’"
+    },
+    "6": {
+     "signo": "Capricorn",
+     "grau": "23°36’47’’"
+    },
+    "7": {
+     "signo": "Aquarius",
+     "grau": "23°36’31’’"
+    },
+    "8": {
+     "signo": "Aries",
+     "grau": "2°15’40’’"
+    },
+    "9": {
+     "signo": "Taurus",
+     "grau": "6°05’05’’"
+    },
+    "10": {
+     "signo": "Gemini",
+     "grau": "3°49’32’’"
+    },
+    "11": {
+     "signo": "Gemini",
+     "grau": "28°26’42’’"
+    },
+    "12": {
+     "signo": "Cancer",
+     "grau": "23°36’47’’"
+    }
+   },
+   "horario_de_verao": true
+  },
+  {
+   "id": "poa-2005",
+   "cidade": "Porto Alegre, Brazil",
+   "data": "2005-11-20",
+   "hora": "06:05",
+   "lat_gm": [
+    30,
+    2,
+    "S"
+   ],
+   "lon_gm": [
+    51,
+    13,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=20&narozeni_mesic=11&narozeni_rok=2005&narozeni_hodina=06&narozeni_minuta=05&narozeni_sekunda=00&narozeni_city=Porto+Alegre%2C+Brazil&narozeni_sirka_stupne=30&narozeni_sirka_minuty=2&narozeni_sirka_smer=1&narozeni_delka_stupne=51&narozeni_delka_minuty=13&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "06:05 (-02, DST)",
+    "ut": "20 November 2005 - 08:05 (+2:00:0h)",
+    "fuso": "America/Sao_Paulo - -02"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Scorpio",
+     "grau": "28°05’58’’",
+     "casa": "1",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Cancer",
+     "grau": "18°50’08’’",
+     "casa": "9",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Sagittarius",
+     "grau": "7°51’17’’",
+     "casa": "1",
+     "movimento": "Retrograde"
+    },
+    "Venus": {
+     "signo": "Capricorn",
+     "grau": "13°56’16’’",
+     "casa": "3",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Taurus",
+     "grau": "10°54’03’’",
+     "casa": "6",
+     "movimento": "Retrograde"
+    },
+    "Jupiter": {
+     "signo": "Scorpio",
+     "grau": "5°24’59’’",
+     "casa": "12",
+     "movimento": "Direct"
+    },
+    "Saturn": {
+     "signo": "Leo",
+     "grau": "11°18’26’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Uranus": {
+     "signo": "Pisces",
+     "grau": "6°51’03’’",
+     "casa": "5",
+     "movimento": "Direct"
+    },
+    "Neptune": {
+     "signo": "Aquarius",
+     "grau": "14°59’07’’",
+     "casa": "4",
+     "movimento": "Direct"
+    },
+    "Pluto": {
+     "signo": "Sagittarius",
+     "grau": "23°21’30’’",
+     "casa": "2",
+     "movimento": "Direct"
+    },
+    "Node": {
+     "signo": "Aries",
+     "grau": "12°33’48’’",
+     "casa": "6",
+     "movimento": "Retrograde"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Scorpio",
+     "grau": "23°02’43’’"
+    },
+    "2": {
+     "signo": "Sagittarius",
+     "grau": "19°51’31’’"
+    },
+    "3": {
+     "signo": "Capricorn",
+     "grau": "13°02’06’’"
+    },
+    "4": {
+     "signo": "Aquarius",
+     "grau": "7°04’30’’"
+    },
+    "5": {
+     "signo": "Pisces",
+     "grau": "5°51’45’’"
+    },
+    "6": {
+     "signo": "Aries",
+     "grau": "12°21’07’’"
+    },
+    "7": {
+     "signo": "Taurus",
+     "grau": "23°02’43’’"
+    },
+    "8": {
+     "signo": "Gemini",
+     "grau": "19°51’31’’"
+    },
+    "9": {
+     "signo": "Cancer",
+     "grau": "13°02’06’’"
+    },
+    "10": {
+     "signo": "Leo",
+     "grau": "7°04’30’’"
+    },
+    "11": {
+     "signo": "Virgo",
+     "grau": "5°51’45’’"
+    },
+    "12": {
+     "signo": "Libra",
+     "grau": "12°21’07’’"
+    }
+   },
+   "horario_de_verao": true
+  },
+  {
+   "id": "bsb-2010",
+   "cidade": "Brasilia, Brazil",
+   "data": "2010-12-31",
+   "hora": "23:50",
+   "lat_gm": [
+    15,
+    47,
+    "S"
+   ],
+   "lon_gm": [
+    47,
+    55,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=31&narozeni_mesic=12&narozeni_rok=2010&narozeni_hodina=23&narozeni_minuta=50&narozeni_sekunda=00&narozeni_city=Brasilia%2C+Brazil&narozeni_sirka_stupne=15&narozeni_sirka_minuty=47&narozeni_sirka_smer=1&narozeni_delka_stupne=47&narozeni_delka_minuty=55&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "23:50 (-02, DST)",
+    "ut": "1 January 2011 - 01:50 (+2:00:0h)",
+    "fuso": "America/Sao_Paulo - -02"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Capricorn",
+     "grau": "10°16’51’’",
+     "casa": "4",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Sagittarius",
+     "grau": "0°16’18’’",
+     "casa": "3",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Sagittarius",
+     "grau": "19°51’26’’",
+     "casa": "end of 3",
+     "movimento": "Direct"
+    },
+    "Venus": {
+     "signo": "Scorpio",
+     "grau": "23°38’16’’",
+     "casa": "end of 2",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Capricorn",
+     "grau": "18°25’51’’",
+     "casa": "5",
+     "movimento": "Direct"
+    },
+    "Jupiter": {
+     "signo": "Pisces",
+     "grau": "26°33’42’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Saturn": {
+     "signo": "Libra",
+     "grau": "16°39’49’’",
+     "casa": "1",
+     "movimento": "Direct"
+    },
+    "Uranus": {
+     "signo": "Pisces",
+     "grau": "26°57’37’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Neptune": {
+     "signo": "Aquarius",
+     "grau": "26°44’12’’",
+     "casa": "6",
+     "movimento": "Direct"
+    },
+    "Pluto": {
+     "signo": "Capricorn",
+     "grau": "5°20’02’’",
+     "casa": "4",
+     "movimento": "Direct"
+    },
+    "Node": {
+     "signo": "Capricorn",
+     "grau": "2°45’46’’",
+     "casa": "4",
+     "movimento": "Direct"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Virgo",
+     "grau": "17°34’24’’"
+    },
+    "2": {
+     "signo": "Libra",
+     "grau": "23°26’24’’"
+    },
+    "3": {
+     "signo": "Scorpio",
+     "grau": "24°10’29’’"
+    },
+    "4": {
+     "signo": "Sagittarius",
+     "grau": "20°46’31’’"
+    },
+    "5": {
+     "signo": "Capricorn",
+     "grau": "16°20’46’’"
+    },
+    "6": {
+     "signo": "Aquarius",
+     "grau": "14°17’07’’"
+    },
+    "7": {
+     "signo": "Pisces",
+     "grau": "17°34’24’’"
+    },
+    "8": {
+     "signo": "Aries",
+     "grau": "23°26’24’’"
+    },
+    "9": {
+     "signo": "Taurus",
+     "grau": "24°10’29’’"
+    },
+    "10": {
+     "signo": "Gemini",
+     "grau": "20°46’31’’"
+    },
+    "11": {
+     "signo": "Cancer",
+     "grau": "16°20’46’’"
+    },
+    "12": {
+     "signo": "Leo",
+     "grau": "14°17’07’’"
+    }
+   },
+   "horario_de_verao": true
+  },
+  {
+   "id": "recife-1983",
+   "cidade": "Recife, Brazil",
+   "data": "1983-07-04",
+   "hora": "03:20",
+   "lat_gm": [
+    8,
+    3,
+    "S"
+   ],
+   "lon_gm": [
+    34,
+    53,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=4&narozeni_mesic=7&narozeni_rok=1983&narozeni_hodina=03&narozeni_minuta=20&narozeni_sekunda=00&narozeni_city=Recife%2C+Brazil&narozeni_sirka_stupne=8&narozeni_sirka_minuty=3&narozeni_sirka_smer=1&narozeni_delka_stupne=34&narozeni_delka_minuty=53&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "03:20 (-03)",
+    "ut": "4 July 1983 - 06:20 (+3:00:0h)",
+    "fuso": "America/Recife - -03"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Cancer",
+     "grau": "11°43’35’’",
+     "casa": "2",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Aries",
+     "grau": "20°30’29’’",
+     "casa": "11",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Cancer",
+     "grau": "5°12’17’’",
+     "casa": "1",
+     "movimento": "Direct"
+    },
+    "Venus": {
+     "signo": "Leo",
+     "grau": "25°39’18’’",
+     "casa": "3",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Cancer",
+     "grau": "3°21’06’’",
+     "casa": "1",
+     "movimento": "Direct"
+    },
+    "Jupiter": {
+     "signo": "Sagittarius",
+     "grau": "2°00’20’’",
+     "casa": "6",
+     "movimento": "Retrograde"
+    },
+    "Saturn": {
+     "signo": "Libra",
+     "grau": "27°43’43’’",
+     "casa": "5",
+     "movimento": "Direct"
+    },
+    "Uranus": {
+     "signo": "Sagittarius",
+     "grau": "5°44’26’’",
+     "casa": "6",
+     "movimento": "Retrograde"
+    },
+    "Neptune": {
+     "signo": "Sagittarius",
+     "grau": "27°28’11’’",
+     "casa": "7",
+     "movimento": "Retrograde"
+    },
+    "Pluto": {
+     "signo": "Libra",
+     "grau": "26°42’48’’",
+     "casa": "5",
+     "movimento": "Retrograde"
+    },
+    "Node": {
+     "signo": "Gemini",
+     "grau": "24°58’11’’",
+     "casa": "1",
+     "movimento": "Direct"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Gemini",
+     "grau": "10°10’13’’"
+    },
+    "2": {
+     "signo": "Cancer",
+     "grau": "8°43’53’’"
+    },
+    "3": {
+     "signo": "Leo",
+     "grau": "8°30’16’’"
+    },
+    "4": {
+     "signo": "Virgo",
+     "grau": "10°18’01’’"
+    },
+    "5": {
+     "signo": "Libra",
+     "grau": "12°35’22’’"
+    },
+    "6": {
+     "signo": "Scorpio",
+     "grau": "12°44’53’’"
+    },
+    "7": {
+     "signo": "Sagittarius",
+     "grau": "10°10’13’’"
+    },
+    "8": {
+     "signo": "Capricorn",
+     "grau": "8°43’53’’"
+    },
+    "9": {
+     "signo": "Aquarius",
+     "grau": "8°30’16’’"
+    },
+    "10": {
+     "signo": "Pisces",
+     "grau": "10°18’01’’"
+    },
+    "11": {
+     "signo": "Aries",
+     "grau": "12°35’22’’"
+    },
+    "12": {
+     "signo": "Taurus",
+     "grau": "12°44’53’’"
+    }
+   },
+   "horario_de_verao": false
+  },
+  {
+   "id": "manaus-1999",
+   "cidade": "Manaus, Brazil",
+   "data": "1999-09-09",
+   "hora": "12:00",
+   "lat_gm": [
+    3,
+    6,
+    "S"
+   ],
+   "lon_gm": [
+    60,
+    1,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=9&narozeni_mesic=9&narozeni_rok=1999&narozeni_hodina=12&narozeni_minuta=00&narozeni_sekunda=00&narozeni_city=Manaus%2C+Brazil&narozeni_sirka_stupne=3&narozeni_sirka_minuty=6&narozeni_sirka_smer=1&narozeni_delka_stupne=60&narozeni_delka_minuty=1&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "12:00 (-04)",
+    "ut": "9 September 1999 - 16:00 (+4:00:0h)",
+    "fuso": "America/Manaus - -04"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Virgo",
+     "grau": "16°31’52’’",
+     "casa": "end of 9",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Virgo",
+     "grau": "13°26’23’’",
+     "casa": "9",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Virgo",
+     "grau": "17°29’21’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Venus": {
+     "signo": "Leo",
+     "grau": "18°49’25’’",
+     "casa": "9",
+     "movimento": "Retrograde"
+    },
+    "Mars": {
+     "signo": "Sagittarius",
+     "grau": "4°20’55’’",
+     "casa": "12",
+     "movimento": "Direct"
+    },
+    "Jupiter": {
+     "signo": "Taurus",
+     "grau": "4°35’06’’",
+     "casa": "5",
+     "movimento": "Retrograde"
+    },
+    "Saturn": {
+     "signo": "Taurus",
+     "grau": "17°04’52’’",
+     "casa": "5",
+     "movimento": "Retrograde"
+    },
+    "Uranus": {
+     "signo": "Aquarius",
+     "grau": "13°35’55’’",
+     "casa": "2",
+     "movimento": "Retrograde"
+    },
+    "Neptune": {
+     "signo": "Aquarius",
+     "grau": "1°53’58’’",
+     "casa": "2",
+     "movimento": "Retrograde"
+    },
+    "Pluto": {
+     "signo": "Sagittarius",
+     "grau": "7°51’59’’",
+     "casa": "12",
+     "movimento": "Direct"
+    },
+    "Node": {
+     "signo": "Leo",
+     "grau": "12°41’09’’",
+     "casa": "8",
+     "movimento": "Retrograde"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Sagittarius",
+     "grau": "20°24’32’’"
+    },
+    "2": {
+     "signo": "Capricorn",
+     "grau": "17°36’54’’"
+    },
+    "3": {
+     "signo": "Aquarius",
+     "grau": "16°04’47’’"
+    },
+    "4": {
+     "signo": "Pisces",
+     "grau": "17°13’01’’"
+    },
+    "5": {
+     "signo": "Aries",
+     "grau": "19°54’39’’"
+    },
+    "6": {
+     "signo": "Taurus",
+     "grau": "21°20’39’’"
+    },
+    "7": {
+     "signo": "Gemini",
+     "grau": "20°24’32’’"
+    },
+    "8": {
+     "signo": "Cancer",
+     "grau": "17°36’54’’"
+    },
+    "9": {
+     "signo": "Leo",
+     "grau": "16°04’47’’"
+    },
+    "10": {
+     "signo": "Virgo",
+     "grau": "17°13’01’’"
+    },
+    "11": {
+     "signo": "Libra",
+     "grau": "19°54’39’’"
+    },
+    "12": {
+     "signo": "Scorpio",
+     "grau": "21°20’39’’"
+    }
+   },
+   "horario_de_verao": false
+  },
+  {
+   "id": "bh-1978",
+   "cidade": "Belo Horizonte, Brazil",
+   "data": "1978-03-03",
+   "hora": "17:45",
+   "lat_gm": [
+    19,
+    55,
+    "S"
+   ],
+   "lon_gm": [
+    43,
+    56,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=3&narozeni_mesic=3&narozeni_rok=1978&narozeni_hodina=17&narozeni_minuta=45&narozeni_sekunda=00&narozeni_city=Belo+Horizonte%2C+Brazil&narozeni_sirka_stupne=19&narozeni_sirka_minuty=55&narozeni_sirka_smer=1&narozeni_delka_stupne=43&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "17:45 (-03)",
+    "ut": "3 March 1978 - 20:45 (+3:00:0h)",
+    "fuso": "America/Sao_Paulo - -03"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Pisces",
+     "grau": "12°55’01’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Capricorn",
+     "grau": "2°51’34’’",
+     "casa": "4",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Pisces",
+     "grau": "17°09’20’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Venus": {
+     "signo": "Pisces",
+     "grau": "22°44’36’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Cancer",
+     "grau": "22°17’20’’",
+     "casa": "11",
+     "movimento": "Direct"
+    },
+    "Jupiter": {
+     "signo": "Gemini",
+     "grau": "26°18’09’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Saturn": {
+     "signo": "Leo",
+     "grau": "25°53’25’’",
+     "casa": "12",
+     "movimento": "Retrograde"
+    },
+    "Uranus": {
+     "signo": "Scorpio",
+     "grau": "16°20’22’’",
+     "casa": "3",
+     "movimento": "Retrograde"
+    },
+    "Neptune": {
+     "signo": "Sagittarius",
+     "grau": "18°14’25’’",
+     "casa": "4",
+     "movimento": "Direct"
+    },
+    "Pluto": {
+     "signo": "Libra",
+     "grau": "16°10’21’’",
+     "casa": "2",
+     "movimento": "Retrograde"
+    },
+    "Node": {
+     "signo": "Libra",
+     "grau": "6°05’46’’",
+     "casa": "1",
+     "movimento": "Retrograde"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Virgo",
+     "grau": "2°47’06’’"
+    },
+    "2": {
+     "signo": "Libra",
+     "grau": "10°25’43’’"
+    },
+    "3": {
+     "signo": "Scorpio",
+     "grau": "12°59’25’’"
+    },
+    "4": {
+     "signo": "Sagittarius",
+     "grau": "10°12’36’’"
+    },
+    "5": {
+     "signo": "Capricorn",
+     "grau": "5°07’41’’"
+    },
+    "6": {
+     "signo": "Aquarius",
+     "grau": "1°20’12’’"
+    },
+    "7": {
+     "signo": "Pisces",
+     "grau": "2°47’06’’"
+    },
+    "8": {
+     "signo": "Aries",
+     "grau": "10°25’43’’"
+    },
+    "9": {
+     "signo": "Taurus",
+     "grau": "12°59’25’’"
+    },
+    "10": {
+     "signo": "Gemini",
+     "grau": "10°12’36’’"
+    },
+    "11": {
+     "signo": "Cancer",
+     "grau": "5°07’41’’"
+    },
+    "12": {
+     "signo": "Leo",
+     "grau": "1°20’12’’"
+    }
+   },
+   "horario_de_verao": false
+  },
+  {
+   "id": "salvador-2001",
+   "cidade": "Salvador, Brazil",
+   "data": "2001-06-21",
+   "hora": "10:10",
+   "lat_gm": [
+    12,
+    58,
+    "S"
+   ],
+   "lon_gm": [
+    38,
+    30,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=21&narozeni_mesic=6&narozeni_rok=2001&narozeni_hodina=10&narozeni_minuta=10&narozeni_sekunda=00&narozeni_city=Salvador%2C+Brazil&narozeni_sirka_stupne=12&narozeni_sirka_minuty=58&narozeni_sirka_smer=1&narozeni_delka_stupne=38&narozeni_delka_minuty=30&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "10:10 (-03)",
+    "ut": "21 June 2001 - 13:10 (+3:00:0h)",
+    "fuso": "America/Bahia - -03"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Cancer",
+     "grau": "0°13’13’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Cancer",
+     "grau": "0°53’51’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Gemini",
+     "grau": "22°51’10’’",
+     "casa": "10",
+     "movimento": "Retrograde"
+    },
+    "Venus": {
+     "signo": "Taurus",
+     "grau": "15°00’17’’",
+     "casa": "9",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Sagittarius",
+     "grau": "20°14’13’’",
+     "casa": "4",
+     "movimento": "Retrograde"
+    },
+    "Jupiter": {
+     "signo": "Gemini",
+     "grau": "25°07’58’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Saturn": {
+     "signo": "Gemini",
+     "grau": "7°48’16’’",
+     "casa": "9",
+     "movimento": "Direct"
+    },
+    "Uranus": {
+     "signo": "Aquarius",
+     "grau": "24°37’49’’",
+     "casa": "6",
+     "movimento": "Retrograde"
+    },
+    "Neptune": {
+     "signo": "Aquarius",
+     "grau": "8°20’25’’",
+     "casa": "6",
+     "movimento": "Retrograde"
+    },
+    "Pluto": {
+     "signo": "Sagittarius",
+     "grau": "13°28’12’’",
+     "casa": "4",
+     "movimento": "Retrograde"
+    },
+    "Node": {
+     "signo": "Cancer",
+     "grau": "6°20’42’’",
+     "casa": "11",
+     "movimento": "Stationary => D"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Virgo",
+     "grau": "4°39’39’’"
+    },
+    "2": {
+     "signo": "Libra",
+     "grau": "10°15’03’’"
+    },
+    "3": {
+     "signo": "Scorpio",
+     "grau": "12°28’08’’"
+    },
+    "4": {
+     "signo": "Sagittarius",
+     "grau": "10°24’28’’"
+    },
+    "5": {
+     "signo": "Capricorn",
+     "grau": "6°20’10’’"
+    },
+    "6": {
+     "signo": "Aquarius",
+     "grau": "3°23’34’’"
+    },
+    "7": {
+     "signo": "Pisces",
+     "grau": "4°39’39’’"
+    },
+    "8": {
+     "signo": "Aries",
+     "grau": "10°15’03’’"
+    },
+    "9": {
+     "signo": "Taurus",
+     "grau": "12°28’08’’"
+    },
+    "10": {
+     "signo": "Gemini",
+     "grau": "10°24’28’’"
+    },
+    "11": {
+     "signo": "Cancer",
+     "grau": "6°20’10’’"
+    },
+    "12": {
+     "signo": "Leo",
+     "grau": "3°23’34’’"
+    }
+   },
+   "horario_de_verao": false
+  },
+  {
+   "id": "lisboa-1985",
+   "cidade": "Lisbon, Portugal",
+   "data": "1985-08-12",
+   "hora": "16:20",
+   "lat_gm": [
+    38,
+    43,
+    "N"
+   ],
+   "lon_gm": [
+    9,
+    8,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=12&narozeni_mesic=8&narozeni_rok=1985&narozeni_hodina=16&narozeni_minuta=20&narozeni_sekunda=00&narozeni_city=Lisbon%2C+Portugal&narozeni_sirka_stupne=38&narozeni_sirka_minuty=43&narozeni_sirka_smer=0&narozeni_delka_stupne=9&narozeni_delka_minuty=8&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "16:20 (WEST, DST)",
+    "ut": "12 August 1985 - 15:20 (-1:00:0h)",
+    "fuso": "Europe/Lisbon - WEST"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Leo",
+     "grau": "19°50’49’’",
+     "casa": "8",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Cancer",
+     "grau": "3°04’44’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Leo",
+     "grau": "16°51’20’’",
+     "casa": "8",
+     "movimento": "Retrograde"
+    },
+    "Venus": {
+     "signo": "Cancer",
+     "grau": "11°48’18’’",
+     "casa": "7",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Leo",
+     "grau": "11°53’03’’",
+     "casa": "8",
+     "movimento": "Direct"
+    },
+    "Jupiter": {
+     "signo": "Aquarius",
+     "grau": "10°58’44’’",
+     "casa": "2",
+     "movimento": "Retrograde"
+    },
+    "Saturn": {
+     "signo": "Scorpio",
+     "grau": "21°43’26’’",
+     "casa": "11",
+     "movimento": "Direct"
+    },
+    "Uranus": {
+     "signo": "Sagittarius",
+     "grau": "14°00’29’’",
+     "casa": "1",
+     "movimento": "Retrograde"
+    },
+    "Neptune": {
+     "signo": "Capricorn",
+     "grau": "1°05’34’’",
+     "casa": "1",
+     "movimento": "Retrograde"
+    },
+    "Pluto": {
+     "signo": "Scorpio",
+     "grau": "2°12’05’’",
+     "casa": "11",
+     "movimento": "Direct"
+    },
+    "Node": {
+     "signo": "Taurus",
+     "grau": "13°17’04’’",
+     "casa": "5",
+     "movimento": "Retrograde"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Sagittarius",
+     "grau": "13°53’14’’"
+    },
+    "2": {
+     "signo": "Capricorn",
+     "grau": "17°37’36’’"
+    },
+    "3": {
+     "signo": "Aquarius",
+     "grau": "26°08’28’’"
+    },
+    "4": {
+     "signo": "Aries",
+     "grau": "2°03’14’’"
+    },
+    "5": {
+     "signo": "Taurus",
+     "grau": "0°48’31’’"
+    },
+    "6": {
+     "signo": "Taurus",
+     "grau": "23°45’39’’"
+    },
+    "7": {
+     "signo": "Gemini",
+     "grau": "13°53’14’’"
+    },
+    "8": {
+     "signo": "Cancer",
+     "grau": "17°37’36’’"
+    },
+    "9": {
+     "signo": "Leo",
+     "grau": "26°08’28’’"
+    },
+    "10": {
+     "signo": "Libra",
+     "grau": "2°03’14’’"
+    },
+    "11": {
+     "signo": "Scorpio",
+     "grau": "0°48’31’’"
+    },
+    "12": {
+     "signo": "Scorpio",
+     "grau": "23°45’39’’"
+    }
+   },
+   "horario_de_verao": true
+  },
+  {
+   "id": "londres-1966",
+   "cidade": "London, United Kingdom",
+   "data": "1966-07-30",
+   "hora": "15:00",
+   "lat_gm": [
+    51,
+    30,
+    "N"
+   ],
+   "lon_gm": [
+    0,
+    7,
+    "W"
+   ],
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=30&narozeni_mesic=7&narozeni_rok=1966&narozeni_hodina=15&narozeni_minuta=00&narozeni_sekunda=00&narozeni_city=London%2C+United+Kingdom&narozeni_sirka_stupne=51&narozeni_sirka_minuty=30&narozeni_sirka_smer=0&narozeni_delka_stupne=0&narozeni_delka_minuty=7&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "hora_local": "15:00 (BST, DST)",
+    "ut": "30 July 1966 - 14:00 (-1:00:0h)",
+    "fuso": "Europe/London - BST"
+   },
+   "planetas": {
+    "Sun": {
+     "signo": "Leo",
+     "grau": "6°57’06’’",
+     "casa": "9",
+     "movimento": "Direct"
+    },
+    "Moon": {
+     "signo": "Capricorn",
+     "grau": "16°38’21’’",
+     "casa": "2",
+     "movimento": "Direct"
+    },
+    "Mercury": {
+     "signo": "Leo",
+     "grau": "3°36’43’’",
+     "casa": "9",
+     "movimento": "Retrograde"
+    },
+    "Venus": {
+     "signo": "Cancer",
+     "grau": "10°39’49’’",
+     "casa": "8",
+     "movimento": "Direct"
+    },
+    "Mars": {
+     "signo": "Cancer",
+     "grau": "13°00’28’’",
+     "casa": "8",
+     "movimento": "Direct"
+    },
+    "Jupiter": {
+     "signo": "Cancer",
+     "grau": "18°41’06’’",
+     "casa": "8",
+     "movimento": "Direct"
+    },
+    "Saturn": {
+     "signo": "Pisces",
+     "grau": "29°23’11’’",
+     "casa": "4",
+     "movimento": "Retrograde"
+    },
+    "Uranus": {
+     "signo": "Virgo",
+     "grau": "17°22’59’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Neptune": {
+     "signo": "Scorpio",
+     "grau": "19°24’23’’",
+     "casa": "1",
+     "movimento": "Retrograde"
+    },
+    "Pluto": {
+     "signo": "Virgo",
+     "grau": "16°48’43’’",
+     "casa": "10",
+     "movimento": "Direct"
+    },
+    "Node": {
+     "signo": "Taurus",
+     "grau": "22°30’31’’",
+     "casa": "7",
+     "movimento": "Retrograde"
+    }
+   },
+   "casas": {
+    "1": {
+     "signo": "Scorpio",
+     "grau": "17°26’28’’"
+    },
+    "2": {
+     "signo": "Sagittarius",
+     "grau": "17°24’32’’"
+    },
+    "3": {
+     "signo": "Capricorn",
+     "grau": "26°03’19’’"
+    },
+    "4": {
+     "signo": "Pisces",
+     "grau": "5°51’00’’"
+    },
+    "5": {
+     "signo": "Aries",
+     "grau": "7°02’34’’"
+    },
+    "6": {
+     "signo": "Aries",
+     "grau": "29°54’03’’"
+    },
+    "7": {
+     "signo": "Taurus",
+     "grau": "17°26’28’’"
+    },
+    "8": {
+     "signo": "Gemini",
+     "grau": "17°24’32’’"
+    },
+    "9": {
+     "signo": "Cancer",
+     "grau": "26°03’19’’"
+    },
+    "10": {
+     "signo": "Virgo",
+     "grau": "5°51’00’’"
+    },
+    "11": {
+     "signo": "Libra",
+     "grau": "7°02’34’’"
+    },
+    "12": {
+     "signo": "Libra",
+     "grau": "29°54’03’’"
+    }
+   },
+   "horario_de_verao": true
+  }
+ ]
+}

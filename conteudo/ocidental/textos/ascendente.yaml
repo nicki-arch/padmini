@@ -1,0 +1,118 @@
+# Ascendente nos 12 signos. Só aparece com hora de nascimento. Rascunho;
+# revisar e trocar `revisado` para true (ver LEIA.md).
+
+aries:
+  revisado: false
+  texto: >-
+    Com Ascendente em Áries, você chega chegando. A primeira impressão é de
+    alguém direto, ativo e decidido — você anda rápido, fala sem rodeio e se
+    oferece para resolver antes de todo mundo. Esse jeito abre caminhos e
+    inspira coragem. O ponto de atenção é parecer impaciente ou brusco em
+    situações que pedem delicadeza, como uma conversa com alguém fragilizado.
+    Reduzir a velocidade nos primeiros minutos costuma mostrar o quanto de
+    cuidado existe por trás da sua pressa.
+touro:
+  revisado: false
+  texto: >-
+    Com Ascendente em Touro, você passa calma e firmeza. As pessoas te
+    percebem como alguém estável, de presença tranquila, que não se abala à
+    toa. Você gosta de coisas bonitas e confortáveis e escolhe com cuidado o
+    que veste e onde fica. O ponto de atenção é a resistência a mudar de
+    plano: um imprevisto pode te irritar mais do que deveria. Lembrar que
+    adaptar não é desistir ajuda a manter a sua serenidade quando o mundo
+    muda de rota.
+gemeos:
+  revisado: false
+  texto: >-
+    Com Ascendente em Gêmeos, você se apresenta pela curiosidade. A primeira
+    impressão é de alguém comunicativo, leve e esperto, que puxa assunto com
+    facilidade e faz perguntas. Você costuma parecer mais jovem e circula bem
+    entre grupos diferentes. O ponto de atenção é parecer disperso ou pouco
+    comprometido, pulando de conversa em conversa. Mostrar profundidade em
+    pelo menos um assunto que te apaixona equilibra a leveza e aproxima quem
+    quer te conhecer de verdade.
+cancer:
+  revisado: false
+  texto: >-
+    Com Ascendente em Câncer, você passa acolhimento. As pessoas se sentem à
+    vontade perto de você e tendem a te contar coisas pessoais logo no
+    primeiro encontro. Você observa antes de se abrir e protege quem está
+    perto. O ponto de atenção é a casca: com gente nova, você pode parecer
+    reservado ou mudar de humor conforme o ambiente. Dar um passo em direção
+    ao outro, em vez de esperar que ele venha, revela o carinho que você
+    guarda.
+leao:
+  revisado: false
+  texto: >-
+    Com Ascendente em Leão, você tem presença. A primeira impressão é de
+    alguém caloroso, confiante e expressivo — você entra na sala e as pessoas
+    notam. Tem um jeito generoso de animar os outros e cuida da própria
+    imagem com gosto. O ponto de atenção é parecer que precisa de atenção o
+    tempo todo, ou se ofender quando não é reconhecido. Usar esse brilho para
+    iluminar também os outros torna a sua presença ainda mais marcante.
+virgem:
+  revisado: false
+  texto: >-
+    Com Ascendente em Virgem, você se apresenta de forma discreta e atenta. As
+    pessoas te percebem como alguém organizado, prestativo e observador, que
+    repara em detalhes que ninguém vê. Você costuma oferecer ajuda prática
+    antes de ser chamado. O ponto de atenção é parecer crítico ou tenso,
+    principalmente em ambientes novos. Relaxar o controle nos primeiros
+    encontros e deixar a sua gentileza aparecer antes da análise facilita as
+    aproximações.
+libra:
+  revisado: false
+  texto: >-
+    Com Ascendente em Libra, você passa elegância e simpatia. A primeira
+    impressão é de alguém educado, agradável e fácil de lidar, que sabe o que
+    dizer para deixar o clima leve. Você tem senso estético e tende a
+    aproximar pessoas. O ponto de atenção é esconder o que pensa para não
+    criar atrito, e depois se sentir invisível. Dizer uma opinião própria
+    logo cedo numa conversa mostra que a sua gentileza tem conteúdo por
+    trás.
+escorpiao:
+  revisado: false
+  texto: >-
+    Com Ascendente em Escorpião, você tem uma presença intensa e magnética.
+    As pessoas sentem que você observa mais do que mostra, e isso desperta
+    curiosidade. Você é reservado no começo e escolhe com cuidado em quem
+    confiar. O ponto de atenção é parecer fechado ou intimidador para quem não
+    te conhece. Um sorriso, uma pergunta genuína ou uma confidência pequena
+    ajudam os outros a atravessar a primeira impressão e encontrar a sua
+    lealdade.
+sagitario:
+  revisado: false
+  texto: >-
+    Com Ascendente em Sagitário, você passa entusiasmo e franqueza. A primeira
+    impressão é de alguém otimista, bem-humorado e aberto, que fala de viagens,
+    ideias e planos grandes. As pessoas tendem a se animar perto de você. O
+    ponto de atenção é a sinceridade sem filtro e o compromisso esquecido na
+    empolgação. Checar a agenda antes do "vamos!" e o tom antes da piada faz
+    a sua espontaneidade virar confiança.
+capricornio:
+  revisado: false
+  texto: >-
+    Com Ascendente em Capricórnio, você passa seriedade e competência. As
+    pessoas te percebem como alguém responsável, maduro e confiável, às vezes
+    desde muito jovem. Você observa antes de se expor e prefere mostrar
+    resultado a falar de si. O ponto de atenção é parecer frio ou distante em
+    situações sociais. Deixar o seu humor seco aparecer mais cedo costuma
+    surpreender e aproximar quem achava você sério demais.
+aquario:
+  revisado: false
+  texto: >-
+    Com Ascendente em Aquário, você se apresenta como alguém original. A
+    primeira impressão é de uma pessoa amigável, mas com um jeito próprio de
+    pensar, vestir ou se colocar. Você trata todo mundo de igual para igual e
+    se interessa por ideias novas. O ponto de atenção é parecer distante ou
+    imprevisível, difícil de acessar emocionalmente. Mostrar o que você sente,
+    e não só o que pensa, ajuda as pessoas a se aproximarem de verdade.
+peixes:
+  revisado: false
+  texto: >-
+    Com Ascendente em Peixes, você passa suavidade e empatia. As pessoas te
+    percebem como alguém sensível, acolhedor e um pouco sonhador, fácil de
+    conversar. Você se adapta aos ambientes e capta o clima das pessoas ao
+    redor. O ponto de atenção é absorver o humor dos outros e perder os
+    próprios contornos, ou deixar que decidam por você. Ter clareza do que
+    você quer antes de entrar num grupo protege a sua sensibilidade.

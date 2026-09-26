@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#241522">
-<title>Padmini — Astrologia védica</title>
-<meta name="description" content="A astrologia védica para autoconhecimento e para casais. Descubra a compatibilidade de vocês dois em 8 dimensões, ou seu mapa védico completo. Amostra grátis.">
+<title>{{ t.seo.titulo }}</title>
+<meta name="description" content="{{ t.seo.descricao }}">
 <link rel="canonical" href="https://padmini.com.br/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Padmini">
-<meta property="og:title" content="A compatibilidade de vocês dois, pela astrologia védica">
-<meta property="og:description" content="8 dimensões, 36 pontos, calculados um a um. Amostra grátis.">
+<meta property="og:title" content="{{ t.seo.og_titulo }}">
+<meta property="og:description" content="{{ t.seo.og_descricao }}">
 <meta property="og:image" content="https://padmini.com.br/static/og-home.png">
 <meta property="og:url" content="https://padmini.com.br/">
 <meta name="twitter:card" content="summary_large_image">
@@ -43,10 +43,12 @@
   .anchor2{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;background:var(--ground-2);border:1px solid var(--line);border-radius:16px;padding:26px}
   .badge{flex:none;width:54px;height:54px;border-radius:50%;background:var(--ground-3);display:grid;place-items:center}
   @media(max-width:640px){.passos,.produtos{grid-template-columns:1fr}section{padding-block:44px}}
+  .cardc::after{content:none} /* o base.css desenha a marca em sânscrito no card */
 </style>
 </head>
 <body>
-{# Texto desta página: conteudo/<versão>/home.yaml (variável `t`). Preço e link: conteudo/<versão>/ofertas.yaml. #}
+{# Home da versão OCIDENTAL. Texto: conteudo/ocidental/home.yaml (variável `t`), inclusive o <head>.
+   Preço: conteudo/ocidental/ofertas.yaml. A home com os quatro produtos vem na Fase 5. #}
 <header class="wrap">
   <div class="topbar">
     <a class="marca" href="/">
@@ -176,7 +178,7 @@
 </main>
 
 <footer>
-  <span class="mark">पद्मिनी</span> · {{ t.rodape.linha1 }}<br>
+  {{ t.rodape.linha1 }}<br>
   {{ t.rodape.linha2 }}<br>
   <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
 </footer>

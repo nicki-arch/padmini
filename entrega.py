@@ -15,15 +15,17 @@ import urllib.parse
 import urllib.request
 
 import acesso
+import sistema as _sistema
 
 SITE_URL = os.environ.get("PADMINI_SITE_URL", "https://padmini.com.br").rstrip("/")
 
 
-def link_completo(produto: str, dados: dict) -> str:
-    """Monta a URL do completo (com token) para o e-mail. produto: 'mapa'|'compat'."""
+def link_completo(produto: str, dados: dict, sistema: str = "vedica") -> str:
+    """Monta a URL do completo (com token) para o e-mail. produto: 'mapa'|'compat'.
+    As rotas são as mesmas nas duas versões: é o token que diz qual versão abrir."""
     if produto == "mapa":
         chave = acesso.chave_mapa(dados["data"], dados["hora"], dados["lat"], dados["lon"])
-        token = acesso.emitir_token("mapa", chave)
+        token = acesso.emitir_token("mapa", chave, sistema)
         q = {"data": dados["data"], "hora": dados["hora"], "lat": dados["lat"], "lon": dados["lon"],
              "cidade": dados.get("cidade", ""), "nome": dados.get("nome", ""), "token": token}
         return f"{SITE_URL}/mapa?" + urllib.parse.urlencode(q)
@@ -31,7 +33,7 @@ def link_completo(produto: str, dados: dict) -> str:
         a, b = dados["a"], dados["b"]
         chave = acesso.chave_compat((a["data"], a["hora"], a["lat"], a["lon"]),
                                     (b["data"], b["hora"], b["lat"], b["lon"]))
-        token = acesso.emitir_token("compat", chave)
+        token = acesso.emitir_token("compat", chave, sistema)
         q = {"token": token}
         for prefixo, pe in (("a", a), ("b", b)):
             for k in ("nome", "data", "hora", "lat", "lon", "cidade"):
@@ -47,9 +49,17 @@ def _ola(nome: str) -> str:
     return f"Olá{(' ' + nome) if nome else ''},"
 
 
-def email_completo_html(produto: str, link: str, nome: str = "", extra: str = "") -> str:
+TITULO_EMAIL = {
+    "vedica": {"compat": "seu relatório de compatibilidade", "mapa": "seu mapa completo"},
+    "ocidental": {"compat": "a sinastria de vocês", "mapa": "seu mapa natal completo"},
+}
+
+
+def email_completo_html(produto: str, link: str, nome: str = "", extra: str = "",
+                        sistema: str = "vedica") -> str:
     """`extra`: HTML já pronto (e escapado) a acrescentar, ex.: a venda cruzada."""
-    titulo = "seu relatório de compatibilidade" if produto == "compat" else "seu mapa completo"
+    titulo = TITULO_EMAIL[sistema]["compat" if produto == "compat" else "mapa"]
+    assinatura = _sistema.ASSINATURA_EMAIL[sistema]
     ola = _ola(nome)
     link = html.escape(link, quote=True)
     return f"""<div style="font-family:Arial,Helvetica,sans-serif;background:#241522;color:#f4e9dc;padding:32px;border-radius:12px;max-width:520px;margin:auto">
@@ -60,7 +70,7 @@ def email_completo_html(produto: str, link: str, nome: str = "", extra: str = ""
   <p style="color:#c9b1a6;font-size:13px;margin:0 0 4px">Se o botão não abrir, copie e cole este link no navegador:</p>
   <p style="color:#c9b1a6;font-size:12px;word-break:break-all;margin:0">{link}</p>
   {extra}
-  <p style="color:#8f7a76;font-size:12px;margin-top:26px">Padmini — astrologia védica para autoconhecimento. Este link é pessoal; não o compartilhe.</p>
+  <p style="color:#8f7a76;font-size:12px;margin-top:26px">{assinatura} Este link é pessoal; não o compartilhe.</p>
 </div>"""
 
 

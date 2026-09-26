@@ -40,6 +40,9 @@ import limites
 import marketing
 import ofertas
 import seguranca
+import rotas_ocidental
+import sistema
+from nascimento import aviso_de_horario, validar_datetime as _validar_datetime
 import textos
 from gerar_pdf import gerar_pdf
 from montar_texto import (
@@ -65,6 +68,12 @@ async def _ciclo_de_vida(_app):
 
 log = logging.getLogger("padmini.app")
 
+# Qual versão do site está no ar (PADMINI_SISTEMA, ver sistema.py). Lido aqui,
+# na subida: valor desconhecido derruba a subida com erro claro, em vez de pôr
+# no ar um site meio montado.
+SISTEMA_NA_SUBIDA = sistema.ativo()
+log.info("Padmini subindo com PADMINI_SISTEMA=%s", SISTEMA_NA_SUBIDA)
+
 app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
 # Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy) em toda resposta.
 app.middleware("http")(seguranca.cabecalhos_de_seguranca)
@@ -80,6 +89,9 @@ async def _avisar_erro_500(request: Request, call_next):
                         chave="erro500", intervalo=15 * 60)
         raise
 app.mount("/static", StaticFiles(directory=RAIZ / "static"), name="static")
+# Rotas da versão ocidental (/api/ocidental/*): existem sempre, qualquer que seja
+# a versão no ar — um link já entregue precisa abrir depois de uma troca.
+app.include_router(rotas_ocidental.rotas)
 busca = BuscaCidades()
 
 
@@ -118,31 +130,8 @@ class PedidoCompatibilidade(BaseModel):
     token: str | None = Field(None, max_length=64)  # libera o completo (ver acesso.py)
 
 
-def aviso_de_horario(dt: datetime, nome_fuso: str) -> str | None:
-    """Detecta horários que não existem ou são ambíguos por causa do horário de verão."""
-    if "hora média local" in nome_fuso:
-        return ("Nascimento antes da adoção da hora padrão nesse local: usamos a hora média local, "
-                "calculada pela longitude da cidade.")
-    z = ZoneInfo(nome_fuso)
-    ida_volta = dt.replace(tzinfo=z).astimezone(timezone.utc).astimezone(z).replace(tzinfo=None)
-    if ida_volta != dt:
-        return ("Esse horário não existiu nesse local: o relógio foi adiantado para o horário de verão "
-                "nesse dia. Confira a hora na certidão de nascimento.")
-    if dt.replace(tzinfo=z, fold=0).utcoffset() != dt.replace(tzinfo=z, fold=1).utcoffset():
-        return ("Esse horário aconteceu duas vezes nesse dia (fim do horário de verão). "
-                "Usamos a primeira ocorrência; se a pessoa nasceu na segunda, o Ascendente pode mudar.")
-    return None
-
-
-def _validar_datetime(d: date, hora: str) -> datetime:
-    """Valida hora e faixa de data; devolve o datetime local ingênuo."""
-    h, m = map(int, hora.split(":"))
-    if not (0 <= h < 24 and 0 <= m < 60):
-        raise HTTPException(422, "Hora inválida.")
-    dt = datetime(d.year, d.month, d.day, h, m)
-    if not (datetime(1800, 1, 1) <= dt <= datetime.now()):
-        raise HTTPException(422, "A data de nascimento precisa estar entre 1800 e hoje.")
-    return dt
+# aviso_de_horario e _validar_datetime moraram aqui até a Fase 1 da versão
+# ocidental; foram para nascimento.py para as rotas das duas versões usarem.
 
 
 # ---------------------------------------------------------------------------
@@ -157,10 +146,10 @@ def _captura_ligada() -> bool:
     return os.environ.get("PADMINI_CAPTURA") == "1"
 
 
-_paginas_prontas: dict[str, str] = {}
+_paginas_prontas: dict[tuple[str, str], str] = {}
 
 # As páginas são templates: o texto vem de `conteudo/<pagina>.yaml` e o preço de
-# `conteudo/ofertas.yaml`. Montado no servidor, e não por JavaScript, para o
+# `conteudo/<versão>/ofertas.yaml`. Montado no servidor, e não por JavaScript, para o
 # conteúdo já sair no HTML (com fetch, o bloco de preço apareceria vazio até a
 # resposta chegar) e para o buscador ver a página inteira.
 # autoescape desligado: o texto é escrito por nós e pode ter <em>/<strong>
@@ -173,18 +162,33 @@ _jinja = jinja2.Environment(
 )
 
 
-def _pagina(arquivo: str) -> Response:
-    """Serve uma página montada. O resultado fica em memória: os arquivos só
-    mudam em deploy, que reinicia o processo."""
-    if arquivo not in _paginas_prontas:
-        _paginas_prontas[arquivo] = _jinja.get_template(arquivo).render(
-            t=textos.da_pagina(arquivo.removesuffix(".html")),
-            ofertas=ofertas.OFERTAS,
+def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:
+    """Serve uma página montada de uma versão do site. O resultado fica em
+    memória: os arquivos só mudam em deploy, que reinicia o processo."""
+    if (versao, arquivo) not in _paginas_prontas:
+        _paginas_prontas[(versao, arquivo)] = _jinja.get_template(arquivo).render(
+            t=textos.da_pagina(pagina, versao),
+            ofertas=ofertas.do_sistema(versao),
         )
-    return Response(_paginas_prontas[arquivo], media_type="text/html; charset=utf-8")
+    return Response(_paginas_prontas[(versao, arquivo)], media_type="text/html; charset=utf-8")
 
 
-def _pagina_ou_lista(request: Request, arquivo: str):
+def _pagina(rota: str, versao: str | None = None) -> Response:
+    """A página de `rota` ("/", "/mapa"...) na versão pedida (padrão: a do ar)."""
+    versao = versao or sistema.ativo()
+    arquivo, pagina = sistema.pagina(rota, versao)
+    return _pagina_montada(arquivo, versao, pagina)
+
+
+def _versao_do_pedido(request: Request) -> str:
+    """Link de entrega (com `token`) abre na versão do token, qualquer que seja a
+    versão no ar: quem comprou a védica continua lendo a védica, e vice-versa."""
+    if "token" in request.query_params:
+        return acesso.sistema_do_token(request.query_params.get("token"))
+    return sistema.ativo()
+
+
+def _pagina_ou_lista(request: Request, rota: str):
     chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
     previa_url = request.query_params.get("previa", "")
     liberado = (not _captura_ligada()
@@ -195,7 +199,7 @@ def _pagina_ou_lista(request: Request, arquivo: str):
         if request.url.query:
             destino += "?" + request.url.query  # mantém ref/utm do afiliado
         return RedirectResponse(destino, status_code=302)
-    resp = _pagina(arquivo)
+    resp = _pagina(rota, _versao_do_pedido(request))
     if chave and previa_url == chave:
         resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
                         secure=request.url.scheme == "https", samesite="lax")
@@ -204,22 +208,22 @@ def _pagina_ou_lista(request: Request, arquivo: str):
 
 @app.api_route("/", methods=["GET", "HEAD"])
 def pagina_home(request: Request):
-    return _pagina_ou_lista(request, "home.html")
+    return _pagina_ou_lista(request, "/")
 
 
 @app.api_route("/mapa", methods=["GET", "HEAD"])
 def pagina_mapa(request: Request):
-    return _pagina_ou_lista(request, "index.html")
+    return _pagina_ou_lista(request, "/mapa")
 
 
 @app.api_route("/compatibilidade", methods=["GET", "HEAD"])
 def pagina_compatibilidade(request: Request):
-    return _pagina_ou_lista(request, "compatibilidade.html")
+    return _pagina_ou_lista(request, "/compatibilidade")
 
 
 @app.api_route("/lista", methods=["GET", "HEAD"])
 def pagina_lista():
-    return _pagina("lista.html")
+    return _pagina("/lista")
 
 
 class Inscricao(BaseModel):
@@ -288,7 +292,10 @@ class SenhaLive(BaseModel):
 
 @app.get("/live")
 def pagina_live():
-    return FileResponse(RAIZ / "static" / "live.html")
+    versao = sistema.ativo()
+    if versao == "vedica":
+        return FileResponse(RAIZ / "static" / sistema.LIVE[versao])
+    return _pagina_montada(sistema.LIVE[versao], versao, "live")
 
 
 @app.get("/api/live/sessao")
@@ -352,6 +359,12 @@ def live_token_compat(pedido: PedidoCompatibilidade, request: Request):
     return {"token": acesso.emitir_token("compat", chave)}
 
 
+def _rotulo_produto(produto: str, versao: str) -> str:
+    """Como o produto vai para o banco: 'mapa' na védica (como sempre foi),
+    'ocidental:mapa' na ocidental."""
+    return produto if versao == "vedica" else f"{versao}:{produto}"
+
+
 @app.api_route("/robots.txt", methods=["GET", "HEAD"])
 def robots():
     # /live é a página do Pedro (senha), /api não é conteúdo, e os links de entrega
@@ -409,6 +422,7 @@ def saude():
 @app.get("/api/config")
 def config():
     return {
+        "sistema": sistema.ativo(),
         "texto_ia_disponivel": bool(os.environ.get("ANTHROPIC_API_KEY")),
         # Métricas de funil (PostHog). Em branco = desligado (nada é carregado).
         "posthog_key": os.environ.get("PADMINI_POSTHOG_KEY", ""),
@@ -634,6 +648,9 @@ def _processar_pedido(evento: dict) -> dict:
 
     pd = cakto.coletar_pd(evento)
     produto = cakto.produto_do_evento(evento, pd)
+    # versão do site da oferta paga (não a que está no ar): uma compra feita
+    # antes da troca de PADMINI_SISTEMA é entregue na versão comprada
+    versao = cakto.sistema_pago(evento) or "vedica"
     email = cakto.email_do_evento(evento)
     if produto not in ("mapa", "compat"):
         # Pagou, mas não dá para entregar com segurança: a oferta paga não foi
@@ -648,13 +665,15 @@ def _processar_pedido(evento: dict) -> dict:
         return {"ok": True, "produto": pago, "email": email or None,
                 "pendente": "produto pago não confere com os dados enviados — conferir e entregar manualmente"}
 
-    dados = cakto.dados_nascimento(pd, produto)
+    # a versão ocidental aceita nascimento sem hora (sem Ascendente e casas)
+    dados = cakto.dados_nascimento(pd, produto, exige_hora=versao == "vedica")
     if not dados:
         # Pagou, mas o `sck` não trouxe os dados de nascimento: não dá para gerar.
         # Grava o pedido sem link (aparece no banco para entrega manual) e responde
         # 200 — a Cakto não reenvia respostas de erro, então 422 não ajudaria.
-        db.registrar_pedido(evento, produto, {}, email, None, False)
-        _alertar_pendente(evento, produto, email, "sck sem os dados de nascimento", pd)
+        db.registrar_pedido(evento, _rotulo_produto(produto, versao), {}, email, None, False)
+        _alertar_pendente(evento, _rotulo_produto(produto, versao), email,
+                          "sck sem os dados de nascimento", pd)
         return {"ok": True, "produto": produto, "email": email or None,
                 "pendente": "dados de nascimento ausentes — entregar manualmente"}
 
@@ -663,19 +682,20 @@ def _processar_pedido(evento: dict) -> dict:
     if db.pedido_entregue(cakto_id):
         return {"ok": True, "produto": produto, "duplicado": True}
 
-    link = entrega.link_completo(produto, dados)
+    link = entrega.link_completo(produto, dados, versao)
     try:
-        extra = marketing.bloco_venda_cruzada(produto, dados)
+        extra = marketing.bloco_venda_cruzada(produto, dados, versao)
     except Exception:  # noqa: BLE001  (a oferta extra nunca pode travar a entrega)
         log.exception("venda cruzada: falha ao montar o bloco")
         extra = ""
     enviado = entrega.enviar_email(
         email, "Seu relatório Padmini está pronto",
-        entrega.email_completo_html(produto, link, dados.get("nome", ""), extra))
-    db.registrar_pedido(evento, produto, dados, email, link, enviado)
+        entrega.email_completo_html(produto, link, dados.get("nome", ""), extra, versao))
+    db.registrar_pedido(evento, _rotulo_produto(produto, versao), dados, email, link, enviado)
     if not enviado:
         alertas.alertar("E-mail de entrega NÃO saiu — mandar o link à mão",
-                        f"pedido {cakto_id} · {produto} · {email or '(sem e-mail)'}\nlink: {link}")
+                        f"pedido {cakto_id} · {_rotulo_produto(produto, versao)} · "
+                        f"{email or '(sem e-mail)'}\nlink: {link}")
     # se não enviou (Resend não configurado), devolve o link para envio manual
     return {"ok": True, "produto": produto, "email": email or None,
             "email_enviado": enviado, "link": None if enviado else link}

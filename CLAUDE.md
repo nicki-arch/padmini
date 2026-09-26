@@ -4,6 +4,22 @@ Site de astrologia védica (Jyotish) para o mercado brasileiro, modelo freemium:
 amostra grátis → paga na Cakto → recebe por e-mail um link assinado que abre o completo.
 Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikTok).
 
+## Duas versões no mesmo código: védica e ocidental
+**Para trocar a versão que está no ar: na Render, abra o serviço → Environment, mude
+`PADMINI_SISTEMA` para `ocidental` (ou `vedica`) e salve.** A Render reinicia sozinha;
+não precisa de deploy nem de mexer em código. Sem a variável, fica `vedica`.
+Valor digitado errado = o site não sobe (erro claro no log), em vez de subir pela metade.
+
+- `sistema.py` é o único lugar que lê a variável; tudo o que muda por versão pergunta para ele.
+- Copy e preços por versão: `conteudo/vedica/…` e `conteudo/ocidental/…`.
+- Link já entregue nunca quebra: o token diz a versão (védica sem prefixo, ocidental `oc-`),
+  e o completo abre na versão comprada qualquer que seja a do ar.
+- O webhook reconhece as ofertas das duas versões, qualquer que seja a ativa.
+- `testes/test_sistema.py` compara a védica com uma foto tirada antes do interruptor
+  (`testes/dados/vedica_html`). Mudou a védica de propósito? `python scripts/foto_vedica.py`
+  e diga no commit o que mudou.
+- Nada da védica se apaga: os testes dela continuam verdes em todo PR.
+
 ## Fontes de verdade
 - **Código:** este repositório (`github.com/nicki-arch/padmini`, branch `master`).
   Cópias de código em outros lugares (ex.: Claude Project) podem estar desatualizadas — não confiar nelas.
@@ -32,7 +48,13 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 | `cakto.py` | Webhook: assinatura HMAC `v1=` sobre `{timestamp}.{corpo}`; dados de nascimento vêm no `sck` |
 | `entrega.py` | Link assinado + e-mail (Resend) |
 | `static/afiliado.js` | Monta o link do checkout: dados no `sck`, afiliado/cupom dobrados em `utm_*` |
-| `ofertas.py` + `conteudo/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML |
+| `mapa_ocidental.py` | Motor ocidental: tropical, Placidus (Porfírio nos polos), nodo verdadeiro, aspectos e orbes num lugar só. Validado contra 11 mapas do astro-seek (`testes/dados/referencias_ocidental.json`) |
+| `montar_texto_ocidental.py` + `conteudo/ocidental/textos/` | Mapa → texto (YAML, `revisado: false` em cada texto; `python scripts/revisao_textos.py` conta o que falta revisar) |
+| `rotas_ocidental.py` + `static/ocidental/` | API `/api/ocidental/*`, páginas e `/live` da versão ocidental; `gerar_pdf_ocidental.py` é o PDF |
+| `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o Índice Padmini (método próprio, pesos em `docs/ocidental.md`) |
+| `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
+| `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, e-mails e tokens de cada versão |
+| `ofertas.py` + `conteudo/<versão>/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML |
 | `cidades.py` + `data/cidades_index.tsv` | Autocomplete de cidades (GeoNames) |
 | `gerar_pdf.py` | PDF do completo |
 | `static/live.html` + rotas `/live`, `/api/live/*` | Modo live do Pedro: senha (`PADMINI_LIVE_SENHA`) → cookie assinado de 12h → token do completo sem pagamento, com log em `live_geracoes` |

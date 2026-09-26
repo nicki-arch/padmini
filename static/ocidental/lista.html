@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#241522">
+{# Lista de espera da versão ocidental (cópia da védica com a copy trocada). #}
+<title>Padmini — Lista de espera</title>
+<meta name="description" content="Mapa natal e sinastria do casal. Entre na lista de espera e receba o aviso da abertura{% if ofertas.compat.preco_de %} com o preço de fundador{% endif %}.">
+<link rel="canonical" href="https://padmini.com.br/lista">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Padmini">
+<meta property="og:title" content="A sinastria de vocês dois — Padmini">
+<meta property="og:description" content="Estamos abrindo. Entre na lista e {% if ofertas.compat.preco_de %}garanta o preço de fundador{% else %}seja avisado primeiro{% endif %}.">
+<meta property="og:image" content="https://padmini.com.br/static/og-home.png">
+<meta property="og:url" content="https://padmini.com.br/lista">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<script src="/static/afiliado.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23e7a24a'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e2a89d'/></svg>">
+<style>
+  /* específico da lista de espera — o resto vem de base.css */
+  .hero{padding-block:40px 8px}
+  h1{font-size:clamp(2.4rem,6.2vw,3.8rem);line-height:1.05}
+  .data-abertura{display:inline-block;margin:0 0 18px;padding:6px 14px;border-radius:999px;border:1px solid rgba(231,162,74,.45);color:var(--saffron);font-size:13px;font-weight:600;letter-spacing:.02em}
+  .grade{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:start;padding-block:12px 56px}
+  .beneficios{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:16px}
+  .beneficios li{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start}
+  .beneficios .ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--saffron);font-weight:600;font-size:14px}
+  .beneficios b{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
+  .beneficios span{color:var(--muted);font-size:14.5px}
+  .preco-fundador{font-weight:600;color:var(--ink)}
+  .preco-fundador s{color:var(--faint);font-size:.9em;margin-left:4px}
+  form{display:grid;gap:14px}
+  .interesse{display:flex;flex-wrap:wrap;gap:8px;border:0;margin:0;padding:0}
+  .interesse legend{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:8px;padding:0}
+  .interesse label{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 14px;border:1px solid var(--line-forte);border-radius:999px;font-size:14px;color:var(--muted);cursor:pointer}
+  .interesse input{position:absolute;inset:0;width:1px;height:1px;min-height:0;padding:0;margin:0;border:0;opacity:0;pointer-events:none}
+  .interesse input:checked + span{color:var(--ink)}
+  .interesse label:has(input:checked){border-color:var(--saffron);background:var(--accent-soft)}
+  .interesse label:has(input:focus-visible){outline:2px solid var(--saffron);outline-offset:2px}
+  .check{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;font-size:14px;color:var(--muted);cursor:pointer}
+  .check input{width:20px;height:20px;min-height:0;margin:1px 0 0;accent-color:var(--saffron)}
+  .check.desligado{opacity:.5}
+  .miudo{font-size:12.5px;color:var(--faint);margin:0}
+  .miudo a{color:inherit}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .pronto{text-align:center;display:grid;gap:12px;justify-items:center;padding:12px 4px}
+  .pronto h2{font-size:1.9rem;margin:0}
+  .pronto p{color:var(--muted);margin:0;max-width:34ch}
+  .lotus{width:44px;height:44px}
+  @media (max-width:760px){ .grade{grid-template-columns:1fr;gap:22px} }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <div class="topbar">
+    <a class="marca" href="/lista" aria-label="Padmini">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+      Padmini
+    </a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <p class="eyebrow">Padmini · lista de espera</p>
+    <p class="data-abertura" id="data-abertura" hidden></p>
+    <h1>O que o mapa de vocês <em>dois</em> revela, está quase abrindo.</h1>
+    <p class="lede">A sinastria do casal em 8 dimensões e o seu mapa natal completo, calculados para o seu nascimento. Entre na lista e seja avisado primeiro{% if ofertas.compat.preco_de %}, com preço de fundador{% endif %}.</p>
+  </section>
+
+  <div class="grade">
+    <ul class="beneficios" aria-label="O que você ganha entrando na lista">
+      <li><span class="ic" aria-hidden="true">1</span><div><b>Aviso no dia da abertura</b><span>Você fica sabendo antes de todo mundo, por e-mail (e pelo WhatsApp, se quiser).</span></div></li>
+      {% if ofertas.compat.preco_de %}<li><span class="ic" aria-hidden="true">2</span><div><b>Preço de fundador</b><span>Sinastria do casal por <span class="preco-fundador">R${{ ofertas.compat.preco }}</span> <s>R${{ ofertas.compat.preco_de }}</s>, só para quem está na lista e por tempo limitado.</span></div></li>{% else %}<li><span class="ic" aria-hidden="true">2</span><div><b>Preço claro, sem surpresa</b><span>Sinastria do casal por <span class="preco-fundador">R${{ ofertas.compat.preco }}</span> e mapa natal por R${{ ofertas.mapa.preco }}: o valor que aparece aqui é o que se paga.</span></div></li>{% endif %}
+      <li><span class="ic" aria-hidden="true">3</span><div><b>Amostra grátis, como sempre</b><span>Você vê a nota de vocês e o essencial antes de decidir qualquer coisa.</span></div></li>
+    </ul>
+
+    <div class="card" id="caixa-form">
+      <form id="form" novalidate>
+        <div class="campo">
+          <label for="nome">Nome <span class="dica">(opcional)</span></label>
+          <input id="nome" name="nome" autocomplete="given-name" maxlength="80">
+        </div>
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required>
+        </div>
+        <div class="campo">
+          <label for="whatsapp">WhatsApp <span class="dica">(opcional, com DDD)</span></label>
+          <input id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20">
+        </div>
+        <fieldset class="interesse">
+          <legend>O que mais te interessa?</legend>
+          <label><input type="radio" name="interesse" value="compat" checked><span>Sinastria do casal</span></label>
+          <label><input type="radio" name="interesse" value="mapa"><span>Meu mapa</span></label>
+          <label><input type="radio" name="interesse" value="ambos"><span>Os dois</span></label>
+        </fieldset>
+        <label class="check"><input type="checkbox" id="aceita-email" required><span>Quero receber por e-mail o aviso da abertura{% if ofertas.compat.preco_de %} e o preço de fundador{% endif %}.</span></label>
+        <label class="check desligado" id="linha-zap"><input type="checkbox" id="aceita-whatsapp" disabled><span>Também quero o aviso pelo WhatsApp.</span></label>
+        <div class="hp" aria-hidden="true"><label for="site">Não preencha</label><input id="site" name="site" tabindex="-1" autocomplete="off"></div>
+        <p class="erro" id="erro" role="alert" hidden></p>
+        <button class="btn btn-primary" type="submit" id="enviar">Entrar na lista</button>
+        <p class="miudo">Usamos seus dados só para avisar da abertura e das novidades do Padmini. Você sai da lista quando quiser. <a href="/privacidade">Política de Privacidade</a>.</p>
+      </form>
+
+      <div class="pronto" id="pronto" hidden>
+        <svg class="lotus" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+        <h2>Pronto, você está na lista.</h2>
+        <p id="pronto-texto">Vamos te avisar assim que abrir. Enquanto isso, chama quem você quer ver o resultado junto.</p>
+        <button class="btn btn-outline" type="button" id="compartilhar">Compartilhar a lista</button>
+        <p class="miudo" id="copiado" hidden>Link copiado.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Padmini — astrologia para autoconhecimento. O conteúdo tem fins de reflexão e não substitui aconselhamento profissional.<br>
+  <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
+</footer>
+
+<script>
+const $ = (s) => document.querySelector(s);
+
+// data de abertura (configurada na Render: PADMINI_DATA_ABERTURA, ex.: "10 de outubro")
+fetch("/api/config").then((r) => r.json()).then((c) => {
+  if (c.data_abertura) { const el = $("#data-abertura"); el.textContent = "Abre em " + c.data_abertura; el.hidden = false; }
+}).catch(() => {});
+
+// WhatsApp: a caixa do WhatsApp só faz sentido com número preenchido
+const zap = $("#whatsapp"), aceitaZap = $("#aceita-whatsapp"), linhaZap = $("#linha-zap");
+zap.addEventListener("input", () => {
+  const d = zap.value.replace(/\D/g, "").slice(0, 11);
+  let f = d;
+  if (d.length > 2) f = `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length > 7) f = `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}`;
+  zap.value = f;
+  const tem = d.length >= 10;
+  aceitaZap.disabled = !tem; linhaZap.classList.toggle("desligado", !tem);
+  if (!tem) aceitaZap.checked = false;
+});
+
+function erro(msg) { const el = $("#erro"); el.textContent = msg || ""; el.hidden = !msg; }
+
+$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  erro("");
+  const email = $("#email").value.trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return erro("Confira o e-mail.");
+  if (!$("#aceita-email").checked) return erro("Marque a autorização para receber o aviso por e-mail.");
+  const botao = $("#enviar"); botao.disabled = true; botao.textContent = "Enviando…";
+  try {
+    const corpo = {
+      nome: $("#nome").value.trim(), email, whatsapp: zap.value,
+      aceita_email: true, aceita_whatsapp: aceitaZap.checked,
+      interesse: (document.querySelector("input[name=interesse]:checked") || {}).value || "",
+      origem: window.padAtribuicao ? window.padAtribuicao() : {},
+      site: $("#site").value,
+    };
+    const r = await fetch("/api/lista", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : "Não conseguimos salvar agora. Tente de novo.");
+    $("#form").hidden = true; $("#pronto").hidden = false;
+    if (window.padTrack) padTrack("lista_inscricao", { interesse: corpo.interesse, whatsapp: !!corpo.whatsapp });
+  } catch (err) {
+    erro(err.message);
+  } finally {
+    botao.disabled = false; botao.textContent = "Entrar na lista";
+  }
+});
+
+$("#compartilhar").addEventListener("click", async () => {
+  const url = location.origin + "/lista";
+  const dados = { title: "Padmini", text: "A sinastria de vocês dois — entra na lista comigo:", url };
+  try {
+    if (navigator.share) { await navigator.share(dados); return; }
+    await navigator.clipboard.writeText(url); $("#copiado").hidden = false;
+  } catch (_) { /* usuário cancelou */ }
+});
+</script>
+</body>
+</html>

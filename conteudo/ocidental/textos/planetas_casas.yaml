@@ -1,0 +1,1093 @@
+# Planetas nas casas — 10 planetas × 12 casas. Só aparece quando há hora de
+# nascimento. Rascunho; revisar e trocar `revisado` para true (ver LEIA.md).
+#
+# O que cada casa representa (para quem for revisar):
+#  1 jeito de se apresentar e de começar · 2 valores, recursos, segurança
+#  3 comunicação, estudos, irmãos, vizinhança · 4 lar, família, raízes
+#  5 criatividade, romance, lazer · 6 rotina, trabalho diário, hábitos
+#  7 parcerias e casamento · 8 intimidade, crises, o que se compartilha
+#  9 estudos, viagens, crenças · 10 carreira e reputação
+#  11 amigos, grupos, planos · 12 bastidores, solidão, mundo interior
+
+sol:
+  1:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 1, você é visto de longe. A sua presença entra na sala
+      antes de você falar, e as pessoas tendem a lembrar de você depois de um
+      primeiro encontro. A identidade se fortalece quando você age em primeira
+      pessoa: toma decisões, assume projetos com o seu nome. O ponto de atenção
+      é tratar tudo como assunto sobre você; às vezes a situação só pede
+      participação, não protagonismo.
+  2:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 2, você se sente você quando constrói segurança com os
+      próprios recursos e talentos. Ter algo que é seu — uma habilidade, um
+      espaço, uma reserva — dá firmeza ao seu jeito de ser. Você tende a
+      valorizar coisas duráveis e a saber o que quer. O ponto de atenção é
+      confundir o que você tem com o que você é. Seus valores falam mais sobre
+      você do que qualquer posse.
+  3:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 3, você brilha na conversa, na escrita e no aprendizado.
+      Você gosta de trocar ideias, de circular pelo bairro, de mandar a notícia
+      primeiro no grupo da família. Irmãos, primos e vizinhos podem ter papel
+      importante na sua história. O ponto de atenção é ficar na superfície de
+      muitos assuntos. Escolher um tema para contar bem — um blog, uma aula, um
+      podcast — dá forma a esse talento.
+  4:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 4, o centro da sua vida é o lar e as raízes. Você se
+      sente você em casa, entre os seus, e tende a dar muita importância à
+      história da família. Muitas vezes é a pessoa que reúne todo mundo no
+      almoço de domingo. O ponto de atenção é a vida pública ficar em segundo
+      plano por excesso de recolhimento. Levar para fora um pouco do calor que
+      você cria em casa amplia o seu brilho.
+  5:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 5, você brilha quando cria, brinca e se diverte. Arte,
+      esportes, romance e tudo que envolve prazer e expressão pessoal te dão
+      energia. Você costuma ter jeito com crianças e com festas. O ponto de
+      atenção é depender de estímulo e novidade para se sentir vivo. Cultivar
+      um hobby com constância transforma o entusiasmo passageiro em uma fonte
+      de alegria que dura.
+  6:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 6, você se sente você quando é útil no dia a dia. Uma
+      rotina bem feita, um trabalho que resolve problemas concretos, hábitos que
+      você cultiva: é aí que você brilha. Colegas costumam contar com você. O
+      ponto de atenção é se definir só pelo trabalho ou pela produtividade.
+      Guardar tempo para o descanso, sem se sentir culpado, também faz parte de
+      uma rotina bem cuidada.
+  7:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 7, você se descobre através dos outros. Parcerias,
+      casamento, sociedades e clientes são centrais na sua vida, e você brilha
+      quando faz as coisas a dois. Você tem talento para entender o outro e
+      negociar. O ponto de atenção é buscar no parceiro a sua própria luz ou
+      depender da aprovação dele. Cultivar algo que seja só seu equilibra a
+      entrega às relações.
+  8:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 8, você se fortalece nas experiências intensas. Crises,
+      mudanças profundas e relações de muita intimidade são onde você mais
+      cresce. Você tende a se interessar pelo que está por baixo da superfície:
+      psicologia, mistérios, o que as pessoas não dizem. O ponto de atenção é
+      viver tudo no extremo. Nem toda situação precisa de transformação total;
+      algumas pedem só um ajuste.
+  9:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 9, você brilha buscando sentido. Viagens, estudos,
+      filosofia, outras culturas e grandes perguntas te movem. Você tende a ser
+      a pessoa que volta da viagem com uma visão nova e quer contar tudo. O
+      ponto de atenção é viver no horizonte e esquecer o chão. Trazer o que
+      aprende para uma prática diária — ensinar, escrever, aplicar — torna a
+      sua busca útil para você e para os outros.
+  10:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 10, você se sente você quando realiza e é reconhecido
+      pelo que faz. Carreira, vocação e reputação têm peso grande na sua vida, e
+      você tende a assumir posições de responsabilidade. As pessoas costumam
+      ver você como referência. O ponto de atenção é medir o próprio valor só
+      pelo sucesso visível. Ter uma vida pessoal que te sustente dá mais
+      firmeza à sua ambição.
+  11:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 11, você brilha em grupo. Amigos, coletivos, projetos
+      com muita gente e planos para o futuro te dão energia e identidade. Você
+      costuma ser quem organiza a turma ou conecta pessoas. O ponto de atenção
+      é se diluir no grupo e esquecer o que você quer para si. Ter metas
+      pessoais, além das coletivas, mantém a sua luz própria no meio dos
+      outros.
+  12:
+    revisado: false
+    texto: >-
+      Com o Sol na casa 12, você brilha nos bastidores. Você tende a precisar de
+      tempo sozinho para se recarregar e tem uma vida interior rica, muitas
+      vezes voltada à arte, à espiritualidade ou ao cuidado com quem precisa.
+      Seu trabalho pode fazer diferença mesmo sem aparecer. O ponto de atenção
+      é se esconder por timidez. Mostrar aos poucos o que você cria por dentro
+      ajuda os outros a conhecer quem você é.
+
+lua:
+  1:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 1, suas emoções aparecem no rosto. As pessoas percebem
+      seu humor antes de você dizer uma palavra, e você reage rápido ao
+      ambiente. Isso te faz acolhedor e fácil de ler. O ponto de atenção é
+      oscilar muito conforme o dia ou a companhia. Conhecer seus sinais — fome,
+      cansaço, sono — ajuda a não confundir um dia difícil com um problema
+      maior.
+  2:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 2, você precisa de segurança concreta para ficar em paz.
+      Ter uma reserva, um cantinho seu e objetos com valor afetivo te acalma.
+      Você tende a guardar coisas que contam histórias. O ponto de atenção é
+      deixar o humor depender da sensação de ter o suficiente. Lembrar dos
+      recursos que não se medem — seus vínculos, suas habilidades — ajuda a
+      manter a calma nas fases mais apertadas.
+  3:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 3, você processa as emoções conversando e escrevendo.
+      Mensagens, telefonemas com irmãos ou amigos e anotações num caderno te
+      ajudam a entender o que sente. Você tem memória afetiva para conversas e
+      lugares do seu dia a dia. O ponto de atenção é a mente inquieta quando
+      você está ansioso. Uma caminhada pelo bairro costuma organizar os
+      pensamentos melhor do que mais uma conversa.
+  4:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 4, casa e família são o seu porto seguro. Você tem uma
+      ligação forte com o passado e com a figura que cuidou de você, e precisa
+      de um lar acolhedor para se sentir bem. Criar ambientes confortáveis é
+      um dos seus dons. O ponto de atenção é se fechar demais no ninho. Receber
+      pessoas em casa é um jeito de abrir o seu mundo sem sair dele.
+  5:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 5, você se nutre brincando e criando. Hobbies, arte,
+      romance, crianças e diversão levantam seu humor, e você tem um lado
+      lúdico que aparece com quem confia. O ponto de atenção é buscar emoção
+      constante e se entediar com o comum. Encontrar prazer em coisas simples
+      do cotidiano — cozinhar, desenhar, dançar em casa — mantém essa alegria
+      ao alcance.
+  6:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 6, sua estabilidade emocional depende muito da rotina.
+      Dormir bem, comer em horários regulares e ter o dia organizado fazem
+      diferença no seu humor. Você costuma cuidar dos outros de forma prática,
+      no trabalho e em casa. O ponto de atenção é transformar preocupação em
+      tarefa sem fim. Incluir na rotina momentos que não servem para nada, só
+      para você, também é cuidado.
+  7:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 7, você precisa de companhia para se sentir inteiro.
+      Relações próximas e parcerias estáveis te dão segurança, e você tende a
+      cuidar do parceiro com atenção. O ponto de atenção é depender do humor
+      do outro para saber como está o seu. Perguntar a si mesmo "o que eu
+      estou sentindo, independentemente dele?" ajuda a manter o vínculo sem
+      se perder nele.
+  8:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 8, suas emoções são profundas e reservadas. Você só se
+      abre de verdade com poucas pessoas, e quando se liga, é com intensidade.
+      Você tem intuição para crises e costuma ser forte quando os outros
+      desmoronam. O ponto de atenção é guardar sentimentos até que pesem.
+      Encontrar um lugar seguro para falar — um amigo, um terapeuta, um diário
+      — evita que a intensidade vire sobrecarga.
+  9:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 9, você se sente bem quando amplia horizontes. Viagens,
+      estudos, leituras e conversas sobre crenças e culturas te nutrem. Você
+      tende a buscar sentido para as emoções e a encontrar conforto numa
+      filosofia de vida. O ponto de atenção é fugir para longe — física ou
+      mentalmente — quando algo aperta perto. Às vezes o horizonte que você
+      procura está na conversa difícil com quem está do lado.
+  10:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 10, sua vida emocional se mistura com a vida pública.
+      Você se importa com a forma como é visto e pode escolher uma profissão
+      ligada ao cuidado ou ao público. As pessoas costumam sentir que você as
+      entende. O ponto de atenção é deixar a reputação ditar o seu humor.
+      Separar um espaço onde você não tem papel a cumprir ajuda a descansar de
+      ser visto.
+  11:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 11, os amigos são a sua família escolhida. Você se sente
+      bem em grupo, em comunidades e em projetos coletivos, e costuma acolher
+      quem chega novo. O ponto de atenção é se sentir sozinho mesmo rodeado de
+      gente, quando os vínculos ficam superficiais. Cultivar algumas amizades
+      mais próximas, com tempo de qualidade, dá ao seu grupo a profundidade que
+      você procura.
+  12:
+    revisado: false
+    texto: >-
+      Com a Lua na casa 12, você tem uma vida emocional rica e discreta. Você
+      precisa de silêncio e de tempo sozinho para entender o que sente, e tem
+      grande empatia por quem sofre. Sonhos, arte e espiritualidade costumam
+      ser seu refúgio. O ponto de atenção é esconder as emoções até de você
+      mesmo. Dar nome ao que sente, mesmo que só para si, ajuda a não carregar
+      sentimentos que nem são seus.
+
+mercurio:
+  1:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 1, você se apresenta pela palavra. Fala com
+      facilidade, faz perguntas e costuma parecer mais jovem ou mais curioso do
+      que a idade. As pessoas te conhecem pelo que você diz e pelo jeito rápido
+      de raciocinar. O ponto de atenção é falar antes de ouvir ou pensar em voz
+      alta demais. Deixar uma pausa antes de responder dá mais peso às suas
+      ideias.
+  2:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 2, sua inteligência é prática e ligada a valores.
+      Você pensa em como transformar ideias em algo útil e tende a ter talento
+      para negociar, vender ou ensinar o que sabe. O ponto de atenção é ficar
+      preso a pensamentos repetitivos sobre segurança. Escrever um plano
+      concreto — em vez de ruminar — costuma acalmar a mente e mostrar o
+      próximo passo.
+  3:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 3, você está em casa na comunicação. Conversar,
+      escrever, estudar e circular fazem parte do seu dia, e você tende a saber
+      das novidades antes dos outros. Irmãos e vizinhos podem ser grandes
+      interlocutores. O ponto de atenção é o excesso de estímulo: notificação,
+      conversa paralela, cinco leituras abertas. Um tempo sem tela por dia
+      ajuda a mente a digerir o que recebeu.
+  4:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 4, sua mente se volta para a casa e para a família.
+      Conversas à mesa, histórias dos avós e memórias de infância marcam o seu
+      jeito de pensar. Você pode trabalhar bem de casa ou gostar de estudar em
+      ambiente familiar. O ponto de atenção é guardar para si opiniões que
+      precisavam ser ditas em família. Falar com calma, em vez de calar, evita
+      mal-entendidos antigos.
+  5:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 5, você pensa brincando. Jogos, escrita criativa,
+      teatro, humor e conversas divertidas são o seu forte, e você tende a
+      ensinar bem crianças e jovens. Paquera, para você, começa na conversa. O
+      ponto de atenção é não levar a sério o que merece seriedade. Saber quando
+      trocar a piada pela escuta faz seu charme verbal funcionar ainda melhor.
+  6:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 6, sua mente é organizada e voltada para o trabalho
+      do dia a dia. Você gosta de listas, de melhorar processos e de resolver
+      problemas práticos. Colegas costumam pedir a sua opinião sobre como fazer
+      melhor. O ponto de atenção é a preocupação com detalhes que tira o sono.
+      Encerrar o expediente com uma lista do dia seguinte ajuda a desligar a
+      cabeça.
+  7:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 7, você pensa melhor em diálogo. Parcerias,
+      conversas a dois e negociações estimulam a sua mente, e você tende a
+      escolher parceiros com quem dá para conversar sobre tudo. O ponto de
+      atenção é depender da opinião do outro para decidir. Anotar o que você
+      pensa antes de consultar alguém ajuda a sua voz a não se perder na
+      conversa.
+  8:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 8, sua mente vai fundo. Você se interessa por
+      psicologia, investigação, mistérios e pelo que as pessoas escondem. Sabe
+      guardar segredos e fazer as perguntas certas. O ponto de atenção é o
+      pensamento obsessivo: voltar à mesma preocupação muitas vezes. Dar um
+      destino ao pensamento — pesquisar, escrever, conversar com alguém — ajuda
+      a sair do círculo.
+  9:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 9, sua mente busca o grande quadro. Estudos
+      superiores, línguas, viagens e filosofia te atraem, e você gosta de
+      discutir ideias e crenças — é comum você transformar uma conversa de
+      jantar num debate sobre o sentido das coisas. Ensinar e escrever sobre
+      o que aprendeu são talentos naturais. O ponto de atenção é generalizar
+      demais ou pregar sem perceber. Perguntar "como você vê isso?" mantém
+      suas conversas abertas.
+  10:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 10, sua carreira passa pela comunicação. Falar em
+      público, escrever, ensinar, negociar ou organizar informação tendem a
+      fazer parte do seu trabalho. Você costuma ser conhecido pelo que diz e
+      pela sua competência técnica. O ponto de atenção é falar só no modo
+      profissional até com quem é próximo. Mudar o tom fora do expediente
+      aproxima as pessoas.
+  11:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 11, você pensa em rede. Grupos de conversa,
+      comunidades online, amigos que trocam ideias e projetos coletivos te
+      estimulam. Você costuma conectar pessoas e ideias. O ponto de atenção
+      é ter muitos contatos e poucas conversas profundas, respondendo a dez
+      grupos e a ninguém com calma. Escolher alguns amigos para conversas
+      longas, sem pressa, alimenta a sua mente de outro jeito.
+  12:
+    revisado: false
+    texto: >-
+      Com Mercúrio na casa 12, sua mente trabalha nos bastidores. Você pensa
+      muito antes de falar, tem intuição forte e pode se expressar melhor por
+      escrito ou pela arte do que em voz alta. Ideias chegam em momentos de
+      silêncio. O ponto de atenção é guardar para si opiniões valiosas por
+      insegurança. Escrever antes de falar ajuda a trazer essas ideias para
+      fora.
+
+venus:
+  1:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 1, você tem um charme que aparece no primeiro contato.
+      As pessoas tendem a se sentir bem perto de você, e você cuida da própria
+      imagem com gosto. Gentileza é uma das suas marcas. O ponto de atenção é
+      querer agradar a todos para ser aceito. Lembrar que ser gostado não
+      depende de concordar sempre ajuda o seu charme a vir com opinião própria.
+  2:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 2, você valoriza o que é bonito, confortável e
+      duradouro. Você tem bom gosto para escolher objetos e ambientes, e pode ter
+      talento para transformar esse senso estético em trabalho. O ponto de
+      atenção é buscar conforto nas compras quando está chateado. Perguntar
+      "isto vai me fazer bem daqui a um mês?" antes de comprar mantém o prazer
+      sem arrependimento.
+  3:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 3, você se comunica com gentileza. Você sabe dizer
+      coisas difíceis de forma agradável, escreve com cuidado e tende a ter boa
+      relação com irmãos e vizinhos. Conversas leves são uma forma de afeto para
+      você. O ponto de atenção é evitar assuntos espinhosos para não estragar o
+      clima. Uma conversa difícil feita com a sua delicadeza pode aproximar em
+      vez de afastar.
+  4:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 4, você cria lares bonitos e acolhedores. Receber
+      pessoas, decorar, cozinhar para os seus: tudo isso é amor para você. A
+      família tende a ser fonte de afeto e de harmonia. O ponto de atenção é
+      evitar conflitos em casa a qualquer custo. Uma divergência dita com
+      carinho mantém a harmonia verdadeira, e não só a aparência dela.
+  5:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 5, amor e diversão andam juntos. Você gosta de romance,
+      de paquera, de arte e de tudo que dá prazer, e costuma ter charme criativo.
+      Encontros com você tendem a ser memoráveis. O ponto de atenção é a
+      paixão pelo começo e o desinteresse quando vira rotina. Trazer
+      criatividade para a relação estável — um programa novo, uma surpresa —
+      mantém o romance vivo.
+  6:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 6, você demonstra amor cuidando no cotidiano. Um
+      ambiente de trabalho agradável e colegas simpáticos fazem diferença
+      para você, e você tende a criar harmonia na equipe — é quem lembra do
+      bolo de aniversário do colega. O ponto de atenção é aceitar tarefas
+      demais para não desagradar. Um "não" gentil protege seu tempo e mantém
+      as boas relações que você cultiva.
+  7:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 7, as parcerias são um terreno fértil para você.
+      Você atrai relações harmoniosas, valoriza o casamento e as sociedades
+      e tem jeito para negociar acordos justos, como dividir as tarefas da
+      casa sem que ninguém se sinta passado para trás. O ponto de atenção é
+      idealizar o parceiro ou fazer tudo para manter a paz. Lembrar que uma
+      boa parceria aguenta discordâncias ajuda você a ser inteiro dentro
+      dela.
+  8:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 8, você ama com intensidade e busca intimidade
+      verdadeira. Relações superficiais não te satisfazem; você quer
+      confiança profunda e entrega, e percebe logo quando o outro está
+      escondendo algo. O ponto de atenção é o ciúme ou a tendência a se
+      fundir com o outro. Manter conversas francas sobre expectativas e
+      sobre o que é de cada um preserva a intensidade sem sufocar.
+  9:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 9, você se encanta pelo diferente. Pessoas de outras
+      culturas, viagens a dois, estudos e conversas sobre o sentido da vida
+      despertam seu afeto. Você gosta de relações que te fazem crescer. O ponto
+      de atenção é achar que o amor ideal está sempre longe. O extraordinário
+      também pode estar em quem está perto, visto com olhos novos.
+  10:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 10, sua vida profissional tende a se beneficiar do seu
+      charme e do seu senso estético. Você trabalha bem com público, com arte,
+      com beleza ou com diplomacia, e costuma ser bem visto. O ponto de atenção
+      é depender de agradar para avançar. Mostrar também a sua firmeza nas
+      decisões equilibra a boa imagem com autoridade.
+  11:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 11, as amizades são uma fonte de alegria e de afeto.
+      Você tende a ter amigos queridos, a se dar bem em grupos e, às vezes, a
+      ver amizade virar romance. Eventos sociais te energizam. O ponto de
+      atenção é agradar o grupo e esquecer as próprias vontades. Propor o
+      programa que você quer, de vez em quando, também é cuidar da amizade.
+  12:
+    revisado: false
+    texto: >-
+      Com Vênus na casa 12, você ama de forma discreta e compassiva. Pode
+      guardar sentimentos por muito tempo antes de revelar e tende a se sentir
+      atraído por quem precisa de cuidado. A arte e a espiritualidade são
+      refúgios de beleza para você. O ponto de atenção é o amor secreto ou o
+      sacrifício excessivo. Dizer o que sente, no tempo certo, dá ao outro a
+      chance de corresponder.
+
+marte:
+  1:
+    revisado: false
+    texto: >-
+      Com Marte na casa 1, você tem uma energia que se nota. Você age rápido,
+      toma a frente e costuma ser visto como alguém corajoso e direto, às vezes
+      competitivo até em jogo de tabuleiro. Atividade física faz muita diferença
+      no seu humor. O ponto de atenção é a impaciência que parece agressividade
+      para quem não te conhece. Respirar antes de reagir preserva a sua força
+      sem assustar ninguém.
+  2:
+    revisado: false
+    texto: >-
+      Com Marte na casa 2, você põe muita energia em construir a própria
+      segurança. Você trabalha duro pelo que quer e defende o que considera
+      seu, seja um espaço, um projeto ou uma ideia. Tem iniciativa para criar
+      fontes próprias de recursos. O ponto de atenção é agir por impulso nas
+      compras ou brigar por posse. Esperar um dia antes de decisões grandes
+      evita arrependimentos.
+  3:
+    revisado: false
+    texto: >-
+      Com Marte na casa 3, sua energia está na palavra. Você argumenta com
+      força, defende suas ideias e não foge de um bom debate — nem no grupo da
+      família. Aprende rápido quando está motivado. O ponto de atenção são as
+      discussões que esquentam à toa, principalmente com irmãos ou vizinhos, e
+      a direção agressiva no trânsito. Escolher quais debates valem a sua
+      energia poupa desgaste.
+  4:
+    revisado: false
+    texto: >-
+      Com Marte na casa 4, sua energia se volta para a casa e para a família.
+      Você pode gostar de reformar, construir e mexer no ambiente com as
+      próprias mãos. Em família, tende a ser protetor e, às vezes, o centro das
+      discussões. O ponto de atenção é descarregar em casa a tensão que veio de
+      fora. Uma atividade física antes de chegar em casa ajuda a trazer só o
+      que é bom para dentro.
+  5:
+    revisado: false
+    texto: >-
+      Com Marte na casa 5, você põe fogo no que faz por prazer. Esportes,
+      competições, projetos criativos e a conquista amorosa te energizam. Você
+      tende a ser apaixonado e a se jogar em hobbies com intensidade. O ponto
+      de atenção é transformar lazer em disputa ou buscar emoção arriscada.
+      Canalizar a vontade de vencer para um esporte com regras claras mantém a
+      diversão divertida.
+  6:
+    revisado: false
+    texto: >-
+      Com Marte na casa 6, você é trabalhador e eficiente. Tem energia para
+      rotinas intensas, gosta de resolver problemas práticos e fica inquieto
+      quando não tem o que fazer. Atividade física regular tende a ser
+      importante para o seu equilíbrio. O ponto de atenção é o excesso de
+      trabalho e a irritação com colegas mais lentos. Pausas planejadas mantêm
+      o seu ritmo sustentável.
+  7:
+    revisado: false
+    texto: >-
+      Com Marte na casa 7, suas relações têm energia e movimento. Você se atrai
+      por pessoas fortes e decididas, e as parcerias tendem a ser dinâmicas —
+      com paixão e, às vezes, disputa. Você defende quem ama com garra. O ponto
+      de atenção é transformar a relação em arena. Combinar como vocês vão
+      brigar — sem gritos, sem sair batendo a porta — ajuda o casal a usar essa
+      energia para crescer.
+  8:
+    revisado: false
+    texto: >-
+      Com Marte na casa 8, sua energia é intensa e profunda. Você enfrenta
+      crises com coragem, tem força de vontade para grandes mudanças e vive a
+      intimidade com paixão. Situações difíceis costumam revelar a sua
+      resistência. O ponto de atenção são as disputas de poder, inclusive
+      sobre o que é compartilhado. Deixar acordos claros e por escrito evita
+      conflitos desnecessários.
+  9:
+    revisado: false
+    texto: >-
+      Com Marte na casa 9, você age movido por ideias e aventuras. Viagens,
+      esportes ao ar livre, estudos e causas em que acredita te dão energia.
+      Você defende suas convicções com entusiasmo. O ponto de atenção é
+      transformar debates sobre crenças em brigas, ou partir para a próxima
+      aventura sem terminar a atual. Ouvir antes de rebater torna a sua defesa
+      mais convincente.
+  10:
+    revisado: false
+    texto: >-
+      Com Marte na casa 10, você tem ambição e energia para a carreira. Gosta
+      de metas, de desafios profissionais e tende a buscar posições de
+      liderança ou de autonomia. Trabalha bem sob pressão. O ponto de atenção
+      é o choque com chefes e autoridades quando você discorda. Escolher o
+      momento e a forma de contestar faz a sua iniciativa ser vista como
+      liderança, e não como rebeldia.
+  11:
+    revisado: false
+    texto: >-
+      Com Marte na casa 11, sua energia se volta para grupos e causas. Você
+      tende a liderar projetos coletivos, mobilizar amigos e lutar por ideias
+      que beneficiam muitos. Amizades são ativas: esportes, viagens, projetos.
+      O ponto de atenção são os atritos dentro do grupo quando você quer
+      acelerar tudo. Respeitar o ritmo dos outros mantém a turma unida em torno
+      do objetivo.
+  12:
+    revisado: false
+    texto: >-
+      Com Marte na casa 12, sua energia trabalha nos bastidores. Você pode ter
+      dificuldade de expressar raiva diretamente e preferir agir em silêncio,
+      com muita força interna. Trabalhos solitários, pesquisas e causas de
+      ajuda aos outros costumam te motivar. O ponto de atenção é engolir a
+      irritação até ela virar cansaço. Uma atividade física regular ajuda a
+      pôr essa energia para fora.
+
+jupiter:
+  1:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 1, você transmite otimismo e confiança. As pessoas
+      tendem a se sentir bem perto de você, e você costuma ser generoso e
+      bem humorado. Oportunidades surgem quando você se apresenta com
+      espontaneidade. O ponto de atenção é o excesso — prometer muito,
+      aceitar convites demais, dizer sim para três festas no mesmo sábado.
+      Dosar o entusiasmo faz ele render mais.
+  2:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 2, você tende a confiar nos próprios talentos e a ter
+      facilidade para gerar recursos quando se dedica. Você é generoso com o
+      que tem e gosta de compartilhar. O ponto de atenção é o otimismo
+      excessivo: gastar contando com o que ainda não chegou. Um planejamento
+      simples, com metas claras, faz essa confiança trabalhar a seu favor.
+  3:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 3, você cresce aprendendo e se comunicando. Leitura,
+      escrita, cursos e conversas abrem caminhos para você, e você tende a ter
+      facilidade para ensinar e para explicar coisas complicadas de forma
+      simples. Irmãos e vizinhos podem ser boas pontes. O ponto de atenção é
+      falar demais ou prometer além do que dá conta. Escolher bem as palavras
+      mantém a sua credibilidade.
+  4:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 4, o lar é fonte de crescimento e proteção. Você
+      tende a ter uma família acolhedora ou a construir uma, e gosta de casas
+      espaçosas e cheias de gente. O sentimento de pertencer te dá confiança. O
+      ponto de atenção é o apego ao conforto de casa, que pode segurar voos
+      maiores. Lembrar que você leva o seu lar por dentro ajuda a arriscar.
+  5:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 5, a alegria é o seu motor. Criatividade, romance,
+      diversão e crianças trazem crescimento e sorte para você. Você tem um
+      entusiasmo contagiante e costuma animar qualquer encontro, do
+      churrasco de domingo ao aniversário de criança. O ponto de atenção é
+      exagerar nos prazeres ou apostar alto demais. Manter o espírito de
+      brincadeira sem perder a medida faz a alegria durar.
+  6:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 6, você cresce pelo trabalho do dia a dia. Você tende
+      a encontrar satisfação em ser útil, a ter boa relação com colegas e a
+      criar rotinas que funcionam. Oportunidades aparecem pela competência. O
+      ponto de atenção é assumir tarefas demais por otimismo. Calcular o tempo
+      real de cada compromisso protege a sua agenda e a sua disposição.
+  7:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 7, as parcerias tendem a te fazer crescer. Você
+      atrai pessoas generosas, confia nos parceiros e costuma se sair bem em
+      sociedades e acordos, em que a sua boa-fé costuma ser retribuída. O
+      casamento pode ser um lugar de expansão. O ponto de atenção é esperar
+      demais do outro ou idealizar a parceria. Dividir responsabilidades de
+      forma clara mantém a confiança sem decepção.
+  8:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 8, você cresce atravessando transformações. Crises
+      tendem a te fortalecer, e você tem facilidade para reconstruir.
+      Relações íntimas tendem a ser fonte de apoio quando a vida muda de
+      rumo. O ponto de atenção é o excesso de confiança em acordos que
+      envolvem o que é de mais de uma pessoa. Ler as condições com calma
+      protege o que vocês constroem juntos.
+  9:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 9, você está em casa no mundo das ideias e das
+      viagens. Estudos, culturas diferentes, filosofia e ensino tendem a ser
+      caminhos de crescimento e de sorte para você. Sua fé na vida inspira os
+      outros. O ponto de atenção é a arrogância de quem já leu muito. Continuar
+      curioso e aberto a quem pensa diferente mantém a sua sabedoria viva.
+  10:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 10, você tende a ter oportunidades de crescimento na
+      carreira e a ser bem visto. Você acredita no próprio trabalho, tem visão
+      ampla e costuma inspirar confiança em chefes e clientes. O ponto de
+      atenção é prometer resultados grandes demais ou se acomodar no
+      reconhecimento. Metas concretas e revisadas de tempos em tempos
+      sustentam o seu crescimento.
+  11:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 11, os amigos e os grupos são fonte de crescimento e
+      oportunidades. Você tende a ter muitos contatos, a ser bem recebido em
+      comunidades e a ter planos grandes para o futuro. Muitas portas se abrem
+      por indicação. O ponto de atenção é se comprometer com projetos demais.
+      Escolher as causas que mais importam dá força ao seu idealismo.
+  12:
+    revisado: false
+    texto: >-
+      Com Júpiter na casa 12, você tem uma proteção discreta e uma fé
+      interior. Momentos de recolhimento, espiritualidade e ajuda aos outros
+      tendem a te fortalecer, e ajuda costuma aparecer quando você mais
+      precisa, às vezes de quem você menos esperava. O ponto de atenção é se
+      isolar esperando que tudo se resolva sozinho. Combinar a confiança
+      interior com passos práticos faz ela render.
+
+saturno:
+  1:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 1, você tende a ser visto como sério, maduro e
+      responsável, às vezes desde criança. Você pensa antes de se expor e
+      prefere mostrar competência a fazer barulho. A confiança cresce com o
+      tempo, e muitas pessoas com essa posição se sentem mais à vontade na vida
+      adulta. O ponto de atenção é a autocrítica que trava. Permitir-se errar
+      em coisas pequenas, na frente dos outros, afrouxa essa armadura.
+  2:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 2, você leva a sério a construção de segurança. Você
+      tende a ser cuidadoso com recursos, a planejar e a construir devagar uma
+      base sólida. Pode ter sentido cedo a necessidade de se virar sozinho. O
+      ponto de atenção é o medo de faltar, que impede de aproveitar o que já
+      conquistou. Separar uma parte do que tem para o prazer, sem culpa, é um
+      bom exercício.
+  3:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 3, você pensa com cuidado antes de falar. Pode ter
+      sentido insegurança para se expressar ou para estudar na infância, e
+      compensado com dedicação. Hoje tende a comunicar com precisão e
+      seriedade. O ponto de atenção é o medo de parecer ignorante, que te faz
+      calar em reuniões. Fazer a pergunta que todo mundo tinha, mas ninguém
+      fez, costuma ser mais valorizado do que você imagina.
+  4:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 4, a família e o lar trazem responsabilidades. Você
+      pode ter assumido cedo papéis de adulto em casa ou sentido falta de
+      acolhimento, e aprendido a construir sua própria base. Com o tempo, tende
+      a criar um lar sólido e estruturado. O ponto de atenção é a rigidez em
+      casa. Deixar espaço para o improviso e para o afeto sem motivo aquece o
+      ambiente que você constrói.
+  5:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 5, você leva a sério até a diversão. Pode ter
+      dificuldade de se soltar, medo de parecer ridículo ou cobrar demais de
+      si nos hobbies. Por outro lado, tem disciplina para desenvolver um talento
+      criativo com profundidade. O ponto de atenção é adiar o prazer para
+      "quando der". Reservar um tempo de brincadeira sem meta nenhuma é parte
+      do seu aprendizado.
+  6:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 6, você é dedicado ao trabalho e à rotina. Tem senso
+      de dever, gosta de fazer as coisas bem e de seguir um método. Costuma ser
+      a pessoa em quem a equipe confia para entregar. O ponto de atenção é o
+      excesso de responsabilidade e a dificuldade de delegar. Aceitar ajuda e
+      respeitar os limites do corpo — dormir, parar — protege a sua
+      constância.
+  7:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 7, você leva as parcerias muito a sério. Tende a ser
+      cauteloso para se comprometer e, quando se compromete, é leal e
+      responsável. Relações podem amadurecer com o tempo ou acontecer com
+      alguém mais velho ou mais sério. O ponto de atenção é o medo de se
+      entregar ou a cobrança excessiva ao parceiro. Combinar expectativas
+      claramente evita frustrações silenciosas.
+  8:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 8, você lida com a intimidade e as crises com cautela
+      e seriedade. Pode ter dificuldade de confiar e de se abrir, mas tem uma
+      resistência admirável nos momentos difíceis. Tende a ser responsável com
+      o que é compartilhado. O ponto de atenção é controlar demais para não se
+      sentir vulnerável. Confiar aos poucos, em pequenas coisas, amplia a
+      proximidade.
+  9:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 9, você leva a sério o que acredita e o que estuda.
+      Tende a buscar conhecimento sólido, com método, e pode ter uma visão de
+      mundo bem estruturada. Viagens e estudos longos podem exigir esforço, mas
+      rendem muito. O ponto de atenção é a rigidez de crenças ou o medo de
+      explorar o desconhecido. Uma viagem ou curso fora da zona de conforto
+      amplia seus horizontes.
+  10:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 10, você tem ambição de longo prazo e grande senso
+      de responsabilidade profissional. Tende a construir a carreira passo a
+      passo, e o reconhecimento costuma vir com o tempo e com esforço. As
+      pessoas veem você como alguém sério e confiável. O ponto de atenção é o
+      medo de falhar publicamente. Lembrar que quem constrói devagar também
+      tem direito a errar alivia a pressão.
+  11:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 11, você é seletivo com as amizades. Prefere poucos
+      amigos leais a muitos conhecidos, e tende a ter amigos mais velhos ou
+      mais sérios. Em grupos, costuma assumir responsabilidades. O ponto de
+      atenção é a sensação de não pertencer. Participar de um grupo com um
+      objetivo concreto — um clube, um projeto — ajuda a criar vínculos no seu
+      ritmo.
+  12:
+    revisado: false
+    texto: >-
+      Com Saturno na casa 12, você carrega responsabilidades que nem sempre
+      aparecem. Pode ter medos difusos ou uma autocobrança silenciosa, e tende
+      a precisar de tempo sozinho para se organizar por dentro. Trabalhos de
+      bastidores, de cuidado ou de pesquisa podem ser muito seus. O ponto de
+      atenção é carregar culpas que não são suas. Conversar sobre elas ajuda
+      a separar o que é seu do que foi herdado.
+
+urano:
+  1:
+    revisado: false
+    texto: >-
+      Com Urano na casa 1, você tem um jeito próprio, difícil de enquadrar.
+      Pode mudar de visual, de interesse ou de opinião com frequência, e as
+      pessoas te percebem como original. Você precisa de liberdade para ser
+      você. O ponto de atenção é a rebeldia automática: ir contra só para não
+      seguir. Perguntar se você quer mesmo aquilo ou só quer ser diferente
+      ajuda a escolher com mais liberdade.
+  2:
+    revisado: false
+    texto: >-
+      Com Urano na casa 2, sua relação com recursos e valores é pouco
+      convencional. Você pode preferir fontes de renda alternativas, trabalhar
+      com tecnologia ou mudar de estratégia com frequência. Seus valores
+      tendem a ser próprios, não herdados. O ponto de atenção são as
+      oscilações: fases de muito e fases de pouco. Ter uma reserva mínima dá
+      segurança para você continuar inovando.
+  3:
+    revisado: false
+    texto: >-
+      Com Urano na casa 3, sua mente é rápida e original. Você tem ideias
+      inesperadas, gosta de tecnologia e de formas novas de aprender e se
+      comunicar. Pode ter um jeito de falar ou escrever que chama atenção. O
+      ponto de atenção é a dispersão e a dificuldade com métodos tradicionais
+      de estudo. Encontrar formatos que te prendam — vídeo, projeto,
+      conversa — ajuda a aprender.
+  4:
+    revisado: false
+    texto: >-
+      Com Urano na casa 4, sua casa e sua família fogem do padrão. Pode ter
+      tido mudanças de casa, uma família pouco convencional ou precisar de
+      muita liberdade dentro do lar. Você tende a criar um ambiente original.
+      O ponto de atenção é a instabilidade doméstica — mudar demais ou não
+      criar raízes. Ter alguns rituais fixos em casa equilibra essa
+      inquietação.
+  5:
+    revisado: false
+    texto: >-
+      Com Urano na casa 5, sua criatividade é original e surpreendente. Você se
+      diverte com o que é diferente, gosta de experimentar e pode viver romances
+      inesperados. Tem ideias criativas que fogem do óbvio. O ponto de atenção
+      é perder o interesse quando a novidade passa. Trazer surpresas para o
+      que já é seu — o mesmo hobby de um jeito novo — mantém o encanto.
+  6:
+    revisado: false
+    texto: >-
+      Com Urano na casa 6, você precisa de liberdade na rotina. Horários rígidos
+      e tarefas repetitivas te cansam; você rende mais com flexibilidade,
+      tecnologia e autonomia. Tende a inovar nos processos de trabalho. O ponto
+      de atenção é a rotina desorganizada que afeta o seu bem-estar. Uma
+      estrutura mínima — mesmo horário para dormir, por exemplo — sustenta a
+      sua criatividade.
+  7:
+    revisado: false
+    texto: >-
+      Com Urano na casa 7, você precisa de parcerias com espaço. Relações
+      tradicionais demais te sufocam; você se atrai por pessoas originais e
+      independentes, que tenham vida própria além do casal. Parcerias podem
+      começar ou mudar de forma inesperada. O ponto de atenção é fugir
+      quando a relação pede compromisso. Combinar acordos que respeitem a
+      liberdade dos dois ajuda a construir vínculos estáveis e vivos.
+  8:
+    revisado: false
+    texto: >-
+      Com Urano na casa 8, você vive transformações de forma súbita e
+      libertadora. Mudanças profundas podem chegar sem aviso e te obrigar a
+      se reinventar — e você costuma se reinventar bem. Tem interesse por
+      temas ocultos ou tabus, daqueles que ninguém discute no almoço de
+      família. O ponto de atenção é o distanciamento na intimidade.
+      Permitir-se ficar, mesmo quando a vulnerabilidade assusta, aprofunda
+      os vínculos.
+  9:
+    revisado: false
+    texto: >-
+      Com Urano na casa 9, você pensa de forma livre e questiona verdades
+      prontas. Viagens inesperadas, estudos alternativos e ideias de vanguarda
+      te atraem. Você tende a mudar de visão de mundo algumas vezes ao longo da
+      vida. O ponto de atenção é rejeitar toda tradição por princípio. Olhar o
+      que o antigo tem de bom também é uma forma de pensar livremente.
+  10:
+    revisado: false
+    texto: >-
+      Com Urano na casa 10, sua carreira tende a ser original ou cheia de
+      mudanças. Você precisa de autonomia no trabalho e pode se destacar em
+      áreas inovadoras, tecnológicas ou pouco convencionais. Chefes rígidos
+      são um desafio. O ponto de atenção são as mudanças bruscas de rumo.
+      Planejar as transições, em vez de sair batendo a porta, protege o que
+      você construiu.
+  11:
+    revisado: false
+    texto: >-
+      Com Urano na casa 11, você tem amigos variados e originais. Grupos,
+      comunidades e causas de mudança social te atraem, e você tende a
+      trazer ideias novas para o coletivo. Amizades podem surgir de forma
+      inesperada, num curso ou numa viagem de última hora. O ponto de
+      atenção é o afastamento repentino quando o grupo te limita. Conversar
+      antes de sair preserva vínculos que valem a pena.
+  12:
+    revisado: false
+    texto: >-
+      Com Urano na casa 12, sua originalidade trabalha por dentro. Você pode
+      ter intuições súbitas, sonhos vívidos e ideias que surgem em momentos
+      de isolamento, como no banho ou pouco antes de dormir. Tende a
+      precisar de liberdade interior mais do que exterior. O ponto de
+      atenção é uma inquietação difusa, difícil de explicar. Práticas como
+      meditação, escrita ou arte ajudam a dar forma a essa energia.
+
+netuno:
+  1:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 1, você tem uma presença suave e difícil de definir.
+      As pessoas projetam em você o que querem ver, e você se adapta com
+      facilidade aos ambientes. Tem sensibilidade artística e uma empatia que
+      aparece no olhar. O ponto de atenção é perder os contornos de quem você
+      é conforme a companhia. Saber dizer do que você gosta, mesmo quando o
+      grupo pensa diferente, fortalece a sua identidade.
+  2:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 2, sua relação com recursos e valores é mais intuitiva
+      do que prática. Você tende a valorizar o que tem sentido — arte, beleza,
+      causas — mais do que o que tem preço. Pode ser muito generoso. O ponto de
+      atenção é a confusão com contas e combinados, ou emprestar sem pensar.
+      Deixar alguém de confiança ajudar a organizar a parte prática libera a
+      sua sensibilidade.
+  3:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 3, sua mente é poética e intuitiva. Você pensa por
+      imagens, tem facilidade com linguagem simbólica, música e escrita
+      criativa. Percebe nas entrelinhas o que as pessoas não dizem. O ponto de
+      atenção são os mal-entendidos — ouvir o que imaginou em vez do que foi
+      dito. Confirmar combinados por escrito evita confusões com quem convive
+      com você.
+  4:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 4, sua casa é um refúgio e um lugar de sonho. Você
+      pode ter memórias idealizadas da infância ou uma família em que as coisas
+      não eram ditas claramente. Tende a criar um lar sensível, com música,
+      arte ou espiritualidade. O ponto de atenção é idealizar o passado ou a
+      família. Olhar para as histórias com carinho e realismo ao mesmo tempo
+      traz paz.
+  5:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 5, sua criatividade é inspirada e romântica. Arte,
+      música, teatro e fantasia são caminhos naturais para você, e você tende a
+      viver o amor como um filme. O ponto de atenção é se apaixonar pela ideia
+      da pessoa e não pela pessoa. Dar tempo para conhecer quem está ali, com
+      qualidades e defeitos, torna o romance mais verdadeiro.
+  6:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 6, você precisa de sentido no trabalho do dia a dia.
+      Tarefas mecânicas te desanimam; trabalhos de cuidado, arte ou ajuda aos
+      outros te motivam. O ponto de atenção é a rotina desorganizada e a
+      tendência a absorver o cansaço do ambiente. Rotinas simples, pausas e
+      limites claros entre trabalho e descanso ajudam você a não se esgotar
+      ajudando.
+  7:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 7, você busca uma parceria quase espiritual. Tende a se
+      doar muito nas relações, a enxergar o melhor no outro e a buscar uma
+      conexão de alma. O ponto de atenção é idealizar o parceiro ou atrair
+      quem precisa ser salvo. Observar as atitudes com o tempo, e não só as
+      promessas, protege seu coração generoso de decepções.
+  8:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 8, sua intimidade é profunda e cheia de mistério. Você
+      tende a viver as relações íntimas como fusão e tem intuição para crises e
+      transformações. Temas espirituais podem te atrair. O ponto de atenção é
+      a falta de clareza em acordos que envolvem o que é compartilhado.
+      Colocar combinados no papel, mesmo com quem você confia, evita
+      confusões.
+  9:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 9, sua busca de sentido é espiritual e imaginativa.
+      Filosofias, religiões, viagens para lugares sagrados e artes te inspiram.
+      Você tende a ter uma fé profunda, mesmo que pouco convencional. O ponto
+      de atenção é seguir gurus ou ideias sem questionar. Manter o senso
+      crítico junto com a abertura torna sua busca mais segura e mais rica.
+  10:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 10, sua vocação pede sentido e inspiração. Você pode
+      se destacar em artes, cuidado, espiritualidade ou áreas que tocam o
+      imaginário coletivo. A carreira pode ter um caminho menos linear, com
+      fases de dúvida. O ponto de atenção é a indefinição sobre o que quer.
+      Testar caminhos na prática, em vez de esperar a certeza, ajuda a
+      encontrar a sua vocação.
+  11:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 11, você sonha com um mundo melhor e busca amigos
+      que compartilhem esse ideal. Grupos artísticos, espirituais ou
+      solidários te atraem. Você tende a ser um amigo generoso e
+      compreensivo, que atende a ligação de madrugada. O ponto de atenção é
+      idealizar amizades ou se decepcionar com o grupo. Aceitar que os
+      amigos também são humanos mantém os vínculos leves.
+  12:
+    revisado: false
+    texto: >-
+      Com Netuno na casa 12, você tem uma vida interior muito rica. Intuição,
+      sonhos, arte e espiritualidade são naturais para você, e você tende a
+      precisar de silêncio e de retiro para se recarregar. Tem grande compaixão
+      por quem sofre. O ponto de atenção é fugir da realidade quando ela pesa.
+      Práticas que te ancorem no corpo — caminhar, nadar, cozinhar — ajudam a
+      equilibrar.
+
+plutao:
+  1:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 1, você tem uma presença intensa e magnética. As
+      pessoas sentem a sua força mesmo quando você está calado, e você passa
+      por várias reinvenções de si ao longo da vida. Tem uma vontade firme. O
+      ponto de atenção é intimidar sem querer ou esconder demais o que sente.
+      Mostrar um pouco de vulnerabilidade aproxima quem se sente distante da
+      sua intensidade.
+  2:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 2, sua relação com segurança e valores é intensa. Você
+      pode passar por fases de perda e reconstrução que te ensinam o que
+      realmente importa, e tende a ter grande capacidade de se reerguer. O
+      ponto de atenção é o apego controlador ao que é seu. Lembrar que
+      segurança verdadeira vem também de dentro ajuda a soltar o controle.
+  3:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 3, sua mente é investigativa e sua palavra tem peso.
+      Você mergulha fundo nos assuntos, percebe o que está por trás das conversas e
+      pode ter grande poder de persuasão. O ponto de atenção é usar as
+      palavras como arma numa discussão ou ficar obcecado por uma ideia. Falar
+      para entender, e não só para vencer, abre conversas mais honestas.
+  4:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 4, a família e o lar são lugares de transformação
+      profunda. Pode haver histórias familiares intensas, segredos ou mudanças
+      marcantes na infância. Você tende a ter raízes fortes e a proteger os
+      seus com força. O ponto de atenção é repetir padrões familiares sem
+      perceber. Olhar para a história da família com consciência ajuda a
+      escolher o que manter.
+  5:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 5, você vive a criatividade e o romance com
+      intensidade. Suas paixões são profundas, e a arte pode ser um caminho
+      de transformação pessoal: escrever, pintar ou dançar pode ajudar você
+      a atravessar uma fase difícil. O ponto de atenção é o ciúme ou o tudo-
+      ou-nada no amor e nos projetos. Permitir que as coisas sejam
+      importantes sem ser absolutas torna o prazer mais leve.
+  6:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 6, você tende a se dedicar intensamente ao trabalho e
+      a querer transformar o que não funciona. Tem capacidade de reorganizar
+      rotinas e processos de cima a baixo. O ponto de atenção é o excesso de
+      controle sobre a rotina ou a obsessão com a perfeição. Delegar e aceitar
+      jeitos diferentes de fazer alivia a tensão no dia a dia.
+  7:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 7, suas relações te transformam profundamente. Você
+      atrai parceiros intensos e as parcerias costumam mexer com questões de
+      poder e confiança. Um relacionamento pode mudar a sua vida, a ponto de
+      haver um antes e um depois dele. O ponto de atenção são as disputas de
+      controle. Conversar abertamente sobre como vocês decidem as coisas a
+      dois evita que o poder vire um jogo silencioso.
+  8:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 8, você está em casa nas profundezas. Crises,
+      intimidade e transformações são terreno conhecido, e você tem uma
+      capacidade rara de se reerguer. Pode se interessar por psicologia e por
+      tudo que é oculto. O ponto de atenção é a necessidade de controle na
+      intimidade. Confiar, mesmo sem garantias, é o salto que aprofunda os
+      seus vínculos.
+  9:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 9, suas crenças passam por transformações
+      profundas. Você busca verdades com intensidade e pode mudar
+      radicalmente de visão de mundo depois de uma viagem ou de um estudo,
+      como quem volta de um intercâmbio outra pessoa. O ponto de atenção é o
+      fanatismo — defender uma ideia com força demais. Lembrar que a sua
+      verdade pode mudar de novo mantém a mente aberta.
+  10:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 10, você tem uma ambição profunda e grande capacidade
+      de influência. A carreira pode passar por transformações marcantes, e
+      você tende a buscar posições em que possa fazer diferença de verdade. O
+      ponto de atenção são os conflitos de poder com autoridades. Usar a sua
+      força para construir, e não para vencer disputas, fortalece a sua
+      reputação.
+  11:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 11, suas amizades e grupos têm papel transformador.
+      Você pode se envolver intensamente em causas coletivas e ter amigos
+      que mudam a sua vida. Tende a liderar ou influenciar grupos, mesmo sem
+      ter o cargo formal. O ponto de atenção são as disputas de poder na
+      turma. Valorizar a voz de cada um no grupo mantém a transformação
+      coletiva saudável.
+  12:
+    revisado: false
+    texto: >-
+      Com Plutão na casa 12, sua força trabalha em silêncio. Você tem uma vida
+      interior intensa, intuição profunda e capacidade de se transformar por
+      dentro. Pode se interessar por psicologia, pesquisa ou espiritualidade. O
+      ponto de atenção são medos ou emoções guardados sem nome. Trazê-los à luz
+      — com terapia, escrita ou uma conversa de confiança — libera muita
+      energia.
