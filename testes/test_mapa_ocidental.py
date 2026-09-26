@@ -157,3 +157,11 @@ def test_elementos_e_modalidades_contam_planetas_e_ascendente():
     mapa = _mapa(REF["mapas"][0])
     assert sum(len(v) for v in mapa["elementos"].values()) == 11
     assert sum(len(v) for v in mapa["modalidades"].values()) == 11
+
+
+def test_grau_trunca_no_minuto_como_a_fonte():
+    """sp-1990: a fonte mostra a Lua a 29°59'58" de Capricórnio; arredondar dava
+    "30°00'", que parece o signo seguinte."""
+    mapa = _mapa(REF["mapas"][0])
+    assert mapa["pontos"]["lua"]["grau_texto"] == "29°59'"
+    assert mo.grau_minuto(12.9999) == "12°59'" and mo.grau_minuto(0.5) == "0°30'"

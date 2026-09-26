@@ -100,8 +100,9 @@ def distancia(a: float, b: float) -> float:
 
 
 def grau_minuto(grau_no_signo: float) -> str:
-    """12.51 → "12°30'" (arredonda para o minuto)."""
-    minutos = round(grau_no_signo * 60)
+    """12.51 → "12°30'". TRUNCA no minuto, como os sites de astrologia: 29°59'58"
+    é 29°59' (arredondar daria 30°00', que parece o signo seguinte)."""
+    minutos = int(grau_no_signo * 60 + 1e-9)
     return f"{minutos // 60}°{minutos % 60:02d}'"
 
 
