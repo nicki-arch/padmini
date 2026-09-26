@@ -65,8 +65,11 @@ def link_checkout(produto: str, dados: dict | None, campanha: str, sistema: str 
     return base + sep + urllib.parse.urlencode(q)
 
 
+PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia": "numerologia", "tarot": "tarot"}
+
+
 def link_site(produto: str, campanha: str) -> str:
-    pagina = "compatibilidade" if produto == "compat" else "mapa"
+    pagina = PAGINA_DO_PRODUTO.get(produto, "mapa")
     return f"{entrega.SITE_URL}/{pagina}?" + urllib.parse.urlencode(
         {"utm_source": "email", "utm_medium": campanha, "utm_campaign": campanha})
 
@@ -215,6 +218,8 @@ def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedi
       - comprou o mapa → a compatibilidade (precisa dos dados do par: vai para o site).
     Cupom opcional: `cupom_pos_compra` da oferta em conteudo/<versão>/ofertas.yaml.
     """
+    if sistema == "ocidental":
+        return _venda_cruzada_ocidental(produto_comprado, dados)
     textos = TEXTO_VENDA_CRUZADA[sistema]
     if produto_comprado == "compat":
         alvo = ofertas.oferta("mapa", sistema)
@@ -237,3 +242,47 @@ def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedi
         texto += f' Use o cupom <b>{_e(cupom)}</b> no checkout.'
     return ('<div style="border-top:1px solid #4a3346;margin-top:26px;padding-top:18px">'
             + _p(texto, "margin:0 0 6px;color:#c9b1a6") + botoes + "</div>")
+
+
+# Versão ocidental: quatro produtos, cada e-mail oferece os outros que fazem
+# sentido (só os que já têm checkout configurado — sem link, nada aparece).
+VENDA_CRUZADA_OCIDENTAL = {
+    "compat": ("numerologia",),
+    "mapa": ("compat", "numerologia"),
+    "numerologia": ("mapa", "tarot"),
+    "tarot": ("numerologia", "mapa"),
+}
+TEXTO_OUTRO_PRODUTO = {
+    "compat": ("Sinastria do casal", "o seu mapa cruzado com o de outra pessoa, em 8 dimensões"),
+    "mapa": ("Mapa natal", "os planetas em signos e casas, os aspectos e o Ascendente"),
+    "numerologia": ("Numerologia", "os números do seu nome de registro e da sua data de nascimento"),
+    "tarot": ("Tarot", "três cartas — Situação, Desafio e Conselho — para pensar no momento"),
+}
+
+
+def _venda_cruzada_ocidental(produto_comprado: str, dados: dict) -> str:
+    sistema = "ocidental"
+    linhas = []
+    if produto_comprado == "compat":
+        # o mapa natal de cada um, com o checkout já preenchido (como na védica)
+        alvo = ofertas.oferta("mapa", sistema)
+        if alvo.get("checkout"):
+            linhas.append(_p(TEXTO_VENDA_CRUZADA[sistema]["compat"].format(preco=alvo.get("preco")),
+                             "margin:0 0 6px;color:#c9b1a6"))
+            linhas += [f'<p style="margin:10px 0"><a href="{_e(link_checkout("mapa", p, "pos_compra", sistema))}" '
+                       f'style="color:#e7a24a;font-weight:bold">Mapa natal de {_e(p.get("nome") or rotulo)} →</a></p>'
+                       for rotulo, p in (("Pessoa A", dados.get("a") or {}), ("Pessoa B", dados.get("b") or {}))
+                       if p]
+    outros = [(k, ofertas.oferta(k, sistema)) for k in VENDA_CRUZADA_OCIDENTAL.get(produto_comprado, ())]
+    outros = [(k, o) for k, o in outros if o.get("checkout")]
+    if outros:
+        linhas.append(_p("Outras leituras da Padmini, todas com amostra grátis:", "margin:14px 0 6px;color:#c9b1a6"))
+        for k, o in outros:
+            titulo, texto = TEXTO_OUTRO_PRODUTO[k]
+            linhas.append(f'<p style="margin:10px 0"><a href="{_e(link_site(k, "pos_compra"))}" '
+                          f'style="color:#e7a24a;font-weight:bold">{titulo} →</a>'
+                          f'<br><span style="color:#c9b1a6;font-size:13px">{texto} · R${_e(o.get("preco"))}</span></p>')
+    if not linhas:
+        return ""
+    return '<div style="border-top:1px solid #4a3346;margin-top:26px;padding-top:18px">' + "".join(linhas) + "</div>"
+

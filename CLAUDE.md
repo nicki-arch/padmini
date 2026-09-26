@@ -9,6 +9,8 @@ Sócios: Nicolas (produto/tecnologia) e Pedro Monteiro (conteúdo, lives no TikT
 `PADMINI_SISTEMA` para `ocidental` (ou `vedica`) e salve.** A Render reinicia sozinha;
 não precisa de deploy nem de mexer em código. Sem a variável, fica `vedica`.
 Valor digitado errado = o site não sobe (erro claro no log), em vez de subir pela metade.
+**Antes de virar para `ocidental`:** `python scripts/pronto_para_virar.py` lista o que ainda
+bloqueia (oferta sem link de checkout, texto não revisado, página falando da védica).
 
 - `sistema.py` é o único lugar que lê a variável; tudo o que muda por versão pergunta para ele.
 - Copy e preços por versão: `conteudo/vedica/…` e `conteudo/ocidental/…`.
@@ -53,10 +55,12 @@ Valor digitado errado = o site não sobe (erro claro no log), em vez de subir pe
 | `rotas_ocidental.py` + `static/ocidental/` | API `/api/ocidental/*`, páginas e `/live` da versão ocidental; `gerar_pdf_ocidental.py` é o PDF |
 | `revisao.py` + `scripts/exportar_revisao.py` / `importar_revisao.py` | Planilha de revisão da família (xlsx ↔ YAML); regras de tom e tamanho num lugar só. A planilha não vai para o git |
 | `numerologia.py` | Numerologia pitagórica (versão ocidental): regras de Y/W e do Caminho de Vida em `docs/ocidental.md` |
+| `scripts/pronto_para_virar.py` | O que falta para trocar `PADMINI_SISTEMA` para `ocidental` (sai com 1 se houver bloqueio) |
+| `scripts/gerar_og_ocidental.py` | Gera as imagens de compartilhamento `static/og-oc-*.png` da versão ocidental |
 | `tarot.py` | Tarot (versão ocidental): 78 cartas, sorteio no servidor, ID da tiragem com selo HMAC — o link pago abre as mesmas cartas da amostra |
 | `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o Índice Padmini (método próprio, pesos em `docs/ocidental.md`) |
 | `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
-| `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, e-mails e tokens de cada versão |
+| `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, termos/privacidade (`LEGAIS`), e-mails e tokens de cada versão |
 | `ofertas.py` + `conteudo/<versão>/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML |
 | `cidades.py` + `data/cidades_index.tsv` | Autocomplete de cidades (GeoNames) |
 | `gerar_pdf.py` | PDF do completo |

@@ -118,3 +118,26 @@ Espadas e Ouros). Nesta versão, só na posição normal (sem cartas invertidas)
 
 Textos: `conteudo/ocidental/textos/tarot.yaml` (leitura de cada carta com 40 a
 90 palavras — ver o LEIA.md da pasta).
+
+## Marca e acabamento (rodada 2, Fase E)
+
+- **Home** com os quatro produtos (sinastria, mapa natal, numerologia, tarot),
+  preços do `ofertas.yaml` e a linha do combo casal + 2 mapas.
+- **Termos e privacidade** próprios (`static/ocidental/termos.html` e
+  `privacidade.html`): mesmos dados da empresa e mesmas bases legais da LGPD,
+  com numerologia e tarot. A pergunta do tarot aparece na privacidade: fica no
+  navegador e não é armazenada. Com a védica no ar, `/termos` e `/privacidade`
+  servem os arquivos de sempre, byte a byte.
+- **Imagens de compartilhamento** `static/og-oc-*.png`, uma por página de
+  produto, geradas por `scripts/gerar_og_ocidental.py` (desenho próprio, sem a
+  marca em sânscrito).
+- **Venda cruzada** no e-mail de entrega entre os quatro produtos (só aparece o
+  que já tem link de checkout): casal → mapa natal de cada um + numerologia;
+  mapa → sinastria + numerologia; numerologia → mapa + tarot; tarot →
+  numerologia + mapa.
+- **Sitemap** por versão: a ocidental anuncia também `/numerologia` e `/tarot`.
+- **Smoke** (`scripts/smoke_producao.py`): a API ocidental dos quatro produtos é
+  conferida sempre (amostra grátis, completo e PDF com 402); as páginas de
+  numerologia e tarot têm de dar 200 com a ocidental no ar e 404 com a védica.
+- **Pronto para virar?** `python scripts/pronto_para_virar.py`.
+

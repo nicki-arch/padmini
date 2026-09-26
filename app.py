@@ -402,7 +402,9 @@ def robots():
 def sitemap():
     # Com a captura ligada, home/mapa/compatibilidade redirecionam para /lista;
     # anunciar as três no sitemap faria o buscador indexar redirecionamento.
-    caminhos = ["/lista"] if _captura_ligada() else ["/", "/mapa", "/compatibilidade"]
+    # Na ocidental entram também numerologia e tarot (as rotas públicas de PAGINAS, sem a lista).
+    publicas = [r for r in sistema.PAGINAS[sistema.ativo()] if r != "/lista"]
+    caminhos = ["/lista"] if _captura_ligada() else publicas
     urls = "".join(f"  <url><loc>{entrega.SITE_URL}{c}</loc></url>\n" for c in caminhos)
     corpo = ('<?xml version="1.0" encoding="UTF-8"?>\n'
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -412,12 +414,12 @@ def sitemap():
 
 @app.api_route("/privacidade", methods=["GET", "HEAD"])
 def pagina_privacidade():
-    return FileResponse(RAIZ / "static" / "privacidade.html")
+    return FileResponse(RAIZ / "static" / sistema.LEGAIS[sistema.ativo()]["/privacidade"])
 
 
 @app.api_route("/termos", methods=["GET", "HEAD"])
 def pagina_termos():
-    return FileResponse(RAIZ / "static" / "termos.html")
+    return FileResponse(RAIZ / "static" / sistema.LEGAIS[sistema.ativo()]["/termos"])
 
 
 @app.get("/api/cidades")

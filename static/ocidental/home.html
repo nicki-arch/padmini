@@ -11,7 +11,7 @@
 <meta property="og:site_name" content="Padmini">
 <meta property="og:title" content="{{ t.seo.og_titulo }}">
 <meta property="og:description" content="{{ t.seo.og_descricao }}">
-<meta property="og:image" content="https://padmini.com.br/static/og-home.png">
+<meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
 <meta property="og:url" content="https://padmini.com.br/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,13 +42,15 @@
   .prod .btn{margin-top:auto}
   .anchor2{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;background:var(--ground-2);border:1px solid var(--line);border-radius:16px;padding:26px}
   .badge{flex:none;width:54px;height:54px;border-radius:50%;background:var(--ground-3);display:grid;place-items:center}
-  @media(max-width:640px){.passos,.produtos{grid-template-columns:1fr}section{padding-block:44px}}
+  .prod .pcombo{font-size:13px;color:var(--muted);margin:0}
+  nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+  @media(max-width:640px){.passos,.produtos{grid-template-columns:1fr}section{padding-block:44px}.so-largo{display:none}}
   .cardc::after{content:none} /* o base.css desenha a marca em sânscrito no card */
 </style>
 </head>
 <body>
 {# Home da versão OCIDENTAL. Texto: conteudo/ocidental/home.yaml (variável `t`), inclusive o <head>.
-   Preço: conteudo/ocidental/ofertas.yaml. A home com os quatro produtos vem na Fase 5. #}
+   Preço: conteudo/ocidental/ofertas.yaml. Quatro produtos: sinastria, mapa, numerologia e tarot. #}
 <header class="wrap">
   <div class="topbar">
     <a class="marca" href="/">
@@ -57,7 +59,9 @@
     </a>
     <nav>
       <a class="navlink" href="/compatibilidade">{{ t.menu.compatibilidade }}</a>
-      <a class="navlink" href="/mapa">{{ t.menu.mapa }}</a>
+      <a class="navlink so-largo" href="/mapa">{{ t.menu.mapa }}</a>
+      <a class="navlink so-largo" href="/numerologia">{{ t.menu.numerologia }}</a>
+      <a class="navlink so-largo" href="/tarot">{{ t.menu.tarot }}</a>
     </nav>
   </div>
 </header>
@@ -131,6 +135,7 @@
         <p class="peco">Você economiza R${{ ofertas.compat.economia }}</p>
         {% else %}<div class="pprice">R${{ ofertas.compat.preco }}</div>
         {% endif %}        <p>{{ t.produtos.compat.texto }}</p>
+        {% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco }}</p>{% endif %}
         <a class="btn btn-primary" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
       </div>
       <div class="prod">
@@ -139,6 +144,20 @@
         <div class="pprice">R${{ ofertas.mapa.preco }}</div>
         <p>{{ t.produtos.mapa.texto }}</p>
         <a class="btn btn-outline" href="/mapa">{{ t.produtos.mapa.botao }}</a>
+      </div>
+      <div class="prod">
+        <span class="plab">{{ t.produtos.numerologia.etiqueta }}</span>
+        <h3>{{ t.produtos.numerologia.titulo }}</h3>
+        <div class="pprice">R${{ ofertas.numerologia.preco }}</div>
+        <p>{{ t.produtos.numerologia.texto }}</p>
+        <a class="btn btn-outline" href="/numerologia">{{ t.produtos.numerologia.botao }}</a>
+      </div>
+      <div class="prod">
+        <span class="plab">{{ t.produtos.tarot.etiqueta }}</span>
+        <h3>{{ t.produtos.tarot.titulo }}</h3>
+        <div class="pprice">R${{ ofertas.tarot.preco }}</div>
+        <p>{{ t.produtos.tarot.texto }}</p>
+        <a class="btn btn-outline" href="/tarot">{{ t.produtos.tarot.botao }}</a>
       </div>
     </div>
   </section>

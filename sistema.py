@@ -69,6 +69,13 @@ PAGINAS = {
     },
 }
 
+# Termos de uso e política de privacidade (arquivos puros em static/). A védica
+# continua servindo os mesmos arquivos de sempre.
+LEGAIS = {
+    "vedica": {"/termos": "termos.html", "/privacidade": "privacidade.html"},
+    "ocidental": {"/termos": "ocidental/termos.html", "/privacidade": "ocidental/privacidade.html"},
+}
+
 # Página do modo live (/live). A védica é servida como arquivo puro, como
 # sempre foi; as outras são templates.
 LIVE = {"vedica": "live.html", "ocidental": "ocidental/live.html"}
