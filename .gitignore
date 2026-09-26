@@ -9,3 +9,6 @@ data/cities1000.txt
 data/admin1CodesASCII.txt
 data/countryInfo.txt
 .e
+
+# planilha de revisão gerada por scripts/exportar_revisao.py (vai para o Drive, não para o git)
+revisao-textos*.xlsx
