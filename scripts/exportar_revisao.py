@@ -100,8 +100,17 @@ def gerar(destino: Path) -> Path:
     return destino
 
 
-def main():
-    destino = Path(sys.argv[1] if len(sys.argv) > 1 else "revisao-textos.xlsx")
+def main(argv=None):
+    args = sys.argv[1:] if argv is None else argv
+    if any(a in ("-h", "--help") for a in args):
+        print(__doc__.strip())
+        return
+    # opção desconhecida não vira nome de arquivo (antes, "--help" criava um arquivo "--help")
+    ruins = [a for a in args if a.startswith("-")]
+    if ruins or len(args) > 1:
+        sys.exit(f"Opção ou argumento inválido: {' '.join(ruins or args[1:])}\n"
+                 "Uso: python scripts/exportar_revisao.py [arquivo.xlsx]   (-h para ajuda)")
+    destino = Path(args[0] if args else "revisao-textos.xlsx")
     gerar(destino)
     total = len(revisao.itens())
     faltam = sum(1 for i in revisao.itens() if not i["revisado"])

@@ -67,10 +67,16 @@ def planejar(linhas: list[dict]) -> tuple[list[dict], list[tuple], list[str]]:
     return alteracoes, recusados, desconhecidos
 
 
-def main():
-    if len(sys.argv) < 2:
-        sys.exit(__doc__)
-    planilha = Path(sys.argv[1])
+def main(argv=None):
+    args = sys.argv[1:] if argv is None else argv
+    if any(a in ("-h", "--help") for a in args):
+        print(__doc__.strip())
+        return
+    ruins = [a for a in args if a.startswith("-") and a != "--gravar"]
+    arquivos = [a for a in args if not a.startswith("-")]
+    if ruins or len(arquivos) != 1:
+        sys.exit((f"Opção inválida: {' '.join(ruins)}\n" if ruins else "") + __doc__.strip())
+    planilha = Path(arquivos[0])
     alteracoes, recusados, desconhecidos = planejar(ler(planilha))
     novos = [a for a in alteracoes if a["texto"]]
     aprovados = [a for a in alteracoes if a["revisado"]]
@@ -85,7 +91,7 @@ def main():
             print(f"  {id_}: {'; '.join(erros)}")
     if desconhecidos:
         print("\nIDs que não existem mais na base (linha ignorada):", ", ".join(desconhecidos))
-    if "--gravar" not in sys.argv:
+    if "--gravar" not in args:
         print("\nNada foi gravado. Para gravar: acrescente --gravar.")
         return
     if alteracoes:

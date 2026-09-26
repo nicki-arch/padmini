@@ -127,7 +127,7 @@
       <p class="erro" id="erro" role="alert" hidden></p>
       <div class="enviar-linha">
         <button id="enviar" type="submit" class="btn btn-primary">Ver nossa sinastria →</button>
-        <span class="price-note">Amostra <b>grátis</b> · relatório completo por <b id="preco-nota">R${{ ofertas.compat.preco }}</b></span>
+        <span class="price-note">Amostra <b>grátis</b> · relatório completo por <b id="preco-nota">R${{ ofertas.compat.preco | moeda }}</b></span>
       </div>
     </form>
   </div>
@@ -144,18 +144,26 @@
 
 <script>
 // Tudo de conteudo/ocidental/ofertas.yaml (trocado no servidor). Não escrever à mão.
-// Preço de tabela por padrão; o preço com cupom só para quem chegou com cupom de
-// afiliado no link (?cupom=...): aí o checkout recebe `coupon=`, o parâmetro da
-// Cakto que já aplica o cupom (ajuda.cakto.com.br, "checkout pré-preenchido").
+// Preço de tabela por padrão; o preço com cupom só para quem chegou com um cupom
+// válido no link (?cupom=PEDRO, sem diferença de maiúsculas): aí o checkout recebe
+// `coupon=pedro`, o parâmetro da Cakto que já aplica o cupom (ajuda.cakto.com.br,
+// "checkout pré-preenchido"). O preço com cupom é calculado do percentual no servidor.
 const LINK_CHECKOUT = "{{ ofertas.compat.checkout }}";
-const PRECO = "{{ ofertas.compat.preco }}";
-const PRECO_CUPOM = "{{ ofertas.compat.preco_cupom or '' }}";
+const PRECO = "{{ ofertas.compat.preco | moeda }}";
+const PRECO_CUPOM = "{{ ofertas.compat.preco_cupom | moeda }}";
+const CUPOM_PERCENTUAL = "{{ ofertas.compat.cupom_percentual or '' }}";
+const CUPONS = {{ ofertas.compat.cupom_codigos | tojson }};
 // Combo "casal completo" (order bump no checkout): a diferença entre o total do
 // combo e o preço de TABELA da sinastria. O cupom de afiliado desconta só a
 // sinastria, então o acréscimo do combo é o mesmo com ou sem cupom.
 // Vazio enquanto o bump não tiver `checkout` no ofertas.yaml.
-const PRECO_BUMP_MAPAS = "{% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.checkout %}R${{ ofertas.bump_mapas_casal.preco - ofertas.compat.preco }}{% endif %}";
-function cupomDoVisitante() { const a = window.padAtribuicao ? padAtribuicao() : {}; return a.cupom || a.coupon || ""; }
+const PRECO_BUMP_MAPAS = "{% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.checkout %}R${{ (ofertas.bump_mapas_casal.preco - ofertas.compat.preco) | moeda }}{% endif %}";
+// só um cupom que existe na Cakto (lista do ofertas.yaml), em minúsculas
+function cupomDoVisitante() {
+  const a = window.padAtribuicao ? padAtribuicao() : {};
+  const c = String(a.cupom || a.coupon || "").trim().toLowerCase();
+  return CUPONS.includes(c) ? c : "";
+}
 function precoMostrado() { return cupomDoVisitante() && PRECO_CUPOM ? PRECO_CUPOM : PRECO; }
 document.addEventListener("DOMContentLoaded", () => { const el = document.getElementById("preco-nota"); if (el) el.textContent = "R$" + precoMostrado(); });
 
@@ -324,7 +332,7 @@ function desenharAmostra(d) {
   const cupom = cupomDoVisitante();
   const comCupom = cupom && PRECO_CUPOM;
   const ctaHref = LINK_CHECKOUT && ultimoCasal
-    ? linkCheckout(LINK_CHECKOUT, { produto: "compat", a: ultimoCasal.a, b: ultimoCasal.b }, { aplicarCupom: true })
+    ? linkCheckout(LINK_CHECKOUT, { produto: "compat", a: ultimoCasal.a, b: ultimoCasal.b }, { aplicarCupom: !!comCupom })
     : "";
   $("#resultado").innerHTML = `
     <div><h2>${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2><p class="moldura">${esc(d.indice_texto)}</p></div>
@@ -343,7 +351,7 @@ function desenharAmostra(d) {
       </ul>
       <div class="preco">R$${esc(comCupom ? PRECO_CUPOM : PRECO)}${comCupom ? ` <small>R$${esc(PRECO)}</small>` : ""}</div>
       ${PRECO_BUMP_MAPAS ? `<p class="sub" style="margin:4px 0 14px">No checkout, dá para incluir <b>o mapa natal de cada um</b> por mais ${esc(PRECO_BUMP_MAPAS)} — os dois chegam no mesmo e-mail.</p>` : ""}
-      ${comCupom ? `<p class="sub" style="margin:4px 0 14px">Com o cupom <b>${esc(cupom)}</b>, já aplicado no checkout. Se ele não aparecer aplicado, digite no campo de cupom.</p>` : ""}
+      ${comCupom ? `<p class="sub" style="margin:4px 0 14px">Com o cupom <b>${esc(cupom.toUpperCase())}</b> (${esc(CUPOM_PERCENTUAL)}% de desconto), já aplicado no checkout. Se ele não aparecer aplicado, digite no campo de cupom.</p>` : ""}
       <div class="enviar-linha">
         ${ctaHref
           ? `<a class="btn btn-primary" href="${esc(ctaHref)}" id="cta-completo" onclick="window.padTrack&&padTrack('checkout_click',{produto:'compat',sistema:'ocidental'})">Quero a sinastria completa →</a>`

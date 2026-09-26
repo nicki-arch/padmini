@@ -88,7 +88,7 @@
 
   <section id="sobre">
     <h2>O que vem na numerologia completa</h2>
-    <p class="sub">A amostra é grátis. O completo (R${{ ofertas.numerologia.preco }}) abre os seis números.</p>
+    <p class="sub">A amostra é grátis. O completo (R${{ ofertas.numerologia.preco | moeda }}) abre os seis números.</p>
     <ul class="lista-completo">
       <li>Caminho de Vida, Expressão, Alma e Personalidade, com a leitura de cada um</li>
       <li>O talento do seu dia de nascimento</li>
@@ -105,7 +105,7 @@
 
 <script>
 const LINK_CHECKOUT = "{{ ofertas.numerologia.checkout }}";
-const PRECO = "{{ ofertas.numerologia.preco }}";
+const PRECO = "{{ ofertas.numerologia.preco | moeda }}";
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let ultimoPedido = null;

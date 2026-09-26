@@ -18,7 +18,8 @@ import textos  # noqa: E402
 def test_precos_da_versao_ocidental():
     assert ofertas.preco("mapa", "ocidental") == "37"
     assert ofertas.preco("compat", "ocidental") == "127"
-    assert ofertas.oferta("compat", "ocidental")["preco_cupom"] == 97
+    # rodada 3: o cupom da Cakto é em % inteiro (24%) e o preço com cupom é calculado
+    assert ofertas.oferta("compat", "ocidental")["preco_cupom"] == 96.52
     assert ofertas.preco("bump_mapas_casal", "ocidental") == "167"
     assert ofertas.preco("numerologia", "ocidental") == "27"
     assert ofertas.preco("tarot", "ocidental") == "19"
@@ -47,11 +48,14 @@ def ocidental_com_bump(monkeypatch):
 def test_combo_na_pagina_anuncia_a_diferenca_do_preco_de_tabela(ocidental_com_bump):
     html = cliente.get("/compatibilidade").text
     assert 'const PRECO_BUMP_MAPAS = "R$40";' in html  # 167 − 127
-    assert 'const PRECO = "127";' in html and 'const PRECO_CUPOM = "97";' in html
+    assert 'const PRECO = "127";' in html and 'const PRECO_CUPOM = "96,52";' in html
     assert "ÍNDICE PADMINI · MÉTODO PRÓPRIO" in html and "const CARD_MOSTRA_INDICE = true;" in html
 
 
 def test_sem_checkout_do_bump_a_linha_do_combo_some(monkeypatch):
+    novas = json.loads(json.dumps(ofertas.POR_SISTEMA["ocidental"]))
+    novas["bump_mapas_casal"]["checkout"] = ""
+    monkeypatch.setitem(ofertas.POR_SISTEMA, "ocidental", novas)
     monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
     app_mod._paginas_prontas.clear()
     assert 'const PRECO_BUMP_MAPAS = "";' in cliente.get("/compatibilidade").text

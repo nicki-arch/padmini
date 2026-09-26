@@ -160,6 +160,8 @@ _jinja = jinja2.Environment(
     undefined=jinja2.StrictUndefined,  # nome errado no template vira erro, não buraco na página
     keep_trailing_newline=True,
 )
+# Preço sempre no formato brasileiro ("R$96,52", nunca "R$96.52"): {{ x | moeda }}.
+_jinja.filters["moeda"] = ofertas.moeda
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:

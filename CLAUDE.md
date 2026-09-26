@@ -61,7 +61,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o Índice Padmini (método próprio, pesos em `docs/ocidental.md`) |
 | `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
 | `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, termos/privacidade (`LEGAIS`), e-mails e tokens de cada versão |
-| `ofertas.py` + `conteudo/<versão>/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML |
+| `ofertas.py` + `conteudo/<versão>/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML. Preço na tela sempre por `ofertas.moeda` / `{{ x \| moeda }}` (R$96,52, nunca R$96.52); preço com cupom é calculado de `cupom_percentual` |
 | `cidades.py` + `data/cidades_index.tsv` | Autocomplete de cidades (GeoNames) |
 | `gerar_pdf.py` | PDF do completo |
 | `static/live.html` + rotas `/live`, `/api/live/*` | Modo live do Pedro: senha (`PADMINI_LIVE_SENHA`) → cookie assinado de 12h → token do completo sem pagamento, com log em `live_geracoes` |

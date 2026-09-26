@@ -158,3 +158,16 @@ def test_gravar_no_tarot(base_copiada):
     assert b["cartas"]["o_louco"]["leitura"]["revisado"] is True
     assert b["conjunto"]["maiores"][2]["revisado"] is True
     assert b["cartas"]["o_mago"] == antes
+
+
+@pytest.mark.parametrize("script", ["exportar", "importar"])
+def test_help_mostra_o_uso_e_nao_cria_arquivo(script, tmp_path, monkeypatch, capsys):
+    """`exportar_revisao.py --help` criava um arquivo chamado "--help"."""
+    monkeypatch.chdir(tmp_path)
+    mod = exportar if script == "exportar" else importar
+    for opcao in ("-h", "--help"):
+        mod.main([opcao])
+        assert "python scripts/" in capsys.readouterr().out
+    with pytest.raises(SystemExit):
+        mod.main(["--qualquer"])
+    assert list(tmp_path.iterdir()) == []

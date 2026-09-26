@@ -69,20 +69,42 @@ tudo em quadratura ≤ 20, nenhum aspecto = 50).
 
 ## Preços (decisão do Nicolas, 26/set/2026)
 
-Tarot R$19 · Numerologia R$27 · Mapa natal R$37 · Sinastria R$127 (R$97 com
-cupom de afiliado) · combo sinastria + 2 mapas natais R$167 (order bump: a
-página anuncia "por mais R$40", a diferença para o preço de TABELA — o cupom
-desconta só a sinastria). Tudo em `conteudo/ocidental/ofertas.yaml`.
+Tarot R$19 · Numerologia R$27 · Mapa natal R$37 · Sinastria R$127 (R$96,52
+com o cupom do Pedro, 24%) · combo sinastria + 2 mapas natais R$167 (order
+bump de R$40 dentro do checkout da sinastria, desmarcado: a página anuncia
+"por mais R$40", a diferença para o preço de TABELA — o cupom não vale para o
+bump). O tarot parcela em até 4x (limite da Cakto para R$19); nenhuma página
+anuncia parcelas. Tudo em `conteudo/ocidental/ofertas.yaml`, com os links de
+checkout colados em 26/set/2026 (rodada 3).
 
-## Preço do casal
+Preço sempre em formato brasileiro, por um filtro só (`ofertas.moeda`, e
+`{{ x | moeda }}` nos templates): R$127 (inteiro, sem centavos), R$96,52 —
+nunca "R$96.52".
 
-`conteudo/ocidental/ofertas.yaml`: `preco: 127` (mostrado por padrão e cobrado
-pela oferta), `preco_cupom: 97` (só para quem chega com `?cupom=` de afiliado).
-A Cakto aceita `coupon=CODIGO` na URL do checkout e aplica o cupom
-(ajuda.cakto.com.br, artigo 61, "checkout pré-preenchido", conferido em
-26/set/2026); a página ocidental repassa o cupom assim e ainda avisa para
-digitar o código se ele não aparecer aplicado. O cupom precisa existir na
-Cakto com o mesmo código. A védica continua como estava (cupom só em utm_term).
+## Cupom do Pedro
+
+A Cakto só aceita desconto em **% inteiro**. O cupom criado é `pedro` (a Cakto
+grava em minúsculas; `PEDRO` também funciona, conferido no checkout real),
+**24%**, só na sinastria, sem validade, sem valer para o bump.
+
+No `ofertas.yaml`: `cupom_percentual: 24` e `cupom_codigos: [pedro]`. O preço
+com cupom **não** é escrito à mão: o `ofertas.py` calcula (127 − 24% = 96,52,
+centavos arredondados meio-para-cima). Foi assim que o site anunciou R$97
+enquanto a Cakto cobraria R$96,52.
+
+A página da sinastria mostra o preço com cupom só para quem chega com um código
+da lista (sem diferença de maiúsculas) e manda `coupon=pedro` (sempre em
+minúsculas) para a Cakto, que aplica o desconto no checkout
+(ajuda.cakto.com.br, "checkout pré-preenchido"). O smoke abre o checkout com o
+cupom e confere o percentual e o valor quando a página da Cakto os traz.
+
+**Link que o Pedro divulga:**
+
+    https://padmini.com.br/compatibilidade?cupom=PEDRO&utm_source=pedro&utm_medium=tiktok
+
+A origem da venda vem do cupom e dos `utm_*` (a Cakto repassa os `utm_*` ao
+webhook; o cupom também vai em `utm_term`). Não usamos o programa de afiliados
+da Cakto. A védica continua como estava (cupom só em `utm_term`).
 
 ## Numerologia (`numerologia.py`) — rodada 2
 

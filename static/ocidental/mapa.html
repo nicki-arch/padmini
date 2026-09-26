@@ -130,7 +130,7 @@
 
   <section id="sobre-mapa">
     <h2>O que vem no mapa completo</h2>
-    <p class="sub">A amostra é grátis. O completo (R${{ ofertas.mapa.preco }}) abre o mapa inteiro.</p>
+    <p class="sub">A amostra é grátis. O completo (R${{ ofertas.mapa.preco | moeda }}) abre o mapa inteiro.</p>
     <ul class="lista-completo">
       <li>A roda do seu mapa e a posição de todos os planetas, signo a signo e casa a casa</li>
       <li>Os aspectos principais: como os planetas conversam entre si</li>
@@ -155,7 +155,7 @@
 <script>
 // Link vem de conteudo/ocidental/ofertas.yaml (trocado no servidor). Vazio = oferta ainda não existe na Cakto.
 const LINK_CHECKOUT_INDIVIDUAL = "{{ ofertas.mapa.checkout }}";
-const PRECO = "{{ ofertas.mapa.preco }}";
+const PRECO = "{{ ofertas.mapa.preco | moeda }}";
 const SIGNOS = ["aries","touro","gemeos","cancer","leao","virgem","libra","escorpiao","sagitario","capricornio","aquario","peixes"];
 const SIGNO_CURTO = { aries:"Ári", touro:"Tou", gemeos:"Gêm", cancer:"Cân", leao:"Leão", virgem:"Vir", libra:"Lib", escorpiao:"Esc", sagitario:"Sag", capricornio:"Cap", aquario:"Aqu", peixes:"Pei" };
 const ABREV = { sol:"Sol", lua:"Lua", mercurio:"Mer", venus:"Vên", marte:"Mar", jupiter:"Júp", saturno:"Sat", urano:"Ura", netuno:"Net", plutao:"Plu", nodo_norte:"Nodo" };
