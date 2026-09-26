@@ -641,8 +641,9 @@ def _processar_pedido(evento: dict) -> dict:
     # mesmo `sck` do casal. Outros bumps/upsells ainda não existem: ignorar evita
     # entregar o produto principal duas vezes.
     tipo = str((evento.get("data") or {}).get("offer_type") or "main").lower()
-    if tipo == "orderbump" and cakto.e_bump_mapas_do_casal(evento):
-        return _entregar_mapas_do_casal(evento)
+    versao_bump = cakto.versao_do_bump_mapas(evento) if tipo == "orderbump" else ""
+    if versao_bump:
+        return _entregar_mapas_do_casal(evento, versao_bump)
     if tipo != "main":
         return {"ok": True, "ignorado": f"oferta {tipo} ainda não tratada"}
 
@@ -701,11 +702,12 @@ def _processar_pedido(evento: dict) -> dict:
             "email_enviado": enviado, "link": None if enviado else link}
 
 
-def _entregar_mapas_do_casal(evento: dict) -> dict:
-    """Order bump do casal: um link de mapa individual para cada pessoa."""
-    produto = "mapas_casal"
+def _entregar_mapas_do_casal(evento: dict, versao: str = "vedica") -> dict:
+    """Order bump do casal: um link de mapa individual para cada pessoa, na
+    versão do site da oferta paga (na ocidental, mapa natal; aceita sem hora)."""
+    produto = _rotulo_produto("mapas_casal", versao)
     email = cakto.email_do_evento(evento)
-    dados = cakto.dados_nascimento(cakto.coletar_pd(evento), "compat")
+    dados = cakto.dados_nascimento(cakto.coletar_pd(evento), "compat", exige_hora=versao == "vedica")
     if not dados:
         db.registrar_pedido(evento, produto, {}, email, None, False)
         _alertar_pendente(evento, produto, email, "sck sem os dados de nascimento (bump)", {})
@@ -714,11 +716,11 @@ def _entregar_mapas_do_casal(evento: dict) -> dict:
     cakto_id = str((evento.get("data") or {}).get("id") or "")
     if db.pedido_entregue(cakto_id):
         return {"ok": True, "produto": produto, "duplicado": True}
-    links = [(p.get("nome") or rotulo, entrega.link_completo("mapa", p))
+    links = [(p.get("nome") or rotulo, entrega.link_completo("mapa", p, versao))
              for rotulo, p in (("Pessoa A", dados["a"]), ("Pessoa B", dados["b"]))]
     enviado = entrega.enviar_email(
         email, "Os mapas individuais de vocês estão prontos",
-        entrega.email_mapas_do_casal_html(links, dados["a"].get("nome", "")))
+        entrega.email_mapas_do_casal_html(links, dados["a"].get("nome", ""), versao))
     db.registrar_pedido(evento, produto, dados, email, "\n".join(l for _, l in links), enviado)
     if not enviado:
         alertas.alertar("E-mail dos mapas do casal NÃO saiu — mandar à mão",

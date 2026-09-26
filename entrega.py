@@ -74,8 +74,9 @@ def email_completo_html(produto: str, link: str, nome: str = "", extra: str = ""
 </div>"""
 
 
-def email_mapas_do_casal_html(links: list, nome: str = "") -> str:
+def email_mapas_do_casal_html(links: list, nome: str = "", sistema: str = "vedica") -> str:
     """links: [(nome da pessoa, link do mapa completo), ...]"""
+    assinatura = _sistema.ASSINATURA_EMAIL[sistema]
     ola = _ola(nome)
     links = [(html.escape(str(pessoa)[:40]), html.escape(l, quote=True)) for pessoa, l in links]
     botoes = "".join(
@@ -88,7 +89,7 @@ def email_mapas_do_casal_html(links: list, nome: str = "") -> str:
   <p style="margin:0 0 12px">{ola}</p>
   <p style="margin:0 0 8px">Os mapas individuais de vocês dois estão prontos — um para cada pessoa.</p>
   {botoes}
-  <p style="color:#8f7a76;font-size:12px;margin-top:26px">Padmini — astrologia védica para autoconhecimento. Estes links são pessoais; não os compartilhe.</p>
+  <p style="color:#8f7a76;font-size:12px;margin-top:26px">{assinatura} Estes links são pessoais; não os compartilhe.</p>
 </div>"""
 
 

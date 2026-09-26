@@ -67,6 +67,13 @@ Testes (`testes/test_sinastria.py`): determinismo, simetria A,B = B,A em 300
 casais (com e sem hora), extremos construídos à mão (tudo em trígono ≥ 85,
 tudo em quadratura ≤ 20, nenhum aspecto = 50).
 
+## Preços (decisão do Nicolas, 26/set/2026)
+
+Tarot R$19 · Numerologia R$27 · Mapa natal R$37 · Sinastria R$127 (R$97 com
+cupom de afiliado) · combo sinastria + 2 mapas natais R$167 (order bump: a
+página anuncia "por mais R$40", a diferença para o preço de TABELA — o cupom
+desconta só a sinastria). Tudo em `conteudo/ocidental/ofertas.yaml`.
+
 ## Preço do casal
 
 `conteudo/ocidental/ofertas.yaml`: `preco: 127` (mostrado por padrão e cobrado

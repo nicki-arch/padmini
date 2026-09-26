@@ -111,8 +111,7 @@ produtos:
       e o PDF para guardar.
     botao: Fazer meu mapa →
 
-# PENDENTE: confirmar com o Pedro o texto exato sobre a família (a versão védica
-# dizia "quarenta anos de estudo").
+# Texto confirmado pelo Nicolas em 26/set/2026.
 tradicao:
   titulo: Uma tradição de família
   texto: >-

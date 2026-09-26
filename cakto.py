@@ -337,16 +337,27 @@ OFERTA_BUMP_MAPAS = (os.environ.get("PADMINI_CAKTO_OFERTA_BUMP_MAPAS")
                      or ofertas.codigo("bump_mapas_casal"))
 
 
-def e_bump_mapas_do_casal(evento: dict) -> bool:
+def versao_do_bump_mapas(evento: dict) -> str:
+    """'vedica' ou 'ocidental' se o pedido é o order bump "casal + 2 mapas" de uma
+    das versões; '' se não é (falha fechada). A versão sai da oferta paga."""
     d = evento.get("data") if isinstance(evento, dict) else None
-    if not isinstance(d, dict) or not OFERTA_BUMP_MAPAS:
-        return False
+    if not isinstance(d, dict):
+        return ""
     if coletar_pd(evento).get("pd_produto") != "compat":
-        return False  # o bump só existe no checkout do casal (sck "c~...")
+        return ""  # o bump só existe no checkout do casal (sck "c~...")
     oferta = d.get("offer") if isinstance(d.get("offer"), dict) else {}
     url = str(d.get("checkoutUrl") or "").split("?", 1)[0]
-    codigos = {str(oferta.get("id") or ""), url.rstrip("/").rsplit("/", 1)[-1]}
-    return OFERTA_BUMP_MAPAS in {c.split("_")[0] for c in codigos if c}
+    codigos = {c.split("_")[0] for c in {str(oferta.get("id") or ""), url.rstrip("/").rsplit("/", 1)[-1]} if c}
+    if OFERTA_BUMP_MAPAS and OFERTA_BUMP_MAPAS in codigos:
+        return "vedica"
+    ocidental = ofertas.codigo("bump_mapas_casal", "ocidental")
+    if ocidental and ocidental in codigos:
+        return "ocidental"
+    return ""
+
+
+def e_bump_mapas_do_casal(evento: dict) -> bool:
+    return bool(versao_do_bump_mapas(evento))
 
 
 def dados_nascimento(pd: dict, produto: str, exige_hora: bool = True):

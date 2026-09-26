@@ -2,7 +2,7 @@
 # (static/ocidental/compatibilidade.html) e em textos/sinastria.yaml.
 
 card:
-  # PERGUNTA EM ABERTO (Nicolas): o card compartilhável mostra o Índice
-  # Padmini (true) ou só os nomes e o ponto mais forte (false)? O relatório
-  # sempre mostra o índice, com o método explicado.
+  # Decisão do Nicolas (26/set/2026): o card compartilhável mostra o Índice
+  # Padmini, sempre com o rótulo "ÍNDICE PADMINI · MÉTODO PRÓPRIO". O relatório
+  # também mostra, com o método explicado.
   mostra_indice: true

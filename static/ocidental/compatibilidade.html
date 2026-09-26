@@ -150,6 +150,11 @@
 const LINK_CHECKOUT = "{{ ofertas.compat.checkout }}";
 const PRECO = "{{ ofertas.compat.preco }}";
 const PRECO_CUPOM = "{{ ofertas.compat.preco_cupom or '' }}";
+// Combo "casal completo" (order bump no checkout): a diferença entre o total do
+// combo e o preço de TABELA da sinastria. O cupom de afiliado desconta só a
+// sinastria, então o acréscimo do combo é o mesmo com ou sem cupom.
+// Vazio enquanto o bump não tiver `checkout` no ofertas.yaml.
+const PRECO_BUMP_MAPAS = "{% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.checkout %}R${{ ofertas.bump_mapas_casal.preco - ofertas.compat.preco }}{% endif %}";
 function cupomDoVisitante() { const a = window.padAtribuicao ? padAtribuicao() : {}; return a.cupom || a.coupon || ""; }
 function precoMostrado() { return cupomDoVisitante() && PRECO_CUPOM ? PRECO_CUPOM : PRECO; }
 document.addEventListener("DOMContentLoaded", () => { const el = document.getElementById("preco-nota"); if (el) el.textContent = "R$" + precoMostrado(); });
@@ -337,6 +342,7 @@ function desenharAmostra(d) {
         <li>Como fazer essa relação funcionar, na prática</li>
       </ul>
       <div class="preco">R$${esc(comCupom ? PRECO_CUPOM : PRECO)}${comCupom ? ` <small>R$${esc(PRECO)}</small>` : ""}</div>
+      ${PRECO_BUMP_MAPAS ? `<p class="sub" style="margin:4px 0 14px">No checkout, dá para incluir <b>o mapa natal de cada um</b> por mais ${esc(PRECO_BUMP_MAPAS)} — os dois chegam no mesmo e-mail.</p>` : ""}
       ${comCupom ? `<p class="sub" style="margin:4px 0 14px">Com o cupom <b>${esc(cupom)}</b>, já aplicado no checkout. Se ele não aparecer aplicado, digite no campo de cupom.</p>` : ""}
       <div class="enviar-linha">
         ${ctaHref
