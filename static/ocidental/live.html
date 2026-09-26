@@ -64,6 +64,7 @@
       <div class="abas" role="tablist">
         <button class="aba" id="aba-mapa" role="tab" aria-selected="true">Mapa individual</button>
         <button class="aba" id="aba-casal" role="tab" aria-selected="false">Sinastria</button>
+        <button class="aba" id="aba-num" role="tab" aria-selected="false">Numerologia</button>
       </div>
       <button class="aba" id="botao-sair" type="button">Sair</button>
     </div>
@@ -102,6 +103,15 @@
       </fieldset>
       <p class="erro" id="erro-casal" role="alert" hidden></p>
       <button class="acao" id="gerar-casal" type="submit">Gerar sinastria</button>
+    </form>
+
+    <form id="form-num" class="card" novalidate hidden>
+      <div class="campos">
+        <div class="campo largo"><label for="n-nome">Nome completo de registro (o da certidão)</label><input id="n-nome" autocomplete="off"></div>
+        <div class="campo"><label for="n-data">Nascimento</label><input id="n-data" inputmode="numeric" placeholder="dd/mm/aaaa"></div>
+      </div>
+      <p class="erro" id="erro-num" role="alert" hidden></p>
+      <button class="acao" id="gerar-num" type="submit">Gerar numerologia</button>
     </form>
 
     <section id="resultado" aria-live="polite" hidden></section>
@@ -197,16 +207,17 @@ $("#botao-sair").addEventListener("click", async () => {
 });
 
 // ---------- abas ----------
+const ABAS = ["mapa", "casal", "num"];
 function aba(qual) {
-  const mapa = qual === "mapa";
-  $("#aba-mapa").setAttribute("aria-selected", String(mapa));
-  $("#aba-casal").setAttribute("aria-selected", String(!mapa));
-  $("#form-mapa").hidden = !mapa;
-  $("#form-casal").hidden = mapa;
+  ABAS.forEach((a) => {
+    const el = document.getElementById(`aba-${a}`);
+    if (!el) return;
+    el.setAttribute("aria-selected", String(a === qual));
+    $(`#form-${a}`).hidden = a !== qual;
+  });
   $("#resultado").hidden = true; $("#resultado").innerHTML = "";
 }
-$("#aba-mapa").addEventListener("click", () => aba("mapa"));
-$("#aba-casal").addEventListener("click", () => aba("casal"));
+ABAS.forEach((a) => { const el = document.getElementById(`aba-${a}`); if (el) el.addEventListener("click", () => aba(a)); });
 
 const DIVISOR = '<p class="faixa pago">Fim da amostra grátis — daqui para baixo é o relatório pago</p>';
 
@@ -298,6 +309,34 @@ function desenharCasal(d) {
     <div class="secao"><h3>Aspectos entre vocês</h3></div>
     ${d.aspectos.map((x) => bloco(x.titulo, x.texto)).join("")}
     ${d.casas.length ? `<div class="secao"><h3>Os planetas de um nas casas do outro</h3></div>${d.casas.map((x) => bloco(x.titulo, x.texto)).join("")}` : ""}`;
+  $("#resultado").hidden = false;
+  $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------- numerologia ----------
+mascara($("#n-data"), [2, 2, 4], "/");
+$("#form-num").addEventListener("submit", async (e) => {
+  e.preventDefault(); erro("#erro-num", "");
+  const nome = $("#n-nome").value.trim(), data = dataISO($("#n-data").value);
+  if (nome.split(/\s+/).length < 2) return erro("#erro-num", "Nome completo, como na certidão.");
+  if (!data) return erro("#erro-num", "Data no formato dd/mm/aaaa.");
+  const botao = $("#gerar-num"); botao.disabled = true; botao.textContent = "Gerando…";
+  try {
+    const t = await pedir("/api/live/ocidental/token/numerologia", { nome, data });
+    desenharNumerologia(await pedir("/api/ocidental/numerologia", { nome, data, nivel: "completo", token: t.token }));
+  } catch (err) { erro("#erro-num", err.message); }
+  finally { botao.disabled = false; botao.textContent = "Gerar numerologia"; }
+});
+function desenharNumerologia(d) {
+  const [cv, ...resto] = d.numeros;
+  $("#resultado").innerHTML = `
+    <h2 class="grande">${esc(d.nome)}</h2>
+    <p class="faixa gratis">Amostra grátis</p>
+    <div class="destaques"><div><span>Caminho de Vida</span><b>${cv.valor}</b></div></div>
+    <div class="secao"><p>${esc(cv.descricao)}</p><p>${esc(cv.texto)}</p></div>
+    ${DIVISOR}
+    <div class="destaques">${resto.map((x) => `<div><span>${esc(x.nome)}</span><b>${x.valor ?? "—"}</b></div>`).join("")}</div>
+    <div class="secao">${resto.map((x) => `<h3>${esc(x.nome)} ${x.valor ?? ""}</h3><p>${esc(x.texto)}</p>`).join("")}</div>`;
   $("#resultado").hidden = false;
   $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
 }

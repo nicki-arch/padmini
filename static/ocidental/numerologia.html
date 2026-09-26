@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#241522">
+<title>Padmini — Numerologia</title>
+<meta name="description" content="A sua numerologia pitagórica pelo nome de registro e a data de nascimento: Caminho de Vida, Expressão, Alma, Personalidade e Ano Pessoal. Amostra grátis.">
+<link rel="canonical" href="https://padmini.com.br/numerologia">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Padmini">
+<meta property="og:title" content="A sua numerologia — Padmini">
+<meta property="og:description" content="O seu Caminho de Vida e os números do seu nome. Amostra grátis.">
+<meta property="og:image" content="https://padmini.com.br/static/og-home.png">
+<meta property="og:url" content="https://padmini.com.br/numerologia">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<script src="/static/afiliado.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23e7a24a'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e2a89d'/></svg>">
+{# Versão ocidental. Preço e checkout: conteudo/ocidental/ofertas.yaml (numerologia);
+   textos: conteudo/ocidental/textos/numerologia.yaml; API: /api/ocidental/numerologia. #}
+<style>
+  h1{font-size:clamp(34px,6vw,48px);margin:24px 0 8px}
+  h2{font-size:28px;margin:0 0 12px}
+  form{display:grid;gap:16px;grid-template-columns:2fr 1fr}
+  button{grid-column:1/-1;font:600 16px Inter,sans-serif;color:var(--on-accent);background:var(--accent);border:0;border-radius:10px;padding:14px;min-height:48px;cursor:pointer}
+  button:hover{background:#efb161}
+  button:disabled{opacity:.6;cursor:wait}
+  .erro{grid-column:1/-1}
+  #resultado{margin:32px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+  .numero-grande{display:flex;gap:22px;align-items:center}
+  .numero-grande .n{font-family:var(--serif);font-size:88px;line-height:1;color:var(--accent);min-width:1.2ch;text-align:center}
+  .numero-grande h3{font-size:24px;margin:0 0 4px}
+  .numero-grande p{margin:0;color:var(--ink-soft);font-size:14px}
+  .relatorio p{margin:10px 0 0;max-width:62ch}
+  .grade-numeros{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .grade-numeros div{background:var(--surface-2);border-radius:var(--radius);padding:14px;text-align:center}
+  .grade-numeros small{display:block;color:var(--ink-soft);font-size:13px}
+  .grade-numeros strong{font-family:var(--serif);font-size:34px;font-weight:500}
+  .oferta-ind{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid rgba(231,162,74,.32)}
+  .lista-completo{list-style:none;padding:0;margin:8px 0 16px;display:grid;gap:10px}
+  .lista-completo li{display:flex;gap:10px;color:var(--ink-soft);font-size:15px}
+  .lista-completo li::before{content:"✓";color:var(--accent);font-weight:700}
+  .preco-ind{font-family:var(--serif);font-size:34px;margin-bottom:8px}
+  .em-breve{opacity:.55;pointer-events:none}
+  .acoes{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+  .acoes button{grid-column:auto;width:auto;padding:12px 18px}
+  button.secundario{grid-column:auto;background:transparent;color:var(--accent);border:1px solid var(--accent);padding:10px 14px;min-height:44px}
+  @media(max-width:640px){form{grid-template-columns:1fr}.grade-numeros{grid-template-columns:1fr 1fr}.card{padding:16px}.acoes button{width:100%}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="topbar">
+    <a class="marca" href="/">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+      Padmini
+    </a>
+    <a class="navlink" href="/mapa">Mapa natal →</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Os números do seu nome</h1>
+  <p class="lede">Com o seu nome completo de registro e a data de nascimento, calculamos o seu Caminho de Vida — e, no completo, a Expressão, a Alma, a Personalidade e o seu Ano Pessoal. Numerologia pitagórica.</p>
+
+  <div class="card">
+    <form id="form" novalidate>
+      <div class="campo">
+        <label for="nome">Nome completo de registro</label>
+        <input id="nome" name="nome" autocomplete="name" maxlength="120" required placeholder="Como está na certidão de nascimento">
+        <span class="dica">Use o nome da <b>certidão de nascimento</b>, completo, mesmo que hoje você use outro. Cada letra conta.</span>
+      </div>
+      <div class="campo">
+        <label for="data">Data de nascimento</label>
+        <input id="data" name="data" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" maxlength="10" required>
+      </div>
+      <p class="erro" id="erro" role="alert" hidden></p>
+      <button id="enviar" type="submit">Ver meu Caminho de Vida</button>
+    </form>
+  </div>
+
+  <section id="resultado" aria-live="polite" hidden></section>
+
+  <section id="sobre">
+    <h2>O que vem na numerologia completa</h2>
+    <p class="sub">A amostra é grátis. O completo (R${{ ofertas.numerologia.preco }}) abre os seis números.</p>
+    <ul class="lista-completo">
+      <li>Caminho de Vida, Expressão, Alma e Personalidade, com a leitura de cada um</li>
+      <li>O talento do seu dia de nascimento</li>
+      <li>O seu Ano Pessoal: o clima deste ano para você</li>
+      <li>O relatório em PDF para guardar</li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  Numerologia pitagórica. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional.<br>
+  <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
+</footer>
+
+<script>
+const LINK_CHECKOUT = "{{ ofertas.numerologia.checkout }}";
+const PRECO = "{{ ofertas.numerologia.preco }}";
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let ultimoPedido = null;
+
+$("#data").addEventListener("input", (e) => {
+  const d = e.target.value.replace(/\D/g, "").slice(0, 8);
+  e.target.value = [d.slice(0, 2), d.slice(2, 4), d.slice(4, 8)].filter(Boolean).join("/");
+});
+function dataParaISO(br) { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(br.trim()); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; }
+function mostrarErro(msg) { const el = $("#erro"); el.textContent = msg; el.hidden = !msg; }
+async function pedir(url, corpo) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+  const c = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Confira os dados informados.");
+  return c;
+}
+function blocoNumero(x) {
+  return `<article class="card relatorio"><div class="numero-grande"><div class="n">${x.valor ?? "—"}</div>
+    <div><h3>${esc(x.nome)}${x.mestre ? " · número mestre" : ""}</h3><p>${esc(x.descricao)}</p></div></div><p>${esc(x.texto)}</p></article>`;
+}
+
+$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault(); mostrarErro("");
+  const nome = $("#nome").value.trim(), data = dataParaISO($("#data").value);
+  if (nome.split(/\s+/).length < 2) return mostrarErro("Escreva o nome completo, como está na certidão.");
+  if (!data) return mostrarErro("Preencha a data de nascimento no formato dd/mm/aaaa.");
+  const botao = $("#enviar"); botao.disabled = true; botao.textContent = "Calculando…";
+  try {
+    ultimoPedido = { nome, data };
+    desenharAmostra(await pedir("/api/ocidental/numerologia", { ...ultimoPedido, nivel: "amostra" }));
+  } catch (err) { mostrarErro(err.message); }
+  finally { botao.disabled = false; botao.textContent = "Ver meu Caminho de Vida"; }
+});
+
+function desenharAmostra(d) {
+  const cta = LINK_CHECKOUT ? linkCheckout(LINK_CHECKOUT, { produto: "numerologia", ...ultimoPedido }) : "";
+  const res = $("#resultado");
+  res.innerHTML = `<h2>${esc(d.nome)}</h2>${blocoNumero(d.caminho_de_vida)}
+    <div class="card oferta-ind">
+      <h2>Ver a numerologia completa</h2>
+      <ul class="lista-completo">
+        <li>Expressão, Alma e Personalidade: o que o seu nome diz</li>
+        <li>O talento do seu dia de nascimento</li>
+        <li>O seu Ano Pessoal</li>
+        <li>O relatório em PDF</li>
+      </ul>
+      <div class="preco-ind">R$${esc(PRECO)}</div>
+      ${cta ? `<a class="navlink destaque" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'numerologia',sistema:'ocidental'})">Quero a numerologia completa →</a><p class="nota" style="margin-top:10px">Garantia de 7 dias.</p>`
+            : `<span class="navlink destaque em-breve" aria-disabled="true">Em breve</span><p class="nota" style="margin-top:10px">O pagamento desta versão ainda está sendo configurado.</p>`}
+    </div>`;
+  res.hidden = false;
+  if (window.padTrack) padTrack("amostra_gerada", { produto: "numerologia", sistema: "ocidental" });
+  res.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+let iaDisponivel = false;
+fetch("/api/config").then((r) => r.json()).then((c) => { iaDisponivel = c.texto_ia_disponivel; }).catch(() => {});
+
+function desenharCompleto(d) {
+  const res = $("#resultado");
+  res.innerHTML = `<div><h2>${esc(d.nome)}</h2><p class="nota">Ano Pessoal calculado para ${d.ano_corrente}.</p></div>
+    <div class="acoes"><button type="button" id="botao-pdf">Baixar a numerologia (PDF)</button><span class="nota" id="status-pdf"></span></div>
+    <div class="grade-numeros">${d.numeros.map((x) => `<div><small>${esc(x.nome)}</small><strong>${x.valor ?? "—"}</strong></div>`).join("")}</div>
+    ${iaDisponivel ? `<div class="acoes"><button type="button" id="botao-ia" class="secundario">Ler versão escrita por IA</button><span class="nota" id="status-ia"></span></div>` : ""}
+    <div id="texto-relatorio" style="display:grid;gap:20px">${d.numeros.map(blocoNumero).join("")}</div>`;
+  res.hidden = false;
+  if (window.padTrack) padTrack("completo_aberto", { produto: "numerologia", sistema: "ocidental" });
+  $("#botao-pdf").addEventListener("click", baixarPDF);
+  if (iaDisponivel) $("#botao-ia").addEventListener("click", pedirIA);
+}
+async function baixarPDF() {
+  const botao = $("#botao-pdf"), status = $("#status-pdf");
+  botao.disabled = true;
+  try {
+    const r = await fetch("/api/ocidental/numerologia/pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...ultimoPedido, nivel: "completo" }) });
+    if (!r.ok) throw new Error("Não foi possível gerar o PDF.");
+    const url = URL.createObjectURL(await r.blob()), a = document.createElement("a");
+    a.href = url; a.download = (r.headers.get("Content-Disposition") || "").match(/filename="([^"]+)"/)?.[1] || "numerologia.pdf";
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { status.textContent = e.message; } finally { botao.disabled = false; }
+}
+async function pedirIA() {
+  const botao = $("#botao-ia"), status = $("#status-ia");
+  botao.disabled = true; status.textContent = "Escrevendo… leva uns 20 segundos.";
+  try {
+    const c = await pedir("/api/ocidental/numerologia", { ...ultimoPedido, nivel: "completo", texto_ia: true });
+    $("#texto-relatorio").innerHTML = c.texto_ia.split(/\n{2,}/).map((b) => b.startsWith("## ") ? `<h3>${esc(b.slice(3))}</h3>` : `<p>${esc(b)}</p>`).join("");
+    botao.remove(); status.textContent = "Versão escrita por IA a partir dos seus números.";
+  } catch (e) { status.textContent = e.message; botao.disabled = false; }
+}
+
+// entrega por link: /numerologia?nome=...&data=AAAA-MM-DD&token=oc-...
+(function abrirCompletoPorLink() {
+  const p = new URLSearchParams(location.search);
+  const token = p.get("token"), nome = p.get("nome"), data = p.get("data");
+  if (!token || !nome || !data) return;
+  ultimoPedido = { nome, data, token };
+  for (const sel of ["main > .card", "#sobre"]) { const el = document.querySelector(sel); if (el) el.hidden = true; }
+  const res = $("#resultado");
+  res.hidden = false; res.innerHTML = '<p class="nota">Abrindo a sua numerologia…</p>';
+  pedir("/api/ocidental/numerologia", { ...ultimoPedido, nivel: "completo" }).then(desenharCompleto).catch((e) => {
+    res.innerHTML = `<p class="aviso">Não foi possível abrir a numerologia completa: ${esc(e.message)} Se você já pagou, confira o link do e-mail ou fale com a gente.</p>`;
+  });
+})();
+</script>
+</body>
+</html>

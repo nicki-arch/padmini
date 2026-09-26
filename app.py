@@ -221,6 +221,25 @@ def pagina_compatibilidade(request: Request):
     return _pagina_ou_lista(request, "/compatibilidade")
 
 
+def _pagina_so_da_ocidental(request: Request, rota: str):
+    """Numerologia e tarot só existem na versão ocidental. Com a védica no ar a
+    página não aparece (404) — mas um link pago já entregue (token "oc-")
+    continua abrindo, qualquer que seja a versão no ar."""
+    if rota not in sistema.PAGINAS[_versao_do_pedido(request)]:
+        raise HTTPException(404, "Página não encontrada.")
+    return _pagina_ou_lista(request, rota)
+
+
+@app.api_route("/numerologia", methods=["GET", "HEAD"])
+def pagina_numerologia(request: Request):
+    return _pagina_so_da_ocidental(request, "/numerologia")
+
+
+@app.api_route("/tarot", methods=["GET", "HEAD"])
+def pagina_tarot(request: Request):
+    return _pagina_so_da_ocidental(request, "/tarot")
+
+
 @app.api_route("/lista", methods=["GET", "HEAD"])
 def pagina_lista():
     return _pagina("/lista")
@@ -653,7 +672,7 @@ def _processar_pedido(evento: dict) -> dict:
     # antes da troca de PADMINI_SISTEMA é entregue na versão comprada
     versao = cakto.sistema_pago(evento) or "vedica"
     email = cakto.email_do_evento(evento)
-    if produto not in ("mapa", "compat"):
+    if produto not in cakto.PRODUTOS:
         # Pagou, mas não dá para entregar com segurança: a oferta paga não foi
         # reconhecida, ou o `sck` pede outro produto (ex.: pagou o mapa e o sck
         # traz um casal — tentativa de levar o produto mais caro). Não emite

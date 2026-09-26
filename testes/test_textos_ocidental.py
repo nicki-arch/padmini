@@ -18,7 +18,7 @@ import mapa_ocidental as mo  # noqa: E402
 import montar_texto_ocidental as mt  # noqa: E402
 
 from revisao import PROIBIDOS  # noqa: E402  (uma lista só: testes e importação da planilha)
-LONGOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais")
+LONGOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais", "numerologia")
 
 
 def test_base_completa():
@@ -42,7 +42,7 @@ def test_todo_texto_tem_revisado():
 @pytest.mark.parametrize("arquivo", LONGOS)
 def test_tamanho_60_a_120_palavras(arquivo):
     for a, caminho, no in mt.cada_texto():
-        if a == arquivo:
+        if a == arquivo and caminho[0] != "descricao":  # descrições da numerologia são peças curtas
             n = len(no["texto"].split())
             assert 60 <= n <= 120, (arquivo, caminho, n)
 

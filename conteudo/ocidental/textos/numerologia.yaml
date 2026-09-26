@@ -1,0 +1,676 @@
+# Numerologia pitagórica — 6 números × 12 valores (1 a 9, 11, 22, 33).
+# Rascunho; revisar e trocar `revisado` para true (ver LEIA.md). 60 a 120 palavras.
+# Alguns valores quase não aparecem para certos números (o Dia de nascimento
+# nunca dá 33); os textos existem assim mesmo, para a base ficar completa.
+
+descricao:
+  caminho_de_vida: {revisado: false, texto: "O Caminho de Vida vem da data de nascimento: é o tema que acompanha você a vida inteira, o tipo de experiência que você tende a buscar e a aprender."}
+  expressao: {revisado: false, texto: "A Expressão vem de todas as letras do seu nome de registro: mostra seus talentos naturais e o jeito como você age no mundo."}
+  alma: {revisado: false, texto: "A Alma vem das vogais do seu nome: fala do que você deseja por dentro, do que realmente te motiva."}
+  personalidade: {revisado: false, texto: "A Personalidade vem das consoantes do seu nome: é a primeira impressão que você causa, o lado que os outros veem primeiro."}
+  dia: {revisado: false, texto: "O Dia de nascimento é um talento extra, um recurso que você tem à mão."}
+  ano_pessoal: {revisado: false, texto: "O Ano Pessoal muda todo aniversário de calendário: indica o clima do ano corrente para você, o tipo de movimento que tende a render mais."}
+
+caminho_de_vida:
+  1:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 1, a sua jornada gira em torno de aprender a
+      caminhar com as próprias pernas. Você tende a se sentir melhor quando
+      decide por conta própria, abre um caminho novo ou assume a frente de um
+      projeto — é comum ser quem propõe o plano no grupo de amigos. O desafio
+      é não confundir independência com fazer tudo sozinho: pedir ajuda também
+      é uma decisão de quem lidera. Ao longo da vida, a coragem de começar
+      tende a ser a sua marca.
+  2:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 2, a sua jornada passa pelas parcerias. Você tende
+      a perceber o que o outro sente antes de ele falar e a encontrar o ponto
+      de acordo numa discussão — no trabalho, costuma ser quem acalma a
+      reunião. O desafio é não se apagar para manter a paz: sua opinião também
+      conta. Ao longo da vida, você aprende que colaborar não é depender, e
+      que a sua delicadeza é uma força, não uma fraqueza.
+  3:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 3, a sua jornada é sobre expressão. Você tende a
+      se comunicar com facilidade, a animar os ambientes e a ter ideias
+      criativas — é quem conta a história que faz todo mundo rir no almoço de
+      domingo. O desafio é a dispersão: muitos começos e poucos finais.
+      Escolher um canal para a sua criatividade, e cuidar dele com
+      constância, transforma talento em obra. Ao longo da vida, a alegria de
+      criar tende a ser o seu norte.
+  4:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 4, a sua jornada é construir. Você tende a gostar
+      de planos, de método e de ver o resultado concreto do seu esforço — é a
+      pessoa que monta a planilha da viagem e confere as reservas. As pessoas
+      confiam na sua palavra. O desafio é a rigidez: quando o plano muda, o
+      incômodo pode ser grande. Aprender a ajustar a rota sem sentir que tudo
+      desmoronou é parte do caminho, e torna a sua solidez ainda mais valiosa.
+  5:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 5, a sua jornada pede movimento. Você tende a
+      buscar novidade, viagens, pessoas diferentes e experiências que ampliem
+      o seu mundo — rotina repetida demais te deixa inquieto. Essa curiosidade
+      faz de você alguém adaptável e interessante. O desafio é não trocar tudo
+      a cada tédio: liberdade também inclui escolher onde ficar. Ao longo da
+      vida, você aprende a usar a mudança a seu favor, em vez de fugir por ela.
+  6:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 6, a sua jornada envolve cuidado e responsabilidade
+      afetiva. Você tende a ser a pessoa que organiza o aniversário, que
+      aconselha o amigo e que se preocupa com o bem-estar de quem ama. Beleza e
+      harmonia em casa importam muito para você. O desafio é cuidar sem
+      controlar e sem esquecer de si. Ao longo da vida, você aprende que
+      receber cuidado também faz parte de amar — e que ninguém precisa ser
+      perfeito para ser querido.
+  7:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 7, a sua jornada é de busca por entendimento.
+      Você tende a questionar, pesquisar e precisar de tempo sozinho para
+      pensar — gosta de conversas profundas e se cansa de conversa rasa. Tem
+      intuição e senso crítico afiados. O desafio é o isolamento: guardar
+      tudo para si pode afastar quem gosta de você. Ao longo da vida, você
+      aprende a compartilhar o que descobre, e a confiar também no que não dá
+      para provar.
+  8:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 8, a sua jornada envolve realização e autoridade.
+      Você tende a ter visão de conjunto, capacidade de organizar recursos e
+      vontade de ver os projetos crescerem — costuma assumir o comando quando
+      a situação aperta. O desafio é equilibrar ambição e vida pessoal, e
+      lidar bem com o poder, o seu e o dos outros. Ao longo da vida, você
+      aprende que conquista de verdade inclui as pessoas que caminham com você.
+  9:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 9, a sua jornada é ampla e generosa. Você tende a
+      se importar com causas maiores, a acolher gente muito diferente e a
+      enxergar o quadro geral — é comum ser procurado para conselhos. O
+      desafio é saber encerrar ciclos: deixar ir o que já cumpriu o seu papel,
+      em vez de carregar tudo. Ao longo da vida, você aprende que servir aos
+      outros começa por cuidar de si, e que desapego também é um ato de amor.
+  11:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 11, um número mestre, a sua jornada é marcada pela
+      intuição e pela inspiração. Você tende a perceber coisas que os outros
+      não percebem e a tocar as pessoas com ideias ou palavras — é comum
+      alguém dizer que uma conversa com você mudou o dia dela. O desafio é a
+      sensibilidade à flor da pele e a cobrança de estar à altura. Ao longo da
+      vida, você aprende a confiar na sua intuição sem se sobrecarregar com ela.
+  22:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 22, um número mestre, a sua jornada une visão e
+      construção. Você tende a imaginar projetos grandes e a ter a disciplina
+      para torná-los reais — pensa em estruturas que sirvam a muita gente. O
+      desafio é o peso da expectativa: querer fazer tudo grande pode paralisar.
+      Dividir o sonho em etapas concretas e aceitar o tempo das coisas ajuda.
+      Ao longo da vida, você aprende que grandes obras são feitas de muitos
+      dias comuns.
+  33:
+    revisado: false
+    texto: >-
+      Com o Caminho de Vida 33, um número mestre raro, a sua jornada é de
+      cuidado em escala ampla. Você tende a sentir vontade de ensinar,
+      acolher e ajudar — em casa, no trabalho, na comunidade — e as pessoas
+      buscam o seu conforto. O desafio é não se sacrificar a ponto de
+      esgotar: cuidar de todos começa por cuidar de si. Ao longo da vida, você
+      aprende que servir com alegria rende mais do que servir por obrigação.
+
+expressao:
+  1:
+    revisado: false
+    texto: >-
+      Com a Expressão 1, o seu talento natural é a iniciativa. Você tende a
+      agir com determinação, a propor soluções e a liderar sem esperar convite
+      — em trabalhos em grupo, é comum ser quem divide as tarefas. Tem
+      originalidade e gosta de deixar a sua marca no que faz. O ponto de
+      atenção é a impaciência com quem tem outro ritmo. Quando você combina a
+      sua energia de começo com escuta, as pessoas seguem você com vontade.
+  2:
+    revisado: false
+    texto: >-
+      Com a Expressão 2, o seu talento natural é a cooperação. Você tende a
+      trabalhar bem em dupla, a mediar conflitos e a perceber detalhes das
+      relações que passam despercebidos — é a pessoa que lembra que o colega
+      estava chateado. Diplomacia e paciência são seus recursos. O ponto de
+      atenção é depender demais da aprovação alheia. Quando você confia no
+      próprio valor, a sua gentileza vira uma força que une as pessoas.
+  3:
+    revisado: false
+    texto: >-
+      Com a Expressão 3, o seu talento natural é a comunicação criativa. Você
+      tende a se expressar bem falando, escrevendo ou pela arte, e a trazer
+      leveza para os ambientes — suas mensagens costumam ser as mais
+      divertidas do grupo. O ponto de atenção é espalhar energia em projetos
+      demais. Quando você escolhe onde colocar a sua criatividade e cuida
+      disso com disciplina, o seu talento ganha forma e alcance.
+  4:
+    revisado: false
+    texto: >-
+      Com a Expressão 4, o seu talento natural é a organização. Você tende a
+      transformar caos em método, a cumprir prazos e a construir coisas que
+      duram — é quem monta o passo a passo que todo mundo acaba usando. As
+      pessoas confiam na sua seriedade. O ponto de atenção é a rigidez com
+      jeitos diferentes de fazer. Quando você abre espaço para o improviso, a
+      sua solidez fica ainda mais útil.
+  5:
+    revisado: false
+    texto: >-
+      Com a Expressão 5, o seu talento natural é a versatilidade. Você tende a
+      se adaptar rápido, a aprender coisas novas com facilidade e a se dar bem
+      com gente de todo tipo — é bom em vender uma ideia e em lidar com
+      imprevistos. O ponto de atenção é a inquietação que abandona projetos no
+      meio. Quando você usa a sua curiosidade para aprofundar, e não só para
+      variar, o seu talento rende muito.
+  6:
+    revisado: false
+    texto: >-
+      Com a Expressão 6, o seu talento natural é cuidar. Você tende a criar
+      ambientes acolhedores, a aconselhar bem e a assumir responsabilidades
+      pelos outros — é comum ser quem organiza a família ou a equipe. Tem senso
+      estético e de justiça. O ponto de atenção é carregar mais do que o seu
+      pedaço. Quando você cuida também de si e aceita ajuda, o seu jeito de
+      cuidar fica leve e sustentável.
+  7:
+    revisado: false
+    texto: >-
+      Com a Expressão 7, o seu talento natural é a análise profunda. Você
+      tende a investigar, pesquisar e entender o que está por trás das coisas
+      — é quem lê o manual inteiro e descobre o que ninguém viu. Tem intuição
+      e senso crítico. O ponto de atenção é parecer distante ou
+      desconfiado. Quando você compartilha o que sabe com generosidade, o seu
+      conhecimento vira referência para os outros.
+  8:
+    revisado: false
+    texto: >-
+      Com a Expressão 8, o seu talento natural é administrar e realizar. Você
+      tende a enxergar oportunidades, a organizar recursos e a conduzir
+      projetos até o fim com firmeza — é quem coloca ordem quando a coisa
+      desanda. Tem ambição e senso prático. O ponto de atenção é medir tudo
+      por resultado e esquecer as pessoas. Quando você lidera com justiça e
+      reconhece o esforço dos outros, sua autoridade cresce naturalmente.
+  9:
+    revisado: false
+    texto: >-
+      Com a Expressão 9, o seu talento natural é a generosidade e a visão
+      ampla. Você tende a se interessar por causas maiores, a entender pontos
+      de vista diferentes e a inspirar as pessoas a serem melhores — é comum
+      ser quem organiza a vaquinha para ajudar alguém. O ponto de atenção é se
+      doar demais e esperar reconhecimento. Quando você ajuda por escolha, e
+      não por obrigação, a sua generosidade renova em vez de cansar.
+  11:
+    revisado: false
+    texto: >-
+      Com a Expressão 11, um número mestre, o seu talento natural é inspirar.
+      Você tende a ter ideias à frente do tempo, intuição aguçada e um jeito
+      de falar que toca as pessoas — sua presença pode mudar o clima de um
+      encontro. O ponto de atenção é a ansiedade de estar sempre à altura
+      dessa sensibilidade. Quando você cuida do corpo e do descanso, a sua
+      inspiração tem chão para se sustentar.
+  22:
+    revisado: false
+    texto: >-
+      Com a Expressão 22, um número mestre, o seu talento natural é
+      transformar grandes ideias em realidade. Você tende a unir visão e
+      método, e a pensar em projetos que beneficiam muita gente — é quem vê o
+      prédio inteiro enquanto os outros veem só o tijolo. O ponto de atenção é
+      a cobrança por resultados grandiosos. Quando você valoriza cada etapa
+      concluída, o grande projeto avança sem esmagar você.
+  33:
+    revisado: false
+    texto: >-
+      Com a Expressão 33, um número mestre raro, o seu talento natural é
+      ensinar e acolher. Você tende a transmitir conhecimento com carinho, a
+      apoiar quem está passando por dificuldades e a criar laços de confiança
+      — é comum ser a pessoa a quem todos recorrem. O ponto de atenção é o
+      excesso de responsabilidade pelo bem-estar alheio. Quando você reserva
+      tempo para si, o seu cuidado continua abundante.
+
+alma:
+  1:
+    revisado: false
+    texto: >-
+      Com a Alma 1, o que te move por dentro é a vontade de ser dono do
+      próprio caminho. Você tende a se sentir realizado quando conquista algo
+      com o seu esforço e a se incomodar quando alguém decide por você — mesmo
+      numa viagem em grupo, quer ter voz no roteiro. Esse desejo de autonomia
+      é saudável; o cuidado é não transformar tudo em disputa. Reconhecer que
+      dá para ser independente e próximo ao mesmo tempo acalma essa chama.
+  2:
+    revisado: false
+    texto: >-
+      Com a Alma 2, o que te move por dentro é o desejo de conexão e harmonia.
+      Você tende a se sentir bem quando as relações estão em paz e a sofrer
+      mais do que mostra com brigas e distanciamentos — uma mensagem seca pode
+      estragar o seu dia. O cuidado é não engolir o que sente para evitar
+      conflito. Dizer com gentileza o que precisa costuma trazer justamente a
+      harmonia que você busca.
+  3:
+    revisado: false
+    texto: >-
+      Com a Alma 3, o que te move por dentro é a vontade de se expressar e de
+      viver com alegria. Você tende a precisar de espaço para criar, conversar
+      e ser espontâneo — um dia sem trocar ideias com ninguém pesa. O cuidado
+      é não depender do aplauso para se sentir bem. Ter um canal criativo só
+      seu, mesmo que ninguém veja, alimenta essa fonte de alegria por dentro.
+  4:
+    revisado: false
+    texto: >-
+      Com a Alma 4, o que te move por dentro é a necessidade de segurança e
+      ordem. Você tende a ficar tranquilo quando sabe o que vem pela frente e
+      quando as coisas estão no lugar — uma agenda organizada te acalma. O
+      cuidado é a ansiedade diante do imprevisto. Lembrar que a sua
+      estabilidade vem também de dentro, e não só do plano perfeito, ajuda a
+      atravessar as mudanças com mais calma.
+  5:
+    revisado: false
+    texto: >-
+      Com a Alma 5, o que te move por dentro é a sede de liberdade e de
+      experiências. Você tende a se sentir vivo quando algo novo acontece —
+      uma viagem, uma pessoa diferente, um projeto inesperado — e sufocado com
+      rotina demais. O cuidado é buscar novidade para fugir de algo que
+      precisaria ser encarado. Encontrar variedade dentro dos compromissos que
+      você escolheu mantém essa chama sem desorganizar a vida.
+  6:
+    revisado: false
+    texto: >-
+      Com a Alma 6, o que te move por dentro é o amor e o cuidado com os seus.
+      Você tende a se realizar quando a família e os amigos estão bem e quando
+      pode oferecer um lar acolhedor — ver alguém confortável na sua casa te
+      faz feliz. O cuidado é se cobrar demais pela felicidade dos outros.
+      Lembrar que cada um é responsável pela própria vida alivia o peso e
+      deixa o seu carinho mais leve.
+  7:
+    revisado: false
+    texto: >-
+      Com a Alma 7, o que te move por dentro é a busca por sentido e verdade.
+      Você tende a precisar de silêncio, leitura e reflexão para se sentir
+      inteiro — um fim de semana sozinho pode ser o melhor presente. O
+      cuidado é se fechar demais e parecer distante de quem ama. Compartilhar
+      com alguém de confiança o que você anda pensando mantém a sua busca
+      profunda sem virar solidão.
+  8:
+    revisado: false
+    texto: >-
+      Com a Alma 8, o que te move por dentro é a vontade de realizar e ser
+      reconhecido pelo que constrói. Você tende a se sentir bem quando vê
+      resultado concreto do seu esforço e quando tem autonomia para decidir —
+      metas claras te dão energia. O cuidado é medir o próprio valor só por
+      conquistas. Celebrar também o que não se mede, como amizades e
+      aprendizados, equilibra essa força.
+  9:
+    revisado: false
+    texto: >-
+      Com a Alma 9, o que te move por dentro é o desejo de fazer diferença no
+      mundo. Você tende a se emocionar com histórias de superação, a querer
+      ajudar e a se interessar por causas coletivas — um trabalho voluntário
+      pode te encher de sentido. O cuidado é se frustrar quando o mundo não
+      corresponde ao seu ideal. Fazer a sua parte, sem carregar tudo, mantém a
+      sua generosidade viva.
+  11:
+    revisado: false
+    texto: >-
+      Com a Alma 11, um número mestre, o que te move por dentro é a busca por
+      inspiração e significado. Você tende a sentir as coisas com muita
+      intensidade e a desejar uma vida que tenha propósito — trabalhos sem
+      sentido te esvaziam. O cuidado é a sensibilidade que cansa: absorver o
+      clima de todos os lugares. Momentos de recolhimento e de contato com a
+      natureza ajudam a recarregar essa antena tão fina.
+  22:
+    revisado: false
+    texto: >-
+      Com a Alma 22, um número mestre, o que te move por dentro é a vontade de
+      construir algo que dure e sirva a muitos. Você tende a sonhar grande e a
+      se sentir realizado quando vê uma ideia virar estrutura real — um
+      projeto que continua funcionando sem você. O cuidado é a autocobrança
+      que nunca descansa. Reconhecer cada passo dado mantém o sonho grande sem
+      virar peso.
+  33:
+    revisado: false
+    texto: >-
+      Com a Alma 33, um número mestre raro, o que te move por dentro é o
+      desejo de cuidar e de ensinar pelo exemplo. Você tende a se realizar
+      quando vê alguém crescer com a sua ajuda — um aluno, um filho, um amigo.
+      O cuidado é esquecer as próprias necessidades no meio de tanto cuidado.
+      Deixar-se ser cuidado também é parte dessa vocação, e renova a sua
+      energia para continuar.
+
+personalidade:
+  1:
+    revisado: false
+    texto: >-
+      Com a Personalidade 1, a primeira impressão que você causa é de firmeza
+      e iniciativa. As pessoas tendem a ver você como alguém decidido, que
+      sabe o que quer — numa entrevista, costuma passar segurança. Isso abre
+      portas. O ponto de atenção é parecer mandão ou pouco acessível para quem
+      acabou de te conhecer. Um sorriso e uma pergunta sobre o outro no começo
+      da conversa equilibram essa imagem forte.
+  2:
+    revisado: false
+    texto: >-
+      Com a Personalidade 2, a primeira impressão que você causa é de
+      gentileza e calma. As pessoas tendem a se sentir à vontade perto de você
+      e a te procurar para conversar — é comum ouvir confidências de quem
+      acabou de conhecer. O ponto de atenção é parecer tímido demais ou fácil
+      de convencer. Mostrar a sua opinião logo cedo, com a mesma delicadeza,
+      completa a imagem de alguém confiável e firme.
+  3:
+    revisado: false
+    texto: >-
+      Com a Personalidade 3, a primeira impressão que você causa é de alegria
+      e simpatia. As pessoas tendem a achar você comunicativo, criativo e
+      divertido — numa festa, logo está no centro da conversa. O ponto de
+      atenção é parecer superficial para quem busca profundidade. Deixar
+      aparecer, aos poucos, o lado mais sério e reflexivo mostra que por trás
+      do bom humor há muito conteúdo.
+  4:
+    revisado: false
+    texto: >-
+      Com a Personalidade 4, a primeira impressão que você causa é de
+      seriedade e confiança. As pessoas tendem a ver você como alguém
+      responsável, organizado e de palavra — é quem recebe a tarefa
+      importante no primeiro dia de trabalho. O ponto de atenção é parecer
+      rígido ou fechado. Mostrar o seu senso de humor e flexibilidade em
+      situações informais aproxima as pessoas da sua solidez.
+  5:
+    revisado: false
+    texto: >-
+      Com a Personalidade 5, a primeira impressão que você causa é de energia
+      e charme. As pessoas tendem a ver você como alguém interessante,
+      aventureiro e fácil de conversar — tem sempre uma história de viagem ou
+      uma novidade para contar. O ponto de atenção é parecer instável ou pouco
+      comprometido. Cumprir o combinado nos pequenos detalhes reforça a
+      confiança sem apagar o seu jeito leve.
+  6:
+    revisado: false
+    texto: >-
+      Com a Personalidade 6, a primeira impressão que você causa é de
+      acolhimento e cuidado. As pessoas tendem a ver você como alguém
+      responsável, afetuoso e com bom gosto — é quem oferece água ou café
+      antes de começar a conversa. O ponto de atenção é parecer controlador
+      quando o cuidado vira conselho demais. Perguntar antes se o outro quer
+      ajuda deixa o seu carinho ainda mais bem-vindo.
+  7:
+    revisado: false
+    texto: >-
+      Com a Personalidade 7, a primeira impressão que você causa é de mistério
+      e profundidade. As pessoas tendem a ver você como alguém inteligente,
+      reservado e observador — fala pouco no começo, mas quando fala, acerta.
+      O ponto de atenção é parecer distante ou crítico. Compartilhar um
+      interesse pessoal ou uma pergunta curiosa ajuda os outros a
+      atravessar a primeira barreira e conhecer o seu lado caloroso.
+  8:
+    revisado: false
+    texto: >-
+      Com a Personalidade 8, a primeira impressão que você causa é de
+      autoridade e competência. As pessoas tendem a ver você como alguém bem
+      sucedido, prático e capaz de liderar — numa reunião, costuma ser ouvido
+      com atenção. O ponto de atenção é parecer frio ou calculista. Mostrar
+      interesse genuíno pelas pessoas, e não só pelos resultados, torna a sua
+      força mais humana e inspiradora.
+  9:
+    revisado: false
+    texto: >-
+      Com a Personalidade 9, a primeira impressão que você causa é de
+      generosidade e maturidade. As pessoas tendem a ver você como alguém
+      compreensivo, com visão ampla e jeito acolhedor — é comum estranhos
+      pedirem informação justamente a você. O ponto de atenção é parecer
+      distante das questões práticas do dia a dia. Mostrar-se presente nos
+      pequenos detalhes aproxima as pessoas do seu idealismo.
+  11:
+    revisado: false
+    texto: >-
+      Com a Personalidade 11, um número mestre, a primeira impressão que você
+      causa é de sensibilidade e magnetismo. As pessoas tendem a sentir que
+      você é diferente, inspirador, alguém que enxerga além — às vezes contam
+      a você coisas que nunca contaram a ninguém. O ponto de atenção é parecer
+      nervoso ou inalcançável. Mostrar o seu lado simples e cotidiano torna a
+      sua presença acolhedora.
+  22:
+    revisado: false
+    texto: >-
+      Com a Personalidade 22, um número mestre, a primeira impressão que você
+      causa é de capacidade e visão. As pessoas tendem a ver você como alguém
+      que sabe construir, confiável para grandes responsabilidades — é quem
+      chamam para tocar o projeto difícil. O ponto de atenção é parecer sério
+      ou exigente demais. Mostrar leveza nos momentos informais equilibra essa
+      imagem de peso.
+  33:
+    revisado: false
+    texto: >-
+      Com a Personalidade 33, um número mestre raro, a primeira impressão que
+      você causa é de acolhimento profundo. As pessoas tendem a se sentir
+      seguras perto de você e a ver alguém sábio, paciente, disposto a ajudar
+      — é comum crianças e idosos se aproximarem naturalmente. O ponto de
+      atenção é atrair quem só quer ser cuidado. Escolher onde colocar a sua
+      energia protege essa generosidade.
+
+dia:
+  1:
+    revisado: false
+    texto: >-
+      Nascer num dia 1 (ou num dia cuja soma dá 1, como 10, 19 e 28) traz
+      como talento extra a capacidade de começar. Você tende a tomar a
+      iniciativa quando os outros hesitam e a ter coragem para o primeiro
+      passo — abrir uma conversa difícil, propor uma ideia nova, inscrever-se
+      antes de todo mundo. Use esse recurso de propósito nos momentos em que a
+      situação está parada: muitas vezes falta só alguém que comece.
+  2:
+    revisado: false
+    texto: >-
+      Nascer num dia 2 (ou 20) traz como talento extra a sensibilidade para as
+      pessoas. Você tende a perceber o que não foi dito, a acalmar tensões e a
+      trabalhar muito bem em dupla — é o parceiro que faz o outro brilhar.
+      Esse recurso é valioso em negociações, atendimento e em qualquer
+      momento de conflito. Lembre de usá-lo também a seu favor, dizendo com
+      delicadeza o que você mesmo precisa.
+  3:
+    revisado: false
+    texto: >-
+      Nascer num dia 3 (ou 12, 21 e 30) traz como talento extra a expressão.
+      Você tende a se comunicar com facilidade, a contar histórias e a
+      encontrar jeitos criativos de resolver problemas — uma apresentação
+      sua raramente é chata. Esse recurso rende em qualquer trabalho que
+      envolva gente, palavra ou criatividade. Use de propósito: escrever,
+      falar em público ou criar algo pode abrir portas inesperadas.
+  4:
+    revisado: false
+    texto: >-
+      Nascer num dia 4 (ou 13 e 31) traz como talento extra a organização.
+      Você tende a colocar ordem no que está bagunçado e a ser persistente
+      até terminar — é quem transforma uma ideia solta num plano com datas.
+      Esse recurso é precioso em projetos longos e em momentos de crise. Use
+      de propósito: quando tudo parecer confuso, fazer uma lista simples já é
+      metade do caminho para você.
+  5:
+    revisado: false
+    texto: >-
+      Nascer num dia 5 (ou 14 e 23) traz como talento extra a adaptação.
+      Você tende a lidar bem com imprevistos, a aprender rápido e a se sentir
+      à vontade em ambientes novos — mudar de cidade ou de emprego te assusta
+      menos do que a outras pessoas. Use esse recurso de propósito quando a
+      vida pedir mudança: sua flexibilidade ajuda você e quem está ao lado a
+      atravessar a transição.
+  6:
+    revisado: false
+    texto: >-
+      Nascer num dia 6 (ou 15 e 24) traz como talento extra o cuidado. Você
+      tende a perceber quando alguém precisa de ajuda e a criar ambientes
+      acolhedores — a sua casa costuma ser o ponto de encontro. Esse recurso
+      é valioso em família, em equipe e em profissões de cuidado. Use também
+      consigo: reservar um tempo para o próprio descanso é parte do mesmo
+      talento.
+  7:
+    revisado: false
+    texto: >-
+      Nascer num dia 7 (ou 16 e 25) traz como talento extra a análise e a
+      intuição. Você tende a enxergar o que está por trás das aparências e a
+      fazer as perguntas certas — antes de comprar algo, pesquisa tudo. Esse
+      recurso rende em estudos, investigação e decisões importantes. Use de
+      propósito: um tempo sozinho para pensar costuma trazer as suas melhores
+      respostas.
+  8:
+    revisado: false
+    texto: >-
+      Nascer num dia 8 (ou 17 e 26) traz como talento extra a capacidade de
+      realizar. Você tende a enxergar o caminho prático para chegar a um
+      objetivo e a organizar pessoas e recursos — é quem transforma o plano do
+      grupo em ação. Esse recurso rende na carreira e em projetos
+      ambiciosos. Use com equilíbrio: realizar com as pessoas, e não apesar
+      delas, multiplica o resultado.
+  9:
+    revisado: false
+    texto: >-
+      Nascer num dia 9 (ou 18 e 27) traz como talento extra a compaixão e a
+      visão ampla. Você tende a compreender pessoas muito diferentes e a
+      pensar no bem coletivo — é comum ser procurado para conselhos. Esse
+      recurso é precioso em qualquer trabalho que ajude os outros. Use de
+      propósito, mas com limite: ajudar sem se esvaziar é o que mantém esse
+      talento vivo.
+  11:
+    revisado: false
+    texto: >-
+      Nascer num dia 11 (ou 29) traz como talento extra uma intuição
+      marcante. É um número mestre: você tende a pressentir situações, a
+      captar o clima das pessoas e a ter ideias que surgem do nada — às vezes
+      sabe quem está ligando antes de olhar o celular. Use esse recurso de
+      propósito, anotando as suas intuições e conferindo depois. Cuidar do
+      descanso ajuda a separar intuição de ansiedade.
+  22:
+    revisado: false
+    texto: >-
+      Nascer num dia 22 traz como talento extra a capacidade de construir em
+      grande escala. É um número mestre: você tende a unir visão e método,
+      transformando ideias ambiciosas em coisas concretas — organiza o evento
+      grande que ninguém acreditava que daria certo. Use esse recurso de
+      propósito, dividindo os projetos em etapas. Paciência com o ritmo das
+      coisas é o que faz esse talento render.
+  33:
+    revisado: false
+    texto: >-
+      Pela regra que usamos, o dia de nascimento não chega a 33 — este texto
+      existe só para a base ficar completa. O 33 é o número mestre do cuidado
+      e do ensino: quem o tem em outro ponto do mapa numerológico tende a
+      acolher, orientar e ensinar pelo exemplo. Se ele aparecer para você no
+      Caminho de Vida, na Expressão, na Alma ou na Personalidade, leia o texto
+      correspondente, que traz o sentido dele para você.
+
+ano_pessoal:
+  1:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 1 é um ano de começos. É um bom momento para iniciar
+      projetos, tomar decisões que você vinha adiando e plantar sementes para
+      os próximos anos — um curso, uma mudança de rotina, um projeto próprio.
+      A energia favorece a iniciativa e a independência. O cuidado é não
+      começar coisas demais ao mesmo tempo: escolher duas ou três prioridades
+      faz o novo ciclo nascer com força.
+  2:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 2 é um ano de parcerias e paciência. É um bom momento para
+      cultivar relações, colaborar e deixar amadurecer o que foi plantado no
+      ano anterior — nem tudo precisa acontecer rápido. A energia favorece a
+      escuta, os acordos e os detalhes. O cuidado é a ansiedade por
+      resultados. Confiar no tempo das coisas, e investir nas pessoas certas,
+      prepara o crescimento que vem depois.
+  3:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 3 é um ano de expressão e vida social. É um bom momento
+      para criar, comunicar, rever amigos e se divertir — projetos criativos e
+      conversas tendem a abrir portas. A energia favorece a leveza e a
+      exposição. O cuidado é a dispersão: muitas festas, muitos planos e pouca
+      entrega. Escolher um projeto criativo para levar até o fim faz esse ano
+      deixar marca.
+  4:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 4 é um ano de construção e trabalho. É um bom momento para
+      organizar a vida prática, criar rotinas, estudar com método e cuidar
+      das bases — casa, documentos, hábitos. A energia favorece a disciplina e
+      o esforço consistente. O cuidado é sentir o ano como pesado. Celebrar
+      pequenas etapas concluídas mantém a motivação enquanto você constrói o
+      que vai sustentar os próximos anos.
+  5:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 5 é um ano de mudanças e movimento. É um bom momento para
+      viajar, experimentar, rever escolhas e abrir espaço para o novo — o que
+      estava parado tende a se mexer. A energia favorece a liberdade e a
+      adaptação. O cuidado é mudar tudo por impulso. Perguntar-se o que
+      realmente precisa de mudança ajuda a aproveitar o ano sem perder o que
+      já está bom.
+  6:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 6 é um ano de família, afetos e responsabilidades. É um
+      bom momento para cuidar da casa, fortalecer relações e assumir
+      compromissos importantes com quem você ama. A energia favorece o
+      cuidado, a harmonia e a beleza no dia a dia. O cuidado é assumir
+      responsabilidades demais pelos outros. Dividir tarefas e cuidar também
+      de si deixa esse ano acolhedor em vez de cansativo.
+  7:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 7 é um ano de introspecção e aprendizado. É um bom momento
+      para estudar, refletir sobre a direção da vida, fazer terapia ou
+      cultivar uma prática espiritual — menos barulho, mais profundidade. A
+      energia favorece o autoconhecimento. O cuidado é o isolamento
+      excessivo. Reservar tempo para si sem se afastar de quem importa faz do
+      7 um ano de respostas valiosas.
+  8:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 8 é um ano de realização e colheita de esforços. É um
+      bom momento para assumir responsabilidades maiores, organizar a vida
+      prática e buscar reconhecimento pelo que você construiu. A energia
+      favorece a firmeza, a gestão e as decisões importantes. O cuidado é o
+      excesso de trabalho. Lembrar que conquista também inclui descanso,
+      tempo livre e relações mantém o ano equilibrado.
+  9:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 9 é um ano de encerramentos e balanço. É um bom momento
+      para concluir o que está pendente, desapegar do que já não serve e
+      agradecer pelo ciclo que termina — arrumar gavetas, fechar projetos,
+      perdoar. A energia favorece a generosidade e a limpeza. O cuidado é
+      começar coisas grandes antes de fechar as antigas. Deixar espaço livre
+      prepara o novo ciclo que vem no ano seguinte.
+  11:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 11 é um ano mestre de intuição e inspiração. É um bom
+      momento para ouvir a sua voz interior, desenvolver talentos criativos ou
+      espirituais e inspirar outras pessoas com a sua experiência. A energia
+      é intensa e sensível. O cuidado é a ansiedade e o cansaço emocional.
+      Momentos de silêncio, sono em dia e escolhas alinhadas com o que você
+      sente fazem desse ano uma fase de clareza.
+  22:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 22 é um ano mestre de construção em grande escala. É um
+      bom momento para tirar do papel projetos ambiciosos, estruturar planos
+      de longo prazo e assumir papéis que envolvem muitas pessoas. A energia
+      favorece a visão com os pés no chão. O cuidado é a pressão por fazer
+      tudo grande de uma vez. Metas por etapas tornam esse potencial real e
+      sustentável.
+  33:
+    revisado: false
+    texto: >-
+      O Ano Pessoal 33 é um ano mestre de cuidado e ensino. É um bom momento
+      para apoiar quem está ao seu redor, compartilhar o que você sabe e
+      assumir um papel de orientação na família, no trabalho ou na
+      comunidade. A energia favorece a generosidade. O cuidado é carregar o
+      mundo nas costas. Estabelecer limites claros permite que o seu cuidado
+      continue abundante o ano todo.

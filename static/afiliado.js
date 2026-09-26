@@ -76,6 +76,10 @@
     if (!dados) return "";
     if (dados.produto === "mapa") return "m~" + _pessoa(dados);
     if (dados.produto === "compat") return "c~" + _pessoa(dados.a) + "~" + _pessoa(dados.b);
+    // versão ocidental: numerologia leva o nome completo de registro (inteiro:
+    // cada letra muda o resultado); tarot leva só o id da tiragem.
+    if (dados.produto === "numerologia") return "n~" + _t(dados.data, 10) + "~" + _t(dados.nome, 120);
+    if (dados.produto === "tarot") return "t~" + _t(dados.tiragem, 40);
     return "";
   };
 

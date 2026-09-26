@@ -19,7 +19,7 @@ import yaml
 import mapa_ocidental as mo
 
 PASTA = Path(__file__).parent / "conteudo" / "ocidental" / "textos"
-ARQUIVOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais", "pecas", "sinastria")
+ARQUIVOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais", "pecas", "sinastria", "numerologia")
 
 # Aspectos só entre planetas lentos são de geração, não da pessoa: ficam fora
 # da lista de "aspectos principais" do completo.
@@ -342,3 +342,42 @@ def montar_prompt_sinastria(rel: dict, a: str, b: str) -> str:
     partes += [f"## {x['titulo']}\n\n{x['texto']}" for x in rel["aspectos"]]
     partes += [f"## {c['titulo']}\n\n{c['texto']}" for c in rel["casas"]]
     return INSTRUCAO_LLM_SINASTRIA + "\n\nMATERIAL:\n\n" + "\n\n".join(partes)
+
+
+# --------------------------------------------------------------------------
+# Numerologia — textos de conteudo/ocidental/textos/numerologia.yaml
+# --------------------------------------------------------------------------
+def _numero(chave: str, valor) -> dict:
+    import numerologia as nu
+    b = base("numerologia")
+    return {"chave": chave, "nome": nu.NOME_PT[chave], "valor": valor,
+            "mestre": valor in nu.MESTRES, "descricao": _t(b["descricao"][chave]),
+            "texto": _t(b[chave].get(valor)) if valor is not None else
+            "Este número precisa de pelo menos uma letra desse tipo no nome."}
+
+
+def montar_numerologia(res: dict, nivel: str) -> dict:
+    """Amostra: o Caminho de Vida. Completo: os seis números, com o Ano Pessoal."""
+    n = res["numeros"]
+    r = {"caminho_de_vida": _numero("caminho_de_vida", n["caminho_de_vida"])}
+    if nivel == "completo":
+        r["numeros"] = [_numero(k, n[k]) for k in
+                        ("caminho_de_vida", "expressao", "alma", "personalidade", "dia", "ano_pessoal")]
+        r["ano_corrente"] = res["ano_corrente"]
+    return r
+
+
+INSTRUCAO_LLM_NUMEROLOGIA = """Você escreve a Numerologia da Padmini (numerologia pitagórica), em português do Brasil.
+
+Regras:
+- Use SOMENTE as informações do material abaixo (os seis números e seus textos). Não acrescente números, cálculos, previsões ou traços que não estejam nele.
+- Reescreva como um texto corrido e acolhedor, mantendo um título por número, e ligue os números entre si quando eles se reforçarem ou se contradisserem.
+- Tendências, não sentenças: nada de "você vai", promessas ou previsões de eventos, saúde, morte ou dinheiro.
+- Escreva para a pessoa, usando "você". Nunca mencione "o material" ou como o texto foi feito.
+- Termine com uma linha: "Esta leitura é uma ferramenta de autoconhecimento, não uma previsão nem substituto de orientação profissional."
+"""
+
+
+def montar_prompt_numerologia(rel: dict) -> str:
+    partes = [f"## {x['nome']}: {x['valor']}\n\n{x['descricao']} {x['texto']}" for x in rel["numeros"]]
+    return INSTRUCAO_LLM_NUMEROLOGIA + "\n\nMATERIAL:\n\n" + "\n\n".join(partes)

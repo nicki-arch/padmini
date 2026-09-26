@@ -297,3 +297,61 @@ if __name__ == "__main__":
     saida = sys.argv[1] if len(sys.argv) > 1 else "exemplo-ocidental.pdf"
     Path(saida).write_bytes(pdf)
     print(f"{saida}: {len(pdf) / 1024:.0f} KB")
+
+
+# --------------------------------------------------------------------------
+# Numerologia (e o esqueleto comum dos PDFs sem roda)
+# --------------------------------------------------------------------------
+def _capa(titulo: str, nome: str, linha: str, caixas: list, subject: str):
+    buf = BytesIO()
+    titulo_curto = f"{titulo} de {nome}" if nome else titulo
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=MARGEM, rightMargin=MARGEM,
+                            topMargin=20 * mm, bottomMargin=18 * mm,
+                            title=titulo_curto, author="Padmini", subject=subject)
+    marca = Table([[Lotus(26), _p("Padmini", "capa_marca")]], colWidths=[34, 200], hAlign="LEFT")
+    marca.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+    h = [marca, Spacer(1, 8 * mm), _p(escape(titulo), "capa_titulo")]
+    if nome:
+        h.append(_p(escape(nome), "capa_nome"))
+    h += [Spacer(1, 3 * mm), _p(linha, "intro"), Spacer(1, 2 * mm), _caixas_resumo(caixas), Spacer(1, 8 * mm)]
+    return buf, doc, h, _rodape(titulo_curto)
+
+
+def gerar_pdf_numerologia(*, rel: dict, nome: str, data_nascimento: date, hoje: date | None = None) -> bytes:
+    hoje = hoje or date.today()
+    por = {x["chave"]: x for x in rel["numeros"]}
+    buf, doc, h, rodape = _capa(
+        "Numerologia", nome,
+        f"Nascimento em <b>{data_nascimento.strftime('%d/%m/%Y')}</b> · Numerologia pitagórica pelo nome "
+        f"completo de registro · Relatório gerado em {hoje.strftime('%d/%m/%Y')}",
+        [("Caminho de Vida", str(por["caminho_de_vida"]["valor"])),
+         ("Expressão", str(por["expressao"]["valor"])),
+         ("Ano Pessoal " + str(rel["ano_corrente"]), str(por["ano_pessoal"]["valor"]))],
+        "Numerologia pitagórica")
+    linhas = [_cab("Número", "Valor", "O que ele mostra")]
+    for x in rel["numeros"]:
+        valor = "—" if x["valor"] is None else f"{x['valor']}{' (mestre)' if x['mestre'] else ''}"
+        linhas.append([_p(x["nome"], "celula"), _p(valor, "celula"), _p(escape(x["descricao"]), "celula_suave")])
+    h.append(_tabela(linhas, [LARGURA_UTIL * f for f in (0.24, 0.14, 0.62)]))
+    h.append(PageBreak())
+    h.append(_p("A leitura dos seus números", "h1"))
+    for x in rel["numeros"]:
+        h.append(CondPageBreak(40 * mm))
+        titulo = f"{x['nome']} {x['valor']}" if x["valor"] is not None else x["nome"]
+        h.append(_p(escape(titulo), "h2"))
+        h.append(_p(escape(x["descricao"]), "intro"))
+        h.append(_p(escape(x["texto"])))
+    h.append(CondPageBreak(50 * mm))
+    h.append(_p("Como os números foram calculados", "h2"))
+    for texto in [
+        "Numerologia pitagórica: A=1 a I=9, J=1 a R=9, S=1 a Z=9. Acentos são removidos e Ç conta como C. "
+        "Y conta como vogal e W como consoante.",
+        "Caminho de Vida: dia, mês e ano reduzidos separadamente e depois somados. Expressão: todas as letras do "
+        "nome; Alma: as vogais; Personalidade: as consoantes. Os números mestres 11, 22 e 33 não são reduzidos.",
+        f"Ano Pessoal: o seu dia e mês de nascimento com o ano de {rel['ano_corrente']}.",
+    ]:
+        h.append(_p(escape(texto)))
+    h.append(_p("<b>Esta leitura é uma ferramenta de autoconhecimento. Descreve tendências, não destino, e não "
+                "substitui orientação profissional.</b>"))
+    doc.build(h, onFirstPage=rodape, onLaterPages=rodape)
+    return buf.getvalue()

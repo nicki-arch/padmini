@@ -176,6 +176,10 @@ def is_aprovado(evento: dict) -> bool:
 
 CAMPOS_PESSOA = ("data", "hora", "lat", "lon", "nome", "cidade")
 
+# Produtos que o webhook entrega. Numerologia e tarot só existem na versão
+# ocidental (o código da oferta no ofertas.yaml ocidental é o que os liga).
+PRODUTOS = ("mapa", "compat", "numerologia", "tarot")
+
 
 def coletar_pd(evento: dict) -> dict:
     """
@@ -184,8 +188,10 @@ def coletar_pd(evento: dict) -> dict:
     A Cakto só repassa ao webhook os campos utm_* e `sck` — parâmetros
     customizados na URL são descartados. Então os dados viajam empacotados no
     `sck`, no formato montado por afiliado.js → padEmpacotar:
-        mapa:  m~data~hora~lat~lon~nome~cidade
-        casal: c~<pessoa A>~<pessoa B>
+        mapa:        m~data~hora~lat~lon~nome~cidade
+        casal:       c~<pessoa A>~<pessoa B>
+        numerologia: n~data~nome completo de registro   (versão ocidental)
+        tarot:       t~id da tiragem                    (versão ocidental)
     Devolve um dicionário no mesmo formato `pd_*` que o resto do módulo já usa,
     para não espalhar a mudança. Mantém também os `pd_*` soltos, se um dia
     chegarem (não custa nada e serve de rede de segurança).
@@ -213,6 +219,15 @@ def coletar_pd(evento: dict) -> dict:
         for i, campo in enumerate(CAMPOS_PESSOA):
             if i < len(resto) and resto[i]:
                 pd.setdefault("pd_" + campo, resto[i])
+    elif tipo == "n" and len(resto) >= 2:
+        pd.setdefault("pd_produto", "numerologia")
+        if resto[0]:
+            pd.setdefault("pd_data", resto[0])
+        if resto[1]:
+            pd.setdefault("pd_nome", resto[1])
+    elif tipo == "t" and resto and resto[0]:
+        pd.setdefault("pd_produto", "tarot")
+        pd.setdefault("pd_tiragem", resto[0])
     elif tipo == "c" and len(resto) >= n + 4:
         pd.setdefault("pd_produto", "compat")
         for prefixo, bloco in (("a", resto[:n]), ("b", resto[n:n * 2])):
@@ -256,7 +271,7 @@ def _codigos_das_ofertas() -> dict:
     PADMINI_CAKTO_OFERTA_MAPA/_COMPAT continuam valendo para a védica."""
     tabela = {}
     for sistema, chave, oferta in ofertas.todas_as_ofertas():
-        if chave in ("mapa", "compat") and oferta.get("codigo"):
+        if chave in PRODUTOS and oferta.get("codigo"):
             tabela[oferta["codigo"]] = (sistema, chave)
     if OFERTA_MAPA:
         tabela[OFERTA_MAPA] = ("vedica", "mapa")
@@ -324,7 +339,7 @@ def produto_do_evento(evento: dict, pd: dict) -> str:
     declarado = str(pd.get("pd_produto", "")).lower()
     if not pago:
         return ""
-    if declarado in ("mapa", "compat") and declarado != pago:
+    if declarado in PRODUTOS and declarado != pago:
         return ""
     return pago
 
@@ -366,6 +381,11 @@ def dados_nascimento(pd: dict, produto: str, exige_hora: bool = True):
     def campo(nome):
         return pd.get("pd_" + nome, "")
 
+    if produto == "numerologia":
+        d = {"nome": campo("nome"), "data": campo("data")}
+        return d if d["nome"] and d["data"] else None
+    if produto == "tarot":
+        return {"tiragem": campo("tiragem")} if campo("tiragem") else None
     if produto == "mapa":
         d = {"nome": campo("nome"), "data": campo("data"), "hora": campo("hora"),
              "lat": campo("lat"), "lon": campo("lon"), "cidade": campo("cidade")}
