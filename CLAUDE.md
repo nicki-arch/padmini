@@ -51,6 +51,7 @@ Valor digitado errado = o site não sobe (erro claro no log), em vez de subir pe
 | `mapa_ocidental.py` | Motor ocidental: tropical, Placidus (Porfírio nos polos), nodo verdadeiro, aspectos e orbes num lugar só. Validado contra 11 mapas do astro-seek (`testes/dados/referencias_ocidental.json`) |
 | `montar_texto_ocidental.py` + `conteudo/ocidental/textos/` | Mapa → texto (YAML, `revisado: false` em cada texto; `python scripts/revisao_textos.py` conta o que falta revisar) |
 | `rotas_ocidental.py` + `static/ocidental/` | API `/api/ocidental/*`, páginas e `/live` da versão ocidental; `gerar_pdf_ocidental.py` é o PDF |
+| `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o Índice Padmini (método próprio, pesos em `docs/ocidental.md`) |
 | `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
 | `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, e-mails e tokens de cada versão |
 | `ofertas.py` + `conteudo/<versão>/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML |

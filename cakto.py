@@ -351,7 +351,7 @@ def e_bump_mapas_do_casal(evento: dict) -> bool:
 
 def dados_nascimento(pd: dict, produto: str, exige_hora: bool = True):
     """Monta os dados de nascimento a partir dos pd_*. Retorna dict ou None se faltar o essencial.
-    `exige_hora=False` (versão ocidental, só no mapa): hora vazia = "não sei a hora"."""
+    `exige_hora=False` (versão ocidental): hora vazia = "não sei a hora"."""
     def campo(nome):
         return pd.get("pd_" + nome, "")
 
@@ -367,7 +367,7 @@ def dados_nascimento(pd: dict, produto: str, exige_hora: bool = True):
                     "hora": pd.get(f"pd_{px}_hora", ""), "lat": pd.get(f"pd_{px}_lat", ""),
                     "lon": pd.get(f"pd_{px}_lon", ""), "cidade": pd.get(f"pd_{px}_cidade", "")}
         a, b = pessoa("a"), pessoa("b")
-        if not (a["data"] and a["hora"] and a["lat"] and a["lon"] and b["data"] and b["hora"] and b["lat"] and b["lon"]):
+        if not all(p["data"] and (p["hora"] or not exige_hora) and p["lat"] and p["lon"] for p in (a, b)):
             return None
         return {"a": a, "b": b, "nome": a["nome"]}
     return None

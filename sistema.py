@@ -60,10 +60,10 @@ PAGINAS = {
         "/lista": ("lista.html", "lista"),
     },
     "ocidental": {
-        "/": ("ocidental/em-construcao.html", "home"),
+        "/": ("ocidental/home.html", "home"),
         "/mapa": ("ocidental/mapa.html", "mapa"),
-        "/compatibilidade": ("ocidental/em-construcao.html", "home"),
-        "/lista": ("ocidental/em-construcao.html", "home"),
+        "/compatibilidade": ("ocidental/compatibilidade.html", "compatibilidade"),
+        "/lista": ("ocidental/lista.html", "lista"),
     },
 }
 

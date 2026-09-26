@@ -46,6 +46,7 @@ def _carregar(sistema: str) -> dict:
         # sempre definido (None = sem desconto): os templates usam StrictUndefined,
         # e `{% if ofertas.compat.preco_de %}` com a chave ausente seria erro.
         oferta.setdefault("preco_de", None)
+        oferta.setdefault("preco_cupom", None)  # preço com cupom de afiliado (só a ocidental usa)
         de, por = oferta.get("preco_de"), oferta.get("preco")
         if de and por and de > por:
             oferta["economia"] = de - por
