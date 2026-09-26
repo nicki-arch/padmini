@@ -125,9 +125,10 @@
       <div class="prod anchor">
         <span class="plab">{{ t.produtos.compat.etiqueta }}</span>
         <h3>{{ t.produtos.compat.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.compat.preco }} <small>R${{ ofertas.compat.preco_de }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
+        {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco }} <small>R${{ ofertas.compat.preco_de }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
         <p class="peco">Você economiza R${{ ofertas.compat.economia }}</p>
-        <p>{{ t.produtos.compat.texto }}</p>
+        {% else %}<div class="pprice">R${{ ofertas.compat.preco }}</div>
+        {% endif %}        <p>{{ t.produtos.compat.texto }}</p>
         <a class="btn btn-primary" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
       </div>
       <div class="prod">

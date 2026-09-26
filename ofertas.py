@@ -31,6 +31,9 @@ def _carregar() -> dict:
     for chave, oferta in dados.items():
         oferta["checkout"] = str(oferta.get("checkout") or "")
         oferta["codigo"] = _codigo_da_oferta(oferta["checkout"])
+        # sempre definido (None = sem desconto): os templates usam StrictUndefined,
+        # e `{% if ofertas.compat.preco_de %}` com a chave ausente seria erro.
+        oferta.setdefault("preco_de", None)
         de, por = oferta.get("preco_de"), oferta.get("preco")
         if de and por and de > por:
             oferta["economia"] = de - por

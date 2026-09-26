@@ -130,8 +130,25 @@ def test_preco_da_home_sai_do_ofertas_yaml():
     html = cliente.get("/").text
     assert f"R${ofertas.preco('compat')}" in html
     assert f"R${ofertas.preco('mapa')}" in html
-    assert f"−{ofertas.oferta('compat')['desconto']}%" in html
-    assert f"economiza R${ofertas.oferta('compat')['economia']}" in html
+    if ofertas.oferta("compat").get("preco_de"):
+        assert f"−{ofertas.oferta('compat')['desconto']}%" in html
+        assert f"economiza R${ofertas.oferta('compat')['economia']}" in html
+    else:
+        assert "economiza" not in html and 'class="poff"' not in html
+
+
+def test_sem_preco_de_nao_ha_selo_de_desconto():
+    """O bug (26/set): o site anunciava o casal por R$97 com R$127 riscado, mas a
+    oferta na Cakto cobrava R$127 — o cupom ia só como utm_term. Sem `preco_de`
+    no YAML, nenhuma página pode sugerir desconto nem "preço de fundador"."""
+    import ofertas
+    if ofertas.oferta("compat").get("preco_de"):
+        pytest.skip("há preco_de configurado")
+    for rota in ("/", "/compatibilidade", "/lista"):
+        html = cliente.get(rota).text
+        visivel = re.sub(r"preco-fundador", "", html)  # nome de classe CSS, não texto
+        assert "economiza" not in visivel and "fundador" not in visivel.lower(), rota
+        assert f"R${ofertas.preco('compat')}" in html, rota
 
 
 def test_webhook_e_site_usam_o_mesmo_codigo_de_oferta():

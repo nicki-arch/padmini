@@ -18,8 +18,11 @@ mapa:
 
 compat:
   nome: Compatibilidade do casal
-  preco: 97
-  preco_de: 127
+  # 127 é o que a oferta cobra na Cakto. Até 26/set/2026 o site anunciava
+  # 97 (com 127 riscado), mas o cupom que o site repassa ia só como utm_term e
+  # não descontava nada: o cliente via um preço e pagava outro. O smoke
+  # (scripts/smoke_producao.py) agora confere YAML = Cakto.
+  preco: 127
   checkout: https://pay.cakto.com.br/qo8uskp_1125345
 
 # Order bump do checkout do casal (casal + os 2 mapas individuais).
