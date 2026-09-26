@@ -65,6 +65,7 @@
         <button class="aba" id="aba-mapa" role="tab" aria-selected="true">Mapa individual</button>
         <button class="aba" id="aba-casal" role="tab" aria-selected="false">Sinastria</button>
         <button class="aba" id="aba-num" role="tab" aria-selected="false">Numerologia</button>
+        <button class="aba" id="aba-tarot" role="tab" aria-selected="false">Tarot</button>
       </div>
       <button class="aba" id="botao-sair" type="button">Sair</button>
     </div>
@@ -112,6 +113,12 @@
       </div>
       <p class="erro" id="erro-num" role="alert" hidden></p>
       <button class="acao" id="gerar-num" type="submit">Gerar numerologia</button>
+    </form>
+
+    <form id="form-tarot" class="card" novalidate hidden>
+      <p class="sub" style="margin:0 0 12px">O sorteio é feito no servidor, entre as 78 cartas. Cada clique é uma tiragem nova.</p>
+      <p class="erro" id="erro-tarot" role="alert" hidden></p>
+      <button class="acao" id="gerar-tarot" type="submit">Tirar 3 cartas</button>
     </form>
 
     <section id="resultado" aria-live="polite" hidden></section>
@@ -207,7 +214,7 @@ $("#botao-sair").addEventListener("click", async () => {
 });
 
 // ---------- abas ----------
-const ABAS = ["mapa", "casal", "num"];
+const ABAS = ["mapa", "casal", "num", "tarot"];
 function aba(qual) {
   ABAS.forEach((a) => {
     const el = document.getElementById(`aba-${a}`);
@@ -337,6 +344,30 @@ function desenharNumerologia(d) {
     ${DIVISOR}
     <div class="destaques">${resto.map((x) => `<div><span>${esc(x.nome)}</span><b>${x.valor ?? "—"}</b></div>`).join("")}</div>
     <div class="secao">${resto.map((x) => `<h3>${esc(x.nome)} ${x.valor ?? ""}</h3><p>${esc(x.texto)}</p>`).join("")}</div>`;
+  $("#resultado").hidden = false;
+  $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------- tarot ----------
+$("#form-tarot").addEventListener("submit", async (e) => {
+  e.preventDefault(); erro("#erro-tarot", "");
+  const botao = $("#gerar-tarot"); botao.disabled = true; botao.textContent = "Embaralhando…";
+  try {
+    const { tiragem } = await pedir("/api/ocidental/tarot/tirar", {});
+    const t = await pedir("/api/live/ocidental/token/tarot", { tiragem });
+    desenharTarot(await pedir("/api/ocidental/tarot", { tiragem, nivel: "completo", token: t.token }));
+  } catch (err) { erro("#erro-tarot", err.message); }
+  finally { botao.disabled = false; botao.textContent = "Tirar 3 cartas"; }
+});
+function desenharTarot(d) {
+  $("#resultado").innerHTML = `
+    <h2 class="grande">Tiragem de 3 cartas</h2>
+    <p class="faixa gratis">Amostra grátis</p>
+    <div class="destaques">${d.cartas.map((c) => `<div><span>${esc(c.posicao_pt)}</span><b>${esc(c.nome)}</b></div>`).join("")}</div>
+    <div class="secao">${d.cartas.map((c) => `<p><b>${esc(c.posicao_pt)}:</b> ${esc(c.frase)}</p>`).join("")}</div>
+    ${DIVISOR}
+    <div class="secao">${d.cartas.map((c) => `<h3>${esc(c.posicao_pt)}: ${esc(c.nome)}</h3><p>${esc(c.moldura)}</p><p>${esc(c.leitura)}</p>`).join("")}
+      <h3>Leitura de conjunto</h3>${d.conjunto.map((t) => `<p>${esc(t)}</p>`).join("")}</div>`;
   $("#resultado").hidden = false;
   $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
 }

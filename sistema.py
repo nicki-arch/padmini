@@ -65,6 +65,7 @@ PAGINAS = {
         "/compatibilidade": ("ocidental/compatibilidade.html", "compatibilidade"),
         "/lista": ("ocidental/lista.html", "lista"),
         "/numerologia": ("ocidental/numerologia.html", "numerologia"),
+        "/tarot": ("ocidental/tarot.html", "tarot"),
     },
 }
 

@@ -11,7 +11,11 @@ aries:
 
 Regras de tom (há teste que confere algumas):
 - português do Brasil, falando com a pessoa ("você");
-- 60 a 120 palavras por texto;
+- 60 a 120 palavras por texto (mapa, sinastria e numerologia);
+- **tarot: 40 a 90 palavras** na leitura de cada carta — mais curto de propósito,
+  porque a leitura completa junta três cartas, a moldura de cada posição e a
+  leitura de conjunto (a frase da amostra, as molduras e as peças de conjunto
+  não têm limite, mas são curtas);
 - concreto: um exemplo de comportamento, do tipo "numa discussão, você…";
 - tendência, não sentença: "tende a", "pode", "costuma" — nada de "você vai";
 - NADA de previsão de saúde, morte ou dinheiro;
@@ -35,3 +39,11 @@ Arquivos:
 - `aspectos_pessoais.yaml` — Sol, Lua, Mercúrio, Vênus e Marte entre si, 5 aspectos cada par
 - `pecas.yaml` — peças para montar os aspectos dos outros pares, elementos,
   modalidades, regente do Ascendente e avisos
+- `sinastria.yaml` — dimensões, casas, Índice Padmini e peças da sinastria
+- `numerologia.yaml` — descrição curta de cada número + 12 textos para cada um dos 6 números
+- `tarot.yaml` — as 78 cartas (frase da amostra + leitura de 40 a 90 palavras),
+  a moldura de cada posição (Situação, Desafio, Conselho) e as peças da leitura
+  de conjunto (quantos arcanos maiores saíram, naipe que predomina, fecho).
+  O nome da carta vem do código (`tarot.py`), por isso os textos não precisam
+  repeti-lo — e cartas como "A Morte" e "A Roda da Fortuna" não têm o nome
+  escrito no texto, porque "morte" e "fortuna" são palavras barradas.

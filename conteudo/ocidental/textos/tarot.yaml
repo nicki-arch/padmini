@@ -1,0 +1,911 @@
+# Tarot — tiragem de 3 cartas (Situação · Desafio · Conselho). Rascunho;
+# revisar e trocar `revisado` para true (ver LEIA.md).
+#
+# Cada carta tem:
+#   frase:   uma linha, aparece na AMOSTRA grátis
+#   leitura: 40 a 90 palavras (mais curto que o mapa), o significado-base
+# O nome da carta vem do código (tarot.py), não daqui — por isso os textos não
+# precisam repetir "A Morte" ou "A Roda da Fortuna" (e não devem: são palavras
+# que os testes barram nos textos, para não soar como previsão).
+# As molduras por posição e as peças da leitura de conjunto estão no fim.
+
+cartas:
+  o_louco:
+    frase: {revisado: false, texto: "Um começo sem mapa, pedindo coragem e leveza."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Louco fala de começo e de confiança no desconhecido. É a energia de
+        quem dá o primeiro passo sem ter todas as respostas — mudar de cidade,
+        aceitar um convite inesperado, tentar algo pela primeira vez. Traz
+        leveza, curiosidade e abertura. O ponto de cuidado é a distração: ir
+        com tudo sem olhar onde pisa. A carta convida a arriscar com os olhos
+        abertos.
+  o_mago:
+    frase: {revisado: false, texto: "Você já tem as ferramentas; falta usá-las."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Mago fala de iniciativa e de recursos à mão. É a carta de quem junta
+        o que sabe, o que tem e o que quer para fazer acontecer — uma ideia que
+        finalmente sai do papel. Indica habilidade, comunicação e foco. O ponto
+        de cuidado é prometer mais do que entrega ou manipular para chegar
+        lá. A carta lembra que a sua vontade, bem dirigida, é uma força real.
+  a_sacerdotisa:
+    frase: {revisado: false, texto: "A resposta está no silêncio e na intuição."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Sacerdotisa fala de intuição, reserva e sabedoria interior. É a carta
+        do que ainda não foi dito, do que você sente antes de conseguir
+        explicar. Pede escuta, paciência e atenção aos sinais sutis — um sonho,
+        um incômodo, uma coincidência. O ponto de cuidado é se fechar demais e
+        esperar indefinidamente. A carta sugere confiar no que você já sabe por
+        dentro.
+  a_imperatriz:
+    frase: {revisado: false, texto: "Tempo de cuidar, criar e deixar florescer."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Imperatriz fala de fertilidade no sentido amplo: criatividade,
+        cuidado, prazer e crescimento. É a energia de um projeto que floresce,
+        de uma casa acolhedora, de um corpo que pede atenção e carinho. Traz
+        abundância de afeto e de ideias. O ponto de cuidado é cuidar demais dos
+        outros e esquecer de si. A carta convida a nutrir o que você quer ver
+        crescer.
+  o_imperador:
+    frase: {revisado: false, texto: "Estrutura, limites claros e firmeza."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Imperador fala de estrutura, liderança e responsabilidade. É a carta
+        de quem organiza, define regras e sustenta decisões — o momento de
+        colocar ordem na casa ou assumir o comando de um projeto. Traz
+        estabilidade e proteção. O ponto de cuidado é a rigidez e o controle
+        excessivo. A carta lembra que firmeza funciona melhor quando vem junto
+        com escuta.
+  o_hierofante:
+    frase: {revisado: false, texto: "Aprender com quem já trilhou o caminho."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Hierofante fala de tradição, ensinamento e pertencimento. É a carta
+        do mestre, da escola, das regras compartilhadas e dos rituais que dão
+        sentido à vida — um curso, um conselho de alguém mais experiente, uma
+        comunidade. Traz orientação e valores. O ponto de cuidado é seguir
+        regras só por hábito. A carta convida a aprender com a tradição sem
+        deixar de pensar por conta própria.
+  os_enamorados:
+    frase: {revisado: false, texto: "Uma escolha feita com o coração e com valores."}
+    leitura:
+      revisado: false
+      texto: >-
+        Os Enamorados falam de escolha e de alinhamento de valores. Nem sempre
+        é sobre romance: é sobre decidir entre caminhos de acordo com o que
+        importa para você — uma parceria, uma proposta, uma mudança. Traz união
+        e sinceridade. O ponto de cuidado é escolher para agradar os outros. A
+        carta pede uma decisão que você consiga sustentar com o coração
+        tranquilo.
+  o_carro:
+    frase: {revisado: false, texto: "Seguir em frente com direção e disciplina."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Carro fala de avanço, determinação e controle da direção. É a carta
+        de quem decide para onde ir e coordena forças diferentes para chegar
+        lá — razão e emoção, trabalho e vida pessoal. Traz movimento e
+        conquista. O ponto de cuidado é atropelar pessoas ou sinais no
+        caminho. A carta convida a seguir em frente segurando as rédeas com
+        atenção.
+  a_forca:
+    frase: {revisado: false, texto: "Coragem suave: firmeza com paciência."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Força fala de coragem interior, paciência e domínio de si. Não é a
+        força bruta, mas a de quem acalma um impulso em vez de reagir — respirar
+        antes de responder numa discussão, por exemplo. Traz autoconfiança e
+        compaixão. O ponto de cuidado é engolir tudo em nome da calma. A carta
+        lembra que gentileza e firmeza podem andar juntas.
+  o_eremita:
+    frase: {revisado: false, texto: "Um passo para trás para enxergar melhor."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Eremita fala de recolhimento, reflexão e busca de sentido. É a carta
+        de quem precisa de silêncio para ouvir a própria voz — um fim de semana
+        sozinho, uma pausa nas redes, uma conversa honesta consigo. Traz
+        maturidade e clareza. O ponto de cuidado é o isolamento prolongado. A
+        carta sugere buscar respostas por dentro e voltar para compartilhar o
+        que encontrou.
+  a_roda_da_fortuna:
+    frase: {revisado: false, texto: "Ciclos mudam; o importante é como você gira junto."}
+    leitura:
+      revisado: false
+      texto: >-
+        Esta carta fala de ciclos e mudanças que não dependem só de você. É o
+        momento em que algo sai do lugar — uma virada no trabalho, um reencontro,
+        uma porta que abre ou fecha. Traz movimento e oportunidade. O ponto de
+        cuidado é achar que tudo é sorte ou azar e deixar de agir. A carta
+        convida a se adaptar ao novo ciclo e aproveitar o que ele oferece.
+  a_justica:
+    frase: {revisado: false, texto: "Clareza, equilíbrio e responsabilidade pelas escolhas."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Justiça fala de equilíbrio, verdade e consequência. É a carta de
+        quem pesa os fatos com honestidade e assume a responsabilidade pelo que
+        escolheu — um acordo que precisa ser justo, uma conversa franca, uma
+        decisão racional. Traz clareza e integridade. O ponto de cuidado é o
+        julgamento duro, com os outros ou consigo. A carta pede decisões
+        equilibradas e transparentes.
+  o_enforcado:
+    frase: {revisado: false, texto: "Parar e ver a situação de outro ângulo."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Enforcado fala de pausa, entrega e mudança de perspectiva. É a carta
+        de quando as coisas não andam do jeito que você queria e a melhor saída
+        é olhar de outro ângulo — esperar um pouco, abrir mão do controle,
+        aceitar um tempo de espera. Traz sabedoria e desapego. O ponto de
+        cuidado é se sacrificar sem necessidade. A carta sugere que parar
+        também é uma forma de avançar.
+  a_morte:
+    frase: {revisado: false, texto: "Um ciclo termina para outro começar."}
+    leitura:
+      revisado: false
+      texto: >-
+        Apesar do nome, esta carta fala de transformação, não de fim literal.
+        É o encerramento de uma fase — um hábito, uma relação, um emprego, um
+        jeito antigo de ser — para abrir espaço ao novo. Traz renovação e
+        limpeza. O ponto de cuidado é resistir a uma mudança que já aconteceu
+        por dentro. A carta convida a soltar com gratidão o que cumpriu o seu
+        papel.
+  a_temperanca:
+    frase: {revisado: false, texto: "Equilíbrio, medida e paciência na mistura."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Temperança fala de equilíbrio, moderação e integração. É a carta de
+        quem combina forças diferentes na medida certa — trabalho e descanso,
+        razão e emoção, o seu jeito e o do outro. Traz calma, cura emocional e
+        cooperação. O ponto de cuidado é a pressa por resultados. A carta
+        lembra que algumas coisas precisam de tempo e de ajustes finos para dar
+        certo.
+  o_diabo:
+    frase: {revisado: false, texto: "O que prende você, e que você pode soltar."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Diabo fala de apegos, tentações e padrões que prendem. É a carta de
+        um hábito difícil de largar, de uma relação que suga energia, de uma
+        crença que limita — correntes que, muitas vezes, estão frouxas. Traz
+        também desejo e intensidade. O ponto de cuidado é se culpar em vez de
+        agir. A carta convida a reconhecer o que te prende para começar a se
+        libertar.
+  a_torre:
+    frase: {revisado: false, texto: "O que era frágil cai — e abre espaço para a verdade."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Torre fala de rupturas e revelações. É a carta de quando algo que
+        parecia sólido se mostra frágil — uma ilusão que cai, uma verdade que
+        vem à tona, um plano que precisa ser refeito. Assusta, mas também
+        liberta. O ponto de cuidado é tentar segurar o que já desmoronou. A
+        carta convida a reconstruir sobre bases mais honestas.
+  a_estrela:
+    frase: {revisado: false, texto: "Esperança renovada e fé no caminho."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Estrela fala de esperança, inspiração e cura depois de um período
+        difícil. É a carta de quem volta a acreditar — em si, num projeto, nas
+        pessoas. Traz serenidade, generosidade e sensação de estar no caminho
+        certo. O ponto de cuidado é ficar só no sonho, sem dar passos
+        concretos. A carta convida a confiar e a agir aos poucos na direção do
+        que te inspira.
+  a_lua:
+    frase: {revisado: false, texto: "Nem tudo está claro; atenção às ilusões."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Lua fala de incerteza, sonhos e emoções profundas. É a carta de
+        quando as coisas não estão claras — medos que parecem maiores à noite,
+        informações incompletas, intuições difíceis de interpretar. Traz
+        sensibilidade e imaginação. O ponto de cuidado é agir movido por medo
+        ou suposição. A carta sugere esperar a situação clarear e checar os
+        fatos antes de decidir.
+  o_sol:
+    frase: {revisado: false, texto: "Clareza, alegria e vitalidade."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Sol fala de clareza, alegria e realização. É uma das cartas mais
+        luminosas do baralho: momentos de confiança, de reconhecimento, de
+        simplicidade feliz — um encontro leve, um projeto que dá certo, um dia
+        em que tudo faz sentido. Traz energia e otimismo. O ponto de cuidado é
+        o excesso de confiança. A carta convida a aproveitar a luz e
+        compartilhá-la.
+  o_julgamento:
+    frase: {revisado: false, texto: "Um chamado para despertar e recomeçar."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Julgamento fala de despertar, balanço e renascimento. É a carta de
+        quem olha para trás, entende o que viveu e ouve um chamado para uma
+        nova fase — uma vocação, uma decisão adiada, um perdão. Traz clareza e
+        renovação. O ponto de cuidado é o julgamento severo de si mesmo. A
+        carta convida a aprender com o passado e responder ao que está te
+        chamando agora.
+  o_mundo:
+    frase: {revisado: false, texto: "Um ciclo se completa com plenitude."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Mundo fala de conclusão, integração e plenitude. É a carta de um
+        ciclo que se fecha bem — um projeto concluído, uma etapa vencida, a
+        sensação de estar inteiro. Traz realização e expansão. O ponto de
+        cuidado é não celebrar e já pular para o próximo desafio. A carta
+        convida a reconhecer o caminho feito antes de começar a próxima
+        jornada.
+
+  # ---------------- Paus: ação, criatividade, energia, projetos
+  as_de_paus:
+    frase: {revisado: false, texto: "A faísca de um projeto novo."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Ás de Paus fala de inspiração e começo cheio de energia. É a ideia
+        que acende, a vontade súbita de criar, de se mexer, de tirar um plano
+        do papel. Traz entusiasmo e potencial. O ponto de cuidado é deixar a
+        faísca apagar por falta de um primeiro passo concreto. A carta convida
+        a agir enquanto a vontade está quente.
+  dois_de_paus:
+    frase: {revisado: false, texto: "Planejar o próximo passo olhando o horizonte."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Dois de Paus fala de planejamento e de escolha de direção. Você já
+        tem algo nas mãos e olha para o que pode vir depois — expandir, mudar,
+        arriscar mais longe. Traz visão e ambição. O ponto de cuidado é
+        planejar demais e nunca sair do lugar. A carta sugere decidir o rumo e
+        marcar a data da partida.
+  tres_de_paus:
+    frase: {revisado: false, texto: "O que você plantou começa a voltar."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Três de Paus fala de expansão e de espera ativa. É o momento em que
+        os esforços começam a dar sinais — uma resposta que chega, uma parceria
+        que se abre, novos horizontes. Traz confiança e perspectiva. O ponto de
+        cuidado é a impaciência com o tempo das coisas. A carta convida a
+        manter o olhar longe e continuar preparando o terreno.
+  quatro_de_paus:
+    frase: {revisado: false, texto: "Celebração, lar e uma conquista para comemorar."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Quatro de Paus fala de celebração, estabilidade e alegria
+        compartilhada. É a festa depois do esforço, a casa cheia, a sensação de
+        pertencer — um marco que merece ser comemorado com quem você ama. Traz
+        harmonia e gratidão. O ponto de cuidado é pular a comemoração por
+        pressa. A carta lembra que celebrar etapas renova a energia para as
+        próximas.
+  cinco_de_paus:
+    frase: {revisado: false, texto: "Disputa de ideias e energia desencontrada."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Cinco de Paus fala de conflito e competição, muitas vezes mais de
+        ideias do que de pessoas. É o grupo em que todos falam ao mesmo tempo,
+        a equipe sem acordo, o atrito que desgasta. Traz também vitalidade e
+        desafio. O ponto de cuidado é transformar tudo em disputa. A carta
+        sugere organizar as vozes e escolher as batalhas que valem a pena.
+  seis_de_paus:
+    frase: {revisado: false, texto: "Reconhecimento pelo seu esforço."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Seis de Paus fala de reconhecimento e confiança. É o momento em que o
+        seu esforço é visto — um elogio público, uma meta alcançada, a
+        admiração de quem está por perto. Traz autoestima e liderança. O ponto
+        de cuidado é depender do aplauso para se sentir bem. A carta convida a
+        aproveitar o reconhecimento e lembrar de quem ajudou na caminhada.
+  sete_de_paus:
+    frase: {revisado: false, texto: "Defender o que você acredita."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Sete de Paus fala de defesa e perseverança. É a situação em que você
+        precisa sustentar uma posição, um projeto ou um limite diante de
+        pressões — críticas, concorrência, cobranças. Traz coragem e
+        convicção. O ponto de cuidado é ficar na defensiva o tempo todo. A
+        carta sugere firmeza no que importa e flexibilidade no que não é
+        essencial.
+  oito_de_paus:
+    frase: {revisado: false, texto: "Tudo acelera: notícias e movimento."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Oito de Paus fala de velocidade e de coisas que se movem rápido.
+        Mensagens chegam, decisões saem, viagens acontecem — o que estava
+        travado começa a andar. Traz agilidade e comunicação. O ponto de
+        cuidado é agir no impulso e se perder no ritmo. A carta convida a
+        aproveitar o embalo com atenção à direção.
+  nove_de_paus:
+    frase: {revisado: false, texto: "Cansaço, mas quase lá: resiliência."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Nove de Paus fala de resistência e de cautela depois de muitas
+        batalhas. Você está cansado, mas perto de concluir — falta pouco para
+        fechar o ciclo. Traz resiliência e experiência. O ponto de cuidado é a
+        desconfiança excessiva, que fecha portas a ajudas. A carta sugere
+        guardar energia para a reta final e aceitar apoio.
+  dez_de_paus:
+    frase: {revisado: false, texto: "Peso demais nas costas."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Dez de Paus fala de sobrecarga. É a pessoa que assumiu tarefas
+        demais, que carrega sozinha o que poderia ser dividido — trabalho,
+        família, expectativas. Traz senso de responsabilidade, mas também
+        exaustão. O ponto de cuidado é achar que ninguém mais dá conta. A carta
+        convida a soltar o que não é seu e delegar.
+  valete_de_paus:
+    frase: {revisado: false, texto: "Curiosidade e vontade de explorar."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Valete de Paus fala de entusiasmo de principiante. É a curiosidade
+        de quem descobre um assunto novo, um hobby, uma possível carreira — e
+        quer experimentar tudo. Traz frescor e criatividade. O ponto de cuidado
+        é começar muitas coisas e não aprofundar nenhuma. A carta sugere
+        explorar com leveza, escolhendo depois o que merece dedicação.
+  cavaleiro_de_paus:
+    frase: {revisado: false, texto: "Ação rápida e paixão pela aventura."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Cavaleiro de Paus fala de impulso, aventura e movimento. É a energia
+        de quem parte para a ação sem medo — uma viagem, uma mudança, uma
+        iniciativa ousada. Traz coragem e carisma. O ponto de cuidado é a
+        impaciência e o hábito de largar tudo no meio. A carta convida a usar
+        esse fogo com um mínimo de planejamento.
+  rainha_de_paus:
+    frase: {revisado: false, texto: "Confiança, calor e presença."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Rainha de Paus fala de autoconfiança, magnetismo e calor humano. É a
+        energia de quem ocupa o próprio espaço com naturalidade, anima as
+        pessoas e cuida de muitos projetos ao mesmo tempo. Traz determinação e
+        generosidade. O ponto de cuidado é o ciúme ou a necessidade de ser o
+        centro. A carta convida a brilhar e a deixar os outros brilharem
+        também.
+  rei_de_paus:
+    frase: {revisado: false, texto: "Liderança com visão e ousadia."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Rei de Paus fala de liderança visionária. É a energia de quem enxerga
+        longe, inspira os outros e toma decisões corajosas — um empreendedor,
+        um líder de equipe, alguém que abre caminhos. Traz iniciativa madura e
+        honra. O ponto de cuidado é a impaciência com quem pensa diferente. A
+        carta sugere liderar pelo exemplo e ouvir antes de decidir.
+
+  # ---------------- Copas: emoções, afetos, relações, intuição
+  as_de_copas:
+    frase: {revisado: false, texto: "Um coração aberto para um novo afeto."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Ás de Copas fala de um novo começo emocional. É o afeto que
+        transborda — uma relação que nasce, uma amizade que se aprofunda, uma
+        emoção que finalmente pode ser sentida por inteiro. Traz amor,
+        compaixão e criatividade. O ponto de cuidado é fechar o coração por
+        medo de se machucar. A carta convida a receber e oferecer afeto sem
+        tanta defesa.
+  dois_de_copas:
+    frase: {revisado: false, texto: "Encontro, parceria e reciprocidade."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Dois de Copas fala de encontro e reciprocidade. É a conexão entre
+        duas pessoas que se reconhecem — um romance, uma amizade, uma parceria
+        de trabalho em que cada um dá e recebe. Traz harmonia e atração. O
+        ponto de cuidado é idealizar o outro. A carta convida a cultivar
+        relações em que os dois lados se sintam vistos.
+  tres_de_copas:
+    frase: {revisado: false, texto: "Amizade, festa e alegria compartilhada."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Três de Copas fala de amizade e celebração. É o brinde com as
+        pessoas queridas, o apoio do grupo, a alegria de pertencer. Traz
+        comunidade e leveza. O ponto de cuidado é o excesso — festa demais,
+        fofoca, companhia que mais distrai do que nutre. A carta convida a
+        valorizar quem está do seu lado e comemorar junto.
+  quatro_de_copas:
+    frase: {revisado: false, texto: "Apatia: algo bom passa despercebido."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Quatro de Copas fala de tédio, insatisfação e introspecção. É o
+        momento em que nada parece empolgar e oportunidades passam
+        despercebidas — um convite ignorado, um carinho não notado. Traz
+        também a necessidade de repensar o que você quer. O ponto de cuidado é
+        a acomodação. A carta sugere olhar de novo para o que já está sendo
+        oferecido.
+  cinco_de_copas:
+    frase: {revisado: false, texto: "Luto por uma perda, e o que ainda resta."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Cinco de Copas fala de tristeza e decepção. É olhar para o que se
+        perdeu — um plano que não deu certo, uma relação que mudou — e
+        esquecer o que ainda está de pé. Traz a necessidade de viver o luto
+        emocional. O ponto de cuidado é ficar preso ao lamento. A carta
+        convida a sentir a perda e, depois, virar-se para o que continua ao
+        seu alcance.
+  seis_de_copas:
+    frase: {revisado: false, texto: "Memórias, infância e doçura."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Seis de Copas fala de nostalgia, lembranças e gentileza. É o
+        reencontro com alguém do passado, uma memória de infância, um gesto
+        simples de carinho. Traz inocência e acolhimento. O ponto de cuidado é
+        viver no passado e comparar tudo com o que já foi. A carta convida a
+        trazer a doçura de antes para a vida de agora.
+  sete_de_copas:
+    frase: {revisado: false, texto: "Muitas opções e fantasias: escolha com os pés no chão."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Sete de Copas fala de sonhos, opções e ilusões. São muitos caminhos
+        possíveis, todos brilhantes, e é difícil saber qual é real — propostas
+        demais, desejos confusos. Traz imaginação e criatividade. O ponto de
+        cuidado é se perder em fantasias e não escolher nada. A carta sugere
+        separar o desejo da realidade e decidir com clareza.
+  oito_de_copas:
+    frase: {revisado: false, texto: "Deixar para trás o que já não preenche."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Oito de Copas fala de partida e busca de algo mais profundo. É a
+        decisão de sair de uma situação que já não satisfaz — mesmo que ela
+        pareça boa de fora. Traz coragem emocional e maturidade. O ponto de
+        cuidado é fugir sem entender o que está buscando. A carta convida a
+        seguir o que dá sentido, mesmo que isso signifique recomeçar.
+  nove_de_copas:
+    frase: {revisado: false, texto: "Satisfação: um desejo realizado."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Nove de Copas fala de satisfação e contentamento. É conhecida como a
+        carta do desejo realizado: momentos de prazer, conforto emocional e
+        gratidão pelo que se tem. Traz alegria e bem-estar. O ponto de cuidado
+        é a complacência ou a vaidade. A carta convida a saborear o que deu
+        certo e compartilhar a sua alegria.
+  dez_de_copas:
+    frase: {revisado: false, texto: "Harmonia em família e afeto duradouro."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Dez de Copas fala de harmonia emocional e vínculos duradouros. É a
+        família — de sangue ou escolhida — reunida, o lar acolhedor, a
+        sensação de paz nas relações. Traz felicidade compartilhada e
+        pertencimento. O ponto de cuidado é idealizar a família perfeita e
+        esconder conflitos. A carta convida a cuidar dos laços que sustentam
+        você.
+  valete_de_copas:
+    frase: {revisado: false, texto: "Uma mensagem afetiva ou uma intuição criativa."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Valete de Copas fala de sensibilidade e abertura emocional. É uma
+        mensagem carinhosa, um convite, uma ideia criativa que surge do nada —
+        ou a sua criança interior pedindo espaço. Traz doçura e imaginação. O
+        ponto de cuidado é a imaturidade emocional. A carta convida a acolher
+        o que você sente com curiosidade e sem vergonha.
+  cavaleiro_de_copas:
+    frase: {revisado: false, texto: "Romance, convites e idealismo."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Cavaleiro de Copas fala de romantismo e de seguir o coração. É a
+        pessoa que chega com um convite, uma declaração, uma proposta cheia de
+        charme. Traz sensibilidade artística e gentileza. O ponto de cuidado é
+        prometer com emoção e não sustentar depois. A carta convida a agir com
+        o coração, checando se as atitudes acompanham as palavras.
+  rainha_de_copas:
+    frase: {revisado: false, texto: "Acolhimento, empatia e intuição."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Rainha de Copas fala de empatia profunda e acolhimento. É a energia
+        de quem escuta sem julgar, percebe o que o outro sente e cuida com
+        delicadeza. Traz intuição e maturidade emocional. O ponto de cuidado é
+        absorver as dores de todos e se esgotar. A carta convida a cuidar dos
+        outros sem esquecer dos seus próprios limites.
+  rei_de_copas:
+    frase: {revisado: false, texto: "Equilíbrio emocional e sabedoria."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Rei de Copas fala de equilíbrio entre emoção e razão. É a energia de
+        quem sente profundamente, mas mantém a calma — o conselheiro, o amigo
+        que acalma, o líder compassivo. Traz diplomacia e maturidade. O ponto
+        de cuidado é esconder o que sente por trás da serenidade. A carta
+        convida a acolher as emoções e responder a elas com sabedoria.
+
+  # ---------------- Espadas: mente, palavra, conflitos, verdade
+  as_de_espadas:
+    frase: {revisado: false, texto: "Clareza que corta a confusão."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Ás de Espadas fala de clareza mental e verdade. É o momento em que
+        uma ideia fica nítida, uma decisão se impõe ou uma verdade vem à tona
+        e corta a confusão. Traz lucidez, foco e justiça. O ponto de cuidado é
+        usar a palavra como arma. A carta convida a dizer o que precisa ser
+        dito, com precisão e respeito.
+  dois_de_espadas:
+    frase: {revisado: false, texto: "Uma decisão adiada entre dois lados."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Dois de Espadas fala de impasse e de decisão adiada. É ficar entre
+        duas opções, de olhos fechados, tentando manter a paz sem escolher —
+        evitando uma conversa, um conflito, uma verdade. Traz equilíbrio
+        aparente. O ponto de cuidado é que a indecisão também cobra seu preço.
+        A carta sugere buscar mais informação e, então, escolher.
+  tres_de_espadas:
+    frase: {revisado: false, texto: "Uma mágoa que precisa ser reconhecida."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Três de Espadas fala de mágoa e decepção. É a dor de uma palavra
+        dura, de uma separação, de uma expectativa quebrada — algo que doeu no
+        coração. Traz a necessidade de reconhecer o que machucou em vez de
+        fingir que nada aconteceu. O ponto de cuidado é se fechar por medo de
+        sofrer de novo. A carta convida a acolher a dor para que ela possa
+        passar.
+  quatro_de_espadas:
+    frase: {revisado: false, texto: "Pausa para descansar e recuperar a mente."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Quatro de Espadas fala de descanso e recuperação. Depois de um
+        período intenso, a mente pede silêncio — uma pausa, um retiro, uma
+        noite bem dormida antes de decidir. Traz restauração e reflexão. O
+        ponto de cuidado é confundir pausa com fuga. A carta convida a parar
+        de propósito, para voltar com mais clareza.
+  cinco_de_espadas:
+    frase: {revisado: false, texto: "Vencer a discussão e perder a relação."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Cinco de Espadas fala de conflito em que ninguém sai inteiro. É a
+        discussão vencida a qualquer custo, a competição que deixa rastros, a
+        vitória que isola. Traz a pergunta sobre o que realmente vale a pena
+        defender. O ponto de cuidado é o orgulho. A carta sugere escolher as
+        batalhas e, às vezes, abrir mão de ter razão.
+  seis_de_espadas:
+    frase: {revisado: false, texto: "Uma travessia para águas mais calmas."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Seis de Espadas fala de transição e de seguir em frente. É deixar
+        para trás uma fase difícil rumo a algo mais tranquilo — uma mudança de
+        casa, de trabalho, de postura. Traz alívio gradual e esperança. O ponto
+        de cuidado é carregar na bagagem o que deveria ficar. A carta convida a
+        fazer a travessia com calma, levando só o necessário.
+  sete_de_espadas:
+    frase: {revisado: false, texto: "Estratégia, ou algo que não está sendo dito."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Sete de Espadas fala de estratégia, discrição e segredos. Pode ser a
+        necessidade de agir com esperteza, sem expor todos os planos — ou o
+        alerta de que algo não está sendo dito com honestidade, por você ou
+        por alguém. O ponto de cuidado é enganar a si mesmo. A carta convida a
+        checar as intenções e agir com integridade.
+  oito_de_espadas:
+    frase: {revisado: false, texto: "Presa por crenças que parecem muros."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Oito de Espadas fala de sensação de aprisionamento. É sentir que não
+        há saída, quando muitas vezes o que prende são pensamentos, medos e
+        crenças — as amarras estão mais frouxas do que parecem. Traz a chance
+        de mudar a perspectiva. O ponto de cuidado é o papel de vítima. A
+        carta convida a questionar o que você acha que não pode fazer.
+  nove_de_espadas:
+    frase: {revisado: false, texto: "Preocupação que tira o sono."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Nove de Espadas fala de ansiedade e preocupação. São os pensamentos
+        que giram de madrugada, o medo que cresce no escuro, a culpa que pesa.
+        Muitas vezes o que se imagina é maior do que o que acontece. O ponto de
+        cuidado é se isolar com esses pensamentos. A carta convida a falar sobre
+        o que preocupa e buscar apoio.
+  dez_de_espadas:
+    frase: {revisado: false, texto: "O fim de uma fase difícil: não dá para piorar."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Dez de Espadas fala de um fim doloroso, mas definitivo. É o ponto em
+        que uma situação chegou ao limite — uma relação, um projeto, uma forma
+        de pensar se esgotou. Parece o fundo do poço, e por isso mesmo só resta
+        subir. O ponto de cuidado é dramatizar a queda. A carta lembra que
+        depois da noite mais escura vem o amanhecer.
+  valete_de_espadas:
+    frase: {revisado: false, texto: "Curiosidade mental e vontade de aprender."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Valete de Espadas fala de curiosidade, vigilância e vontade de
+        aprender. É a mente jovem que faz perguntas, investiga, quer entender
+        como as coisas funcionam — e também a pessoa atenta ao que acontece ao
+        redor. O ponto de cuidado é a fofoca ou falar sem pensar. A carta
+        convida a usar a curiosidade para aprender, não para julgar.
+  cavaleiro_de_espadas:
+    frase: {revisado: false, texto: "Pressa em agir e dizer o que pensa."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Cavaleiro de Espadas fala de pressa, ambição e franqueza. É a
+        energia de quem corre atrás de uma ideia sem olhar para os lados,
+        dizendo o que pensa de forma direta. Traz determinação e agilidade
+        mental. O ponto de cuidado é atropelar pessoas e detalhes. A carta
+        sugere manter o foco, mas medir as palavras e o ritmo.
+  rainha_de_espadas:
+    frase: {revisado: false, texto: "Lucidez, honestidade e limites claros."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Rainha de Espadas fala de lucidez e independência. É a energia de
+        quem viveu, aprendeu e agora enxerga com clareza — diz a verdade com
+        elegância, põe limites e não se deixa enganar. Traz discernimento e
+        honestidade. O ponto de cuidado é a frieza ou a crítica excessiva. A
+        carta convida a unir clareza e compaixão.
+  rei_de_espadas:
+    frase: {revisado: false, texto: "Autoridade pela razão e pela ética."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Rei de Espadas fala de autoridade intelectual e ética. É a energia
+        de quem decide com base em fatos, princípios e lógica — o juiz, o
+        especialista, o líder que pensa antes de agir. Traz justiça e
+        clareza. O ponto de cuidado é a rigidez e a distância emocional. A
+        carta sugere decidir com a cabeça sem esquecer as pessoas envolvidas.
+
+  # ---------------- Ouros: corpo, dinheiro, trabalho, coisas concretas
+  as_de_ouros:
+    frase: {revisado: false, texto: "Uma oportunidade concreta para começar."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Ás de Ouros fala de uma oportunidade concreta. É a semente de algo
+        material — um trabalho, um projeto que pode dar frutos, um recurso que
+        chega, um cuidado maior com o corpo e a rotina. Traz prosperidade
+        possível e base sólida. O ponto de cuidado é deixar a oportunidade
+        passar por falta de plano. A carta convida a plantar com paciência.
+  dois_de_ouros:
+    frase: {revisado: false, texto: "Equilibrar várias coisas ao mesmo tempo."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Dois de Ouros fala de equilíbrio e adaptação. É a fase de fazer
+        malabarismo com contas, tarefas e compromissos, ajustando o tempo e o
+        dinheiro conforme a vida muda. Traz flexibilidade e jogo de cintura. O
+        ponto de cuidado é se desorganizar tentando abraçar tudo. A carta
+        sugere definir prioridades e manter o ritmo leve.
+  tres_de_ouros:
+    frase: {revisado: false, texto: "Trabalho em equipe e competência reconhecida."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Três de Ouros fala de colaboração e de trabalho bem feito. É a equipe
+        em que cada um contribui com sua habilidade, o projeto que ganha forma,
+        a competência que é reconhecida. Traz aprendizado e qualidade. O ponto
+        de cuidado é querer fazer tudo sozinho. A carta convida a somar
+        talentos e valorizar o que cada pessoa traz.
+  quatro_de_ouros:
+    frase: {revisado: false, texto: "Segurar forte demais o que se tem."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Quatro de Ouros fala de segurança e controle. É a necessidade de
+        proteger o que você conquistou — dinheiro, posição, espaço — e o medo
+        de perder. Traz estabilidade e prudência. O ponto de cuidado é segurar
+        tão forte que nada novo consegue entrar. A carta sugere cuidar dos
+        recursos sem se fechar à troca e à generosidade.
+  cinco_de_ouros:
+    frase: {revisado: false, texto: "Aperto e sensação de estar do lado de fora."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Cinco de Ouros fala de dificuldade e sensação de exclusão. Pode ser
+        um aperto financeiro, uma fase de insegurança ou o sentimento de estar
+        do lado de fora, sem apoio. Traz a lembrança de que a ajuda costuma
+        estar mais perto do que parece. O ponto de cuidado é o orgulho que
+        impede de pedir. A carta convida a buscar apoio e recursos.
+  seis_de_ouros:
+    frase: {revisado: false, texto: "Dar e receber com equilíbrio."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Seis de Ouros fala de generosidade e troca justa. É o momento de dar
+        ou de receber — ajuda, tempo, dinheiro, oportunidade — e de perceber o
+        equilíbrio nessa relação. Traz gratidão e partilha. O ponto de cuidado
+        é a ajuda que cria dependência ou dívida emocional. A carta convida a
+        dar sem humilhar e receber sem vergonha.
+  sete_de_ouros:
+    frase: {revisado: false, texto: "Avaliar a colheita e ter paciência."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Sete de Ouros fala de paciência e avaliação. É o momento de olhar
+        para o que você plantou e perguntar se está valendo a pena — o
+        resultado ainda está crescendo. Traz perseverança e visão de longo
+        prazo. O ponto de cuidado é desistir cedo demais ou insistir no que já
+        não rende. A carta sugere avaliar com honestidade e ajustar.
+  oito_de_ouros:
+    frase: {revisado: false, texto: "Dedicação e aperfeiçoamento no ofício."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Oito de Ouros fala de dedicação e aperfeiçoamento. É o trabalho
+        paciente de quem treina, estuda e repete até ficar bom — o artesão
+        concentrado no seu ofício. Traz disciplina e maestria em construção. O
+        ponto de cuidado é o perfeccionismo que não deixa terminar. A carta
+        convida a valorizar o progresso feito passo a passo.
+  nove_de_ouros:
+    frase: {revisado: false, texto: "Independência e conforto conquistados."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Nove de Ouros fala de independência e conforto conquistado. É
+        desfrutar do que você construiu com o próprio esforço — autonomia,
+        bom gosto, tempo para si. Traz autoconfiança e refinamento. O ponto de
+        cuidado é se isolar na autossuficiência. A carta convida a aproveitar
+        suas conquistas sem esquecer que a vida também é compartilhada.
+  dez_de_ouros:
+    frase: {revisado: false, texto: "Estabilidade duradoura e legado de família."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Dez de Ouros fala de estabilidade duradoura e legado. É a família,
+        a tradição, o patrimônio construído ao longo de gerações — aquilo que
+        permanece e dá segurança. Traz raízes e continuidade. O ponto de
+        cuidado é ficar preso às expectativas da família ou ao valor material.
+        A carta convida a construir algo que faça sentido para quem vem
+        depois.
+  valete_de_ouros:
+    frase: {revisado: false, texto: "Estudo, prática e um começo com os pés no chão."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Valete de Ouros fala de estudo e de aprendizado prático. É a pessoa
+        que começa um curso, um estágio, um projeto concreto, com dedicação e
+        vontade de fazer direito. Traz foco e seriedade. O ponto de cuidado é
+        ficar só no planejamento. A carta convida a transformar interesse em
+        prática diária, sem pressa de resultados.
+  cavaleiro_de_ouros:
+    frase: {revisado: false, texto: "Constância: devagar e sempre."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Cavaleiro de Ouros fala de constância e responsabilidade. É a energia
+        de quem avança devagar, mas sem parar — cumpre o combinado, faz o
+        trabalho, cuida dos detalhes. Traz confiabilidade e método. O ponto de
+        cuidado é a rotina que vira teimosia ou estagnação. A carta lembra que
+        o ritmo firme leva longe, desde que haja espaço para ajustar.
+  rainha_de_ouros:
+    frase: {revisado: false, texto: "Cuidado prático, lar e abundância."}
+    leitura:
+      revisado: false
+      texto: >-
+        A Rainha de Ouros fala de cuidado prático e presença acolhedora. É a
+        energia de quem cuida da casa, das pessoas e das finanças com os pés
+        no chão, criando um ambiente de conforto. Traz generosidade e bom
+        senso. O ponto de cuidado é se esquecer de si mesma cuidando de todos.
+        A carta convida a nutrir também o próprio corpo e descanso.
+  rei_de_ouros:
+    frase: {revisado: false, texto: "Solidez, prosperidade e bom administrador."}
+    leitura:
+      revisado: false
+      texto: >-
+        O Rei de Ouros fala de solidez e sucesso material construído com
+        trabalho. É a energia do bom administrador — alguém que sabe lidar com
+        dinheiro, oferece segurança e cumpre o que promete. Traz
+        prosperidade e estabilidade. O ponto de cuidado é medir tudo pelo
+        valor material. A carta convida a usar os recursos para cuidar de
+        quem está ao redor.
+
+# ---------------------------------------------------------------------------
+# Moldura por posição: abre a leitura de cada carta no completo (antes do
+# significado-base). Sem limite de palavras (são peças curtas).
+posicoes:
+  situacao:
+    revisado: false
+    texto: >-
+      Na posição de Situação, a carta mostra o cenário em que você está agora:
+      o clima do momento e as forças que já estão em jogo, mesmo as que você
+      ainda não nomeou.
+  desafio:
+    revisado: false
+    texto: >-
+      Na posição de Desafio, a carta aponta o que pede mais atenção: o ponto
+      de atrito, o hábito ou o medo que pode travar o caminho — e, muitas
+      vezes, o aprendizado que o momento oferece.
+  conselho:
+    revisado: false
+    texto: >-
+      Na posição de Conselho, a carta sugere uma atitude: não é uma ordem nem
+      uma previsão, é uma direção possível para atravessar a situação com mais
+      clareza.
+
+# ---------------------------------------------------------------------------
+# Leitura de conjunto (no completo, depois das três cartas). O código escolhe
+# as peças: quantos arcanos maiores saíram e, se dois ou três menores forem do
+# mesmo naipe, o naipe que predomina. Sem limite de palavras.
+conjunto:
+  maiores:
+    0:
+      revisado: false
+      texto: >-
+        Nenhum arcano maior saiu na tiragem: o momento fala mais do dia a dia
+        do que de grandes viradas. As respostas estão nas escolhas práticas e
+        nas conversas de sempre — o que está nas suas mãos agora.
+    1:
+      revisado: false
+      texto: >-
+        Um arcano maior apareceu na tiragem: ele é o centro de gravidade da
+        leitura. O tema dessa carta é o que dá o tom ao resto, e as outras
+        mostram como ele aparece no cotidiano.
+    2:
+      revisado: false
+      texto: >-
+        Dois arcanos maiores na tiragem indicam um momento de peso: há temas
+        de fundo se movendo, que pedem mais reflexão do que pressa. Vale olhar
+        para o que essa fase está ensinando.
+    3:
+      revisado: false
+      texto: >-
+        As três cartas são arcanos maiores: a tiragem fala de um momento
+        marcante, de aprendizados grandes e de mudanças de perspectiva. É uma
+        fase para olhar a própria história com calma e atenção.
+  naipe:
+    paus:
+      revisado: false
+      texto: >-
+        Paus predomina: o assunto é energia, iniciativa e projetos. A leitura
+        pede movimento e coragem para agir, com cuidado para não se dispersar.
+    copas:
+      revisado: false
+      texto: >-
+        Copas predomina: o assunto é afeto, relações e o que você sente. A
+        leitura pede escuta do coração, com cuidado para não idealizar.
+    espadas:
+      revisado: false
+      texto: >-
+        Espadas predomina: o assunto é mente, palavras e decisões. A leitura
+        pede clareza e honestidade, com cuidado para não se perder em
+        preocupações.
+    ouros:
+      revisado: false
+      texto: >-
+        Ouros predomina: o assunto é trabalho, dinheiro, corpo e rotina. A
+        leitura pede passos concretos e paciência, com cuidado para não medir
+        tudo pelo resultado material.
+  fecho:
+    revisado: false
+    texto: >-
+      Lidas juntas, as cartas contam uma pequena história: de onde você parte,
+      o que pede atenção e uma direção possível. Use a tiragem como um espelho
+      para pensar, não como uma sentença — quem decide o próximo passo é você.

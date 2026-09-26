@@ -100,3 +100,21 @@ Pitagórica. Entrada: nome completo de REGISTRO (o da certidão) + data.
 
 Token do completo: assinado sobre o nome NORMALIZADO + a data (acento não
 muda nada; uma letra a mais muda). `sck`: `n~data~nome completo`.
+
+## Tarot (`tarot.py`) — rodada 2
+
+Tiragem de 3 cartas: **Situação · Desafio · Conselho**. Baralho de 78 cartas
+(tradição Rider-Waite-Smith: 22 arcanos maiores + 56 menores em Paus, Copas,
+Espadas e Ouros). Nesta versão, só na posição normal (sem cartas invertidas).
+
+| Tema | Decisão |
+|---|---|
+| Sorteio | no servidor, `secrets.SystemRandom().sample(range(78), 3)` — 3 cartas diferentes |
+| ID da tiragem | as 3 cartas + 5 bytes aleatórios + selo HMAC de 4 bytes (chave do `PADMINI_SEGREDO`), em base64url (16 caracteres). Não precisa de banco; ID inventado ou alterado → 422 |
+| Amostra → completo | o link pago assina o ID (`acesso.chave_tarot`), então o completo mostra exatamente as cartas da amostra. O `sck` leva `t~<id>` |
+| Pergunta | opcional, até 140 caracteres. Fica só no navegador (localStorage) e só vai ao servidor no pedido do texto por IA do completo. Texto com pergunta **não** vai para o cache nem para o banco; sem pergunta, o texto por IA é guardado em cache como nos outros produtos |
+| Cartas na tela | só tipografia + um símbolo simples nosso por naipe (lótus nos arcanos maiores). Nenhuma imagem de terceiros |
+| Leitura de conjunto | peças escolhidas pelo código: quantos arcanos maiores (0 a 3), o naipe que predomina (2 ou 3 menores do mesmo naipe) e um fecho |
+
+Textos: `conteudo/ocidental/textos/tarot.yaml` (leitura de cada carta com 40 a
+90 palavras — ver o LEIA.md da pasta).

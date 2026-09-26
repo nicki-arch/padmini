@@ -355,3 +355,27 @@ def gerar_pdf_numerologia(*, rel: dict, nome: str, data_nascimento: date, hoje: 
                 "substitui orientação profissional.</b>"))
     doc.build(h, onFirstPage=rodape, onLaterPages=rodape)
     return buf.getvalue()
+
+
+def gerar_pdf_tarot(*, rel: dict, hoje: date | None = None) -> bytes:
+    hoje = hoje or date.today()
+    buf, doc, h, rodape = _capa(
+        "Tarot", "",
+        "Tiragem de 3 cartas · Situação, Desafio e Conselho · Baralho de 78 cartas (tradição "
+        f"Rider-Waite-Smith), cartas na posição normal · Relatório gerado em {hoje.strftime('%d/%m/%Y')}",
+        [(c["posicao_pt"], c["nome"]) for c in rel["cartas"]],
+        "Tarot · tiragem de 3 cartas")
+    for c in rel["cartas"]:
+        h.append(CondPageBreak(45 * mm))
+        h.append(_p(escape(f"{c['posicao_pt']}: {c['nome']}"), "h2"))
+        h.append(_p(escape(c["frase"]), "intro"))
+        h.append(_p(escape(c["moldura"])))
+        h.append(_p(escape(c["leitura"])))
+    h.append(CondPageBreak(50 * mm))
+    h.append(_p("Leitura de conjunto", "h2"))
+    for texto in rel["conjunto"]:
+        h.append(_p(escape(texto)))
+    h.append(_p("<b>Esta leitura é uma ferramenta de autoconhecimento. Descreve tendências, não destino, e não "
+                "substitui orientação profissional.</b>"))
+    doc.build(h, onFirstPage=rodape, onLaterPages=rodape)
+    return buf.getvalue()

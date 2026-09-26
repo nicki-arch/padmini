@@ -307,3 +307,91 @@ def live_token_numerologia(p: PedidoNumerologia, request: Request):
     _calcular_numerologia(p)
     db.registrar_live(f"{VERSAO}:numerologia", p.nome.strip()[:80], "", p.data.isoformat())
     return {"token": acesso.emitir_token("numerologia", chave_da_numerologia(p), VERSAO)}
+
+
+# --------------------------------------------------------------------------
+# TAROT (/tarot) — tiragem de 3 cartas. O ID da tiragem (tarot.py) carrega as
+# cartas com selo do servidor; o link pago assina esse ID, então o completo
+# mostra exatamente as cartas da amostra.
+#
+# A PERGUNTA (opcional, até 140 caracteres) só entra no prompt da IA do
+# completo: não vai para o banco, nem para o log, nem para o cache — texto
+# com pergunta é gerado na hora e não é guardado.
+# --------------------------------------------------------------------------
+class PedidoTarot(BaseModel):
+    tiragem: str = Field(..., min_length=10, max_length=40)
+    nivel: str = Field("amostra", pattern=r"^(amostra|completo)$")
+    texto_ia: bool = False
+    pergunta: str = Field("", max_length=140)
+    token: str | None = Field(None, max_length=64)
+
+
+def _cartas(p: PedidoTarot) -> list[dict]:
+    import tarot
+    try:
+        return tarot.cartas_da_tiragem(p.tiragem)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@rotas.post("/api/ocidental/tarot/tirar")
+def tarot_tirar(request: Request):
+    """Sorteia no servidor (gerador criptográfico) e devolve o ID + a amostra."""
+    import tarot
+    limites.exigir(limites.CALCULO, request)
+    tiragem = tarot.tirar()
+    return {"nivel": "amostra", "sistema": VERSAO, "tiragem": tiragem,
+            **mt.montar_tarot(tarot.cartas_da_tiragem(tiragem), "amostra")}
+
+
+@rotas.post("/api/ocidental/tarot")
+def tarot_ocidental(p: PedidoTarot, request: Request):
+    limites.exigir(limites.CALCULO, request)
+    if p.texto_ia and p.nivel != "completo":
+        raise HTTPException(402, "O texto por IA faz parte da leitura completa.")
+    cartas = _cartas(p)
+    base_resp = {"nivel": p.nivel, "sistema": VERSAO, "tiragem": p.tiragem}
+    if p.nivel == "amostra":
+        return {**base_resp, **mt.montar_tarot(cartas, "amostra")}
+    chave = acesso.chave_tarot(p.tiragem)
+    if not acesso.completo_liberado("tarot", chave, p.token, VERSAO):
+        raise HTTPException(402, "A leitura completa requer pagamento.")
+    rel = mt.montar_tarot(cartas, "completo")
+    texto_ia = None
+    if p.texto_ia:
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
+        from montar_texto import gerar_com_claude
+        pergunta = " ".join(p.pergunta.split())
+        if pergunta:  # não vai para o cache: a pergunta não é guardada
+            limites.exigir(limites.TEXTO_IA, request)
+            texto_ia = gerar_com_claude(mt.montar_prompt_tarot(rel, pergunta))
+        else:
+            chave_cache = f"{VERSAO}|{chave}"
+            texto_ia = db.texto_ia(chave_cache)
+            if texto_ia is None:
+                limites.exigir(limites.TEXTO_IA, request)
+                texto_ia = gerar_com_claude(mt.montar_prompt_tarot(rel))
+                db.guardar_texto_ia(chave_cache, f"{VERSAO}:tarot", texto_ia,
+                                    os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
+    return {**base_resp, **rel, "texto_ia": texto_ia}
+
+
+@rotas.post("/api/ocidental/tarot/pdf")
+def tarot_pdf(p: PedidoTarot, request: Request):
+    limites.exigir(limites.PDF, request)
+    if not acesso.completo_liberado("tarot", acesso.chave_tarot(p.tiragem), p.token, VERSAO):
+        raise HTTPException(402, "O PDF completo requer pagamento.")
+    from gerar_pdf_ocidental import gerar_pdf_tarot
+    conteudo = gerar_pdf_tarot(rel=mt.montar_tarot(_cartas(p), "completo"))
+    return Response(conteudo, media_type="application/pdf",
+                    headers={"Content-Disposition": 'attachment; filename="tarot-padmini.pdf"'})
+
+
+@rotas.post("/api/live/ocidental/token/tarot")
+def live_token_tarot(p: PedidoTarot, request: Request):
+    if not acesso.sessao_valida("live", request.cookies.get("pad_live")):
+        raise HTTPException(401, "Sessão do modo live expirada. Entre de novo.")
+    cartas = _cartas(p)
+    db.registrar_live(f"{VERSAO}:tarot", " · ".join(c["nome"] for c in cartas)[:80], "", "")
+    return {"token": acesso.emitir_token("tarot", acesso.chave_tarot(p.tiragem), VERSAO)}
