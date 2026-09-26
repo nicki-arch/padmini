@@ -142,3 +142,19 @@ def test_regras_de_tom_iguais_as_dos_testes():
     assert revisao.problemas("Você vai " + ok, "planetas_signos", ("venus", "libra"))
     assert revisao.problemas(" ".join(_texto_ok(130)), "planetas_signos", ("venus", "libra"))
     assert revisao.problemas("curta", "pecas", ("temas", "venus")) == []  # peça: sem limite
+
+
+def test_gravar_no_tarot(base_copiada):
+    """A frase das cartas é de uma linha só no YAML ({revisado, texto}); a gravação
+    precisa funcionar nela e na leitura, sem mexer na carta vizinha."""
+    antes = mt.base("tarot")["cartas"]["o_mago"]
+    revisao.gravar([
+        {"arquivo": "tarot", "caminho": ("cartas", "o_louco", "frase"), "texto": "Um começo novo.", "revisado": True},
+        {"arquivo": "tarot", "caminho": ("cartas", "o_louco", "leitura"), "texto": None, "revisado": True},
+        {"arquivo": "tarot", "caminho": ("conjunto", "maiores", "2"), "texto": None, "revisado": True},
+    ])
+    b = mt.base("tarot")
+    assert b["cartas"]["o_louco"]["frase"] == {"revisado": True, "texto": "Um começo novo."}
+    assert b["cartas"]["o_louco"]["leitura"]["revisado"] is True
+    assert b["conjunto"]["maiores"][2]["revisado"] is True
+    assert b["cartas"]["o_mago"] == antes

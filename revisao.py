@@ -56,7 +56,7 @@ def limites(arquivo: str, caminho: tuple) -> tuple[int, int] | None:
     if arquivo == "numerologia":
         return None if caminho[0] == "descricao" else (60, 120)
     if arquivo == "tarot":
-        return (40, 90) if caminho[0] == "cartas" else None
+        return (40, 90) if caminho[0] == "cartas" and caminho[-1] == "leitura" else None
     return None
 
 
@@ -131,7 +131,19 @@ def onde_aparece(arquivo: str, c: tuple) -> str:
     if arquivo == "numerologia":
         return f"Numerologia · {_pt(c[0])} {c[1]}" if len(c) > 1 else f"Numerologia · {_pt(c[0])}"
     if arquivo == "tarot":
-        return "Tarot · " + " · ".join(_pt(x) for x in c)
+        import tarot
+        if c[0] == "cartas":
+            nome = next((x["nome"] for x in tarot.CARTAS if x["chave"] == c[1]), c[1])
+            return f"Tarot · {nome} · " + ("frase da amostra" if c[2] == "frase" else "leitura do completo")
+        if c[0] == "posicoes":
+            return f"Tarot · abertura da posição {tarot.POSICAO_PT[c[1]]}"
+        if c[0] == "conjunto":
+            if c[1] == "maiores":
+                return f"Tarot · leitura de conjunto: {c[2]} arcano(s) maior(es)"
+            if c[1] == "naipe":
+                return f"Tarot · leitura de conjunto: predomina {c[2].capitalize()}"
+            return "Tarot · leitura de conjunto: fecho"
+        return "Tarot · " + " · ".join(c)
     return f"{arquivo} · {'/'.join(c)}"
 
 
@@ -173,7 +185,8 @@ def _reescrever(linhas: list[str], caminho: tuple, texto: str | None, revisado: 
         if n == len(caminho) - 1:
             break
         ini, fim, nivel = i + 1, _fim_do_bloco(linhas, i, nivel), nivel + 2
-    atual = yaml.safe_load("\n".join(linhas[i:_fim_do_bloco(linhas, i, nivel)]))[caminho[-1]]
+    bloco = yaml.safe_load("\n".join(linhas[i:_fim_do_bloco(linhas, i, nivel)]))
+    atual = bloco[_chave_real(bloco, caminho[-1])]
     texto = " ".join((atual["texto"] if texto is None else texto).split())
     revisado = atual.get("revisado", False) if revisado is None else revisado
     corpo = textwrap.wrap(texto, 76 - nivel - 4, break_long_words=False, break_on_hyphens=False)
