@@ -17,9 +17,7 @@ import pytest
 import mapa_ocidental as mo  # noqa: E402
 import montar_texto_ocidental as mt  # noqa: E402
 
-PROIBIDOS = ["morte", "morrer", "morrerá", "doença", "doente", "saúde", "câncer de", "cirurgia",
-             "diagnóstico", "acidente", "enriquec", "ficar rico", "fortuna", "herança", "loteria",
-             "você vai ", "você irá", "com certeza", "destino é", "está condenad"]
+from revisao import PROIBIDOS  # noqa: E402  (uma lista só: testes e importação da planilha)
 LONGOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais")
 
 
