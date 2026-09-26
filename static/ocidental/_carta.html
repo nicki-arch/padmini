@@ -1,0 +1,30 @@
+{# Carta de tarot tipográfica (versão ocidental): o CSS e o desenho, num lugar só.
+   Incluído por ocidental/tarot.html e ocidental/estilo.html. Nenhuma imagem de terceiros. #}
+<style>
+  .carta{width:100%;max-width:170px;aspect-ratio:3/5;border-radius:6px;background:var(--surface);border:1px solid color-mix(in srgb, var(--saffron) 45%, transparent);box-shadow:0 0 0 5px var(--surface),0 0 0 6px var(--line);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 10px;box-sizing:border-box;animation:virar .5s ease both}
+  .carta .num{font-family:var(--serif);font-size:22px;color:var(--accent);line-height:1;min-height:1em}
+  .carta svg{width:56%;height:auto}
+  .carta svg .t,.carta svg .z{fill:none;stroke:var(--saffron);stroke-width:1.8px;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+  .carta svg .z{stroke:var(--blush)}
+  .carta svg .za{fill:var(--blush)}
+  .carta .nome{font-family:var(--serif);font-size:19px;line-height:1.15;color:var(--ink)}
+  @keyframes virar{from{opacity:0;transform:rotateY(80deg)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.carta{animation:none}}
+</style>
+<script>
+// Símbolos em traço de gravura, desenhados por nós: um peso de linha só em tudo
+// (vector-effect mantém 1,8px em qualquer tamanho), ouro velho com um detalhe em
+// zarcão. Arcanos maiores: o lótus da marca (marca.py).
+const SIMBOLO = {
+  maior: '<g transform="scale(2)"><path class="t" d="{{ marca.tracos_d() }}"/><path class="za" d="{{ marca.astro_d() }}"/></g>',
+  paus: '<path class="t" d="M32 7V57"/><path class="z" d="M32 21c5-1 8.5-4.5 9.5-9M32 33c-5-1-8.5-4.5-9.5-9M32 45c5-1 8.5-4.5 9.5-9"/>',
+  copas: '<path class="t" d="M17 11H47C47 26 40.5 34 32 34S17 26 17 11ZM32 34V47M22 53H42M26 47H38"/><path class="z" d="M21 17H43"/>',
+  espadas: '<path class="t" d="M32 5L36.5 14V41H27.5V14ZM32 41V55"/><path class="z" d="M19 41H45"/><circle class="t" cx="32" cy="57.5" r="2.5"/>',
+  ouros: '<circle class="t" cx="32" cy="32" r="22"/><path class="z" d="M32 15.5L35.9 27H48L38.2 34.1 41.9 45.6 32 38.5 22.1 45.6 25.8 34.1 16 27H28.1Z"/>',
+};
+function carta(c) {
+  const e = (t) => String(t ?? "").replace(/[&<>"']/g, (x) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[x]));
+  return `<div class="carta" role="img" aria-label="${e(c.nome)}"><span class="num">${e(c.rotulo)}</span>
+    <svg viewBox="0 0 64 64" aria-hidden="true">${SIMBOLO[c.naipe || "maior"]}</svg><span class="nome">${e(c.nome)}</span></div>`;
+}
+</script>

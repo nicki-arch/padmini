@@ -33,6 +33,7 @@ from reportlab.platypus import (
 
 from base_significacoes import NOME_PT, SIGNO_PT
 from compute_chart import SIGNOS, VIMSHOTTARI_ANOS, VIMSHOTTARI_SEQ, nakshatra_de
+import paleta
 from detectar_fatos import DIGNIDADES, SIGN_LORDS
 from montar_texto import dasha_atual
 
@@ -46,14 +47,16 @@ pdfmetrics.registerFontFamily("Inter", normal="Inter", bold="Inter-SemiBold", it
 pdfmetrics.registerFontFamily("Cormorant", normal="Cormorant", bold="Cormorant-SemiBold",
                               italic="Cormorant-Italic", boldItalic="Cormorant-SemiBold")
 
-TINTA = colors.HexColor("#1f1a2e")
-TINTA_SUAVE = colors.HexColor("#5b5470")
-NOITE = colors.HexColor("#2a2350")
-ACENTO = colors.HexColor("#c2410c")
-ACENTO_SUAVE = colors.HexColor("#fbe7d6")
-SUPERFICIE = colors.HexColor("#f3ece0")
-FUNDO = colors.HexColor("#faf6ef")
-LINHA = colors.HexColor("#e4dccd")
+# cores do papel: paleta.py (fonte única; os valores da védica são os de sempre)
+_PAPEL = paleta.papel("vedica")
+TINTA = colors.HexColor(_PAPEL["tinta"])
+TINTA_SUAVE = colors.HexColor(_PAPEL["tinta_suave"])
+NOITE = colors.HexColor(_PAPEL["noite"])
+ACENTO = colors.HexColor(_PAPEL["acento"])
+ACENTO_SUAVE = colors.HexColor(_PAPEL["acento_suave"])
+SUPERFICIE = colors.HexColor(_PAPEL["superficie"])
+FUNDO = colors.HexColor(_PAPEL["fundo"])
+LINHA = colors.HexColor(_PAPEL["linha"])
 
 LARGURA_PAGINA, ALTURA_PAGINA = A4
 MARGEM = 20 * mm
@@ -295,7 +298,7 @@ class Lotus(Flowable):
         p = c.beginPath()
         p.moveTo(4, 14); p.curveTo(9, 14, 13, 17, 16, 21); p.curveTo(11, 23, 6, 21, 4, 14)
         p.moveTo(28, 14); p.curveTo(23, 14, 19, 17, 16, 21); p.curveTo(21, 23, 26, 21, 28, 14)
-        c.setFillColor(colors.HexColor("#e08a3c"))
+        c.setFillColor(colors.HexColor(_PAPEL["lotus"]))
         c.drawPath(p, fill=1, stroke=0)
         c.setStrokeColor(NOITE)
         c.setLineWidth(1.5)

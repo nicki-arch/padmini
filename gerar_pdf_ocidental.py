@@ -21,19 +21,108 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.platypus import CondPageBreak, Flowable, PageBreak, SimpleDocTemplate, Spacer, Table, TableStyle
 
+import gerar_pdf
 import mapa_ocidental as mo
-from gerar_pdf import (
-    ACENTO, ALTURA_PAGINA, LARGURA_PAGINA, LARGURA_UTIL, LINHA, MARGEM, NOITE, SUPERFICIE, TINTA, TINTA_SUAVE,
-    Lotus, _cab, _caixas_resumo, _p, _tabela,
-)
-from reportlab.lib.styles import ParagraphStyle  # noqa: E402  (estilos extras abaixo)
+import marca
+import paleta
+from gerar_pdf import ALTURA_PAGINA, LARGURA_PAGINA, LARGURA_UTIL, MARGEM
+from reportlab.lib.styles import ParagraphStyle  # noqa: E402
+from reportlab.pdfbase import pdfmetrics  # noqa: E402
+from reportlab.pdfbase.ttfonts import TTFont  # noqa: E402
+from reportlab.platypus import Paragraph  # noqa: E402
+
+# ---------------------------------------------------------------- aparência
+# Identidade "Almanaque" (rodada 3): cores do papel e fontes de paleta.py; o
+# lótus em traço de marca.py. A estrutura (capa, tabelas, roda) é a de antes.
+_PAPEL = paleta.papel("ocidental")
+for _chave in ("fonte_titulo", "fonte_corpo", "fonte_corpo_forte"):
+    _nome, _arquivo = _PAPEL[_chave]
+    if _nome not in pdfmetrics.getRegisteredFontNames():
+        pdfmetrics.registerFont(TTFont(_nome, str(gerar_pdf.FONTES / _arquivo)))
+TITULO = _PAPEL["fonte_titulo"][0]          # Young Serif (um peso só, sem itálico)
+CORPO = _PAPEL["fonte_corpo"][0]            # Source Sans 3
+CORPO_FORTE = _PAPEL["fonte_corpo_forte"][0]
+pdfmetrics.registerFontFamily(CORPO, normal=CORPO, bold=CORPO_FORTE, italic=CORPO, boldItalic=CORPO_FORTE)
+pdfmetrics.registerFontFamily(TITULO, normal=TITULO, bold=TITULO, italic=TITULO, boldItalic=TITULO)
+
+TINTA = colors.HexColor(_PAPEL["tinta"])
+TINTA_SUAVE = colors.HexColor(_PAPEL["tinta_suave"])
+NOITE = colors.HexColor(_PAPEL["noite"])
+ACENTO = colors.HexColor(_PAPEL["acento"])        # zarcão
+ACENTO_SUAVE = colors.HexColor(_PAPEL["acento_suave"])
+SUPERFICIE = colors.HexColor(_PAPEL["superficie"])
+LINHA = colors.HexColor(_PAPEL["linha"])
+OURO = colors.HexColor(_PAPEL["lotus"])           # ouro velho, só em desenho (não em texto)
+HARMONICO = colors.HexColor(_PAPEL["harmonico"])
+
+# Mesmos estilos da védica (gerar_pdf.E), com as fontes e as tintas daqui.
+# Young Serif é mais larga e mais "cheia" que a Cormorant: títulos um pouco menores.
+_FONTE = {"Cormorant-SemiBold": TITULO, "Cormorant-Italic": TITULO, "Cormorant": TITULO,
+          "Inter": CORPO, "Inter-SemiBold": CORPO_FORTE}
+_COR = {id(gerar_pdf.TINTA): TINTA, id(gerar_pdf.TINTA_SUAVE): TINTA_SUAVE, id(gerar_pdf.NOITE): NOITE,
+        id(gerar_pdf.ACENTO): ACENTO}
+_TAMANHO = {"capa_marca": .9, "capa_titulo": .86, "capa_nome": .9, "h1": .86, "h2": .9, "centro": .9}
+E = {}
+for _k, _e in gerar_pdf.E.items():
+    _f = _TAMANHO.get(_k, 1.04)  # Source Sans tem o olho menor que a Inter: corpo um tico maior
+    E[_k] = ParagraphStyle(f"oc_{_k}", parent=_e, fontName=_FONTE[_e.fontName],
+                           fontSize=round(_e.fontSize * _f, 1), leading=round(_e.leading * _f, 1),
+                           textColor=_COR.get(id(_e.textColor), _e.textColor))
+
+
+def _p(texto: str, estilo: str = "corpo") -> Paragraph:
+    return Paragraph(texto, E[estilo])
+
+
+def _cab(*titulos):
+    return [Paragraph(f"<b>{escape(t)}</b>", E["celula_suave"]) for t in titulos]
+
+
+def _tabela(dados, larguras, cabecalho=True, respiro=5):
+    t = Table(dados, colWidths=larguras, repeatRows=1 if cabecalho else 0)
+    estilo = [("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 5),
+              ("RIGHTPADDING", (0, 0), (-1, -1), 5), ("TOPPADDING", (0, 0), (-1, -1), respiro),
+              ("BOTTOMPADDING", (0, 0), (-1, -1), respiro), ("LINEBELOW", (0, 0), (-1, -1), 0.5, LINHA)]
+    if cabecalho:
+        estilo += [("LINEBELOW", (0, 0), (-1, 0), 0.9, NOITE)]
+    t.setStyle(TableStyle(estilo))
+    return t
+
+
+def _caixas_resumo(itens):
+    """As três caixas da capa, como quadros de almanaque: filete fino, sem fundo cheio."""
+    celulas = [[_p(escape(rot), "rotulo"), _p(escape(val), "valor")] for rot, val in itens]
+    larg = (LARGURA_UTIL - 2 * 6) / 3
+    t = Table([[Table([[a], [b]], colWidths=[larg - 16]) for a, b in celulas]], colWidths=[larg + 4] * 3)
+    t.setStyle(TableStyle([
+        ("BOX", (0, 0), (0, 0), 0.6, NOITE), ("BOX", (1, 0), (1, 0), 0.6, NOITE), ("BOX", (2, 0), (2, 0), 0.6, NOITE),
+        ("LINEAFTER", (0, 0), (1, 0), 6, colors.white),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"), ("TOPPADDING", (0, 0), (-1, -1), 9),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 9), ("LEFTPADDING", (0, 0), (-1, -1), 8),
+    ]))
+    return t
+
+
+class Lotus(Flowable):
+    """A marca em traço de gravura (o mesmo desenho do site, marca.py)."""
+
+    def __init__(self, tamanho: float = 28):
+        super().__init__()
+        self.t = tamanho
+
+    def wrap(self, *_):
+        return self.t, self.t
+
+    def draw(self):
+        marca.desenhar_pdf(self.canv, 0, 0, self.t, OURO, astro=ACENTO, traco=1.8)
+
 
 ABREV = {"sol": "Sol", "lua": "Lua", "mercurio": "Mer", "venus": "Vên", "marte": "Mar", "jupiter": "Júp",
          "saturno": "Sat", "urano": "Ura", "netuno": "Net", "plutao": "Plu", "nodo_norte": "Nodo"}
 SIGNO_CURTO = {"aries": "Ári", "touro": "Tou", "gemeos": "Gêm", "cancer": "Cân", "leao": "Leão",
                "virgem": "Vir", "libra": "Lib", "escorpiao": "Esc", "sagitario": "Sag",
                "capricornio": "Cap", "aquario": "Aqu", "peixes": "Pei"}
-COR_ASPECTO = {"conjuncao": NOITE, "sextil": colors.HexColor("#2f7d6d"), "trigono": colors.HexColor("#2f7d6d"),
+COR_ASPECTO = {"conjuncao": NOITE, "sextil": HARMONICO, "trigono": HARMONICO,
                "quadratura": ACENTO, "oposicao": ACENTO}
 
 
@@ -90,7 +179,7 @@ class RodaZodiacal(Flowable):
         c.setStrokeColor(LINHA)
         c.circle(cx, cy, r_miolo, stroke=1, fill=0)
         # signos
-        c.setFont("Inter", 7.5)
+        c.setFont(CORPO, 7.5)
         for i, s in enumerate(mo.SIGNOS):
             c.setStrokeColor(NOITE)
             c.setLineWidth(0.6)
@@ -109,9 +198,9 @@ class RodaZodiacal(Flowable):
                 meio = cusp + ((prox - cusp) % 360) / 2
                 x, y = xy(meio, r_miolo + 7)
                 c.setFillColor(TINTA_SUAVE)
-                c.setFont("Inter", 6)
+                c.setFont(CORPO, 6)
                 c.drawCentredString(x, y - 2, str(n))
-            c.setFont("Inter-SemiBold", 7)
+            c.setFont(CORPO_FORTE, 7)
             c.setFillColor(ACENTO)
             x, y = xy(m["pontos"]["ascendente"]["longitude"], r_ext + 1)
             c.drawRightString(x - 2, y - 2.5, "ASC")
@@ -127,7 +216,7 @@ class RodaZodiacal(Flowable):
         # planetas
         pontos = {k: m["pontos"][k]["longitude"] for k in ABREV}
         rotulos = separar_rotulos(pontos)
-        c.setFont("Inter-SemiBold", 7)
+        c.setFont(CORPO_FORTE, 7)
         for k, lng in pontos.items():
             c.setStrokeColor(NOITE)
             c.setLineWidth(0.6)
@@ -143,16 +232,16 @@ def _rodape(titulo_curto: str):
     def desenhar(canvas, doc):
         canvas.saveState()
         if doc.page > 1:
-            canvas.setFont("Cormorant-SemiBold", 11)
+            canvas.setFont(TITULO, 10)
             canvas.setFillColor(NOITE)
             canvas.drawString(MARGEM, ALTURA_PAGINA - 12 * mm, "Padmini")
-            canvas.setFont("Inter", 7.5)
+            canvas.setFont(CORPO, 7.8)
             canvas.setFillColor(TINTA_SUAVE)
             canvas.drawRightString(LARGURA_PAGINA - MARGEM, ALTURA_PAGINA - 12 * mm, titulo_curto)
             canvas.setStrokeColor(LINHA)
             canvas.setLineWidth(0.5)
             canvas.line(MARGEM, ALTURA_PAGINA - 14 * mm, LARGURA_PAGINA - MARGEM, ALTURA_PAGINA - 14 * mm)
-        canvas.setFont("Inter", 7.5)
+        canvas.setFont(CORPO, 7.8)
         canvas.setFillColor(TINTA_SUAVE)
         canvas.drawString(MARGEM, 10 * mm, "Ferramenta de autoconhecimento. "
                                            "Não é previsão nem substitui orientação profissional.")
@@ -207,9 +296,9 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
     roda.setStyle(TableStyle([("ALIGN", (0, 0), (-1, -1), "CENTER")]))
     h.append(roda)
     h.append(Spacer(1, 3 * mm))
-    h.append(_p("Zodíaco tropical. " + ("Ascendente à esquerda; linhas laranja são os eixos das casas 1–7 e 4–10. "
+    h.append(_p("Zodíaco tropical. " + ("Ascendente à esquerda; linhas vermelhas são os eixos das casas 1–7 e 4–10. "
                                         if mapa["tem_hora"] else "Áries à esquerda (sem hora não há casas). ")
-                + "Linhas no miolo: aspectos (laranja = tensos, verde = harmônicos). R = retrógrado.", "nota"))
+                + "Linhas no miolo: aspectos (vermelho = tensos, verde = harmônicos). R = retrógrado.", "nota"))
     h.append(PageBreak())
 
     # ---- 2. posições
@@ -272,7 +361,7 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
         "com o histórico oficial de cada lugar.",
         "O Ascendente muda de signo a cada duas horas, em média. Se a hora não for exata, confira a certidão: "
         "poucos minutos podem mudar o Ascendente e as casas.",
-        "Dados de cidades: GeoNames (CC BY 4.0). Fontes tipográficas: Inter e Cormorant Garamond "
+        "Dados de cidades: GeoNames (CC BY 4.0). Fontes tipográficas: Young Serif e Source Sans 3 "
         "(SIL Open Font License).",
     ]:
         h.append(_p(escape(texto)))

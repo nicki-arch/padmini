@@ -24,6 +24,7 @@ import urllib.parse
 import acesso
 import entrega
 import ofertas
+import paleta
 import sistema as _sistema
 
 CATEGORIA_LABEL = {
@@ -98,23 +99,33 @@ def _e(v) -> str:
     return html.escape(str(v if v is not None else ""), quote=True)
 
 
-def _botao(link: str, texto: str) -> str:
-    return (f'<p style="margin:26px 0"><a href="{_e(link)}" style="background:#e7a24a;color:#2a1608;'
-            f'text-decoration:none;padding:14px 26px;border-radius:999px;font-weight:bold;'
-            f'display:inline-block">{_e(texto)}</a></p>')
+# Cores e fontes dos e-mails: paleta.email(versão). Estes e-mails de marketing
+# (amostra, lembrete, abandono) ainda só existem na védica; a moldura e o botão
+# já aceitam a versão.
+def _cor(sistema: str = "vedica") -> dict:
+    return paleta.email(sistema)
+
+
+_V, _O = paleta.email("vedica"), paleta.email("ocidental")
+
+
+def _botao(link: str, texto: str, sistema: str = "vedica") -> str:
+    return (f'<p style="margin:26px 0"><a href="{_e(link)}" style="{entrega.estilo_botao(_cor(sistema))}">'
+            f'{_e(texto)}</a></p>')
 
 
 def _moldura(corpo: str, rodape: str = "", sistema: str = "vedica") -> str:
-    return f"""<div style="font-family:Arial,Helvetica,sans-serif;background:#241522;color:#f4e9dc;padding:32px;border-radius:12px;max-width:520px;margin:auto">
-  <p style="font-family:Georgia,serif;font-size:24px;color:#e7a24a;margin:0 0 18px">Padmini</p>
+    c = _cor(sistema)
+    return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
+  <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
   {corpo}
-  <p style="color:#8f7a76;font-size:12px;margin-top:26px">{_sistema.ASSINATURA_EMAIL[sistema]}{rodape}</p>
+  <p style="color:{c['fraco']};font-size:12px;margin-top:26px">{_sistema.ASSINATURA_EMAIL[sistema]}{rodape}</p>
 </div>"""
 
 
-def _rodape_descadastro(email: str) -> str:
+def _rodape_descadastro(email: str, sistema: str = "vedica") -> str:
     return (f' Não quer mais receber? <a href="{_e(link_descadastro(email))}" '
-            f'style="color:#c9b1a6">Descadastrar</a>.')
+            f'style="color:{_cor(sistema)["suave"]}">Descadastrar</a>.')
 
 
 def _ola(nome: str) -> str:
@@ -133,14 +144,14 @@ def _resumo_amostra(produto: str, amostra: dict) -> str:
         cat = CATEGORIA_LABEL.get(amostra["categoria"], amostra["categoria"])
         forte, atencao = amostra.get("ponto_forte") or {}, amostra.get("ponto_atencao") or {}
         return (
-            _p(f'<span style="font-size:13px;color:#c9b1a6;letter-spacing:2px">'
+            _p(f'<span style="font-size:13px;color:{_V["suave"]};letter-spacing:2px">'
                f'{_e(nomes["a"]).upper()} &amp; {_e(nomes["b"]).upper()}</span><br>'
-               f'<span style="font-family:Georgia,serif;font-size:44px">{_e(amostra["nota"])}</span>'
-               f'<span style="color:#8f7a76"> / 36 · {_e(cat)}</span>')
+               f'<span style="font-family:{_V["fonte_marca"]};font-size:44px">{_e(amostra["nota"])}</span>'
+               f'<span style="color:{_V["fraco"]}"> / 36 · {_e(cat)}</span>')
             + _p(_e(amostra.get("moldura", "")))
-            + (_p(f'<b style="color:#e7a24a">Ponto mais forte — {_e(forte.get("tema", ""))}</b><br>'
+            + (_p(f'<b style="color:{_V["acento"]}">Ponto mais forte — {_e(forte.get("tema", ""))}</b><br>'
                   f'{_e(forte.get("texto", ""))}') if forte else "")
-            + (_p(f'<b style="color:#e2a89d">Ponto de atenção — {_e(atencao.get("tema", ""))}</b><br>'
+            + (_p(f'<b style="color:{_V["acento2"]}">Ponto de atenção — {_e(atencao.get("tema", ""))}</b><br>'
                   f'{_e(atencao.get("texto", ""))}') if atencao else ""))
     fase = amostra.get("fase") or ""
     return (
@@ -177,7 +188,7 @@ def email_lembrete_html(produto: str, amostra: dict, dados: dict, email: str) ->
                   f"as 12 casas e as fases da sua vida.")
     corpo = (_ola(nome) + _p(gancho)
              + _botao(link_checkout(produto, dados, "lembrete"), "Ver o relatório completo →")
-             + _p('<span style="color:#c9b1a6;font-size:13px">Garantia de 7 dias: se não fizer sentido '
+             + _p(f'<span style="color:{_V["suave"]};font-size:13px">Garantia de 7 dias: se não fizer sentido '
                   'para você, devolvemos o valor.</span>'))
     return _moldura(corpo, _rodape_descadastro(email))
 
@@ -188,7 +199,7 @@ def email_abandono_html(produto: str, nome: str, link: str, email: str) -> str:
              + _p(f"Vimos que você começou a pedir {titulo} na Padmini, mas o pagamento não foi "
                   "concluído. Se algo deu errado no checkout, é só continuar de onde parou:")
              + _botao(link, "Continuar →")
-             + _p('<span style="color:#c9b1a6;font-size:13px">Ficou alguma dúvida? Responda este e-mail. '
+             + _p(f'<span style="color:{_V["suave"]};font-size:13px">Ficou alguma dúvida? Responda este e-mail. '
                   'E se o relatório não fizer sentido para você, a garantia de 7 dias devolve o valor.</span>'))
     return _moldura(corpo, _rodape_descadastro(email))
 
@@ -227,7 +238,7 @@ def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedi
             return ""
         botoes = "".join(
             f'<p style="margin:10px 0"><a href="{_e(link_checkout("mapa", p, "pos_compra", sistema))}" '
-            f'style="color:#e7a24a;font-weight:bold">Mapa individual de {_e(p.get("nome") or rotulo)} →</a></p>'
+            f'style="color:{_V["acento"]};font-weight:bold">Mapa individual de {_e(p.get("nome") or rotulo)} →</a></p>'
             for rotulo, p in (("Pessoa A", dados.get("a") or {}), ("Pessoa B", dados.get("b") or {})) if p)
         texto = textos["compat"].format(preco=ofertas.moeda(alvo.get("preco")))
     else:
@@ -235,13 +246,13 @@ def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedi
         if not alvo.get("checkout"):
             return ""
         botoes = (f'<p style="margin:10px 0"><a href="{_e(link_site("compat", "pos_compra"))}" '
-                  f'style="color:#e7a24a;font-weight:bold">{textos["botao_compat"]}</a></p>')
+                  f'style="color:{_V["acento"]};font-weight:bold">{textos["botao_compat"]}</a></p>')
         texto = textos["mapa"]
     cupom = str(alvo.get("cupom_pos_compra") or "").strip()
     if cupom:
         texto += f' Use o cupom <b>{_e(cupom)}</b> no checkout.'
-    return ('<div style="border-top:1px solid #4a3346;margin-top:26px;padding-top:18px">'
-            + _p(texto, "margin:0 0 6px;color:#c9b1a6") + botoes + "</div>")
+    return (f'<div style="border-top:1px solid {_V["linha"]};margin-top:26px;padding-top:18px">'
+            + _p(texto, f"margin:0 0 6px;color:{_V['suave']}") + botoes + "</div>")
 
 
 # Versão ocidental: quatro produtos, cada e-mail oferece os outros que fazem
@@ -268,21 +279,21 @@ def _venda_cruzada_ocidental(produto_comprado: str, dados: dict) -> str:
         alvo = ofertas.oferta("mapa", sistema)
         if alvo.get("checkout"):
             linhas.append(_p(TEXTO_VENDA_CRUZADA[sistema]["compat"].format(preco=ofertas.moeda(alvo.get("preco"))),
-                             "margin:0 0 6px;color:#c9b1a6"))
+                             f"margin:0 0 6px;color:{_O['suave']}"))
             linhas += [f'<p style="margin:10px 0"><a href="{_e(link_checkout("mapa", p, "pos_compra", sistema))}" '
-                       f'style="color:#e7a24a;font-weight:bold">Mapa natal de {_e(p.get("nome") or rotulo)} →</a></p>'
+                       f'style="color:{_O["acento"]};font-weight:bold">Mapa natal de {_e(p.get("nome") or rotulo)} →</a></p>'
                        for rotulo, p in (("Pessoa A", dados.get("a") or {}), ("Pessoa B", dados.get("b") or {}))
                        if p]
     outros = [(k, ofertas.oferta(k, sistema)) for k in VENDA_CRUZADA_OCIDENTAL.get(produto_comprado, ())]
     outros = [(k, o) for k, o in outros if o.get("checkout")]
     if outros:
-        linhas.append(_p("Outras leituras da Padmini, todas com amostra grátis:", "margin:14px 0 6px;color:#c9b1a6"))
+        linhas.append(_p("Outras leituras da Padmini, todas com amostra grátis:", f"margin:14px 0 6px;color:{_O['suave']}"))
         for k, o in outros:
             titulo, texto = TEXTO_OUTRO_PRODUTO[k]
             linhas.append(f'<p style="margin:10px 0"><a href="{_e(link_site(k, "pos_compra"))}" '
-                          f'style="color:#e7a24a;font-weight:bold">{titulo} →</a>'
-                          f'<br><span style="color:#c9b1a6;font-size:13px">{texto} · R${_e(ofertas.moeda(o.get("preco")))}</span></p>')
+                          f'style="color:{_O["acento"]};font-weight:bold">{titulo} →</a>'
+                          f'<br><span style="color:{_O["suave"]};font-size:13px">{texto} · R${_e(ofertas.moeda(o.get("preco")))}</span></p>')
     if not linhas:
         return ""
-    return '<div style="border-top:1px solid #4a3346;margin-top:26px;padding-top:18px">' + "".join(linhas) + "</div>"
+    return f'<div style="border-top:1px solid {_O["linha"]};margin-top:26px;padding-top:18px">' + "".join(linhas) + "</div>"
 

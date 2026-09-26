@@ -58,6 +58,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `scripts/pronto_para_virar.py` | O que falta para trocar `PADMINI_SISTEMA` para `ocidental` (sai com 1 se houver bloqueio) |
 | `scripts/gerar_og_ocidental.py` | Gera as imagens de compartilhamento `static/og-oc-*.png` da versão ocidental |
 | `tarot.py` | Tarot (versão ocidental): 78 cartas, sorteio no servidor, ID da tiragem com selo HMAC — o link pago abre as mesmas cartas da amostra |
+| `paleta.py` + `marca.py` | **Cores e fontes de cada versão, fonte única** (tela, e-mail, PDF, imagens) e o lótus em traço da ocidental. `static/ocidental/tema.css` é GERADO de `paleta.py` (`python scripts/gerar_tema_css.py`). Marca "Almanaque" e contrastes: `docs/marca-ocidental.md`; vitrine em `/estilo?previa=<PADMINI_PREVIA_CHAVE>` |
 | `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o Índice Padmini (método próprio, pesos em `docs/ocidental.md`) |
 | `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
 | `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, termos/privacidade (`LEGAIS`), e-mails e tokens de cada versão |

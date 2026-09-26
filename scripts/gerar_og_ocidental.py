@@ -3,18 +3,18 @@ Gera as imagens de compartilhamento (og:image, 1200×630) da versão ocidental:
 
     python scripts/gerar_og_ocidental.py
 
-Grava static/og-oc-<página>.png. Desenho próprio (tipografia + a lótus da
-marca), no mesmo estilo das imagens da védica, sem nenhuma imagem de terceiros
-e sem a marca em sânscrito (que é da versão védica). Precisa do Playwright com
-o Chromium; as fontes vêm do Google Fonts.
+Grava static/og-oc-<página>.png. Identidade "Almanaque" (rodada 3): cores e
+fontes de paleta.py, o lótus em traço de marca.py, filete duplo de almanaque.
+Nenhuma imagem de terceiros, nenhum devanágari. Precisa do Playwright com o
+Chromium; as fontes são os TTF de fontes/ (sem rede).
 
 Mudou o texto de alguma? Edite IMAGENS abaixo e rode de novo.
 """
-import os
 import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(RAIZ))
 
 IMAGENS = {
     "home": ("Astrologia para autoconhecimento",
@@ -34,26 +34,46 @@ IMAGENS = {
               "Baralho de 78 cartas · as cartas são grátis"),
 }
 
-MODELO = """<!doctype html><html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+def _fontes_locais() -> str:
+    """@font-face com os TTF de fontes/ embutidos (os mesmos do PDF): a imagem não
+    depende de rede e sai igual toda vez."""
+    import base64
+    faces = [("Young Serif", 400, "YoungSerif-Regular.ttf"), ("Source Sans 3", 400, "SourceSans3-Regular.ttf"),
+             ("Source Sans 3", 600, "SourceSans3-SemiBold.ttf")]
+    return "\n".join(
+        f"@font-face{{font-family:'{nome}';font-weight:{peso};src:url(data:font/ttf;base64,"
+        f"{base64.b64encode((RAIZ / 'fontes' / arq).read_bytes()).decode()}) format('truetype')}}"
+        for nome, peso, arq in faces)
+
+
+def modelo() -> str:
+    """HTML da imagem: cores e fontes de paleta.py, o lótus de marca.py."""
+    import marca
+    import paleta
+    t, f = paleta.tela("ocidental"), paleta.FONTES["ocidental"]
+    return f"""<!doctype html><html><head><meta charset="utf-8">
 <style>
-  html,body{margin:0;width:1200px;height:630px;overflow:hidden}
-  body{background:radial-gradient(1100px 500px at 30% -10%,#3a2428,transparent),#241522;color:#f3e9e0;
-       font-family:Inter,sans-serif;position:relative}
-  .marca{position:absolute;left:80px;top:74px;display:flex;align-items:center;gap:16px;
-         font:500 36px 'Cormorant Garamond',serif}
-  .eyebrow{position:absolute;left:80px;top:178px;font-size:17px;letter-spacing:.28em;text-transform:uppercase;
-           color:#e7a24a;font-weight:600}
-  h1{position:absolute;left:80px;top:212px;margin:0;width:900px;font:500 76px/1.05 'Cormorant Garamond',serif}
-  h1 em{color:#e2a89d}
-  .rodape{position:absolute;left:80px;bottom:68px;font-size:21px;color:#cbb4aa}
-  .lotus{position:absolute;right:70px;bottom:40px;opacity:.16}
+{_fontes_locais()}
+  html,body{{margin:0;width:1200px;height:630px;overflow:hidden}}
+  body{{background:{t['ground']};color:{t['ink']};font-family:{f['sans']};position:relative}}
+  /* filete duplo de almanaque, em vez de brilho */
+  .moldura{{position:absolute;inset:26px;border:2px solid {t['saffron']}}}
+  .moldura::after{{content:"";position:absolute;inset:8px;border:1px solid {paleta.rgba(t['saffron'], .5)}}}
+  .marca{{position:absolute;left:80px;top:74px;display:flex;align-items:center;gap:16px;
+         font:400 36px {f['serif']};color:{t['saffron']}}}
+  .eyebrow{{position:absolute;left:80px;top:176px;font-size:28px;letter-spacing:.2em;font-variant-caps:all-small-caps;
+           color:{t['saffron']};font-weight:600}}
+  h1{{position:absolute;left:80px;top:218px;margin:0;width:880px;font:400 68px/1.1 {f['serif']}}}
+  h1 em{{font-style:normal;color:{t['blush']}}}
+  .rodape{{position:absolute;left:80px;bottom:72px;font-size:22px;color:{t['muted']}}}
+  .lotus{{position:absolute;right:80px;bottom:56px;opacity:.9}}
 </style></head><body>
-<div class="marca"><svg width="34" height="34" viewBox="0 0 32 32"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>Padmini</div>
-<div class="eyebrow">{eyebrow}</div>
-<h1>{titulo}</h1>
-<div class="rodape">{rodape}</div>
-<svg class="lotus" width="230" height="230" viewBox="0 0 32 32"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+<div class="moldura"></div>
+<div class="marca">{marca.svg(40, cor=t['saffron'], astro=t['blush'], traco=1.8)}Padmini</div>
+<div class="eyebrow">{{eyebrow}}</div>
+<h1>{{titulo}}</h1>
+<div class="rodape">{{rodape}}</div>
+{marca.svg(210, cor=t['saffron'], astro=t['blush'], traco=1.1, classe='lotus')}
 </body></html>"""
 
 
@@ -63,11 +83,14 @@ def main() -> int:
     with sync_playwright() as p:
         navegador = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         pagina = navegador.new_context(viewport={"width": 1200, "height": 630},
-                                       ignore_https_errors=bool(os.environ.get("OG_IGNORAR_TLS"))).new_page()
+                                       ).new_page()
         for nome, (eyebrow, titulo, rodape) in IMAGENS.items():
-            html = MODELO.replace("{eyebrow}", eyebrow).replace("{titulo}", titulo).replace("{rodape}", rodape)
+            html = modelo().replace("{eyebrow}", eyebrow).replace("{titulo}", titulo).replace("{rodape}", rodape)
             pagina.set_content(html, wait_until="networkidle")
             pagina.evaluate("document.fonts.ready")
+            if not pagina.evaluate("document.fonts.check('400 68px \"Young Serif\"') && "
+                                   "document.fonts.check('400 22px \"Source Sans 3\"')"):
+                raise RuntimeError("as fontes não carregaram; a imagem sairia com a fonte errada")
             destino = RAIZ / "static" / f"og-oc-{nome}.png"
             pagina.screenshot(path=str(destino))
             print(destino.relative_to(RAIZ))
