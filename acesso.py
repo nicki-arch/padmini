@@ -42,6 +42,18 @@ def chave_compat(a: tuple, b: tuple) -> str:
     return chave_mapa(*a) + "||" + chave_mapa(*b)
 
 
+def chave_numerologia(nome_normalizado: str, data: str) -> str:
+    """Chave de um pedido de numerologia: o nome já normalizado (numerologia.
+    normalizar_nome) e a data ISO. Trocar uma letra do nome muda o resultado,
+    então muda a chave."""
+    return f"num|{nome_normalizado}|{data}"
+
+
+def chave_tarot(tiragem: str) -> str:
+    """Chave de uma tiragem de tarot: o id dela (que já diz quais são as cartas)."""
+    return f"tarot|{tiragem}"
+
+
 def emitir_token(produto: str, chave: str, sistema: str = "vedica") -> str:
     """Assina (produto, chave) de uma versão. produto ∈ {'mapa','compat'}. Precisa de PADMINI_SECRET."""
     if not SEGREDO:

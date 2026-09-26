@@ -227,3 +227,83 @@ def live_token_sinastria_ocidental(p: PedidoSinastria, request: Request):
     db.registrar_live(f"{VERSAO}:compat", f"{p.a.nome.strip()} & {p.b.nome.strip()}".strip(" &"),
                       p.a.cidade, f"{p.a.data.isoformat()} / {p.b.data.isoformat()}")
     return {"token": acesso.emitir_token("compat", chave_do_casal(p), VERSAO)}
+
+
+# --------------------------------------------------------------------------
+# NUMEROLOGIA (/numerologia) — nome completo de registro + data
+# --------------------------------------------------------------------------
+class PedidoNumerologia(BaseModel):
+    nome: str = Field(..., min_length=2, max_length=120)  # nome completo de REGISTRO
+    data: date
+    nivel: str = Field("amostra", pattern=r"^(amostra|completo)$")
+    texto_ia: bool = False
+    token: str | None = Field(None, max_length=64)
+
+
+def _calcular_numerologia(p: PedidoNumerologia) -> dict:
+    import numerologia as nu
+    validar_data(p.data)
+    try:
+        return nu.calcular_numerologia(p.nome, p.data)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+def chave_da_numerologia(p: PedidoNumerologia) -> str:
+    import numerologia as nu
+    return acesso.chave_numerologia(nu.normalizar_nome(p.nome), p.data.isoformat())
+
+
+@rotas.post("/api/ocidental/numerologia")
+def numerologia_ocidental(p: PedidoNumerologia, request: Request):
+    limites.exigir(limites.CALCULO, request)
+    if p.texto_ia and p.nivel != "completo":
+        raise HTTPException(402, "O texto por IA faz parte da numerologia completa.")
+    res = _calcular_numerologia(p)
+    base_resp = {"nivel": p.nivel, "sistema": VERSAO, "nome": p.nome.strip(), "data": p.data.isoformat()}
+    if p.nivel == "amostra":
+        return {**base_resp, **mt.montar_numerologia(res, "amostra")}
+    chave = chave_da_numerologia(p)
+    if not acesso.completo_liberado("numerologia", chave, p.token, VERSAO):
+        raise HTTPException(402, "A numerologia completa requer pagamento.")
+    rel = mt.montar_numerologia(res, "completo")
+    texto_ia = None
+    if p.texto_ia:
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
+        from montar_texto import gerar_com_claude
+        chave_cache = f"{VERSAO}|{chave}|{res['ano_corrente']}"  # o Ano Pessoal muda todo ano
+        texto_ia = db.texto_ia(chave_cache)
+        if texto_ia is None:
+            limites.exigir(limites.TEXTO_IA, request)
+            texto_ia = gerar_com_claude(mt.montar_prompt_numerologia(rel))
+            db.guardar_texto_ia(chave_cache, f"{VERSAO}:numerologia", texto_ia,
+                                os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
+    return {**base_resp, **rel, "texto_ia": texto_ia}
+
+
+@rotas.post("/api/ocidental/numerologia/pdf")
+def numerologia_pdf(p: PedidoNumerologia, request: Request):
+    limites.exigir(limites.PDF, request)
+    if not acesso.completo_liberado("numerologia", chave_da_numerologia(p), p.token, VERSAO):
+        raise HTTPException(402, "O PDF completo requer pagamento.")
+    from gerar_pdf_ocidental import gerar_pdf_numerologia
+    rel = mt.montar_numerologia(_calcular_numerologia(p), "completo")
+    conteudo = gerar_pdf_numerologia(rel=rel, nome=p.nome.strip(), data_nascimento=p.data)
+    return Response(conteudo, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{_arquivo("numerologia", p.nome)}"'})
+
+
+def _arquivo(prefixo: str, nome: str) -> str:
+    sem_acento = unicodedata.normalize("NFKD", nome).encode("ascii", "ignore").decode()
+    slug = re.sub(r"[^a-z0-9]+", "-", sem_acento.lower()).strip("-")[:40]
+    return f"{prefixo}-{slug}.pdf" if slug else f"{prefixo}.pdf"
+
+
+@rotas.post("/api/live/ocidental/token/numerologia")
+def live_token_numerologia(p: PedidoNumerologia, request: Request):
+    if not acesso.sessao_valida("live", request.cookies.get("pad_live")):
+        raise HTTPException(401, "Sessão do modo live expirada. Entre de novo.")
+    _calcular_numerologia(p)
+    db.registrar_live(f"{VERSAO}:numerologia", p.nome.strip()[:80], "", p.data.isoformat())
+    return {"token": acesso.emitir_token("numerologia", chave_da_numerologia(p), VERSAO)}

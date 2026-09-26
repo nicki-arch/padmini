@@ -52,6 +52,7 @@ Valor digitado errado = o site não sobe (erro claro no log), em vez de subir pe
 | `montar_texto_ocidental.py` + `conteudo/ocidental/textos/` | Mapa → texto (YAML, `revisado: false` em cada texto; `python scripts/revisao_textos.py` conta o que falta revisar) |
 | `rotas_ocidental.py` + `static/ocidental/` | API `/api/ocidental/*`, páginas e `/live` da versão ocidental; `gerar_pdf_ocidental.py` é o PDF |
 | `revisao.py` + `scripts/exportar_revisao.py` / `importar_revisao.py` | Planilha de revisão da família (xlsx ↔ YAML); regras de tom e tamanho num lugar só. A planilha não vai para o git |
+| `numerologia.py` | Numerologia pitagórica (versão ocidental): regras de Y/W e do Caminho de Vida em `docs/ocidental.md` |
 | `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o Índice Padmini (método próprio, pesos em `docs/ocidental.md`) |
 | `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
 | `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, e-mails e tokens de cada versão |

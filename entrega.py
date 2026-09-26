@@ -39,6 +39,15 @@ def link_completo(produto: str, dados: dict, sistema: str = "vedica") -> str:
             for k in ("nome", "data", "hora", "lat", "lon", "cidade"):
                 q[f"{prefixo}_{k}"] = pe.get(k, "")
         return f"{SITE_URL}/compatibilidade?" + urllib.parse.urlencode(q)
+    if produto == "numerologia":
+        import numerologia
+        chave = acesso.chave_numerologia(numerologia.normalizar_nome(dados["nome"]), dados["data"])
+        q = {"nome": dados["nome"], "data": dados["data"], "token": acesso.emitir_token(produto, chave, sistema)}
+        return f"{SITE_URL}/numerologia?" + urllib.parse.urlencode(q)
+    if produto == "tarot":
+        chave = acesso.chave_tarot(dados["tiragem"])
+        q = {"t": dados["tiragem"], "token": acesso.emitir_token(produto, chave, sistema)}
+        return f"{SITE_URL}/tarot?" + urllib.parse.urlencode(q)
     raise ValueError(f"produto inválido: {produto}")
 
 
@@ -51,14 +60,15 @@ def _ola(nome: str) -> str:
 
 TITULO_EMAIL = {
     "vedica": {"compat": "seu relatório de compatibilidade", "mapa": "seu mapa completo"},
-    "ocidental": {"compat": "a sinastria de vocês", "mapa": "seu mapa natal completo"},
+    "ocidental": {"compat": "a sinastria de vocês", "mapa": "seu mapa natal completo",
+                  "numerologia": "a sua numerologia completa", "tarot": "a leitura completa da sua tiragem"},
 }
 
 
 def email_completo_html(produto: str, link: str, nome: str = "", extra: str = "",
                         sistema: str = "vedica") -> str:
     """`extra`: HTML já pronto (e escapado) a acrescentar, ex.: a venda cruzada."""
-    titulo = TITULO_EMAIL[sistema]["compat" if produto == "compat" else "mapa"]
+    titulo = TITULO_EMAIL[sistema].get(produto) or TITULO_EMAIL[sistema]["mapa"]
     assinatura = _sistema.ASSINATURA_EMAIL[sistema]
     ola = _ola(nome)
     link = html.escape(link, quote=True)

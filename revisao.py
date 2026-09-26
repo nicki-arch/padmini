@@ -54,7 +54,7 @@ def limites(arquivo: str, caminho: tuple) -> tuple[int, int] | None:
             return 55, 120
         return None
     if arquivo == "numerologia":
-        return 60, 120
+        return None if caminho[0] == "descricao" else (60, 120)
     if arquivo == "tarot":
         return (40, 90) if caminho[0] == "cartas" else None
     return None

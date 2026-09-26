@@ -83,3 +83,20 @@ A Cakto aceita `coupon=CODIGO` na URL do checkout e aplica o cupom
 26/set/2026); a página ocidental repassa o cupom assim e ainda avisa para
 digitar o código se ele não aparecer aplicado. O cupom precisa existir na
 Cakto com o mesmo código. A védica continua como estava (cupom só em utm_term).
+
+## Numerologia (`numerologia.py`) — rodada 2
+
+Pitagórica. Entrada: nome completo de REGISTRO (o da certidão) + data.
+
+| Tema | Decisão |
+|---|---|
+| Tabela | A=1…I=9, J=1…R=9, S=1…Z=9; acentos removidos, Ç=C; o que não é letra é ignorado |
+| Y e W | **Y é vogal, W é consoante** — em nomes brasileiros o Y soa "i" (Yasmin, Kelly) e o W soa "v"/"u" consonantal (Wagner, Wellington) |
+| Mestres | 11, 22 e 33 não reduzem |
+| Caminho de Vida | dia, mês e ano reduzidos SEPARADAMENTE, depois somados e reduzidos (04/01/1950 → 11; a variante "todos os algarismos" daria 2) |
+| Expressão / Alma / Personalidade | todas as letras / vogais / consoantes, somadas e reduzidas |
+| Dia | o dia reduzido (29 → 11) |
+| Ano Pessoal | dia + mês de nascimento + ano corrente, cada um reduzido, somados e reduzidos |
+
+Token do completo: assinado sobre o nome NORMALIZADO + a data (acento não
+muda nada; uma letra a mais muda). `sck`: `n~data~nome completo`.
