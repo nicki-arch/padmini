@@ -8,9 +8,10 @@
 # Para ligar: criar a oferta na Cakto, colar aqui o link de Produto → Checkout
 # e fazer o deploy (é um PR comum). Só depois trocar PADMINI_SISTEMA.
 
+# Preços decididos pelo Nicolas em 26/set/2026 (rodada 2).
 mapa:
   nome: Mapa Natal completo
-  preco: 47
+  preco: 37
   checkout: ""
 
 # `preco` é o de tabela, o que a página mostra por padrão e o que a oferta
@@ -22,4 +23,22 @@ compat:
   nome: Sinastria do casal
   preco: 127
   preco_cupom: 97
+  checkout: ""
+
+# Order bump do checkout da sinastria: casal + o mapa natal de cada um.
+# `preco` é o TOTAL do combo; a página anuncia a diferença para o preço de
+# tabela da sinastria ("por mais R$X") assim que houver `checkout`.
+bump_mapas_casal:
+  nome: Casal completo (sinastria + 2 mapas natais)
+  preco: 167
+  checkout: ""
+
+numerologia:
+  nome: Numerologia completa
+  preco: 27
+  checkout: ""
+
+tarot:
+  nome: Tarot — tiragem de 3 cartas
+  preco: 19
   checkout: ""
