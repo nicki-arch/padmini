@@ -78,7 +78,7 @@ def test_precos_das_paginas_vem_do_yaml(precos_trocados, rota, esperados, proibi
 
 
 def test_nenhum_preco_escrito_a_mao_nos_html():
-    for pagina in (RAIZ / "static").glob("*.html"):
+    for pagina in (RAIZ / "static").rglob("*.html"):  # inclui static/ocidental/
         texto = pagina.read_text(encoding="utf-8")
         assert not re.search(r"R\$\s?\d", texto), pagina.name
 

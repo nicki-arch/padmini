@@ -40,7 +40,9 @@ import limites
 import marketing
 import ofertas
 import seguranca
+import rotas_ocidental
 import sistema
+from nascimento import aviso_de_horario, validar_datetime as _validar_datetime
 import textos
 from gerar_pdf import gerar_pdf
 from montar_texto import (
@@ -87,6 +89,9 @@ async def _avisar_erro_500(request: Request, call_next):
                         chave="erro500", intervalo=15 * 60)
         raise
 app.mount("/static", StaticFiles(directory=RAIZ / "static"), name="static")
+# Rotas da versão ocidental (/api/ocidental/*): existem sempre, qualquer que seja
+# a versão no ar — um link já entregue precisa abrir depois de uma troca.
+app.include_router(rotas_ocidental.rotas)
 busca = BuscaCidades()
 
 
@@ -125,31 +130,8 @@ class PedidoCompatibilidade(BaseModel):
     token: str | None = Field(None, max_length=64)  # libera o completo (ver acesso.py)
 
 
-def aviso_de_horario(dt: datetime, nome_fuso: str) -> str | None:
-    """Detecta horários que não existem ou são ambíguos por causa do horário de verão."""
-    if "hora média local" in nome_fuso:
-        return ("Nascimento antes da adoção da hora padrão nesse local: usamos a hora média local, "
-                "calculada pela longitude da cidade.")
-    z = ZoneInfo(nome_fuso)
-    ida_volta = dt.replace(tzinfo=z).astimezone(timezone.utc).astimezone(z).replace(tzinfo=None)
-    if ida_volta != dt:
-        return ("Esse horário não existiu nesse local: o relógio foi adiantado para o horário de verão "
-                "nesse dia. Confira a hora na certidão de nascimento.")
-    if dt.replace(tzinfo=z, fold=0).utcoffset() != dt.replace(tzinfo=z, fold=1).utcoffset():
-        return ("Esse horário aconteceu duas vezes nesse dia (fim do horário de verão). "
-                "Usamos a primeira ocorrência; se a pessoa nasceu na segunda, o Ascendente pode mudar.")
-    return None
-
-
-def _validar_datetime(d: date, hora: str) -> datetime:
-    """Valida hora e faixa de data; devolve o datetime local ingênuo."""
-    h, m = map(int, hora.split(":"))
-    if not (0 <= h < 24 and 0 <= m < 60):
-        raise HTTPException(422, "Hora inválida.")
-    dt = datetime(d.year, d.month, d.day, h, m)
-    if not (datetime(1800, 1, 1) <= dt <= datetime.now()):
-        raise HTTPException(422, "A data de nascimento precisa estar entre 1800 e hoje.")
-    return dt
+# aviso_de_horario e _validar_datetime moraram aqui até a Fase 1 da versão
+# ocidental; foram para nascimento.py para as rotas das duas versões usarem.
 
 
 # ---------------------------------------------------------------------------
@@ -359,10 +341,9 @@ def live_token_mapa(pedido: PedidoMapa, request: Request):
     _exigir_live(request)
     _validar_datetime(pedido.data, pedido.hora)
     chave = acesso.chave_mapa(pedido.data.isoformat(), pedido.hora, pedido.lat, pedido.lon)
-    versao = sistema.ativo()
-    db.registrar_live(_rotulo_produto("mapa", versao), pedido.nome.strip(), pedido.cidade,
+    db.registrar_live("mapa", pedido.nome.strip(), pedido.cidade,
                       f"{pedido.data.isoformat()} {pedido.hora}")
-    return {"token": acesso.emitir_token("mapa", chave, versao)}
+    return {"token": acesso.emitir_token("mapa", chave)}
 
 
 @app.post("/api/live/token/compat")
@@ -373,11 +354,9 @@ def live_token_compat(pedido: PedidoCompatibilidade, request: Request):
     chave = acesso.chave_compat(
         (pedido.a.data.isoformat(), pedido.a.hora, pedido.a.lat, pedido.a.lon),
         (pedido.b.data.isoformat(), pedido.b.hora, pedido.b.lat, pedido.b.lon))
-    versao = sistema.ativo()
-    db.registrar_live(_rotulo_produto("compat", versao),
-                      f"{pedido.a.nome.strip()} & {pedido.b.nome.strip()}".strip(" &"),
+    db.registrar_live("compat", f"{pedido.a.nome.strip()} & {pedido.b.nome.strip()}".strip(" &"),
                       pedido.a.cidade, f"{pedido.a.data.isoformat()} / {pedido.b.data.isoformat()}")
-    return {"token": acesso.emitir_token("compat", chave, versao)}
+    return {"token": acesso.emitir_token("compat", chave)}
 
 
 def _rotulo_produto(produto: str, versao: str) -> str:
@@ -686,7 +665,8 @@ def _processar_pedido(evento: dict) -> dict:
         return {"ok": True, "produto": pago, "email": email or None,
                 "pendente": "produto pago não confere com os dados enviados — conferir e entregar manualmente"}
 
-    dados = cakto.dados_nascimento(pd, produto)
+    # a versão ocidental aceita nascimento sem hora (sem Ascendente e casas)
+    dados = cakto.dados_nascimento(pd, produto, exige_hora=versao == "vedica")
     if not dados:
         # Pagou, mas o `sck` não trouxe os dados de nascimento: não dá para gerar.
         # Grava o pedido sem link (aparece no banco para entrega manual) e responde

@@ -1,0 +1,1119 @@
+# Planetas em signos — 10 planetas × 12 signos. Rascunho; revisar e trocar
+# `revisado` para true. Tom e regras: ver LEIA.md nesta pasta.
+
+sol:
+  aries:
+    revisado: false
+    texto: >-
+      Com o Sol em Áries, você se sente mais vivo quando está começando alguma
+      coisa. A energia vem no arranque: você é quem levanta a mão primeiro na
+      reunião, quem se inscreve antes de ler o regulamento inteiro. Isso abre
+      portas que outras pessoas ficam só olhando. O ponto de atenção é o fôlego
+      depois da largada: quando o projeto entra na fase repetitiva, o interesse
+      tende a cair. Combinar consigo mesmo uma etapa de "terminar antes de
+      começar outra" costuma render mais do que forçar a paciência.
+  touro:
+    revisado: false
+    texto: >-
+      Com o Sol em Touro, você constrói a sua identidade devagar e com as mãos:
+      o que é seu, você cuida. Você costuma ser a pessoa que conserta em vez de
+      trocar, que tem o restaurante de sempre e sabe o nome de quem atende. Essa
+      constância faz os outros confiarem em você. O lado difícil aparece quando
+      a mudança vem de fora: você pode segurar um plano velho só porque já estava
+      acostumado. Perguntar "isto ainda me serve?" de tempos em tempos ajuda a
+      separar firmeza de teimosia.
+  gemeos:
+    revisado: false
+    texto: >-
+      Com o Sol em Gêmeos, você se reconhece pelo que está aprendendo agora.
+      Você abre três abas, puxa conversa na fila e junta assuntos que ninguém
+      tinha ligado. As pessoas procuram você para entender rápido uma novidade.
+      O risco é espalhar a atenção a ponto de nada ganhar profundidade: dez
+      começos e nenhum capítulo inteiro. Escolher uma curiosidade por temporada
+      para levar até o fim não tira a sua leveza; dá a ela um lugar para chegar.
+  cancer:
+    revisado: false
+    texto: >-
+      Com o Sol em Câncer, você se sente você quando está cuidando de alguém ou
+      de algum lugar. Você lembra do aniversário do amigo, guarda a foto antiga,
+      transforma um quarto alugado em casa em uma semana. Essa memória afetiva é
+      a sua força. A armadilha é se fechar quando se sente ferido: em vez de
+      dizer "aquilo me magoou", você pode recolher o carinho e esperar que o
+      outro adivinhe. Nomear o incômodo cedo evita que ele vire mágoa guardada.
+  leao:
+    revisado: false
+    texto: >-
+      Com o Sol em Leão, você brilha quando põe o coração no que faz e alguém
+      vê. Você é quem organiza a festa surpresa, quem capricha na apresentação,
+      quem anima o grupo quando o clima cai. A generosidade é real, e o
+      reconhecimento funciona como combustível. O ponto de atenção é depender
+      demais do aplauso: um projeto sem plateia pode parecer que não vale. Ter
+      alguma coisa que você faz só pelo prazer de fazer, sem mostrar a ninguém,
+      costuma equilibrar isso.
+  virgem:
+    revisado: false
+    texto: >-
+      Com o Sol em Virgem, você se sente bem quando algo funciona melhor porque
+      você passou por ali. Você revisa o texto do colega, reorganiza a planilha,
+      percebe o detalhe que ia dar problema na sexta-feira. Ser útil é uma forma
+      de afeto para você. O custo aparece quando a régua vira contra você mesmo:
+      o trabalho está bom, mas você só enxerga o que falta. Definir antes o que
+      é "pronto" ajuda a entregar sem se castigar pelo que ficou de fora.
+  libra:
+    revisado: false
+    texto: >-
+      Com o Sol em Libra, você se encontra na relação com os outros. Você
+      percebe o clima da sala, costura acordos e tem jeito para deixar os
+      ambientes mais agradáveis. Numa briga entre amigos, é comum você ser
+      chamado para mediar. O desafio é a decisão que desagrada alguém: você pode
+      adiar escolhas ou dizer "tanto faz" quando não faz. Treinar dar a sua
+      opinião primeiro, antes de ouvir a dos outros, ajuda a sua voz a aparecer
+      sem perder a gentileza.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Com o Sol em Escorpião, você se sente inteiro quando vai fundo. Conversa
+      superficial cansa; você prefere uma amizade verdadeira a dez conhecidos,
+      e percebe o que não foi dito numa reunião. Essa intensidade dá foco e
+      lealdade. O lado difícil é a desconfiança: você pode testar as pessoas em
+      silêncio ou guardar uma traição por anos. Dizer o que está sentindo antes
+      de tirar conclusões costuma poupar desgaste, e mostra que sua profundidade
+      também pode ser leve.
+  sagitario:
+    revisado: false
+    texto: >-
+      Com o Sol em Sagitário, você se reconhece no movimento e no sentido das
+      coisas. Uma viagem, um curso, uma conversa sobre o que a vida quer dizer:
+      é aí que você se acende. Você costuma ser a pessoa otimista do grupo, que
+      topa o plano novo. O ponto de atenção é prometer mais do que cabe na
+      agenda ou dizer uma verdade sem medir o impacto. Checar o calendário antes
+      do "sim" e o tom antes da franqueza mantém seu entusiasmo confiável.
+  capricornio:
+    revisado: false
+    texto: >-
+      Com o Sol em Capricórnio, você se sente você quando está construindo algo
+      que dura. Você pensa em etapas, assume responsabilidades cedo e costuma
+      ser quem os outros chamam quando a coisa precisa sair do papel. O humor
+      seco aparece quando você relaxa. A armadilha é tratar descanso como
+      prêmio que só vem depois de tudo pronto — e nunca fica tudo pronto. Pôr o
+      lazer na agenda com o mesmo peso de um compromisso é um jeito prático de
+      cuidar do longo prazo.
+  aquario:
+    revisado: false
+    texto: >-
+      Com o Sol em Aquário, você se sente você quando pensa com a própria
+      cabeça. Você questiona a regra que ninguém lembra por que existe, tem
+      amigos de mundos diferentes e se anima com ideias que melhoram algo para
+      muita gente. As pessoas valorizam sua originalidade. O ponto de atenção é
+      a distância: você pode racionalizar o que sente e parecer frio justo com
+      quem está perto. Mostrar o afeto em gestos simples, não só em ideias,
+      aproxima quem gosta de você.
+  peixes:
+    revisado: false
+    texto: >-
+      Com o Sol em Peixes, você se reconhece pela imaginação e pela empatia.
+      Você sente o clima de um lugar antes de alguém falar, se emociona com uma
+      música no ônibus e tem facilidade para se colocar no lugar do outro. Isso
+      faz de você um bom ouvinte e alguém criativo. O risco é absorver o que não
+      é seu e se perder nas necessidades alheias. Ter um momento do dia só seu,
+      sem ninguém pedindo nada, ajuda a separar o que você sente do que você
+      captou.
+
+lua:
+  aries:
+    revisado: false
+    texto: >-
+      Com a Lua em Áries, suas emoções chegam rápido e pedem ação. Quando algo
+      incomoda, você quer resolver agora: mandar a mensagem, sair para caminhar,
+      tirar a limpo. A vantagem é que a raiva passa tão rápido quanto veio, e
+      você raramente guarda rancor. O ponto de atenção é agir no calor do
+      momento e depois precisar consertar o tom. Dar dez minutos entre sentir e
+      responder costuma bastar para você dizer a mesma coisa de um jeito que o
+      outro consegue ouvir.
+  touro:
+    revisado: false
+    texto: >-
+      Com a Lua em Touro, você se acalma pelo corpo e pela rotina: uma comida
+      feita em casa, a mesma caneca, o cheiro da roupa limpa. Você precisa de
+      estabilidade para se sentir seguro, e oferece aos outros uma presença que
+      acalma. Mudanças bruscas de plano podem te desorganizar por dentro mais do
+      que você mostra. Avisar quem convive com você de que precisa de um tempo
+      para se ajustar evita que a sua quietude seja lida como má vontade.
+  gemeos:
+    revisado: false
+    texto: >-
+      Com a Lua em Gêmeos, você entende o que sente falando sobre isso. Uma
+      conversa longa com um amigo, uma troca de áudios, escrever num caderno:
+      é assim que a emoção se organiza. Você se distrai com facilidade quando
+      está triste, o que ajuda a não afundar. O outro lado é explicar demais o
+      que sente em vez de sentir: racionalizar a saudade, por exemplo. Às vezes
+      vale ficar um pouco com a emoção antes de transformá-la em assunto.
+  cancer:
+    revisado: false
+    texto: >-
+      Com a Lua em Câncer, sua vida emocional é rica e protetora. Você sente de
+      longe quando alguém da família não está bem e tem o impulso de cuidar,
+      levar comida, ligar. Um lar acolhedor é quase uma necessidade física. O
+      risco é o humor oscilar com o ambiente e você se retrair quando se sente
+      pouco valorizado, esperando que percebam. Pedir colo diretamente, com
+      palavras, costuma trazer o cuidado que você oferece aos outros com tanta
+      naturalidade.
+  leao:
+    revisado: false
+    texto: >-
+      Com a Lua em Leão, você precisa sentir que é importante para quem ama.
+      Um bilhete, um elogio na frente dos outros, alguém que lembra do que você
+      contou: isso te nutre. Você também tem um calor que contagia, e quando
+      está bem, anima a casa inteira. O ponto de atenção é o orgulho ferido:
+      se sente que foi deixado de lado, pode dramatizar ou se fechar com
+      dignidade. Dizer "eu queria ter sido lembrado" é mais simples e funciona
+      melhor.
+  virgem:
+    revisado: false
+    texto: >-
+      Com a Lua em Virgem, você se acalma arrumando: a gaveta, a lista, o
+      problema do amigo. Cuidar do concreto é o seu jeito de lidar com a
+      ansiedade, e quem convive com você recebe ajuda prática e atenta. O custo
+      é a preocupação que não desliga — você pode revisar mentalmente uma
+      conversa três vezes antes de dormir. Separar o que dá para resolver hoje
+      do que não depende de você ajuda a transformar a inquietação em ação, e
+      o resto em descanso.
+  libra:
+    revisado: false
+    texto: >-
+      Com a Lua em Libra, você se sente bem quando há harmonia ao redor. Um
+      clima pesado em casa te afeta mais do que parece, e você costuma ser quem
+      suaviza a conversa difícil. A beleza do ambiente e a companhia fazem
+      diferença no seu humor. O risco é engolir o que sente para manter a paz,
+      e acumular. Uma discordância dita com calma, na hora, preserva a relação
+      muito mais do que o silêncio que vira distância.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Com a Lua em Escorpião, você sente tudo com intensidade, mas mostra pouco.
+      Você percebe as intenções por trás das palavras e se liga profundamente a
+      poucas pessoas. Quando confia, é de uma lealdade rara. O lado difícil é
+      guardar a mágoa em silêncio e só revelar quando já virou decisão. Contar
+      a alguém de confiança o que está sentindo enquanto ainda é pequeno evita
+      que a emoção cresça no escuro e ganhe um tamanho que não precisava ter.
+  sagitario:
+    revisado: false
+    texto: >-
+      Com a Lua em Sagitário, você se recupera emocionalmente com espaço e
+      perspectiva: uma viagem, uma trilha, uma conversa que ponha o problema em
+      contexto. Você tende ao otimismo e a encontrar sentido nas dificuldades,
+      o que ajuda quem está ao lado. O ponto de atenção é fugir do desconforto
+      com mais um plano ou uma piada. Quando alguém próximo precisa que você
+      fique na tristeza junto, ficar — sem tentar consertar — já é o cuidado.
+  capricornio:
+    revisado: false
+    texto: >-
+      Com a Lua em Capricórnio, você lida com as emoções sendo responsável.
+      Quando algo dói, você arregaça as mangas e resolve; as pessoas contam com
+      você nas crises. Por dentro, porém, pode existir a sensação de que não é
+      permitido fraquejar. Você talvez só perceba o cansaço quando ele já pesou.
+      Deixar alguém cuidar de você de vez em quando, sem retribuir na hora, é
+      um exercício difícil e valioso para uma Lua que aprendeu a se bastar cedo.
+  aquario:
+    revisado: false
+    texto: >-
+      Com a Lua em Aquário, você precisa de liberdade até dentro das relações
+      mais próximas. Você gosta de amizade, de conversas sobre ideias e de
+      espaço para ser diferente sem precisar explicar. Em momentos difíceis,
+      tende a se afastar um pouco para pensar com clareza. Quem gosta de você
+      pode ler esse recuo como frieza. Avisar "preciso de um tempo e já volto"
+      transforma a distância em cuidado com você, e não em porta fechada para
+      o outro.
+  peixes:
+    revisado: false
+    texto: >-
+      Com a Lua em Peixes, você é uma esponja emocional. Você chora no filme,
+      sente a tristeza do amigo antes que ele conte e encontra conforto na
+      música, no mar, na arte. A compaixão é o seu dom. O risco é não saber
+      onde termina você e começa o outro, e ficar esgotado depois de um dia
+      cheio de gente. Momentos de silêncio e sono de verdade funcionam como
+      recarga, e dizer "hoje não consigo" é também uma forma de cuidar.
+
+mercurio:
+  aries:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Áries, você pensa rápido e fala direto. Numa reunião,
+      você chega à conclusão antes dos outros e já quer partir para a ação.
+      Isso te faz ótimo para destravar decisões e responder na hora. O ponto de
+      atenção é interromper ou soar ríspido sem querer, principalmente por
+      mensagem. Reler antes de enviar e perguntar "você terminou?" antes de
+      responder são ajustes pequenos que fazem as pessoas ouvirem suas ideias,
+      e não só o seu tom.
+  touro:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Touro, você pensa com calma e firmeza. Você prefere
+      entender de verdade a decorar, e quando forma uma opinião, ela tem base.
+      Explica as coisas de forma concreta, com exemplos que dá para pegar na
+      mão. O lado difícil é mudar de ideia: um argumento novo pode demorar a
+      entrar. Dar-se um dia antes de responder a uma proposta diferente permite
+      que você reconsidere sem sentir que perdeu a discussão.
+  gemeos:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Gêmeos, sua mente é ágil e curiosa. Você aprende pelo
+      diálogo, pula de um assunto a outro com facilidade e costuma ter a
+      palavra certa para descontrair. É o tipo que explica o mesmo tema de três
+      jeitos até o outro entender. O risco é a dispersão: começar a ler cinco
+      livros ao mesmo tempo. Anotar as ideias num lugar só e voltar a elas
+      depois ajuda sua inteligência rápida a produzir coisas que ficam.
+  cancer:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Câncer, você pensa com a memória e com o sentimento.
+      Você lembra de conversas antigas em detalhes e percebe o tom emocional
+      por trás do que as pessoas dizem. Isso te faz bom ouvinte e bom contador
+      de histórias. O ponto de atenção é levar para o pessoal uma crítica que
+      era só sobre o trabalho. Perguntar "você está falando do texto ou de
+      mim?" costuma desfazer o mal-entendido antes que ele pese.
+  leao:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Leão, você comunica com presença. Você conta uma história
+      e todo mundo presta atenção, defende suas ideias com convicção e tem jeito
+      para apresentar, ensinar, liderar uma conversa. O desafio é ouvir uma
+      opinião contrária sem sentir que é um ataque à sua pessoa. Separar "minha
+      ideia" de "eu" deixa você mais livre para mudar de posição quando o
+      argumento do outro for bom — o que, no fim, também é sinal de confiança.
+  virgem:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Virgem, você tem um olhar analítico e preciso. Você
+      encontra o erro na planilha, organiza o passo a passo e explica
+      procedimentos com clareza. Colegas costumam pedir a sua revisão. O risco
+      é a crítica escapar em momentos que pediam acolhimento, ou você travar
+      por não achar a palavra perfeita. Perguntar antes "você quer sugestão ou
+      só quer contar?" ajuda a usar o seu talento na hora certa.
+  libra:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Libra, você pensa pesando os dois lados. Você é bom em
+      negociar, em reformular uma crítica de forma gentil e em entender pontos
+      de vista diferentes do seu. Numa discussão, costuma achar o meio-termo.
+      O ponto de atenção é a indecisão: ver todos os lados pode te fazer adiar
+      a escolha. Dar-se um prazo para decidir e aceitar que nenhuma opção
+      agrada a todos ajuda sua diplomacia a virar ação.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Escorpião, sua mente investiga. Você lê nas entrelinhas,
+      desconfia de respostas fáceis e gosta de entender o motivo real das
+      coisas. É ótimo em pesquisa, em estratégia e em guardar segredo. O risco
+      é presumir más intenções onde havia só distração. Antes de concluir o que
+      alguém "quis dizer", perguntar diretamente evita que a sua perspicácia
+      vire suspeita e mantém as conversas francas.
+  sagitario:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Sagitário, você pensa no quadro geral. Você se interessa
+      por filosofia, culturas e grandes ideias, e fala com entusiasmo, muitas
+      vezes com humor. É bom em inspirar e em ver sentido nas coisas. O ponto de
+      atenção são os detalhes: datas, números, a letra miúda. Deixar alguém mais
+      detalhista revisar o contrato, ou usar uma lista de conferência, protege
+      suas boas ideias de tropeços bobos.
+  capricornio:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Capricórnio, você pensa de forma prática e estruturada.
+      Antes de falar, você já sabe o objetivo; suas mensagens são curtas e
+      úteis, e seus planos têm começo, meio e fim. As pessoas confiam no que
+      você diz. O risco é soar seco ou pessimista, descartando ideias antes de
+      testá-las. Dizer primeiro o que funciona numa proposta e depois o que
+      falta torna a sua avaliação realista também encorajadora.
+  aquario:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Aquário, você pensa fora da caixa. Você gosta de
+      tecnologia, de teorias e de perguntar "e se fosse diferente?". Suas ideias
+      costumam estar um passo à frente, e você não se incomoda de discordar da
+      maioria. O ponto de atenção é defender uma posição por princípio, sem
+      perceber como ela soa para quem está emocionado. Reconhecer o sentimento
+      do outro antes de expor o argumento ajuda suas ideias a serem ouvidas.
+  peixes:
+    revisado: false
+    texto: >-
+      Com Mercúrio em Peixes, você pensa por imagens e intuições. Você entende
+      as coisas antes de conseguir explicá-las, tem memória para músicas e
+      climas e se expressa bem pela arte ou pela escrita livre. O desafio é a
+      organização: prazos escorregam e instruções longas cansam. Ferramentas
+      simples — um alarme, uma lista curta, um calendário visível — dão chão à
+      sua imaginação sem apagá-la.
+
+venus:
+  aries:
+    revisado: false
+    texto: >-
+      Com Vênus em Áries, você ama com iniciativa. Você gosta de conquistar,
+      de tomar a frente no convite e se encanta por quem tem energia e
+      coragem. A paixão aparece rápido e com sinceridade. O ponto de atenção é
+      o tédio quando a relação fica previsível, ou a impaciência quando o outro
+      precisa de mais tempo. Criar novidades a dois — um esporte, uma viagem
+      curta — mantém o fogo aceso sem precisar trocar de fogueira.
+  touro:
+    revisado: false
+    texto: >-
+      Com Vênus em Touro, você ama com constância e pelos sentidos. Um jantar
+      bem feito, um abraço demorado, um presente que dura: é assim que você
+      mostra e reconhece carinho. Você é leal e gosta de relações estáveis. O
+      desafio é o apego ao conforto, que pode te fazer ficar numa situação que
+      já não te faz bem, ou sentir ciúme do que considera seu. Conversar sobre
+      o que cada um precisa mantém a segurança sem virar posse.
+  gemeos:
+    revisado: false
+    texto: >-
+      Com Vênus em Gêmeos, você se apaixona pela conversa. Uma pessoa que te
+      faz rir e pensar ganha você mais do que qualquer gesto grandioso. Você
+      gosta de variedade, de mensagens durante o dia, de programas diferentes.
+      O ponto de atenção é a leveza virar fuga quando o assunto fica sério.
+      Reservar um momento para falar sobre a relação em si, e não só sobre o
+      mundo, aprofunda o vínculo sem pesar.
+  cancer:
+    revisado: false
+    texto: >-
+      Com Vênus em Câncer, você ama cuidando. Você lembra da comida preferida
+      do outro, cria rituais a dois e quer construir um lar afetivo. Com você,
+      as pessoas se sentem em casa. O risco é cuidar demais e esperar, sem
+      dizer, o mesmo em troca — e se magoar quando não vem. Falar o que te faz
+      sentir amado, com exemplos concretos, dá ao outro a chance de acertar.
+  leao:
+    revisado: false
+    texto: >-
+      Com Vênus em Leão, você ama com generosidade e brilho. Você gosta de
+      demonstrações claras de afeto, de ser admirado e de admirar o parceiro.
+      Presentes, declarações e programas especiais fazem parte do seu jeito de
+      amar. O ponto de atenção é precisar de atenção constante ou se ferir com
+      pequenos esquecimentos. Lembrar que o carinho do outro pode vir em outro
+      formato — mais discreto — ajuda a não confundir estilo com falta de amor.
+  virgem:
+    revisado: false
+    texto: >-
+      Com Vênus em Virgem, você ama nos detalhes práticos. Você demonstra
+      carinho resolvendo: levando o carro para a revisão, lembrando do remédio,
+      organizando a viagem. Valoriza quem é confiável e cuidadoso. O desafio é
+      a exigência: você pode notar mais o que falta no outro do que o que ele
+      oferece. Dizer em voz alta o que você admira, com a mesma precisão com
+      que percebe os defeitos, equilibra a relação.
+  libra:
+    revisado: false
+    texto: >-
+      Com Vênus em Libra, você ama a parceria. Você gosta de fazer as coisas a
+      dois, valoriza gentileza, beleza e bons modos, e tem talento para criar um
+      clima agradável. Relações equilibradas te fazem florescer. O ponto de
+      atenção é se adaptar tanto ao gosto do outro que o seu some, ou evitar
+      conflitos necessários. Lembrar que um casal saudável tem duas opiniões —
+      e que discordar faz parte — fortalece a harmonia que você busca.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Com Vênus em Escorpião, você ama com profundidade e entrega. Você não se
+      interessa por relações mornas: quer intimidade real, confiança e
+      intensidade. Quando se liga, é por inteiro. O risco é o ciúme e o teste
+      silencioso — verificar se o outro é mesmo leal. Conversar abertamente
+      sobre inseguranças, em vez de investigar, costuma trazer a segurança que
+      você procura e preserva a paixão.
+  sagitario:
+    revisado: false
+    texto: >-
+      Com Vênus em Sagitário, você ama com liberdade e aventura. Você se
+      encanta por quem te apresenta um mundo novo, gosta de viajar a dois e de
+      rir junto. Relação boa, para você, tem espaço para crescer. O ponto de
+      atenção é a promessa feita no entusiasmo e o incômodo com a rotina.
+      Combinar o que é compromisso e o que é espaço individual evita que o
+      outro sinta sua liberdade como descaso.
+  capricornio:
+    revisado: false
+    texto: >-
+      Com Vênus em Capricórnio, você ama com seriedade. Você demonstra afeto
+      com presença e compromisso: está lá quando precisa, planeja o futuro
+      junto, cumpre o que promete. Valoriza quem é maduro e responsável. O
+      desafio é a contenção: você pode demorar a se abrir e parecer reservado
+      demais. Arriscar um gesto de carinho sem motivo, no meio da semana,
+      mostra ao outro o que você sente e já vive por dentro.
+  aquario:
+    revisado: false
+    texto: >-
+      Com Vênus em Aquário, você ama como amigo. Você precisa de respeito à
+      individualidade, gosta de parceiros originais e de relações que fogem do
+      roteiro. Conversas sobre ideias são uma forma de intimidade para você. O
+      ponto de atenção é manter distância emocional quando a relação pede
+      vulnerabilidade. Mostrar que o outro é especial para você, e não só
+      interessante, aquece o vínculo sem tirar sua liberdade.
+  peixes:
+    revisado: false
+    texto: >-
+      Com Vênus em Peixes, você ama com romantismo e compaixão. Você se doa,
+      perdoa com facilidade e enxerga o melhor no outro. Música, poesia e
+      gestos simbólicos falam direto com o seu coração. O risco é idealizar a
+      pessoa e se decepcionar com o que é humano nela, ou se sacrificar demais.
+      Olhar também para as atitudes, e não só para o potencial, protege sua
+      entrega e a deixa mais leve.
+
+marte:
+  aries:
+    revisado: false
+    texto: >-
+      Com Marte em Áries, sua energia é direta e competitiva. Você age primeiro
+      e pensa no caminho, gosta de desafio e não tem medo de disputar. Um
+      esporte, uma meta difícil ou um prazo apertado te colocam no seu melhor.
+      O ponto de atenção é a irritação que explode e passa, deixando o outro
+      assustado. Ter uma válvula física — correr, pedalar, socar um saco de
+      areia — ajuda a usar esse fogo sem queimar ninguém.
+  touro:
+    revisado: false
+    texto: >-
+      Com Marte em Touro, você age devagar e não para. Sua força está na
+      persistência: você termina o que começa e aguenta tarefas longas que
+      cansariam outros. Demora para se irritar, mas quando se irrita, é
+      difícil mudar de posição. O ponto de atenção é a teimosia virar muro numa
+      negociação. Perguntar o que você realmente precisa garantir — e onde pode
+      ceder — transforma sua firmeza em vantagem.
+  gemeos:
+    revisado: false
+    texto: >-
+      Com Marte em Gêmeos, sua energia se move pela mente e pela palavra. Você
+      faz várias coisas ao mesmo tempo, argumenta bem e se defende com
+      rapidez verbal. Tarefas variadas te mantêm motivado. O risco é dispersar
+      o esforço e discutir por esporte, cansando quem está perto. Escolher uma
+      prioridade do dia e guardar o debate para quando ele importa ajuda a
+      canalizar essa agilidade.
+  cancer:
+    revisado: false
+    texto: >-
+      Com Marte em Câncer, você age para proteger. Quando alguém que você ama é
+      ameaçado, aparece uma força surpreendente. No dia a dia, porém, você
+      tende a evitar o confronto direto e a demonstrar irritação de forma
+      indireta — um silêncio, uma porta mais forte. Dizer o que te incomoda
+      enquanto ainda é pequeno, com calma, evita que a raiva vá se acumulando
+      e saia de lado.
+  leao:
+    revisado: false
+    texto: >-
+      Com Marte em Leão, você age com paixão e orgulho. Você se empenha quando
+      acredita no projeto, gosta de liderar e tem uma coragem que inspira.
+      Trabalho criativo e desafios visíveis te motivam. O ponto de atenção é o
+      orgulho ferido: ser contrariado em público pode virar disputa. Lembrar
+      que ceder num detalhe não diminui você ajuda a guardar sua energia para
+      as batalhas que valem.
+  virgem:
+    revisado: false
+    texto: >-
+      Com Marte em Virgem, você age com método. Sua energia rende quando há um
+      processo claro para melhorar: consertar, otimizar, organizar. Você é
+      trabalhador e atento aos detalhes. O risco é a irritação virar crítica
+      constante — com os outros e com você. Transformar o incômodo em proposta
+      concreta ("que tal fazermos assim?") usa a sua precisão a favor da equipe
+      em vez de contra ela.
+  libra:
+    revisado: false
+    texto: >-
+      Com Marte em Libra, você age buscando justiça e acordo. Você luta bem
+      pelos outros, defende quem foi injustiçado e prefere resolver conflitos
+      conversando. O desafio é agir por conta própria quando não há consenso:
+      você pode esperar aprovação e perder o momento. Lembrar que tomar uma
+      decisão e depois ajustar é melhor do que não decidir ajuda sua energia a
+      sair do lugar.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Com Marte em Escorpião, sua energia é intensa e concentrada. Quando você
+      decide algo, vai até o fim com uma determinação silenciosa. Você é
+      estratégico, resiste à pressão e não esquece uma afronta. O ponto de
+      atenção é a raiva guardada que vira controle ou revanche. Colocar o
+      desagrado em palavras cedo, e não em estratégia, evita guerras longas que
+      custam mais do que valem.
+  sagitario:
+    revisado: false
+    texto: >-
+      Com Marte em Sagitário, você age pelo entusiasmo e por uma causa. Você se
+      anima com aventuras, viagens, esportes ao ar livre e metas grandes. A
+      franqueza é sua arma: diz o que pensa sem rodeio. O risco é começar com
+      tudo e perder o interesse, ou ferir alguém com uma sinceridade sem filtro.
+      Dividir o grande objetivo em etapas e escolher a hora de ser franco mantém
+      seu fogo produtivo.
+  capricornio:
+    revisado: false
+    texto: >-
+      Com Marte em Capricórnio, sua energia é disciplinada e ambiciosa. Você
+      trabalha com consistência, planeja antes de agir e sabe esperar o momento
+      certo. As pessoas contam com seu esforço. O ponto de atenção é tratar
+      tudo como obrigação e esquecer do prazer de fazer, ou ser duro demais com
+      quem tem outro ritmo. Celebrar etapas intermediárias alivia a pressão e
+      mantém você motivado no longo caminho.
+  aquario:
+    revisado: false
+    texto: >-
+      Com Marte em Aquário, você age por ideias e ideais. Você se mobiliza por
+      causas coletivas, gosta de fazer do seu jeito e resiste a ordens que não
+      fazem sentido. Trabalho em grupo com autonomia te motiva. O risco é
+      rebeldia pelo gosto da rebeldia, ou teimosia disfarçada de princípio.
+      Perguntar se a regra que você quer quebrar é injusta ou só incômoda ajuda
+      a escolher bem as suas lutas.
+  peixes:
+    revisado: false
+    texto: >-
+      Com Marte em Peixes, sua energia flui por ondas e pela inspiração. Você
+      rende mais quando o trabalho tem significado — ajudar alguém, criar algo
+      bonito — e menos sob pressão fria. Em conflito, tende a recuar ou ceder.
+      O ponto de atenção é deixar a raiva virar cansaço ou queixa. Reconhecer o
+      que te incomoda e dizer isso com clareza, mesmo com a voz baixa, protege
+      sua energia de escoar.
+
+jupiter:
+  aries:
+    revisado: false
+    texto: >-
+      Com Júpiter em Áries, você cresce tomando iniciativa. A confiança aumenta
+      quando você se arrisca num projeto próprio, puxa um grupo ou é o primeiro
+      a tentar. Oportunidades aparecem quando você age em vez de esperar
+      convite. O excesso a vigiar é o otimismo apressado: começar muitas frentes
+      ao mesmo tempo. Escolher uma aposta por vez faz sua coragem render o que
+      ela promete.
+  touro:
+    revisado: false
+    texto: >-
+      Com Júpiter em Touro, você cresce com paciência e com o que é concreto.
+      Seu otimismo aparece em construir aos poucos, aproveitar os prazeres
+      simples e confiar no tempo das coisas. Você tende a atrair estabilidade
+      quando é constante. O excesso a vigiar é o conforto demais — comer, gastar
+      tempo ou adiar mudanças porque está bom assim. Um desafio novo de tempos
+      em tempos evita que a segurança vire acomodação.
+  gemeos:
+    revisado: false
+    texto: >-
+      Com Júpiter em Gêmeos, você cresce aprendendo e trocando. Cursos, leituras,
+      conversas e redes de contatos abrem portas para você. Você tem facilidade
+      em explicar e em conectar pessoas: é comum você indicar o contato certo.
+      O excesso a vigiar é saber um pouco de
+      tudo e se aprofundar em pouco. Escolher um tema para dominar, entre os
+      muitos que te interessam, transforma curiosidade em referência.
+  cancer:
+    revisado: false
+    texto: >-
+      Com Júpiter em Câncer, você cresce através do cuidado e do pertencimento.
+      A família, os amigos próximos e um lar acolhedor são a base da sua
+      confiança. Você tem uma generosidade afetiva que faz as pessoas se
+      sentirem adotadas. O excesso a vigiar é proteger demais — a si e aos
+      outros — e evitar o que é novo. Levar esse calor para ambientes
+      desconhecidos amplia o seu mundo sem perder o ninho.
+  leao:
+    revisado: false
+    texto: >-
+      Com Júpiter em Leão, você cresce quando se expressa com generosidade.
+      Criar, apresentar, liderar e celebrar trazem confiança e boas
+      oportunidades. Você tem um entusiasmo que contagia e anima os outros a
+      brilhar também. O excesso a vigiar é a grandiosidade — prometer um
+      espetáculo onde bastava um bom trabalho. Manter o foco no que você está
+      oferecendo, e não só em como vai parecer, sustenta o seu brilho.
+  virgem:
+    revisado: false
+    texto: >-
+      Com Júpiter em Virgem, você cresce sendo útil e aperfeiçoando. Seu
+      otimismo é prático: você acredita que dá para melhorar as coisas passo a
+      passo, e prova isso trabalhando bem. Serviço, ofício e aprendizado técnico
+      te abrem caminhos. O excesso a vigiar é o perfeccionismo que atrasa tudo.
+      Aceitar a versão boa, entregue no prazo, em vez da perfeita que nunca sai,
+      é onde está o seu crescimento.
+  libra:
+    revisado: false
+    texto: >-
+      Com Júpiter em Libra, você cresce em parceria. Sociedades, colaborações e
+      relações equilibradas te fazem avançar, e você tem senso de justiça e
+      talento para aproximar pessoas. Muitas oportunidades chegam por
+      indicação de alguém. O excesso a vigiar é depender do outro para dar o
+      primeiro passo. Saber o que você quer antes de negociar faz as parcerias
+      somarem de verdade.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Com Júpiter em Escorpião, você cresce indo fundo. Pesquisa, transformação
+      pessoal e situações que exigem coragem emocional te fortalecem, como
+      encarar uma conversa adiada há anos. Você tem
+      uma confiança que nasce de ter atravessado momentos difíceis. O excesso a
+      vigiar é o tudo-ou-nada: apostar alto demais ou querer controlar o
+      resultado. Aceitar etapas intermediárias preserva a intensidade sem
+      transformá-la em risco desnecessário.
+  sagitario:
+    revisado: false
+    texto: >-
+      Com Júpiter em Sagitário, sua fé na vida é grande. Viagens, estudos,
+      filosofia e conversas sobre sentido te expandem, e você tende a inspirar
+      os outros com seu otimismo. Oportunidades aparecem quando você sai do
+      lugar conhecido. O excesso a vigiar é prometer demais ou achar que já
+      sabe o suficiente. Continuar aluno, mesmo quando é chamado de professor,
+      mantém sua sabedoria viva.
+  capricornio:
+    revisado: false
+    texto: >-
+      Com Júpiter em Capricórnio, você cresce com estrutura e responsabilidade.
+      Sua confiança vem de metas claras e de conquistas construídas com esforço.
+      Você tende a amadurecer cedo e a ganhar respeito pelo que cumpre. O
+      excesso a vigiar é medir o próprio valor só pelas realizações. Dar espaço
+      para o prazer e para o improviso, sem culpa, torna o seu caminho tão bom
+      de viver quanto de mostrar.
+  aquario:
+    revisado: false
+    texto: >-
+      Com Júpiter em Aquário, você cresce por meio de ideias novas e de grupos.
+      Projetos coletivos, tecnologia, causas sociais e amizades diferentes
+      ampliam seu horizonte. Você acredita no progresso e em fazer diferente. O
+      excesso a vigiar é abraçar tantas causas que nenhuma avança, ou achar que
+      a sua visão é a única moderna. Escolher uma frente concreta dá corpo ao
+      seu idealismo.
+  peixes:
+    revisado: false
+    texto: >-
+      Com Júpiter em Peixes, você cresce pela compaixão e pela imaginação. Arte,
+      espiritualidade, ajuda ao próximo e momentos de contemplação te nutrem e
+      costumam abrir caminhos inesperados. Você confia que as coisas se
+      encaixam. O excesso a vigiar é esperar que a vida resolva sozinha, ou
+      ajudar a ponto de se esgotar. Um pouco de estrutura torna a sua
+      generosidade sustentável.
+
+saturno:
+  aries:
+    revisado: false
+    texto: >-
+      Com Saturno em Áries, a sua lição é aprender a agir por conta própria sem
+      pedir licença, e sem atropelar. Você pode ter sentido cedo que precisava
+      provar coragem, ou, ao contrário, hesitar em tomar a frente. Com o tempo,
+      tende a desenvolver uma liderança que sabe esperar o momento certo. Um
+      bom exercício é começar pequenos projetos pessoais e levá-los até o fim:
+      cada um deles constrói a confiança de que a sua iniciativa tem valor.
+  touro:
+    revisado: false
+    texto: >-
+      Com Saturno em Touro, a sua lição gira em torno de segurança e valor
+      próprio. Você pode sentir que precisa de garantias antes de relaxar, e
+      trabalhar muito para ter uma base sólida. Essa prudência constrói coisas
+      duráveis. O ponto de atenção é medir o próprio valor só pelo que você
+      tem ou produz. Lembrar das qualidades que não se compram — sua paciência,
+      sua palavra cumprida — ajuda a sentir firmeza mesmo quando a base balança.
+  gemeos:
+    revisado: false
+    texto: >-
+      Com Saturno em Gêmeos, a sua lição passa pela comunicação e pelo estudo.
+      Você pode ter sentido insegurança para falar em público ou medo de parecer
+      pouco inteligente, e compensado estudando com seriedade. Com o tempo,
+      isso tende a virar um pensamento cuidadoso e confiável. Preparar-se é
+      bom; o ponto é não esperar saber tudo para dar a sua opinião. Falar mesmo
+      com dúvida também faz parte de aprender.
+  cancer:
+    revisado: false
+    texto: >-
+      Com Saturno em Câncer, a sua lição envolve família, lar e o jeito de
+      mostrar sentimentos. Você pode ter assumido responsabilidades emocionais
+      cedo, ou aprendido a se proteger guardando o que sente. Isso te torna
+      alguém que cuida com seriedade. O ponto de atenção é a dificuldade de
+      pedir apoio. Construir, aos poucos, relações onde você pode ser cuidado
+      também — e não só cuidar — é parte do seu amadurecimento.
+  leao:
+    revisado: false
+    texto: >-
+      Com Saturno em Leão, a sua lição é sobre se mostrar e ser reconhecido.
+      Você pode ter sentido que precisava merecer atenção, ou ter receio de
+      brilhar e ser julgado. Com o tempo, tende a desenvolver uma autoconfiança
+      sólida, que não depende de aplauso imediato. Um bom caminho é expressar a
+      sua criatividade com regularidade — um hobby, uma apresentação — mesmo
+      que imperfeita, até que mostrar-se fique natural.
+  virgem:
+    revisado: false
+    texto: >-
+      Com Saturno em Virgem, a sua lição passa pelo trabalho, pela rotina e pela
+      autocrítica. Você tende a ser muito responsável com tarefas e exigente
+      com a qualidade, o que te torna confiável. O ponto de atenção é a cobrança
+      que não desliga e a sensação de nunca ter feito o suficiente. Criar
+      rotinas que incluam pausas de verdade, e aceitar o "bom o bastante",
+      ajuda a transformar exigência em competência tranquila.
+  libra:
+    revisado: false
+    texto: >-
+      Com Saturno em Libra, a sua lição é sobre relações e compromisso. Você
+      leva parcerias a sério e tende a buscar relações justas e duradouras,
+      às vezes com cautela para se envolver. Você pode aprender, com o tempo, a
+      dizer não sem culpa e a colocar limites claros. Relações em que as regras
+      são combinadas às claras — quem faz o quê — costumam ser as que funcionam
+      melhor para você.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Com Saturno em Escorpião, a sua lição passa pela confiança e pelo
+      controle. Você tende a se proteger de ser vulnerável e a levar muito a
+      sério a intimidade, o que te dá profundidade e resistência nas crises. O
+      ponto de atenção é querer controlar situações para não ser pego de
+      surpresa. Permitir-se confiar aos poucos, em pequenas coisas, ajuda a
+      descobrir que abrir mão do controle nem sempre é perder.
+  sagitario:
+    revisado: false
+    texto: >-
+      Com Saturno em Sagitário, a sua lição envolve crenças, estudo e liberdade.
+      Você tende a levar a sério aquilo em que acredita e a buscar um sentido
+      sólido para a vida, às vezes questionando verdades prontas. Com o tempo,
+      pode se tornar alguém com uma visão de mundo bem fundamentada. O ponto de
+      atenção é a rigidez de ideias. Manter a curiosidade por visões diferentes
+      mantém a sua sabedoria aberta.
+  capricornio:
+    revisado: false
+    texto: >-
+      Com Saturno em Capricórnio, você tem um senso forte de dever e de
+      estrutura. Metas de longo prazo, disciplina e responsabilidade são
+      naturais para você, e você tende a ganhar autoridade com o tempo. O ponto
+      de atenção é o peso: sentir que tudo depende de você ou que não pode
+      descansar. Dividir tarefas e comemorar pequenas vitórias equilibra essa
+      força com leveza.
+  aquario:
+    revisado: false
+    texto: >-
+      Com Saturno em Aquário, a sua lição é sobre pertencer sem deixar de ser
+      você. Você pode oscilar entre querer se encaixar num grupo e querer
+      mudar as regras dele. Com o tempo, tende a aprender a propor mudanças de
+      forma organizada e duradoura. Participar de um projeto coletivo com
+      responsabilidades definidas — um grupo de estudo, uma associação — é um
+      bom lugar para exercitar isso.
+  peixes:
+    revisado: false
+    texto: >-
+      Com Saturno em Peixes, a sua lição envolve dar forma à sensibilidade.
+      Você pode sentir o sofrimento dos outros com força e ter dificuldade de
+      pôr limites. Com o tempo, tende a transformar essa empatia em algo
+      concreto — um trabalho de cuidado, uma obra, uma prática. O ponto de
+      atenção é se sentir responsável por tudo. Escolher onde ajudar, em vez
+      de tentar ajudar em tudo, protege a sua energia.
+
+# Urano, Netuno e Plutão andam devagar: o signo deles é o mesmo para todo mundo
+# que nasceu numa faixa de anos. As faixas citadas foram conferidas no Swiss
+# Ephemeris (26/set/2026); nas bordas elas se sobrepõem porque o planeta entra,
+# volta (retrógrado) e entra de novo — vale sempre o cálculo do mapa. Os textos dizem isso com todas as letras — o
+# que é pessoal é a CASA e os aspectos, que vêm em outras seções.
+urano:
+  aries:
+    revisado: false
+    texto: >-
+      Urano em Áries marca uma geração inteira (quem nasceu entre 1927 e 1935, e
+      entre 2010 e 2019): é uma posição compartilhada, não só sua. Ela fala de
+      um impulso coletivo de romper com o velho pela ação, de começar do zero e
+      afirmar a própria independência. Na sua vida, isso tende a aparecer como
+      pouca paciência com regras que tolhem a iniciativa. Onde isso fica
+      pessoal é na casa em que Urano está no seu mapa, descrita mais adiante.
+  touro:
+    revisado: false
+    texto: >-
+      Urano em Touro é uma posição de geração (1934 a 1942, e 2018 a 2026),
+      compartilhada com quem nasceu na mesma época. Ela fala de mudanças no que
+      parecia sólido: jeitos novos de lidar com recursos, com o corpo, com a
+      natureza e com o trabalho. Na sua vida, pode aparecer como uma vontade de
+      segurança que convive com a inquietação de fazer diferente. A casa de
+      Urano no seu mapa mostra em que área isso fica mais pessoal.
+  gemeos:
+    revisado: false
+    texto: >-
+      Urano em Gêmeos é uma posição de geração (1941 a 1949, e de 2025 em
+      diante), compartilhada com quem nasceu na mesma época. Ela fala de
+      revoluções na comunicação, na informação e no jeito de aprender. Na sua
+      vida, pode aparecer como uma mente inquieta, que gosta de novidade e de
+      testar formas diferentes de pensar e conversar. A casa de Urano no seu
+      mapa mostra em que parte da vida essa inquietação se concentra.
+  cancer:
+    revisado: false
+    texto: >-
+      Urano em Câncer é uma posição de geração (1948 a 1956), compartilhada com
+      quem nasceu na mesma época. Ela fala de mudanças no jeito de viver em
+      família e na ideia de lar — novos arranjos, mais liberdade dentro de casa.
+      Na sua vida, pode aparecer como um desejo de pertencer que convive com a
+      necessidade de ter espaço próprio mesmo entre os seus. A casa de Urano
+      no seu mapa mostra onde isso fica mais pessoal.
+  leao:
+    revisado: false
+    texto: >-
+      Urano em Leão é uma posição de geração (1955 a 1962), compartilhada com
+      quem nasceu na mesma época. Ela fala de uma expressão pessoal ousada:
+      criatividade, estilo próprio, vontade de ser visto como único. Na sua
+      vida, pode aparecer como gosto por se destacar do jeito que ninguém
+      espera e resistência a papéis prontos. A casa de Urano no seu mapa mostra
+      em que área essa originalidade pede espaço.
+  virgem:
+    revisado: false
+    texto: >-
+      Urano em Virgem é uma posição de geração (1961 a 1969), compartilhada com
+      quem nasceu na mesma época. Ela fala de mudanças no trabalho, nas rotinas
+      e no cuidado com o corpo — métodos novos, tecnologia no dia a dia. Na sua
+      vida, pode aparecer como vontade de melhorar processos e de rever hábitos
+      com olhar crítico e criativo. A casa de Urano no seu mapa mostra onde
+      isso se torna mais seu.
+  libra:
+    revisado: false
+    texto: >-
+      Urano em Libra é uma posição de geração (1968 a 1975), compartilhada com
+      quem nasceu na mesma época. Ela fala de mudanças nas relações e nos
+      acordos: parcerias mais livres, casamento repensado, igualdade como
+      valor. Na sua vida, pode aparecer como necessidade de relações em que
+      cada um tenha espaço, e desconforto com vínculos presos a regras antigas.
+      A casa de Urano no seu mapa mostra onde isso pesa mais.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Urano em Escorpião é uma posição de geração (1974 a 1981), compartilhada
+      com quem nasceu na mesma época. Ela fala de romper tabus — sobre
+      intimidade, poder e o que antes não se dizia. Na sua vida, pode aparecer
+      como vontade de ir fundo nas questões e de não aceitar segredos por
+      conveniência, além de uma capacidade de se reinventar depois das crises.
+      A casa de Urano no seu mapa mostra onde isso fica mais pessoal.
+  sagitario:
+    revisado: false
+    texto: >-
+      Urano em Sagitário é uma posição de geração (1981 a 1988), compartilhada
+      com quem nasceu na mesma época. Ela fala de uma busca por liberdade de
+      pensamento, viagens, culturas e crenças novas. Na sua vida, pode aparecer
+      como inquietação diante de verdades prontas e gosto por experimentar
+      caminhos diferentes para entender o mundo. A casa de Urano no seu mapa
+      mostra em que área essa busca se concentra.
+  capricornio:
+    revisado: false
+    texto: >-
+      Urano em Capricórnio é uma posição de geração (1988 a 1996), compartilhada
+      com quem nasceu na mesma época. Ela fala de mudar estruturas por dentro:
+      instituições, carreiras e regras repensadas com pragmatismo. Na sua vida,
+      pode aparecer como vontade de construir algo sólido, mas do seu jeito, sem
+      seguir o caminho tradicional só porque sempre foi assim. A casa de Urano
+      no seu mapa mostra onde isso se torna pessoal.
+  aquario:
+    revisado: false
+    texto: >-
+      Urano em Aquário é uma posição de geração (1995 a 2003), compartilhada com
+      quem nasceu na mesma época. Ela fala de redes, tecnologia e ideais
+      coletivos — a turma que cresceu conectada. Na sua vida, pode aparecer
+      como pensamento independente, amizades diversas e facilidade com o que é
+      novo. O ponto de atenção é o distanciamento. A casa de Urano no seu mapa
+      mostra em que área essa originalidade se manifesta mais.
+  peixes:
+    revisado: false
+    texto: >-
+      Urano em Peixes é uma posição de geração (2003 a 2011), compartilhada com
+      quem nasceu na mesma época. Ela fala de mudanças na imaginação coletiva,
+      na arte, na espiritualidade e na forma de sentir o outro. Na sua vida,
+      pode aparecer como intuição aguçada e interesse por experiências que
+      fogem do concreto. A casa de Urano no seu mapa mostra onde essa
+      sensibilidade inovadora fica mais pessoal.
+
+netuno:
+  aries:
+    revisado: false
+    texto: >-
+      Netuno em Áries é uma posição de geração (de 2025 em diante; antes,
+      1861 a 1875), compartilhada com quem nasceu na mesma época. Ela fala de
+      sonhos coletivos ligados a coragem, recomeço e identidade. Na sua vida,
+      pode aparecer como idealização de heróis e de novos começos, e como
+      inspiração para agir por uma causa. A casa de Netuno no seu mapa mostra
+      em que área você sonha e se inspira mais.
+  touro:
+    revisado: false
+    texto: >-
+      Netuno em Touro é uma posição de geração (1874 a 1889), compartilhada com
+      quem nasceu na mesma época. Ela fala de ideais ligados à terra, à beleza
+      e ao conforto material. Na vida de quem a tem, pode aparecer como
+      sensibilidade estética e ligação afetiva com a natureza e com os objetos.
+      A casa de Netuno no mapa mostra onde essa sensibilidade se torna pessoal
+      e onde é preciso cuidado com ilusões.
+  gemeos:
+    revisado: false
+    texto: >-
+      Netuno em Gêmeos é uma posição de geração (1887 a 1902), compartilhada
+      com quem nasceu na mesma época. Ela fala de ideais ligados à palavra, à
+      comunicação e à troca de ideias. Na vida de quem a tem, pode aparecer
+      como imaginação verbal, gosto por histórias e facilidade para inspirar
+      pela conversa. A casa de Netuno no mapa mostra em que área isso fica
+      pessoal e onde vale checar os fatos.
+  cancer:
+    revisado: false
+    texto: >-
+      Netuno em Câncer é uma posição de geração (1901 a 1916), compartilhada
+      com quem nasceu na mesma época. Ela fala de ideais ligados à família, à
+      pátria e ao lar. Na vida de quem a tem, pode aparecer como uma
+      sensibilidade profunda para o passado, as raízes e o cuidado. A casa de
+      Netuno no mapa mostra onde essa saudade e esse cuidado se tornam
+      pessoais, e onde é preciso não idealizar demais.
+  leao:
+    revisado: false
+    texto: >-
+      Netuno em Leão é uma posição de geração (1914 a 1929), compartilhada com
+      quem nasceu na mesma época. Ela fala de ideais ligados ao brilho, ao
+      romance e à expressão artística. Na vida de quem a tem, pode aparecer
+      como amor pelo espetáculo e pela criação, e como tendência a idealizar
+      figuras de destaque. A casa de Netuno no mapa mostra onde essa
+      inspiração fica pessoal.
+  virgem:
+    revisado: false
+    texto: >-
+      Netuno em Virgem é uma posição de geração (1928 a 1943), compartilhada
+      com quem nasceu na mesma época. Ela fala de ideais ligados ao serviço, ao
+      trabalho bem feito e ao cuidado com os outros. Na sua vida, pode aparecer
+      como vontade de ajudar de forma prática e como uma sensibilidade que se
+      expressa nos detalhes. A casa de Netuno no seu mapa mostra onde isso se
+      torna mais pessoal.
+  libra:
+    revisado: false
+    texto: >-
+      Netuno em Libra é uma posição de geração (1942 a 1957), compartilhada com
+      quem nasceu na mesma época. Ela fala de ideais ligados ao amor, à paz e à
+      harmonia nas relações. Na sua vida, pode aparecer como romantismo, busca
+      por relações ideais e sensibilidade para a arte e a beleza. A casa de
+      Netuno no seu mapa mostra em que área você sonha mais alto, e onde vale
+      olhar as relações com realismo também.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Netuno em Escorpião é uma posição de geração (1955 a 1970), compartilhada
+      com quem nasceu na mesma época. Ela fala de ideais ligados à
+      transformação, ao mistério e ao que está escondido. Na sua vida, pode
+      aparecer como atração por temas profundos, intuição para o não dito e
+      interesse por mudanças interiores. A casa de Netuno no seu mapa mostra
+      onde essa busca fica mais pessoal.
+  sagitario:
+    revisado: false
+    texto: >-
+      Netuno em Sagitário é uma posição de geração (1970 a 1984), compartilhada
+      com quem nasceu na mesma época. Ela fala de ideais ligados à fé, às
+      viagens e à busca de sentido. Na sua vida, pode aparecer como vontade de
+      conhecer outras culturas e filosofias, e como um otimismo espiritual. A
+      casa de Netuno no seu mapa mostra onde você busca inspiração, e onde vale
+      não seguir gurus sem questionar.
+  capricornio:
+    revisado: false
+    texto: >-
+      Netuno em Capricórnio é uma posição de geração (1984 a 1998),
+      compartilhada com quem nasceu na mesma época. Ela fala de sonhos ligados a
+      estrutura, carreira e realização concreta — e também de desilusão com
+      instituições. Na sua vida, pode aparecer como vontade de construir algo
+      com sentido, não só com status. A casa de Netuno no seu mapa mostra em
+      que área esse ideal se concentra.
+  aquario:
+    revisado: false
+    texto: >-
+      Netuno em Aquário é uma posição de geração (1998 a 2012), compartilhada
+      com quem nasceu na mesma época. Ela fala de sonhos coletivos ligados a
+      tecnologia, comunidade e um futuro mais justo. Na sua vida, pode aparecer
+      como idealismo social, vida em redes e facilidade para imaginar o que
+      ainda não existe. A casa de Netuno no seu mapa mostra onde isso se torna
+      pessoal.
+  peixes:
+    revisado: false
+    texto: >-
+      Netuno em Peixes é uma posição de geração (2011 a 2026), compartilhada com
+      quem nasceu na mesma época. Netuno está no próprio signo, o que reforça a
+      imaginação, a compaixão e o interesse pelo invisível. Na sua vida, pode
+      aparecer como grande sensibilidade artística e emocional, e necessidade
+      de aprender a pôr limites. A casa de Netuno no seu mapa mostra onde isso
+      se concentra.
+
+plutao:
+  aries:
+    revisado: false
+    texto: >-
+      Plutão em Áries é uma posição de geração (1822 a 1853; volta em 2066),
+      compartilhada com quem nasceu na mesma época. Ela fala de transformações
+      coletivas pela afirmação, pela coragem e pelo pioneirismo. Na vida de
+      quem a tem, pode aparecer como uma força de vontade intensa e necessidade
+      de se reinventar pela ação. A casa de Plutão no mapa mostra onde essa
+      intensidade é mais pessoal.
+  touro:
+    revisado: false
+    texto: >-
+      Plutão em Touro é uma posição de geração (1851 a 1884), compartilhada com
+      quem nasceu na mesma época. Ela fala de transformações ligadas à posse, à
+      terra e aos recursos. Na vida de quem a tem, pode aparecer como apego
+      forte ao que é seu e grande capacidade de reconstruir a própria base. A
+      casa de Plutão no mapa mostra em que área essa força de transformação se
+      concentra.
+  gemeos:
+    revisado: false
+    texto: >-
+      Plutão em Gêmeos é uma posição de geração (1882 a 1914), compartilhada
+      com quem nasceu na mesma época. Ela fala de transformações na
+      comunicação, na informação e no jeito de pensar. Na vida de quem a tem,
+      pode aparecer como curiosidade intensa e poder de convencer pela palavra.
+      A casa de Plutão no mapa mostra onde essa intensidade mental fica
+      pessoal.
+  cancer:
+    revisado: false
+    texto: >-
+      Plutão em Câncer é uma posição de geração (1912 a 1939), compartilhada
+      com quem nasceu na mesma época. Ela fala de transformações profundas na
+      família, no lar e na ideia de pátria. Na vida de quem a tem, pode
+      aparecer como ligação intensa com as raízes e forte instinto de proteger
+      os seus. A casa de Plutão no mapa mostra onde esse tema se torna pessoal.
+  leao:
+    revisado: false
+    texto: >-
+      Plutão em Leão é uma posição de geração (1937 a 1958), compartilhada com
+      quem nasceu na mesma época. Ela fala de transformações ligadas à
+      expressão pessoal, à autoridade e à vontade de deixar marca. Na sua
+      vida, pode aparecer como força criativa e desejo de ser reconhecido pelo
+      que é. A casa de Plutão no seu mapa mostra em que área essa intensidade
+      se manifesta.
+  virgem:
+    revisado: false
+    texto: >-
+      Plutão em Virgem é uma posição de geração (1956 a 1972), compartilhada
+      com quem nasceu na mesma época. Ela fala de transformações no trabalho,
+      nos métodos e na relação com o corpo e a rotina. Na sua vida, pode
+      aparecer como capacidade de analisar a fundo e de reorganizar o que não
+      funciona. A casa de Plutão no seu mapa mostra onde esse poder de
+      transformação se concentra.
+  libra:
+    revisado: false
+    texto: >-
+      Plutão em Libra é uma posição de geração (1971 a 1984), compartilhada com
+      quem nasceu na mesma época. Ela fala de transformações profundas nas
+      relações, nos acordos e na ideia de justiça. Na sua vida, pode aparecer
+      como relações intensas que te transformam e forte senso do que é justo.
+      A casa de Plutão no seu mapa mostra em que área isso se torna mais
+      pessoal.
+  escorpiao:
+    revisado: false
+    texto: >-
+      Plutão em Escorpião é uma posição de geração (1983 a 1995), compartilhada
+      com quem nasceu na mesma época. Plutão está no signo que rege, o que
+      reforça a intensidade, a busca pela verdade e a capacidade de se
+      reconstruir. Na sua vida, pode aparecer como pouca tolerância a relações
+      superficiais e grande resiliência. A casa de Plutão no seu mapa mostra
+      onde essa força é mais pessoal.
+  sagitario:
+    revisado: false
+    texto: >-
+      Plutão em Sagitário é uma posição de geração (1995 a 2008), compartilhada
+      com quem nasceu na mesma época. Ela fala de transformações nas crenças,
+      no ensino, nas viagens e na relação entre culturas. Na sua vida, pode
+      aparecer como busca intensa por sentido e vontade de questionar verdades
+      herdadas. A casa de Plutão no seu mapa mostra onde essa busca se
+      concentra.
+  capricornio:
+    revisado: false
+    texto: >-
+      Plutão em Capricórnio é uma posição de geração (2008 a 2024),
+      compartilhada com quem nasceu na mesma época. Ela fala de transformações
+      em estruturas, instituições e na ideia de autoridade. Na sua vida, pode
+      aparecer como ambição concentrada e capacidade de reconstruir o que
+      desmorona. A casa de Plutão no seu mapa mostra em que área essa força
+      de transformação se manifesta.
+  aquario:
+    revisado: false
+    texto: >-
+      Plutão em Aquário é uma posição de geração (a partir de 2023),
+      compartilhada com quem nasceu na mesma época. Ela fala de transformações
+      ligadas a tecnologia, redes e ao poder dos grupos. Na vida de quem a tem,
+      pode aparecer como forte senso coletivo e vontade de mudar o sistema.
+      A casa de Plutão no mapa mostra onde essa intensidade se torna pessoal.
+  peixes:
+    revisado: false
+    texto: >-
+      Plutão em Peixes é uma posição de geração (1797 a 1823; volta em 2043),
+      compartilhada com quem nasceu na mesma época. Ela fala de transformações
+      na espiritualidade, na arte e na forma de sentir o coletivo. Na vida de
+      quem a tem, pode aparecer como intuição profunda e grande capacidade de
+      empatia. A casa de Plutão no mapa mostra onde essa sensibilidade é mais
+      pessoal.
