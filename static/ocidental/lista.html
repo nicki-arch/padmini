@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#241522">
+<meta name="theme-color" content="{{ cores.ground }}">
 {# Lista de espera da versão ocidental (cópia da védica com a copy trocada). #}
 <title>Padmini — Lista de espera</title>
 <meta name="description" content="Mapa natal e sinastria do casal. Entre na lista de espera e receba o aviso da abertura{% if ofertas.compat.preco_de %} com o preço de fundador{% endif %}.">
@@ -17,16 +17,17 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/ocidental/tema.css">
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23e7a24a'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e2a89d'/></svg>">
+<link rel="icon" href="{{ marca.favicon_uri() }}">
 <style>
   /* específico da lista de espera — o resto vem de base.css */
   .hero{padding-block:40px 8px}
   h1{font-size:clamp(2.4rem,6.2vw,3.8rem);line-height:1.05}
-  .data-abertura{display:inline-block;margin:0 0 18px;padding:6px 14px;border-radius:999px;border:1px solid rgba(231,162,74,.45);color:var(--saffron);font-size:13px;font-weight:600;letter-spacing:.02em}
+  .data-abertura{display:inline-block;margin:0 0 18px;padding:6px 14px;border-radius:999px;border:1px solid color-mix(in srgb, var(--saffron) 45%, transparent);color:var(--saffron);font-size:13px;font-weight:600;letter-spacing:.02em}
   .grade{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:start;padding-block:12px 56px}
   .beneficios{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:16px}
   .beneficios li{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start}
@@ -61,7 +62,7 @@
 <header class="wrap">
   <div class="topbar">
     <a class="marca" href="/lista" aria-label="Padmini">
-      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+      {{ marca.svg(30) }}
       Padmini
     </a>
   </div>
@@ -111,7 +112,7 @@
       </form>
 
       <div class="pronto" id="pronto" hidden>
-        <svg class="lotus" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+        {{ marca.svg(44, classe="lotus") }}
         <h2>Pronto, você está na lista.</h2>
         <p id="pronto-texto">Vamos te avisar assim que abrir. Enquanto isso, chama quem você quer ver o resultado junto.</p>
         <button class="btn btn-outline" type="button" id="compartilhar">Compartilhar a lista</button>

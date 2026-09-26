@@ -15,6 +15,7 @@ import urllib.parse
 import urllib.request
 
 import acesso
+import paleta
 import sistema as _sistema
 
 SITE_URL = os.environ.get("PADMINI_SITE_URL", "https://padmini.com.br").rstrip("/")
@@ -67,39 +68,47 @@ TITULO_EMAIL = {
 
 def email_completo_html(produto: str, link: str, nome: str = "", extra: str = "",
                         sistema: str = "vedica") -> str:
-    """`extra`: HTML já pronto (e escapado) a acrescentar, ex.: a venda cruzada."""
+    """`extra`: HTML já pronto (e escapado) a acrescentar, ex.: a venda cruzada.
+    Cores e fontes: paleta.email(sistema)."""
+    c = paleta.email(sistema)
     titulo = TITULO_EMAIL[sistema].get(produto) or TITULO_EMAIL[sistema]["mapa"]
     assinatura = _sistema.ASSINATURA_EMAIL[sistema]
     ola = _ola(nome)
     link = html.escape(link, quote=True)
-    return f"""<div style="font-family:Arial,Helvetica,sans-serif;background:#241522;color:#f4e9dc;padding:32px;border-radius:12px;max-width:520px;margin:auto">
-  <p style="font-family:Georgia,serif;font-size:24px;color:#e7a24a;margin:0 0 18px">Padmini</p>
+    return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
+  <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
   <p style="margin:0 0 12px">{ola}</p>
   <p style="margin:0 0 8px">Seu pagamento foi confirmado — {titulo} está pronto.</p>
-  <p style="margin:26px 0"><a href="{link}" style="background:#e7a24a;color:#2a1608;text-decoration:none;padding:14px 26px;border-radius:999px;font-weight:bold;display:inline-block">Ver meu relatório completo →</a></p>
-  <p style="color:#c9b1a6;font-size:13px;margin:0 0 4px">Se o botão não abrir, copie e cole este link no navegador:</p>
-  <p style="color:#c9b1a6;font-size:12px;word-break:break-all;margin:0">{link}</p>
+  <p style="margin:26px 0"><a href="{link}" style="{estilo_botao(c)}">Ver meu relatório completo →</a></p>
+  <p style="color:{c['suave']};font-size:13px;margin:0 0 4px">Se o botão não abrir, copie e cole este link no navegador:</p>
+  <p style="color:{c['suave']};font-size:12px;word-break:break-all;margin:0">{link}</p>
   {extra}
-  <p style="color:#8f7a76;font-size:12px;margin-top:26px">{assinatura} Este link é pessoal; não o compartilhe.</p>
+  <p style="color:{c['fraco']};font-size:12px;margin-top:26px">{assinatura} Este link é pessoal; não o compartilhe.</p>
 </div>"""
+
+
+def estilo_botao(c: dict) -> str:
+    """O botão dos e-mails (o mesmo em todos), nas cores de `c` = paleta.email(versão)."""
+    return (f"background:{c['acento']};color:{c['sobre_acento']};text-decoration:none;padding:14px 26px;"
+            f"border-radius:{c['raio_botao']};font-weight:bold;display:inline-block")
 
 
 def email_mapas_do_casal_html(links: list, nome: str = "", sistema: str = "vedica") -> str:
     """links: [(nome da pessoa, link do mapa completo), ...]"""
+    c = paleta.email(sistema)
     assinatura = _sistema.ASSINATURA_EMAIL[sistema]
     ola = _ola(nome)
     links = [(html.escape(str(pessoa)[:40]), html.escape(l, quote=True)) for pessoa, l in links]
     botoes = "".join(
-        f'<p style="margin:18px 0"><a href="{l}" style="background:#e7a24a;color:#2a1608;text-decoration:none;'
-        f'padding:14px 26px;border-radius:999px;font-weight:bold;display:inline-block">Mapa de {pessoa} →</a></p>'
-        f'<p style="color:#c9b1a6;font-size:12px;word-break:break-all;margin:0 0 8px">{l}</p>'
+        f'<p style="margin:18px 0"><a href="{l}" style="{estilo_botao(c)}">Mapa de {pessoa} →</a></p>'
+        f'<p style="color:{c["suave"]};font-size:12px;word-break:break-all;margin:0 0 8px">{l}</p>'
         for pessoa, l in links)
-    return f"""<div style="font-family:Arial,Helvetica,sans-serif;background:#241522;color:#f4e9dc;padding:32px;border-radius:12px;max-width:520px;margin:auto">
-  <p style="font-family:Georgia,serif;font-size:24px;color:#e7a24a;margin:0 0 18px">Padmini</p>
+    return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
+  <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
   <p style="margin:0 0 12px">{ola}</p>
   <p style="margin:0 0 8px">Os mapas individuais de vocês dois estão prontos — um para cada pessoa.</p>
   {botoes}
-  <p style="color:#8f7a76;font-size:12px;margin-top:26px">{assinatura} Estes links são pessoais; não os compartilhe.</p>
+  <p style="color:{c['fraco']};font-size:12px;margin-top:26px">{assinatura} Estes links são pessoais; não os compartilhe.</p>
 </div>"""
 
 

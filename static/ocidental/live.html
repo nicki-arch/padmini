@@ -3,29 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#241522">
+<meta name="theme-color" content="{{ cores.ground }}">
 <meta name="robots" content="noindex, nofollow">
 <title>Modo live — Padmini</title>
 {# Versão ocidental do modo live (mapa natal e sinastria). #}
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/ocidental/tema.css">
 <style>
   /* Tela pensada para transmissão: fonte grande, muito contraste, pouca decoração. */
   body { font-size: 17px; }
   .barra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; margin-bottom: 18px; }
   .abas { display: flex; gap: 8px; }
-  .aba { font: 600 15px Inter, sans-serif; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; min-height: 44px; cursor: pointer; }
+  .aba { font: 600 15px var(--sans); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; min-height: 44px; cursor: pointer; }
   .aba[aria-selected="true"] { color: var(--on-accent); background: var(--saffron); border-color: var(--saffron); }
   .campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end; }
   .campos .largo { grid-column: 1 / -1; }
-  button.acao { font: 600 16px Inter, sans-serif; color: var(--on-accent); background: var(--saffron); border: 0; border-radius: 10px; padding: 14px 20px; min-height: 48px; cursor: pointer; }
+  button.acao { font: 600 16px var(--sans); color: var(--on-accent); background: var(--saffron); border: 0; border-radius: 10px; padding: 14px 20px; min-height: 48px; cursor: pointer; }
   button.acao[disabled] { opacity: .6; cursor: default; }
   fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 0 0 14px; }
   legend { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--saffron); font-weight: 600; padding: 0 6px; }
-  .faixa { display: flex; align-items: center; gap: 10px; margin: 30px 0 16px; font: 600 13px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+  .faixa { display: flex; align-items: center; gap: 10px; margin: 30px 0 16px; font: 600 13px var(--sans); letter-spacing: .1em; text-transform: uppercase; }
   .faixa::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .35; }
   .faixa.gratis { color: var(--sage); }
-  .faixa.pago { color: var(--saffron); }
+  .faixa.pago { color: var(--blush); }  /* a "linha laranja" do Pedro: zarcão */
   .grande { font-family: var(--serif); font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.15; margin: 0 0 6px; }
   .destaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 18px; }
   .destaques div { background: var(--ground-3); border-radius: 12px; padding: 14px 16px; }

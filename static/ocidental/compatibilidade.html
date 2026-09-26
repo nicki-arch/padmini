@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#241522">
+<meta name="theme-color" content="{{ cores.ground }}">
 <title>Padmini — Sinastria do casal</title>
 <meta name="description" content="A sinastria de vocês dois: os mapas natais cruzados em 8 dimensões, com o Índice Padmini. Amostra grátis.">
 <link rel="canonical" href="https://padmini.com.br/compatibilidade">
@@ -16,13 +16,14 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/ocidental/tema.css">
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 {# Versão ocidental (sinastria). Preço e checkout: conteudo/ocidental/ofertas.yaml;
    textos: conteudo/ocidental/textos/sinastria.yaml; API: /api/ocidental/sinastria. #}
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23e7a24a'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e2a89d'/></svg>">
+<link rel="icon" href="{{ marca.favicon_uri() }}">
 <style>
   /* específico da compatibilidade — o resto vem de base.css */
   .duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -59,7 +60,7 @@
 <header class="wrap">
   <div class="topbar">
     <a class="marca" href="/">
-      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+      {{ marca.svg(30) }}
       Padmini
     </a>
     <nav>
@@ -148,6 +149,8 @@
 // válido no link (?cupom=PEDRO, sem diferença de maiúsculas): aí o checkout recebe
 // `coupon=pedro`, o parâmetro da Cakto que já aplica o cupom (ajuda.cakto.com.br,
 // "checkout pré-preenchido"). O preço com cupom é calculado do percentual no servidor.
+const CORES = {{ cores | tojson }};
+const LOTUS_TRACOS = "{{ marca.tracos_d() }}", LOTUS_ASTRO = "{{ marca.astro_d() }}";
 const LINK_CHECKOUT = "{{ ofertas.compat.checkout }}";
 const PRECO = "{{ ofertas.compat.preco | moeda }}";
 const PRECO_CUPOM = "{{ ofertas.compat.preco_cupom | moeda }}";
@@ -447,48 +450,42 @@ async function montarCanvasCard(d) {
   const c = document.createElement("canvas");
   c.width = W; c.height = H;
   const x = c.getContext("2d");
+  // cores e fontes da versão (paleta.py → cores); o lótus é o mesmo desenho da marca (marca.py)
+  const C = CORES, SERIF = '"Young Serif", Georgia, serif', SANS = '"Source Sans 3", sans-serif';
   try {
     await document.fonts.ready;
-    await Promise.all([
-      document.fonts.load('500 220px "Cormorant Garamond"'), document.fonts.load('600 46px "Cormorant Garamond"'),
-      document.fonts.load('italic 500 52px "Cormorant Garamond"'), document.fonts.load('600 28px "Inter"'),
-      document.fonts.load('400 28px "Inter"'),
-    ]);
+    await Promise.all([document.fonts.load('400 220px "Young Serif"'), document.fonts.load('600 28px "Source Sans 3"'),
+                       document.fonts.load('400 28px "Source Sans 3"')]);
   } catch (e) {}
-  const g = x.createLinearGradient(0, 0, W, H);
-  g.addColorStop(0, "#301d2d"); g.addColorStop(.7, "#3f2740");
-  x.fillStyle = g; x.fillRect(0, 0, W, H);
-  const rg = x.createRadialGradient(W / 2, -120, 60, W / 2, -120, 780);
-  rg.addColorStop(0, "rgba(231,162,74,.20)"); rg.addColorStop(1, "rgba(231,162,74,0)");
-  x.fillStyle = rg; x.fillRect(0, 0, W, H);
-  x.strokeStyle = "rgba(231,162,74,.30)"; x.lineWidth = 2;
-  x.strokeRect(24, 24, W - 48, H - 48);
+  x.fillStyle = C["ground"]; x.fillRect(0, 0, W, H);           // tinta chapada, sem brilho
+  x.strokeStyle = C["saffron"]; x.lineWidth = 2; x.strokeRect(28, 28, W - 56, H - 56);   // filete duplo de almanaque
+  x.lineWidth = 1; x.strokeRect(40, 40, W - 80, H - 80);
+  x.save(); x.translate(PX, 96); x.scale(2.4, 2.4);             // lótus em traço (32×32 → 77px)
+  x.strokeStyle = C["saffron"]; x.lineWidth = 1.5; x.lineCap = "round"; x.lineJoin = "round";
+  x.stroke(new Path2D(LOTUS_TRACOS)); x.fillStyle = C["blush"]; x.fill(new Path2D(LOTUS_ASTRO)); x.restore();
   x.textAlign = "left"; x.textBaseline = "alphabetic";
-  x.font = '600 46px "Cormorant Garamond", serif'; x.fillStyle = "#e7a24a"; x.fillText("padmini", PX, 160);
-  _setLS(x, "5px"); x.font = '600 26px "Inter", sans-serif'; x.fillStyle = "#c9b1a6"; x.fillText("SINASTRIA DO CASAL", PX, 250);
-  x.font = '600 34px "Inter", sans-serif'; x.fillStyle = "#f4e9dc"; _setLS(x, "1px");
+  x.font = "400 46px " + SERIF; x.fillStyle = C["saffron"]; x.fillText("Padmini", PX + 96, 160);
+  _setLS(x, "5px"); x.font = "600 26px " + SANS; x.fillStyle = C["muted"]; x.fillText("SINASTRIA DO CASAL", PX, 250);
+  x.font = "600 34px " + SANS; x.fillStyle = C["ink"]; _setLS(x, "1px");
   x.fillText((nomeA + "  &  " + nomeB).toUpperCase(), PX, 330); _setLS(x, "0px");
   const barW = W - 2 * PX;
   let y = 590;
   if (CARD_MOSTRA_INDICE) {
-    x.font = '500 230px "Cormorant Garamond", serif'; x.fillStyle = "#f4e9dc";
+    x.font = "400 220px " + SERIF; x.fillStyle = C["ink"];
     const num = String(d.indice); x.fillText(num, PX, 590);
     const numW = x.measureText(num).width;
-    x.font = '500 90px "Cormorant Garamond", serif'; x.fillStyle = "#8f7a76"; x.fillText(" / 100", PX + numW + 12, 590);
-    _setLS(x, "3px"); x.font = '600 28px "Inter", sans-serif'; x.fillStyle = "#e2a89d";
+    x.font = "400 86px " + SERIF; x.fillStyle = C["faint"]; x.fillText(" / 100", PX + numW + 12, 590);
+    _setLS(x, "3px"); x.font = "600 28px " + SANS; x.fillStyle = C["blush"];
     x.fillText("ÍNDICE PADMINI · MÉTODO PRÓPRIO", PX, 660); _setLS(x, "0px");
-    const barY = 705, barH = 14, r = barH / 2;
-    const rr = (xx, yy, ww, hh, rad) => { x.beginPath(); x.moveTo(xx + rad, yy); x.arcTo(xx + ww, yy, xx + ww, yy + hh, rad);
-      x.arcTo(xx + ww, yy + hh, xx, yy + hh, rad); x.arcTo(xx, yy + hh, xx, yy, rad); x.arcTo(xx, yy, xx + ww, yy, rad); x.closePath(); };
-    rr(PX, barY, barW, barH, r); x.fillStyle = "rgba(244,233,220,.14)"; x.fill();
-    const bg = x.createLinearGradient(PX, 0, PX + barW, 0); bg.addColorStop(0, "#e2a89d"); bg.addColorStop(1, "#e7a24a");
-    rr(PX, barY, Math.max(barH, barW * d.indice / 100), barH, r); x.fillStyle = bg; x.fill();
+    const barY = 705, barH = 10;
+    x.fillStyle = C["bar-trilha"]; x.fillRect(PX, barY, barW, barH);                     // barra reta, de régua
+    x.fillStyle = C["saffron"]; x.fillRect(PX, barY, Math.max(barH, barW * d.indice / 100), barH);
     y = 850;
   } else { y = 520; }
-  x.font = 'italic 500 54px "Cormorant Garamond", serif'; x.fillStyle = "#f4e9dc";
+  x.font = "400 52px " + SERIF; x.fillStyle = C["ink"];
   _wrap(x, "“O ponto mais forte de vocês: " + d.ponto_forte.titulo.toLowerCase() + ".”", PX, y, barW, 70);
-  x.font = '400 30px "Inter", sans-serif'; x.fillStyle = "#c9b1a6"; x.fillText("Façam a de vocês, de graça:", PX, H - 150);
-  x.font = '600 52px "Inter", sans-serif'; x.fillStyle = "#e7a24a"; x.fillText("padmini.com.br", PX, H - 85);
+  x.font = "400 30px " + SANS; x.fillStyle = C["muted"]; x.fillText("Façam a de vocês, de graça:", PX, H - 150);
+  x.font = "600 52px " + SANS; x.fillStyle = C["saffron"]; x.fillText("padmini.com.br", PX, H - 85);
   return c;
 }
 

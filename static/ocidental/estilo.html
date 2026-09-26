@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="{{ cores.ground }}">
+<meta name="robots" content="noindex, nofollow">
+<title>Estilo — Padmini (versão ocidental)</title>
+<link href="{{ fontes.google }}" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/ocidental/tema.css">
+{% include "ocidental/_carta.html" %}
+<link rel="icon" href="{{ marca.favicon_uri() }}">
+{# Vitrine da identidade "Almanaque" (rodada 3), para o Nicolas aprovar. Só com a
+   chave de prévia (PADMINI_PREVIA_CHAVE), sempre na versão ocidental, fora do buscador.
+   Tudo aqui sai de paleta.py / marca.py / tema.css: é o que as páginas usam. #}
+<style>
+  h1{font-size:clamp(2.2rem,5vw,3.2rem)}
+  .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .amostra{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--ground-2)}
+  .amostra .cor{height:78px;border-bottom:1px solid var(--line)}
+  .amostra .info{padding:10px 12px;font-size:14px}
+  .amostra code{font-size:13px;color:var(--muted)}
+  .ok{color:var(--sage)} .ruim{color:var(--erro)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--faint);font-weight:600}
+  .tipos>*{margin:0 0 14px}
+  .linha{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .form{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px}
+  .tiragem{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:560px}
+  .tiragem .posicao{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+  .rotulo-pos{font-variant-caps:all-small-caps;letter-spacing:.16em;color:var(--saffron);font-weight:600;font-size:15px}
+  .email{max-width:560px}
+  .marcas{display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap}
+  .marcas figure{margin:0;text-align:center;font-size:13px;color:var(--faint)}
+  @media(max-width:640px){.form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="topbar">
+    <a class="marca" href="/">{{ marca.svg(30) }} Padmini</a>
+    <span class="nota">Vitrine de estilo · versão ocidental</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section style="padding-top:20px">
+    <p class="eyebrow">Identidade · Almanaque</p>
+    <h1>A roupa nova da <em>Padmini</em> ocidental.</h1>
+    <p class="lede">Azul de tinta de impressão, papel creme, ouro velho e zarcão — as cores dos almanaques, dos atlas celestes e do tarô impresso em litografia. Mesmas páginas, mesmos componentes: muda a roupa, não a casa.</p>
+  </section>
+
+  <section>
+    <h2>A marca</h2>
+    <p class="sub">O lótus (Padmini é "a do lótus") em traço de gravura, linha única, com um astro de quatro pontas no centro. Um desenho só para o site, o favicon, o PDF e as imagens de compartilhamento (<code>marca.py</code>).</p>
+    <div class="marcas">
+      <figure><img src="{{ marca.favicon_uri() }}" width="16" height="16" alt=""><figcaption>16px (favicon)</figcaption></figure>
+      <figure><img src="{{ marca.favicon_uri() }}" width="32" height="32" alt=""><figcaption>32px</figcaption></figure>
+      <figure>{{ marca.svg(64) }}<figcaption>64px</figcaption></figure>
+      <figure>{{ marca.svg(160, traco=1.2) }}<figcaption>grande</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Paleta e contrastes</h2>
+    <p class="sub">Razão de contraste WCAG. Regra: texto de corpo entre 10:1 e 13:1; nada legível abaixo de 4,5:1.</p>
+    <div class="grade">
+      {%- for c in paleta_amostras %}
+      <div class="amostra"><div class="cor" style="background:{{ c.valor }}"></div>
+        <div class="info"><b>{{ c.nome }}</b><br><code>--{{ c.token }} · {{ c.valor }}</code><br>{{ c.uso }}</div></div>
+      {%- endfor %}
+    </div>
+    <table style="margin-top:22px">
+      <tr><th>Texto</th><th>Sobre</th><th>Contraste</th><th>Regra</th></tr>
+      {%- for c in contrastes %}
+      <tr><td>{{ c.texto }}</td><td>{{ c.fundo }}</td><td><b>{{ c.razao }}:1</b></td>
+        <td class="{{ 'ok' if c.passa else 'ruim' }}">{{ c.regra }} {{ '✓' if c.passa else '✗' }}</td></tr>
+      {%- endfor %}
+    </table>
+  </section>
+
+  <section class="tipos">
+    <h2>Tipografia</h2>
+    <p class="sub">Títulos: <b>Young Serif</b> (serifa de impressão antiga; um peso só, sem itálico — a ênfase é a segunda tinta). Corpo: <b>Source Sans 3</b> (sans humanista). Rótulos em versaletes espaçados.</p>
+    <p class="eyebrow">Rótulo em versaletes · Situação · Desafio · Conselho</p>
+    <h1 style="margin:0">Título grande com <em>ênfase</em></h1>
+    <h2 style="margin:0">Título de seção</h2>
+    <h3>Título de bloco</h3>
+    <p class="lede">Texto de abertura, maior e mais suave, para a primeira frase de uma página.</p>
+    <p>Texto corrido de leitura: o Sol em Touro fala de constância e de prazer nas coisas concretas. Tendências, não sentenças — o texto fala com você, com calma, e explica o porquê de cada coisa.</p>
+    <p class="sub">Nota de rodapé, aviso pequeno, texto de apoio.</p>
+  </section>
+
+  <section>
+    <h2>Botões e campos</h2>
+    <div class="linha" style="margin-bottom:22px">
+      <a class="btn btn-primary" href="#">Quero a leitura completa →</a>
+      <a class="btn btn-outline" href="#">Fazer meu mapa</a>
+      <a class="navlink" href="#">Mapa natal →</a>
+      <a class="navlink destaque" href="#">Destaque</a>
+    </div>
+    <div class="card form">
+      <div class="campo"><label for="e-nome">Nome</label><input id="e-nome" placeholder="Como você quer ser chamada"></div>
+      <div class="campo"><label for="e-data">Data de nascimento</label><input id="e-data" placeholder="dd/mm/aaaa"><span class="dica">Dica de campo, texto terciário.</span></div>
+      <p class="erro" style="grid-column:1/-1">Mensagem de erro de um campo.</p>
+      <p class="aviso" style="grid-column:1/-1;margin:0">Aviso: sem a hora de nascimento, o Ascendente e as casas ficam de fora.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Card do mapa</h2>
+    <article class="card relatorio" style="max-width:620px">
+      <p class="eyebrow" style="margin-bottom:6px">Sol em Touro · casa 8</p>
+      <h3>O jeito de brilhar</h3>
+      <p style="color:var(--faint);margin:4px 0 0">24°37'</p>
+      <p>Com o Sol em Touro, você tende a construir devagar e a confiar no que dá para tocar. Numa decisão importante, costuma pedir tempo — e isso, que às vezes parece teimosia, é o seu jeito de ter certeza.</p>
+    </article>
+  </section>
+
+  <section>
+    <h2>As cartas do tarot</h2>
+    <p class="sub">Tipográficas, com um símbolo nosso por naipe; nos arcanos maiores, o lótus. Figuras (Valete, Cavaleiro, Rainha, Rei) sem rótulo em cima.</p>
+    <div class="tiragem" id="cartas"></div>
+  </section>
+
+  <section>
+    <h2>Card compartilhável da sinastria</h2>
+    <div class="share">
+      <div class="cardc">
+        <div class="top"><span class="wm">padmini</span>{{ marca.svg(22) }}</div>
+        <div class="who">Ana &amp; Rafael</div>
+        <div class="score">78<span> / 100</span></div>
+        <div class="scorelab">Índice Padmini · método próprio</div>
+        <div class="bar"><i style="width:78%"></i></div>
+        <div class="insight">"O ponto mais forte de vocês: emoções."</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>E-mail de entrega</h2>
+    <p class="sub">Como chega na caixa de entrada (cores de <code>paleta.email("ocidental")</code>; o e-mail não baixa fonte: onde a Young Serif não existir, cai no Georgia).</p>
+    <div class="email">{{ email_exemplo }}</div>
+  </section>
+</main>
+
+<footer>Padmini — vitrine de estilo da versão ocidental. Não aparece no buscador.</footer>
+<script>
+const CARTAS = {{ cartas_exemplo | tojson }};
+document.getElementById("cartas").innerHTML = CARTAS.map((c) =>
+  `<div class="posicao">${carta(c)}<span class="rotulo-pos">${c.posicao_pt}</span></div>`).join("");
+</script>
+</body>
+</html>

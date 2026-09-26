@@ -38,7 +38,9 @@ import db
 import entrega
 import limites
 import marketing
+import marca
 import ofertas
+import paleta
 import seguranca
 import rotas_ocidental
 import sistema
@@ -171,6 +173,9 @@ def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:
         _paginas_prontas[(versao, arquivo)] = _jinja.get_template(arquivo).render(
             t=textos.da_pagina(pagina, versao),
             ofertas=ofertas.do_sistema(versao),
+            # cores, fontes e a marca da versão (paleta.py / marca.py): as páginas
+            # da ocidental usam; as da védica não (e saem iguais a antes)
+            cores=paleta.tela(versao), fontes=paleta.FONTES[versao], marca=marca,
         )
     return Response(_paginas_prontas[(versao, arquivo)], media_type="text/html; charset=utf-8")
 
@@ -240,6 +245,32 @@ def pagina_numerologia(request: Request):
 @app.api_route("/tarot", methods=["GET", "HEAD"])
 def pagina_tarot(request: Request):
     return _pagina_so_da_ocidental(request, "/tarot")
+
+
+@app.api_route("/estilo", methods=["GET", "HEAD"])
+def pagina_estilo(request: Request):
+    """Vitrine da identidade da versão ocidental (cores com contraste, fontes,
+    botões, campos, cartas, card do casal, e-mail) para o Nicolas aprovar. Só
+    com a chave de prévia; sem ela, 404. Sempre a ocidental, fora do buscador."""
+    chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
+    if not (chave and chave in (request.query_params.get("previa"), request.cookies.get("pad_previa"))):
+        raise HTTPException(404, "Página não encontrada.")
+    import tarot
+    t = paleta.tela("ocidental")
+    exemplo = ["a_estrela", "valete_de_copas", "as_de_ouros", "sete_de_espadas", "dez_de_paus"]
+    posicoes = ["Situação", "Desafio", "Conselho", "Espadas", "Paus"]
+    cartas = [{**next(c for c in tarot.CARTAS if c["chave"] == k), "posicao_pt": p} for k, p in zip(exemplo, posicoes)]
+    email = entrega.email_completo_html("tarot", f"{entrega.SITE_URL}/tarot?t=exemplo&token=oc-exemplo", "Ana",
+                                        marketing._venda_cruzada_ocidental("tarot", {}), "ocidental")
+    html = _jinja.get_template("ocidental/estilo.html").render(
+        cores=t, fontes=paleta.FONTES["ocidental"], marca=marca, contrastes=paleta.contrastes("ocidental"),
+        paleta_amostras=[{"token": k, "valor": t[k], "nome": n, "uso": u} for k, (n, u) in paleta.NOMES.items()],
+        cartas_exemplo=cartas, email_exemplo=email)
+    resp = Response(html, media_type="text/html; charset=utf-8", headers={"X-Robots-Tag": "noindex, nofollow"})
+    if request.query_params.get("previa") == chave:
+        resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
+                        secure=request.url.scheme == "https", samesite="lax")
+    return resp
 
 
 @app.api_route("/lista", methods=["GET", "HEAD"])
@@ -416,12 +447,22 @@ def sitemap():
 
 @app.api_route("/privacidade", methods=["GET", "HEAD"])
 def pagina_privacidade():
-    return FileResponse(RAIZ / "static" / sistema.LEGAIS[sistema.ativo()]["/privacidade"])
+    return _pagina_legal("/privacidade")
 
 
 @app.api_route("/termos", methods=["GET", "HEAD"])
 def pagina_termos():
-    return FileResponse(RAIZ / "static" / sistema.LEGAIS[sistema.ativo()]["/termos"])
+    return _pagina_legal("/termos")
+
+
+def _pagina_legal(rota: str) -> Response:
+    """Termos e privacidade. A védica serve os arquivos de sempre, byte a byte; a
+    ocidental monta o template (cores, fontes e a marca vêm da paleta)."""
+    versao = sistema.ativo()
+    arquivo = sistema.LEGAIS[versao][rota]
+    if versao == "vedica":
+        return FileResponse(RAIZ / "static" / arquivo)
+    return _pagina_montada(arquivo, versao, rota.strip("/"))
 
 
 @app.get("/api/cidades")

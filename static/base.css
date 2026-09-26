@@ -31,6 +31,18 @@
   --accent-soft: rgba(231,162,74,.14);/* preenchimento de acento suave */
   --on-accent: #2a1608;   /* texto sobre botão açafrão */
   --focus: #e7a24a;
+  /* Cores que antes ficavam fixas nos componentes (mesmos valores): viraram
+     tokens para a versão ocidental poder trocá-las (static/ocidental/tema.css). */
+  --accent-hover: #efb161;             /* botão açafrão com o mouse em cima */
+  --accent-hl: rgba(231,162,74,.16);   /* opção destacada no autocomplete */
+  --accent-borda: rgba(231,162,74,.32);/* borda do card do casal e da faixa de cross-sell */
+  --glow: rgba(231,162,74,.10);        /* brilho no topo da página */
+  --erro: #f6a9a0;
+  --card-a: #301d2d;                   /* degradê do card compartilhável */
+  --card-b: #3f2740;
+  --card-marca: "पद्मिनी";              /* marca-d'água do card */
+  --card-marca-cor: rgba(231,162,74,.09);
+  --bar-trilha: rgba(244,233,220,.14); /* trilho da barra do índice */
 
   /* — Tipografia — */
   --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
@@ -57,7 +69,7 @@ body {
   color: var(--ink);
   font: 16px/1.62 var(--sans);
   -webkit-font-smoothing: antialiased;
-  background-image: radial-gradient(120% 70% at 50% -8%, rgba(231,162,74,.10), transparent 58%);
+  background-image: radial-gradient(120% 70% at 50% -8%, var(--glow), transparent 58%);
 }
 a { color: inherit; }
 img { max-width: 100%; }
@@ -91,14 +103,14 @@ nav { display: flex; gap: 8px; flex-wrap: wrap; }
 .navlink { display: inline-flex; align-items: center; min-height: 40px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; border: 1px solid var(--line); padding: 8px 15px; border-radius: 999px; }
 .navlink:hover { border-color: var(--saffron); }
 .navlink.destaque { background: var(--saffron); color: var(--on-accent); border-color: transparent; font-weight: 600; }
-.navlink.destaque:hover { background: #efb161; }
+.navlink.destaque:hover { background: var(--accent-hover); }
 
 /* — Botões — */
 .btn { display: inline-flex; gap: 9px; align-items: center; justify-content: center; border: 0; cursor: pointer;
   font-family: var(--sans); font-weight: 600; font-size: 15px; padding: 15px 26px; border-radius: 999px;
   text-decoration: none; min-height: 48px; }
 .btn-primary { background: var(--saffron); color: var(--on-accent); }
-.btn-primary:hover { background: #efb161; }
+.btn-primary:hover { background: var(--accent-hover); }
 .btn-primary:disabled { opacity: .6; cursor: wait; }
 .btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 .btn-outline:hover { border-color: var(--saffron); }
@@ -119,7 +131,7 @@ input { width: 100%; font: inherit; color: var(--ink); background: var(--ground-
 input::placeholder { color: var(--faint); }
 input:focus-visible, button:focus-visible, a.btn:focus-visible, .navlink:focus-visible, li[role=option]:focus-visible {
   outline: 2px solid var(--focus); outline-offset: 1px; }
-.erro { color: #f6a9a0; font-size: 14px; margin: 0; }
+.erro { color: var(--erro); font-size: 14px; margin: 0; }
 
 /* — Autocomplete de cidade — */
 .auto { position: relative; }
@@ -127,26 +139,26 @@ input:focus-visible, button:focus-visible, a.btn:focus-visible, .navlink:focus-v
   list-style: none; background: var(--ground-3); border: 1px solid var(--line); border-radius: 10px;
   box-shadow: 0 12px 30px rgb(0 0 0 / .5); max-height: 280px; overflow: auto; }
 .auto li { padding: 10px; border-radius: 8px; cursor: pointer; }
-.auto li[aria-selected=true], .auto li:hover { background: rgba(231,162,74,.16); }
+.auto li[aria-selected=true], .auto li:hover { background: var(--accent-hl); }
 
 /* — Card compartilhável do casal — */
 .share { display: flex; justify-content: center; }
-.cardc { width: 300px; border-radius: 22px; padding: 30px 26px 26px; background: linear-gradient(165deg,#301d2d,#3f2740 70%);
-  border: 1px solid rgba(231,162,74,.32); box-shadow: 0 24px 60px -20px rgba(0,0,0,.6); position: relative; overflow: hidden; text-align: left; }
-.cardc::after { content: "पद्मिनी"; position: absolute; right: -6px; bottom: -14px; font-family: var(--serif); font-size: 4.4rem; color: rgba(231,162,74,.09); }
+.cardc { width: 300px; border-radius: 22px; padding: 30px 26px 26px; background: linear-gradient(165deg,var(--card-a),var(--card-b) 70%);
+  border: 1px solid var(--accent-borda); box-shadow: 0 24px 60px -20px rgba(0,0,0,.6); position: relative; overflow: hidden; text-align: left; }
+.cardc::after { content: var(--card-marca); position: absolute; right: -6px; bottom: -14px; font-family: var(--serif); font-size: 4.4rem; color: var(--card-marca-cor); }
 .cardc .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
 .cardc .wm { font-family: var(--serif); font-size: 1rem; color: var(--saffron); }
 .cardc .who { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 .cardc .score { font-family: var(--serif); font-size: 3.6rem; line-height: 1; font-weight: 500; }
 .cardc .score span { font-size: 1.4rem; color: var(--faint); }
 .cardc .scorelab { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--blush); margin-top: 6px; font-weight: 600; }
-.cardc .bar { height: 5px; border-radius: 3px; background: rgba(244,233,220,.14); margin: 18px 0; overflow: hidden; }
+.cardc .bar { height: 5px; border-radius: 3px; background: var(--bar-trilha); margin: 18px 0; overflow: hidden; }
 .cardc .bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg,var(--blush),var(--saffron)); }
 .cardc .insight { font-family: var(--serif); font-style: italic; font-size: 1.12rem; line-height: 1.35; }
 
 /* — Faixa de cross-sell entre produtos — */
 .cross { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
-  background: linear-gradient(180deg, var(--ground-3), var(--ground-2)); border: 1px solid rgba(231,162,74,.32);
+  background: linear-gradient(180deg, var(--ground-3), var(--ground-2)); border: 1px solid var(--accent-borda);
   border-radius: var(--radius); padding: 20px 22px; }
 .cross p { margin: 0; }
 .cross h3 { margin: 0 0 4px; }
