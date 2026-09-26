@@ -13,11 +13,20 @@ Configuração por ambiente:
 
 Fluxo em produção: webhook da Cakto confirma o pagamento → backend chama
 emitir_token(produto, chave) → manda o link com ?token=... por e-mail.
+
+Versão do site (Fase 0.5, ver sistema.py): o token diz de que versão ele é.
+  - védica:    32 hex, sem prefixo — o formato de todo link já entregue, que
+               continua valendo;
+  - ocidental: "oc-" + 32 hex, assinado sobre "ocidental|produto|chave".
+Assim o link de um relatório pago abre na versão comprada, qualquer que seja a
+versão no ar, e um token de uma versão não abre o completo da outra.
 """
 
 import hashlib
 import hmac
 import os
+
+import sistema as _sistema
 
 SEGREDO = os.environ.get("PADMINI_SECRET", "")
 MODO_ABERTO = os.environ.get("PADMINI_MODO_ABERTO") == "1"
@@ -33,12 +42,22 @@ def chave_compat(a: tuple, b: tuple) -> str:
     return chave_mapa(*a) + "||" + chave_mapa(*b)
 
 
-def emitir_token(produto: str, chave: str) -> str:
-    """Assina (produto, chave). produto ∈ {'mapa','compat'}. Precisa de PADMINI_SECRET."""
+def emitir_token(produto: str, chave: str, sistema: str = "vedica") -> str:
+    """Assina (produto, chave) de uma versão. produto ∈ {'mapa','compat'}. Precisa de PADMINI_SECRET."""
     if not SEGREDO:
         raise RuntimeError("PADMINI_SECRET não configurado — não é possível emitir token.")
-    msg = f"{produto}|{chave}".encode("utf-8")
-    return hmac.new(SEGREDO.encode("utf-8"), msg, hashlib.sha256).hexdigest()[:32]
+    prefixo = _sistema.PREFIXO_TOKEN[sistema]
+    msg = (f"{produto}|{chave}" if sistema == "vedica" else f"{sistema}|{produto}|{chave}").encode("utf-8")
+    return prefixo + hmac.new(SEGREDO.encode("utf-8"), msg, hashlib.sha256).hexdigest()[:32]
+
+
+def sistema_do_token(token: str | None) -> str:
+    """De que versão é um token (pelo prefixo). Sem prefixo = védica."""
+    token = str(token or "")
+    for sistema, prefixo in _sistema.PREFIXO_TOKEN.items():
+        if prefixo and token.startswith(prefixo):
+            return sistema
+    return "vedica"
 
 
 def emitir_sessao(papel: str, expira_em: int) -> str:
@@ -65,13 +84,13 @@ def sessao_valida(papel: str, valor: str | None, agora: int | None = None) -> bo
         return False
 
 
-def completo_liberado(produto: str, chave: str, token: str | None) -> bool:
-    """True se o completo pode ser servido para este pedido."""
+def completo_liberado(produto: str, chave: str, token: str | None, sistema: str = "vedica") -> bool:
+    """True se o completo desta versão pode ser servido para este pedido."""
     if MODO_ABERTO:
         return True
     if not SEGREDO or not token:
         return False
     try:
-        return hmac.compare_digest(token, emitir_token(produto, chave))
+        return hmac.compare_digest(token, emitir_token(produto, chave, sistema))
     except Exception:
         return False

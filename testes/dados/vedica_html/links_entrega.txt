@@ -1,0 +1,2 @@
+https://padmini.teste/mapa?data=1990-05-15&hora=14%3A30&lat=-23.5505&lon=-46.6333&cidade=S%C3%A3o+Paulo%2C+SP&nome=Ana&token=e3f1d63d512468eefbda91fd2d5e8322
+https://padmini.teste/compatibilidade?token=ccc2d185da9de13d1c4b4cef5542668a&a_nome=Ana&a_data=1990-05-15&a_hora=14%3A30&a_lat=-23.5505&a_lon=-46.6333&a_cidade=S%C3%A3o+Paulo%2C+SP&b_nome=Bruno&b_data=1992-03-10&b_hora=08%3A00&b_lat=-22.9068&b_lon=-43.1729&b_cidade=Rio+de+Janeiro%2C+RJ

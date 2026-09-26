@@ -1,0 +1,178 @@
+{
+ "aviso_horario": null,
+ "cidade": "São Paulo, SP",
+ "dashas": [
+  {
+   "atual": false,
+   "fim": "1992-01-18",
+   "inicio": "1990-05-15",
+   "nome": "Sol",
+   "regente": "Surya"
+  },
+  {
+   "atual": false,
+   "fim": "2002-01-17",
+   "inicio": "1992-01-18",
+   "nome": "Lua",
+   "regente": "Chandra"
+  },
+  {
+   "atual": false,
+   "fim": "2009-01-17",
+   "inicio": "2002-01-17",
+   "nome": "Marte",
+   "regente": "Mangala"
+  },
+  {
+   "atual": true,
+   "fim": "2027-01-17",
+   "inicio": "2009-01-17",
+   "nome": "Rahu",
+   "regente": "Rahu"
+  },
+  {
+   "atual": false,
+   "fim": "2043-01-17",
+   "inicio": "2027-01-17",
+   "nome": "Júpiter",
+   "regente": "Guru"
+  },
+  {
+   "atual": false,
+   "fim": "2062-01-17",
+   "inicio": "2043-01-17",
+   "nome": "Saturno",
+   "regente": "Shani"
+  },
+  {
+   "atual": false,
+   "fim": "2079-01-17",
+   "inicio": "2062-01-17",
+   "nome": "Mercúrio",
+   "regente": "Budha"
+  },
+  {
+   "atual": false,
+   "fim": "2086-01-16",
+   "inicio": "2079-01-17",
+   "nome": "Ketu",
+   "regente": "Ketu"
+  },
+  {
+   "atual": false,
+   "fim": "2106-01-17",
+   "inicio": "2086-01-16",
+   "nome": "Vênus",
+   "regente": "Shukra"
+  }
+ ],
+ "fuso": {
+  "nome_iana": "America/Sao_Paulo",
+  "offset_horas_na_data": -3.0
+ },
+ "grahas": [
+  {
+   "casa": 9,
+   "grau": 0.89,
+   "id": "Surya",
+   "nome": "Sol",
+   "retrogrado": false,
+   "signo": "Vrishabha",
+   "signo_pt": "Touro"
+  },
+  {
+   "casa": 5,
+   "grau": 6.27,
+   "id": "Chandra",
+   "nome": "Lua",
+   "retrogrado": false,
+   "signo": "Makara",
+   "signo_pt": "Capricórnio"
+  },
+  {
+   "casa": 6,
+   "grau": 24.78,
+   "id": "Mangala",
+   "nome": "Marte",
+   "retrogrado": false,
+   "signo": "Kumbha",
+   "signo_pt": "Aquário"
+  },
+  {
+   "casa": 8,
+   "grau": 14.26,
+   "id": "Budha",
+   "nome": "Mercúrio",
+   "retrogrado": true,
+   "signo": "Mesha",
+   "signo_pt": "Áries"
+  },
+  {
+   "casa": 10,
+   "grau": 15.86,
+   "id": "Guru",
+   "nome": "Júpiter",
+   "retrogrado": false,
+   "signo": "Mithuna",
+   "signo_pt": "Gêmeos"
+  },
+  {
+   "casa": 7,
+   "grau": 19.35,
+   "id": "Shukra",
+   "nome": "Vênus",
+   "retrogrado": false,
+   "signo": "Meena",
+   "signo_pt": "Peixes"
+  },
+  {
+   "casa": 5,
+   "grau": 1.52,
+   "id": "Shani",
+   "nome": "Saturno",
+   "retrogrado": true,
+   "signo": "Makara",
+   "signo_pt": "Capricórnio"
+  },
+  {
+   "casa": 5,
+   "grau": 17.6,
+   "id": "Rahu",
+   "nome": "Rahu",
+   "retrogrado": false,
+   "signo": "Makara",
+   "signo_pt": "Capricórnio"
+  },
+  {
+   "casa": 11,
+   "grau": 17.6,
+   "id": "Ketu",
+   "nome": "Ketu",
+   "retrogrado": false,
+   "signo": "Karka",
+   "signo_pt": "Câncer"
+  }
+ ],
+ "lagna": {
+  "grau": 5.0,
+  "signo": "Kanya",
+  "signo_pt": "Virgem"
+ },
+ "nakshatra_lua": {
+  "nome": "Uttara Ashadha",
+  "pada": 3
+ },
+ "nivel": "completo",
+ "nome": "Ana",
+ "secoes": {
+  "Ascendente": "Com Ascendente em Virgem, a pessoa se apresenta pela competência e pelo cuidado com os detalhes. O olhar crítico que resolve problemas também pode se voltar contra ela mesma.",
+  "Destaques do mapa": [
+   "Vênus exaltada em Peixes dá amor generoso e sensibilidade artística refinada. A pessoa ama de forma idealista e às vezes pouco prática.",
+   "Saturno em Capricórnio, seu próprio signo, dá persistência e capacidade de construir estruturas duradouras.",
+   "Vênus forte em ângulo (Malavya Yoga) dá charme, gosto refinado e facilidade para atrair conforto e boas parcerias."
+  ],
+  "Fase atual": "De 2009 a 2027, a pessoa vive a fase de Rahu (18 anos): ambição, desejo de novidade e caminhos pouco convencionais. Crescimento rápido, com risco de perder o chão.",
+  "Lua e nakshatra": "A Lua está em Capricórnio, na nakshatra Uttara Ashadha (pada 3, regida por Sol, deidade Vishvadevas). Lua em Uttara Ashadha dá senso ético firme e vitórias que vêm devagar, mas ficam. A pessoa sustenta princípios mesmo quando custa caro no curto prazo."
+ },
+ "texto_ia": null
+}

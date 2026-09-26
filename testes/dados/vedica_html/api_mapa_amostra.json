@@ -1,0 +1,28 @@
+{
+ "aviso_horario": null,
+ "cidade": "São Paulo, SP",
+ "fase_atual": {
+  "fim": "2027-01-17",
+  "inicio": "2009-01-17",
+  "nome": "Rahu"
+ },
+ "fuso": {
+  "nome_iana": "America/Sao_Paulo",
+  "offset_horas_na_data": -3.0
+ },
+ "lagna": {
+  "grau": 5.0,
+  "signo": "Kanya",
+  "signo_pt": "Virgem"
+ },
+ "lua": {
+  "nakshatra": {
+   "nome": "Uttara Ashadha",
+   "pada": 3
+  },
+  "signo_pt": "Capricórnio"
+ },
+ "lua_texto": "A Lua está em Capricórnio, na nakshatra Uttara Ashadha (pada 3, regida por Sol, deidade Vishvadevas). Lua em Uttara Ashadha dá senso ético firme e vitórias que vêm devagar, mas ficam. A pessoa sustenta princípios mesmo quando custa caro no curto prazo.",
+ "nivel": "amostra",
+ "nome": "Ana"
+}

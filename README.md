@@ -7,6 +7,14 @@ Site com dois produtos de astrologia védica (Jyotish), em modelo **freemium** (
 
 Visual "Lótus à meia-luz" (full dark), com design system compartilhado (`static/base.css`).
 
+## Duas versões: védica e ocidental
+
+O mesmo código serve duas versões do site. **Para trocar a versão que está no ar:
+na Render, abra o serviço → Environment, mude `PADMINI_SISTEMA` para `ocidental`
+(ou de volta para `vedica`) e salve.** Não precisa de deploy. Sem a variável, fica
+`vedica`. Links de relatórios já comprados continuam abrindo na versão comprada.
+Detalhes em `sistema.py` e no `CLAUDE.md`.
+
 ## Rotas
 
 Páginas: `/` (home), `/mapa`, `/compatibilidade`, `/lista` (lista de espera), `/privacidade`, `/termos`.
@@ -24,6 +32,7 @@ Roda no Render (https://padmini.com.br), ligado ao GitHub: cada `git push` na `m
 |---|---|
 | `ANTHROPIC_API_KEY` | Texto por IA (opcional; o botão de IA só aparece se existir) |
 | `PADMINI_MODELO` | Trocar o modelo (padrão `claude-sonnet-5`) |
+| `PADMINI_SISTEMA` | Versão no ar: `vedica` (padrão) ou `ocidental`. Trocar = mudar aqui e salvar |
 | `PADMINI_SECRET` | **Obrigatório em produção** — assina os tokens do completo |
 | `PADMINI_MODO_ABERTO` | `1` libera o completo sem token. **Só em staging — NUNCA em produção** |
 | `PADMINI_SITE_URL` | Base dos links de entrega (padrão `https://padmini.com.br`) |

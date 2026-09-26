@@ -24,6 +24,7 @@ import urllib.parse
 import acesso
 import entrega
 import ofertas
+import sistema as _sistema
 
 CATEGORIA_LABEL = {
     "excepcional": "Excepcional",
@@ -52,9 +53,9 @@ def empacotar_sck(produto: str, dados: dict) -> str:
     return ""
 
 
-def link_checkout(produto: str, dados: dict | None, campanha: str) -> str:
+def link_checkout(produto: str, dados: dict | None, campanha: str, sistema: str = "vedica") -> str:
     """Checkout da Cakto com os dados de nascimento no `sck` e utm de e-mail."""
-    base = ofertas.checkout(produto)
+    base = ofertas.checkout(produto, sistema)
     if not base:
         return f"{entrega.SITE_URL}/{'compatibilidade' if produto == 'compat' else 'mapa'}"
     q = {"utm_source": "email", "utm_medium": campanha, "utm_campaign": campanha}
@@ -100,11 +101,11 @@ def _botao(link: str, texto: str) -> str:
             f'display:inline-block">{_e(texto)}</a></p>')
 
 
-def _moldura(corpo: str, rodape: str = "") -> str:
+def _moldura(corpo: str, rodape: str = "", sistema: str = "vedica") -> str:
     return f"""<div style="font-family:Arial,Helvetica,sans-serif;background:#241522;color:#f4e9dc;padding:32px;border-radius:12px;max-width:520px;margin:auto">
   <p style="font-family:Georgia,serif;font-size:24px;color:#e7a24a;margin:0 0 18px">Padmini</p>
   {corpo}
-  <p style="color:#8f7a76;font-size:12px;margin-top:26px">Padmini — astrologia védica para autoconhecimento.{rodape}</p>
+  <p style="color:#8f7a76;font-size:12px;margin-top:26px">{_sistema.ASSINATURA_EMAIL[sistema]}{rodape}</p>
 </div>"""
 
 
@@ -189,31 +190,48 @@ def email_abandono_html(produto: str, nome: str, link: str, email: str) -> str:
     return _moldura(corpo, _rodape_descadastro(email))
 
 
-def bloco_venda_cruzada(produto_comprado: str, dados: dict) -> str:
+TEXTO_VENDA_CRUZADA = {
+    "vedica": {
+        "compat": ("Quer ir além do casal? O mapa individual de cada um mostra o Ascendente, os 9 planetas "
+                   "e a fase de vida de cada pessoa — R${preco}."),
+        "mapa": ("Tem alguém especial? A compatibilidade mede o encaixe de vocês dois em 8 dimensões — "
+                 "com amostra grátis."),
+        "botao_compat": "Ver a compatibilidade do casal →",
+    },
+    "ocidental": {
+        "compat": ("Quer ir além do casal? O mapa natal de cada um mostra os planetas em signos e casas, "
+                   "os aspectos e o Ascendente de cada pessoa — R${preco}."),
+        "mapa": ("Tem alguém especial? A sinastria cruza o seu mapa com o da outra pessoa em 8 dimensões — "
+                 "com amostra grátis."),
+        "botao_compat": "Ver a sinastria do casal →",
+    },
+}
+
+
+def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedica") -> str:
     """
-    Oferta do outro produto no e-mail de entrega.
+    Oferta do outro produto (da mesma versão do site) no e-mail de entrega.
       - comprou o casal → o mapa individual de cada um, com o checkout já preenchido;
       - comprou o mapa → a compatibilidade (precisa dos dados do par: vai para o site).
-    Cupom opcional: `cupom_pos_compra` da oferta em conteudo/ofertas.yaml.
+    Cupom opcional: `cupom_pos_compra` da oferta em conteudo/<versão>/ofertas.yaml.
     """
+    textos = TEXTO_VENDA_CRUZADA[sistema]
     if produto_comprado == "compat":
-        alvo = ofertas.oferta("mapa")
+        alvo = ofertas.oferta("mapa", sistema)
         if not alvo.get("checkout"):
             return ""
         botoes = "".join(
-            f'<p style="margin:10px 0"><a href="{_e(link_checkout("mapa", p, "pos_compra"))}" '
+            f'<p style="margin:10px 0"><a href="{_e(link_checkout("mapa", p, "pos_compra", sistema))}" '
             f'style="color:#e7a24a;font-weight:bold">Mapa individual de {_e(p.get("nome") or rotulo)} →</a></p>'
             for rotulo, p in (("Pessoa A", dados.get("a") or {}), ("Pessoa B", dados.get("b") or {})) if p)
-        texto = (f"Quer ir além do casal? O mapa individual de cada um mostra o Ascendente, os 9 planetas "
-                 f"e a fase de vida de cada pessoa — R${alvo.get('preco')}.")
+        texto = textos["compat"].format(preco=alvo.get("preco"))
     else:
-        alvo = ofertas.oferta("compat")
+        alvo = ofertas.oferta("compat", sistema)
         if not alvo.get("checkout"):
             return ""
         botoes = (f'<p style="margin:10px 0"><a href="{_e(link_site("compat", "pos_compra"))}" '
-                  f'style="color:#e7a24a;font-weight:bold">Ver a compatibilidade do casal →</a></p>')
-        texto = ("Tem alguém especial? A compatibilidade mede o encaixe de vocês dois em 8 dimensões — "
-                 "com amostra grátis.")
+                  f'style="color:#e7a24a;font-weight:bold">{textos["botao_compat"]}</a></p>')
+        texto = textos["mapa"]
     cupom = str(alvo.get("cupom_pos_compra") or "").strip()
     if cupom:
         texto += f' Use o cupom <b>{_e(cupom)}</b> no checkout.'
