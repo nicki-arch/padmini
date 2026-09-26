@@ -1,0 +1,380 @@
+# Aspectos entre os planetas pessoais (Sol, Lua, Mercúrio, Vênus, Marte), com
+# texto próprio. Rascunho; revisar e trocar `revisado` para true (ver LEIA.md).
+#
+# Só existem os aspectos que o céu permite: Mercúrio nunca se afasta mais de
+# ~28° do Sol e Vênus, ~47°. Por isso Sol–Mercúrio e Sol–Vênus só têm
+# conjunção, e Mercúrio–Vênus só conjunção e sextil. (Há teste conferindo que
+# todo aspecto que o motor encontra entre pessoais tem texto aqui.)
+
+sol-lua:
+  conjuncao:
+    revisado: false
+    texto: >-
+      O Sol e a Lua juntos no seu mapa (você nasceu perto da Lua nova) indicam
+      alguém em que vontade e sentimento andam na mesma direção. Quando você
+      quer algo, quer por inteiro, sem conflito interno. Isso dá foco e
+      sinceridade. O ponto de atenção é enxergar a situação só do seu ângulo:
+      como razão e emoção concordam, pode faltar o contraponto. Pedir a opinião
+      de alguém diferente antes de decisões importantes completa a visão.
+  sextil:
+    revisado: false
+    texto: >-
+      O sextil entre o Sol e a Lua mostra uma boa conversa entre o que você
+      quer e o que você sente. Você tende a conseguir conciliar trabalho e vida
+      pessoal, razão e emoção, sem grandes brigas internas. As pessoas percebem
+      em você uma coerência tranquila. Esse aspecto é uma oportunidade: rende
+      mais quando você a usa de propósito, por exemplo reservando tempo para os
+      afetos no meio de uma fase de muito trabalho.
+  quadratura:
+    revisado: false
+    texto: >-
+      A quadratura entre o Sol e a Lua indica uma tensão entre o que você quer
+      conquistar e o que você precisa para se sentir bem. Você pode, por
+      exemplo, aceitar um desafio profissional e depois sentir falta de casa,
+      ou o contrário. Essa fricção gera movimento e muita energia para
+      realizar. O caminho não é escolher um lado, mas negociar: perguntar, a
+      cada decisão, o que a sua ambição e o seu coração precisam para
+      caminharem juntos.
+  trigono:
+    revisado: false
+    texto: >-
+      O trígono entre o Sol e a Lua indica harmonia natural entre vontade e
+      emoção. Você tende a se sentir à vontade consigo mesmo e passa aos outros
+      uma segurança tranquila. Muitas coisas fluem sem grande esforço interno.
+      O ponto de atenção é justamente o conforto: sem atrito, você pode se
+      acomodar. Escolher desafios de propósito — algo que te tire da zona
+      conhecida — faz esse equilíbrio virar crescimento.
+  oposicao:
+    revisado: false
+    texto: >-
+      A oposição entre o Sol e a Lua (você nasceu perto da Lua cheia) mostra
+      dois polos que se puxam: o que você quer fora e o que você precisa
+      dentro, você e o outro. Você tende a perceber muito bem os dois lados de
+      uma situação e a buscar equilíbrio nas relações. O desafio é não oscilar
+      entre extremos. Reconhecer as duas necessidades como legítimas, e dar
+      espaço a cada uma na semana, reduz o cabo de guerra.
+
+sol-mercurio:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com o Sol junto de Mercúrio, você pensa e se identifica com as próprias
+      ideias. Falar, escrever e aprender são parte central de quem você é, e
+      você costuma comunicar com convicção. O ponto de atenção é a dificuldade
+      de separar a sua opinião da sua pessoa: uma crítica à ideia pode soar
+      como crítica a você. Lembrar que mudar de ideia é sinal de inteligência,
+      e não de fraqueza, deixa suas conversas mais livres.
+
+sol-venus:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com o Sol junto de Vênus, você tem um charme natural e um senso estético
+      forte. As pessoas tendem a gostar da sua companhia, e você valoriza
+      harmonia, beleza e boas relações. Afeto e identidade andam juntos: você
+      se sente você quando está amando ou criando algo bonito. O ponto de
+      atenção é evitar conflitos para ser querido. Um desacordo dito com
+      gentileza também faz parte de relações harmoniosas.
+
+sol-marte:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com o Sol junto de Marte, você tem energia de sobra e vontade de agir. É
+      corajoso, competitivo e gosta de desafios; quando decide, parte para a
+      ação. Isso faz de você alguém que realiza. O ponto de atenção é a
+      impaciência e a irritação quando as coisas não andam no seu ritmo. Um
+      esporte ou uma atividade física regular ajuda a usar essa força sem
+      atrito com quem está ao redor.
+  sextil:
+    revisado: false
+    texto: >-
+      O sextil entre o Sol e Marte dá a você uma energia bem dirigida. Você
+      costuma saber o que quer e ter disposição para ir atrás, sem precisar de
+      conflito para se mover. Iniciativas práticas, esportes e projetos com
+      prazo são terreno fértil. Esse aspecto rende quando você aproveita as
+      oportunidades: dizer sim a um desafio que aparece, em vez de esperar o
+      momento perfeito.
+  quadratura:
+    revisado: false
+    texto: >-
+      A quadratura entre o Sol e Marte indica muita energia com algum atrito.
+      Você pode reagir forte quando se sente desafiado ou entrar em disputas
+      que não precisava. Por outro lado, tem uma força enorme para superar
+      obstáculos. O segredo é escolher o alvo: canalizar essa garra para metas
+      difíceis, esportes ou causas, e não para brigas do dia a dia. Contar até
+      dez funciona melhor do que parece.
+  trigono:
+    revisado: false
+    texto: >-
+      O trígono entre o Sol e Marte mostra coragem e energia que fluem com
+      naturalidade. Você tende a agir com confiança, liderar sem esforço e se
+      recuperar rápido de reveses. As pessoas se animam com a sua disposição.
+      O ponto de atenção é contar demais com essa facilidade e não treinar a
+      persistência. Projetos de longo prazo, com etapas, ensinam a sua
+      energia a durar além do primeiro impulso.
+  oposicao:
+    revisado: false
+    texto: >-
+      A oposição entre o Sol e Marte costuma aparecer nas relações: você pode
+      atrair pessoas competitivas ou sentir que precisa se afirmar diante dos
+      outros. Há muita energia em jogo, e ela pode virar parceria ou disputa.
+      Aprender a negociar — defender o seu ponto sem precisar derrotar o do
+      outro — transforma esse aspecto em uma grande capacidade de trabalhar
+      em dupla e de lidar com conflitos.
+
+lua-mercurio:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com a Lua junto de Mercúrio, você pensa com o coração e sente com a
+      cabeça. Você fala facilmente sobre emoções, tem memória para conversas e
+      percebe o clima das palavras. Isso te faz um bom ouvinte e um bom
+      conselheiro. O ponto de atenção é o humor afetar o raciocínio: num dia
+      triste, tudo parece pior. Esperar o dia seguinte para decisões
+      importantes, quando está abalado, costuma ajudar.
+  sextil:
+    revisado: false
+    texto: >-
+      O sextil entre a Lua e Mercúrio mostra facilidade para colocar
+      sentimentos em palavras. Você consegue explicar o que sente sem drama
+      e entender os outros com sensibilidade. Conversas difíceis tendem a
+      sair melhor com você: é comum ser chamado para explicar a um parente o
+      que o outro quis dizer. Esse talento cresce com o uso: escrever,
+      conversar abertamente com quem ama e mediar conflitos na família são
+      jeitos de aproveitá-lo.
+  quadratura:
+    revisado: false
+    texto: >-
+      A quadratura entre a Lua e Mercúrio indica atrito entre o que você sente
+      e o que você pensa. Você pode dizer algo e sentir o contrário, ou
+      remoer uma conversa por dias. Também pode ser muito perspicaz, porque
+      enxerga as contradições. Ajuda separar os momentos: primeiro sentir, sem
+      analisar; depois pensar, com calma. Escrever o que sente antes de uma
+      conversa difícil organiza as duas coisas.
+  trigono:
+    revisado: false
+    texto: >-
+      O trígono entre a Lua e Mercúrio mostra harmonia entre razão e emoção.
+      Você tende a se comunicar com naturalidade e empatia, tem boa memória e
+      facilidade para aprender o que desperta interesse. As pessoas se sentem
+      compreendidas quando falam com você. O ponto de atenção é usar essa
+      facilidade só em conversas confortáveis. Levá-la também para as
+      conversas difíceis é onde ela mais vale.
+  oposicao:
+    revisado: false
+    texto: >-
+      A oposição entre a Lua e Mercúrio mostra uma oscilação entre o lado
+      emocional e o racional, muitas vezes percebida nas relações: você pode
+      achar que o outro não entende o que você sente, ou que só você está
+      sendo lógico. Essa tensão te dá a capacidade de ver os dois lados. O
+      exercício é ouvir até o fim antes de responder e dizer como se sente,
+      além do que pensa.
+
+lua-venus:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com a Lua junto de Vênus, você é afetuoso e busca harmonia. Você gosta de
+      conforto, de beleza e de gente querida por perto, e tende a ser gentil
+      mesmo sob pressão. Criar um ambiente acolhedor é um dom seu. O ponto de
+      atenção é evitar conflitos a ponto de engolir o que sente, ou buscar
+      conforto em excessos. Dizer o que te incomoda com a mesma doçura com que
+      você elogia mantém as relações verdadeiras.
+  sextil:
+    revisado: false
+    texto: >-
+      O sextil entre a Lua e Vênus mostra facilidade para dar e receber afeto.
+      Você tende a ter boas amizades, relações carinhosas e senso de beleza no
+      cotidiano. As pessoas se sentem bem na sua presença. Esse aspecto
+      floresce quando você cultiva de propósito: um encontro marcado com
+      amigos, um presente sem motivo, um cuidado com a casa que deixa todos à
+      vontade.
+  quadratura:
+    revisado: false
+    texto: >-
+      A quadratura entre a Lua e Vênus indica que o que você precisa
+      emocionalmente e o que você deseja no amor nem sempre combinam. Você pode
+      se encantar por quem não oferece segurança, ou sentir que dá mais do que
+      recebe. Isso também te torna sensível às nuances do afeto. Perguntar a si
+      mesmo "o que me faz sentir seguro?" e "o que me encanta?", e buscar
+      alguém que atenda aos dois, ajuda muito.
+  trigono:
+    revisado: false
+    texto: >-
+      O trígono entre a Lua e Vênus mostra uma natureza afetuosa e
+      harmoniosa. Você tende a se sentir bem nas relações, tem gosto para
+      beleza e conforto e cria um clima agradável aonde vai. O ponto de
+      atenção é esperar que tudo seja sempre leve e evitar o esforço que as
+      relações às vezes pedem. Encarar as fases difíceis com a mesma ternura
+      aprofunda os vínculos que você cultiva.
+  oposicao:
+    revisado: false
+    texto: >-
+      A oposição entre a Lua e Vênus mostra uma tensão entre suas necessidades
+      e as do outro nas relações. Você pode alternar entre cuidar demais e
+      querer ser cuidado, ou sentir que precisa escolher entre agradar e se
+      proteger. Esse aspecto te dá sensibilidade para a dinâmica dos casais. O
+      equilíbrio vem de combinados claros: o que cada um oferece e o que cada
+      um precisa receber.
+
+lua-marte:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com a Lua junto de Marte, suas emoções são intensas e rápidas. Você reage
+      com força, protege quem ama com garra e não fica parado quando algo te
+      incomoda. Há coragem emocional aqui. O ponto de atenção é o pavio curto:
+      a irritação pode sair antes que você perceba. Identificar os sinais no
+      corpo — calor, mandíbula tensa — e fazer uma pausa antes de responder
+      evita discussões que você depois lamentaria.
+  sextil:
+    revisado: false
+    texto: >-
+      O sextil entre a Lua e Marte mostra coragem para agir sobre o que você
+      sente. Quando algo te incomoda, você tende a resolver de forma direta e
+      prática, sem guardar mágoa. Você tem disposição e energia para proteger
+      quem ama. Esse aspecto rende quando você transforma emoção em
+      atitude: uma conversa franca, uma mudança de rotina, uma atividade física
+      nos dias pesados.
+  quadratura:
+    revisado: false
+    texto: >-
+      A quadratura entre a Lua e Marte indica emoções que esquentam fácil. Você
+      pode reagir forte a situações que mexem com a sua segurança, e depois
+      se arrepender do tom. Ao mesmo tempo, tem uma energia enorme para
+      defender o que importa. Encontrar uma válvula de escape — esporte,
+      dança, trabalho manual — e combinar com quem convive com você um tempo
+      para esfriar antes de conversar faz muita diferença.
+  trigono:
+    revisado: false
+    texto: >-
+      O trígono entre a Lua e Marte mostra emoções que se transformam
+      naturalmente em ação. Você tende a ter disposição, coragem para defender
+      o que sente e uma resiliência rápida depois de aborrecimentos. As pessoas
+      se sentem protegidas perto de você. O ponto de atenção é agir sem
+      checar se o outro queria ajuda. Perguntar "posso ajudar?" antes de
+      resolver tudo mostra respeito pelo tempo alheio.
+  oposicao:
+    revisado: false
+    texto: >-
+      A oposição entre a Lua e Marte costuma aparecer nas relações próximas:
+      você pode sentir que o outro te provoca, ou alternar entre se recolher e
+      explodir. Há muita energia emocional em jogo. Esse aspecto ensina a
+      reconhecer a própria raiva antes que ela apareça no outro. Dizer "isso
+      me chateou" no começo, com calma, evita que a tensão se acumule até
+      virar briga.
+
+mercurio-venus:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com Mercúrio junto de Vênus, você fala com charme. Você tem jeito com as
+      palavras, sabe elogiar, escreve com leveza e tende a ter talento para
+      arte, poesia ou diplomacia. Conversas com você costumam ser agradáveis.
+      O ponto de atenção é suavizar tanto a mensagem que ela perde a clareza.
+      Em assuntos importantes, dizer o essencial primeiro e o gentil depois
+      garante que a sua delicadeza não esconda o recado.
+  sextil:
+    revisado: false
+    texto: >-
+      O sextil entre Mercúrio e Vênus mostra facilidade para se comunicar
+      com gentileza e bom gosto. Você tende a negociar bem, a escrever de
+      forma agradável e a ter senso estético no que produz. Relações se
+      fortalecem pela conversa, e você costuma saber o elogio certo na hora
+      certa. Aproveitar esse talento de propósito — numa carta, numa
+      apresentação, num acordo delicado — é onde ele brilha.
+
+mercurio-marte:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com Mercúrio junto de Marte, sua mente é rápida e combativa. Você pensa
+      depressa, fala com firmeza e adora um bom debate. É ótimo para
+      argumentar, defender ideias e decidir sob pressão. O ponto de atenção é a
+      palavra afiada que machuca sem querer, ou discutir para vencer. Perguntar
+      "estou querendo entender ou ganhar?" no meio da discussão muda o rumo da
+      conversa.
+  sextil:
+    revisado: false
+    texto: >-
+      O sextil entre Mercúrio e Marte mostra uma mente ágil e prática. Você
+      transforma ideias em ação com facilidade, argumenta bem e resolve
+      problemas rápido. Tem talento para planejar e executar: sai de uma
+      reunião já com a lista de próximos passos. Esse aspecto rende quando
+      você o usa de forma consciente: em projetos que pedem decisão rápida,
+      em negociações e em qualquer tarefa que junte cabeça e mão.
+  quadratura:
+    revisado: false
+    texto: >-
+      A quadratura entre Mercúrio e Marte indica uma mente inquieta e uma
+      língua rápida. Você pode se irritar em discussões, interromper ou dizer
+      coisas das quais se arrepende. Também tem uma capacidade crítica afiada
+      e coragem para falar o que ninguém fala. Reler as mensagens antes de
+      enviar e esperar o outro terminar de falar são ajustes simples que
+      transformam a sua franqueza em força.
+  trigono:
+    revisado: false
+    texto: >-
+      O trígono entre Mercúrio e Marte mostra um raciocínio rápido e decidido.
+      Você tende a pensar com clareza sob pressão, a argumentar com
+      convicção e a executar o que planeja. Aprender coisas práticas é fácil
+      para você. O ponto de atenção é a pressa em concluir. Deixar espaço para
+      a dúvida, antes de fechar uma opinião, torna as suas decisões ainda mais
+      certeiras.
+  oposicao:
+    revisado: false
+    texto: >-
+      A oposição entre Mercúrio e Marte costuma aparecer em debates: você pode
+      atrair discussões ou sentir que precisa defender as suas ideias contra os
+      outros. Há energia mental de sobra. O exercício é transformar o debate em
+      diálogo — ouvir o argumento do outro até o fim e responder à ideia, e
+      não à pessoa. Com isso, sua capacidade de argumentar vira um talento
+      para negociar.
+
+venus-marte:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Com Vênus junto de Marte, desejo e afeto andam de mãos dadas. Você tem
+      um magnetismo forte, vive o amor com paixão e toma iniciativa na
+      conquista. Criatividade e sensualidade também se misturam. O ponto de
+      atenção é a intensidade que vira impulsividade nas relações — começar
+      algo no calor do momento. Deixar a paixão amadurecer alguns encontros
+      antes de grandes decisões preserva o encanto.
+  sextil:
+    revisado: false
+    texto: >-
+      O sextil entre Vênus e Marte mostra equilíbrio entre dar e receber,
+      entre conquistar e se deixar conquistar. Você tende a ter charme, bom
+      humor na paquera e facilidade para criar relações vivas, em que
+      carinho e desejo convivem sem briga. Quem está com você costuma se
+      sentir admirado e querido ao mesmo tempo. Esse aspecto rende quando
+      você toma a iniciativa: um convite, uma surpresa, um programa novo a
+      dois mantêm a chama acesa.
+  quadratura:
+    revisado: false
+    texto: >-
+      A quadratura entre Vênus e Marte indica tensão entre o que você deseja e
+      o que você valoriza no amor. Você pode se atrair por quem desafia você ou
+      viver relações com química forte e algum atrito. Essa energia gera
+      paixão e criatividade. Conversar sobre expectativas — o ritmo de cada
+      um, o que é romântico para cada um — ajuda a transformar faísca em
+      fogo que aquece.
+  trigono:
+    revisado: false
+    texto: >-
+      O trígono entre Vênus e Marte mostra harmonia entre desejo e afeto. Você
+      tende a ter charme natural, facilidade para se relacionar e uma vida
+      amorosa com química e carinho ao mesmo tempo. Também costuma ter talento
+      artístico. O ponto de atenção é esperar que tudo aconteça sem esforço.
+      Cultivar a relação com gestos concretos mantém esse encaixe vivo com o
+      tempo.
+  oposicao:
+    revisado: false
+    texto: >-
+      A oposição entre Vênus e Marte traz uma atração forte pelos opostos. Você
+      pode sentir o desejo puxando para um lado e o afeto para outro, ou atrair
+      parceiros muito diferentes de você. Há muita química aqui. O equilíbrio
+      vem de reconhecer as duas necessidades — ser desejado e ser cuidado — e
+      falar delas abertamente com quem está do seu lado.
