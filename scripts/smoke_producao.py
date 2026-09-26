@@ -125,6 +125,73 @@ def _():
     return f"relatório completo por <b>R${preco}</b>".encode() in req("/compatibilidade")[1]
 
 
+# ---------------------------------------------------------------------------
+# YAML = Cakto. A checagem acima só garante site = YAML; esta fecha o ciclo:
+# o preço anunciado precisa estar entre os valores que o checkout mostra.
+# Foi o bug de 26/set/2026: o site dizia R$97 (com R$127 riscado) e a oferta
+# cobrava R$127 — o cupom que o site repassava ia só como utm_term.
+# ---------------------------------------------------------------------------
+AVISOS = []
+NAVEGADOR = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+             "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
+
+
+def valores_do_checkout(html: str) -> set:
+    """Valores em reais que a página do checkout mostra ('R$ 127,00' → 127).
+    Ignora os de um dígito: são o chamariz de parcelamento ("6x de R$ 9,99")
+    ou centavos soltos, nunca o preço de uma oferta nossa."""
+    import re
+    texto = html.replace("&nbsp;", " ").replace("\u00a0", " ").replace("\xa0", " ")
+    valores = set()
+    for inteiro in re.findall(r"R\$\s?(\d{1,3}(?:\.\d{3})*),\d{2}", texto):
+        n = int(inteiro.replace(".", ""))
+        if n >= 10:
+            valores.add(n)
+    return valores
+
+
+def conferir_precos_na_cakto(ofertas: dict, baixar=None) -> list:
+    """Para cada oferta com `checkout`, confere que `preco` aparece no checkout.
+    Devolve a lista de falhas (texto). Cakto fora do ar = aviso, não falha."""
+    def _baixar(url):
+        r = urllib.request.Request(url, headers={"User-Agent": NAVEGADOR,
+                                                 "Accept-Language": "pt-BR,pt;q=0.9"})
+        with urllib.request.urlopen(r, timeout=45) as resp:
+            return resp.read().decode("utf-8", "replace")
+    baixar = baixar or _baixar
+    falhas = []
+    for chave, oferta in ofertas.items():
+        url, preco = str(oferta.get("checkout") or ""), oferta.get("preco")
+        if not url or not preco:
+            continue
+        try:
+            valores = valores_do_checkout(baixar(url))
+        except Exception as e:  # noqa: BLE001
+            AVISOS.append(f"checkout de '{chave}' não respondeu ({e}); preço não conferido")
+            continue
+        if not valores:
+            AVISOS.append(f"checkout de '{chave}' não mostrou nenhum valor; preço não conferido")
+        elif int(preco) not in valores:
+            falhas.append(f"'{chave}': site anuncia R${preco}, checkout mostra "
+                          + ", ".join(f"R${v}" for v in sorted(valores)))
+    return falhas
+
+
+def _ofertas_do_yaml() -> dict:
+    import pathlib
+    import yaml
+    raiz = pathlib.Path(__file__).resolve().parents[1]
+    return yaml.safe_load((raiz / "conteudo" / "ofertas.yaml").read_text(encoding="utf-8")) or {}
+
+
+@checar("preço do ofertas.yaml bate com o que a Cakto cobra")
+def _():
+    falhas = conferir_precos_na_cakto(_ofertas_do_yaml())
+    for f in falhas:
+        print("      ", f)
+    return not falhas
+
+
 def main():
     # o plano grátis "dorme": a primeira chamada acorda o servidor
     for _ in range(3):
@@ -141,6 +208,8 @@ def main():
             ok, nome = False, f"{nome} ({e})"
         print(("OK   " if ok else "FALHA"), nome)
         falhas += not ok
+    for aviso in AVISOS:
+        print("AVISO", aviso)
     print(f"\n{len(CHECAGENS) - falhas}/{len(CHECAGENS)} checagens OK em {BASE}")
     sys.exit(1 if falhas else 0)
 

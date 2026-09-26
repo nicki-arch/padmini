@@ -355,7 +355,7 @@ function desenharAmostra(d) {
   const ctaHref = LINK_CHECKOUT
     ? linkCheckout(LINK_CHECKOUT, ultimoCasal ? { produto: "compat", a: ultimoCasal.a, b: ultimoCasal.b } : null)
     : "#";
-  const ctaNota = LINK_CHECKOUT ? "Preço de fundador por tempo limitado · garantia de 7 dias." : "Checkout da Cakto a configurar (checklist §D).";
+  const ctaNota = LINK_CHECKOUT ? "{% if ofertas.compat.preco_de %}Preço de fundador por tempo limitado · garantia{% else %}Garantia{% endif %} de 7 dias." : "Checkout da Cakto a configurar (checklist §D).";
 
   $("#resultado").innerHTML = `
     <div>

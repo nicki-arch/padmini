@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#241522">
 <title>Padmini — Lista de espera</title>
-<meta name="description" content="Astrologia védica para casais e para você. Entre na lista de espera e receba o aviso da abertura com o preço de fundador.">
+<meta name="description" content="Astrologia védica para casais e para você. Entre na lista de espera e receba o aviso da abertura{% if ofertas.compat.preco_de %} com o preço de fundador{% endif %}.">
 <link rel="canonical" href="https://padmini.com.br/lista">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Padmini">
 <meta property="og:title" content="A compatibilidade de vocês dois, pela astrologia védica">
-<meta property="og:description" content="Estamos abrindo. Entre na lista e garanta o preço de fundador.">
+<meta property="og:description" content="Estamos abrindo. Entre na lista e {% if ofertas.compat.preco_de %}garanta o preço de fundador{% else %}seja avisado primeiro{% endif %}.">
 <meta property="og:image" content="https://padmini.com.br/static/og-home.png">
 <meta property="og:url" content="https://padmini.com.br/lista">
 <meta name="twitter:card" content="summary_large_image">
@@ -71,13 +71,13 @@
     <p class="eyebrow">Astrologia védica · lista de espera</p>
     <p class="data-abertura" id="data-abertura" hidden></p>
     <h1>O que o mapa de vocês <em>dois</em> revela, está quase abrindo.</h1>
-    <p class="lede">A compatibilidade do casal em 8 dimensões e o seu mapa védico completo, calculados um a um pela tradição do Jyotish. Entre na lista e seja avisado primeiro, com preço de fundador.</p>
+    <p class="lede">A compatibilidade do casal em 8 dimensões e o seu mapa védico completo, calculados um a um pela tradição do Jyotish. Entre na lista e seja avisado primeiro{% if ofertas.compat.preco_de %}, com preço de fundador{% endif %}.</p>
   </section>
 
   <div class="grade">
     <ul class="beneficios" aria-label="O que você ganha entrando na lista">
       <li><span class="ic" aria-hidden="true">1</span><div><b>Aviso no dia da abertura</b><span>Você fica sabendo antes de todo mundo, por e-mail (e pelo WhatsApp, se quiser).</span></div></li>
-      <li><span class="ic" aria-hidden="true">2</span><div><b>Preço de fundador</b><span>Compatibilidade do casal por <span class="preco-fundador">R${{ ofertas.compat.preco }}</span> <s>R${{ ofertas.compat.preco_de }}</s>, só para quem está na lista e por tempo limitado.</span></div></li>
+      {% if ofertas.compat.preco_de %}<li><span class="ic" aria-hidden="true">2</span><div><b>Preço de fundador</b><span>Compatibilidade do casal por <span class="preco-fundador">R${{ ofertas.compat.preco }}</span> <s>R${{ ofertas.compat.preco_de }}</s>, só para quem está na lista e por tempo limitado.</span></div></li>{% else %}<li><span class="ic" aria-hidden="true">2</span><div><b>Preço claro, sem surpresa</b><span>Compatibilidade do casal por <span class="preco-fundador">R${{ ofertas.compat.preco }}</span> e mapa individual por R${{ ofertas.mapa.preco }}: o valor que aparece aqui é o que se paga.</span></div></li>{% endif %}
       <li><span class="ic" aria-hidden="true">3</span><div><b>Amostra grátis, como sempre</b><span>Você vê a nota de vocês e o essencial antes de decidir qualquer coisa.</span></div></li>
     </ul>
 
@@ -101,7 +101,7 @@
           <label><input type="radio" name="interesse" value="mapa"><span>Meu mapa</span></label>
           <label><input type="radio" name="interesse" value="ambos"><span>Os dois</span></label>
         </fieldset>
-        <label class="check"><input type="checkbox" id="aceita-email" required><span>Quero receber por e-mail o aviso da abertura e o preço de fundador.</span></label>
+        <label class="check"><input type="checkbox" id="aceita-email" required><span>Quero receber por e-mail o aviso da abertura{% if ofertas.compat.preco_de %} e o preço de fundador{% endif %}.</span></label>
         <label class="check desligado" id="linha-zap"><input type="checkbox" id="aceita-whatsapp" disabled><span>Também quero o aviso pelo WhatsApp.</span></label>
         <div class="hp" aria-hidden="true"><label for="site">Não preencha</label><input id="site" name="site" tabindex="-1" autocomplete="off"></div>
         <p class="erro" id="erro" role="alert" hidden></p>
