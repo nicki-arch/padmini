@@ -4,11 +4,12 @@
    link do checkout. Same-origin: o sessionStorage sobrevive à navegação entre
    as páginas do site, então basta capturar uma vez ao entrar.
 
-   IMPORTANTE: ajustar PARAM_AFILIADO para o nome de parâmetro que a Cakto usa
-   no checkout (ex.: "ref", "afiliado", "aff"). Confirmar na conta da Cakto.
+   Não usamos o programa de afiliados da Cakto: quem identifica a origem de uma
+   venda é o CUPOM (ex.: ?cupom=PEDRO) e os utm_*, que a Cakto repassa ao
+   webhook. `ref` é só mais um rótulo de campanha nosso, dobrado em utm_*.
    ========================================================================== */
 (function () {
-  var PARAM_AFILIADO = "ref"; // <-- ajustar quando tivermos o checkout da Cakto
+  var PARAM_AFILIADO = "ref"; // rótulo de campanha nosso (não é parâmetro da Cakto)
   var CHAVES = [PARAM_AFILIADO, "cupom", "coupon",
     "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
 
@@ -107,7 +108,8 @@
     }
     var cupom = attr.cupom || attr.coupon;
     if (cupom && !repassar.utm_term) repassar.utm_term = cupom;
-    if (cupom && opcoes && opcoes.aplicarCupom) extra.coupon = cupom;
+    // a Cakto grava o código em minúsculas; mandamos sempre assim
+    if (cupom && opcoes && opcoes.aplicarCupom) extra.coupon = String(cupom).trim().toLowerCase();
     var todos = Object.assign({}, repassar, extra);
     var keys = Object.keys(todos);
     if (!keys.length) return base;

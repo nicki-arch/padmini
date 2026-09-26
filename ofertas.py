@@ -19,6 +19,7 @@ troca. As funções abaixo recebem `sistema`; sem ele, valem para a védica (o
 comportamento de antes da Fase 0.5).
 """
 
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 import yaml
@@ -34,6 +35,25 @@ def _codigo_da_oferta(checkout: str) -> str:
     return ultimo.split("_")[0]
 
 
+def com_desconto(preco, percentual) -> float:
+    """127 com 24% → 96.52 (centavos arredondados meio-para-cima, como dinheiro)."""
+    valor = Decimal(str(preco)) * (Decimal(100) - Decimal(str(percentual))) / Decimal(100)
+    return float(valor.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
+def moeda(valor) -> str:
+    """Formato brasileiro, sem o "R$": 127 → '127'; 96.52 → '96,52'; 1297 → '1.297'.
+    O ÚNICO jeito de escrever preço (páginas, e-mails, PDF): nunca "96.52"."""
+    if valor is None or valor == "":
+        return ""
+    v = Decimal(str(valor)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    inteiro, centavos = divmod(abs(v), 1)
+    texto = f"{int(inteiro):,}".replace(",", ".")
+    if centavos:
+        texto += "," + f"{centavos:.2f}"[2:]
+    return ("-" if v < 0 else "") + texto
+
+
 def arquivo(sistema: str) -> Path:
     return PASTA / sistema / "ofertas.yaml"
 
@@ -46,7 +66,11 @@ def _carregar(sistema: str) -> dict:
         # sempre definido (None = sem desconto): os templates usam StrictUndefined,
         # e `{% if ofertas.compat.preco_de %}` com a chave ausente seria erro.
         oferta.setdefault("preco_de", None)
-        oferta.setdefault("preco_cupom", None)  # preço com cupom de afiliado (só a ocidental usa)
+        # Preço com cupom (só a ocidental usa): CALCULADO do percentual, que é o que
+        # a Cakto aceita — escrever o valor à mão já divergiu (R$97 × R$96,52).
+        pct = oferta.get("cupom_percentual")
+        oferta["preco_cupom"] = com_desconto(oferta["preco"], pct) if pct and oferta.get("preco") else None
+        oferta["cupom_codigos"] = [str(c).strip().lower() for c in oferta.get("cupom_codigos") or [] if str(c).strip()]
         de, por = oferta.get("preco_de"), oferta.get("preco")
         if de and por and de > por:
             oferta["economia"] = de - por

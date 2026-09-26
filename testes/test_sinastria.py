@@ -179,14 +179,14 @@ def test_pagina_do_casal_ocidental(ocidental):
     assert "/api/ocidental/sinastria" in html and "Índice Padmini" in html and "método próprio" in html
     assert "védic" not in html.lower() and "Guna" not in html and "पद्मिनी" not in html
     assert ".cardc::after{content:none}" in html  # base.css desenha "पद्मिनी" no card
-    # R$127 por padrão; R$97 só existe como preço com cupom (do YAML)
+    # R$127 por padrão; o preço com cupom (R$96,52) só para quem chega com cupom válido
     assert f"relatório completo por <b id=\"preco-nota\">R${ofertas.preco('compat', 'ocidental')}</b>" in html
-    assert f'const PRECO_CUPOM = "{ofertas.oferta("compat", "ocidental")["preco_cupom"]}";' in html
+    assert 'const PRECO_CUPOM = "96,52";' in html and 'const CUPONS = ["pedro"];' in html
 
 
 def test_precos_do_casal_ocidental_no_yaml():
     o = ofertas.oferta("compat", "ocidental")
-    assert o["preco"] == 127 and o["preco_cupom"] == 97
+    assert o["preco"] == 127 and o["cupom_percentual"] == 24 and o["preco_cupom"] == 96.52
 
 
 def test_home_e_lista_ocidentais(ocidental):
@@ -198,10 +198,11 @@ def test_home_e_lista_ocidentais(ocidental):
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="node não instalado")
-@pytest.mark.parametrize("opcoes,esperado", [("undefined", None), ("{aplicarCupom:true}", "PEDRO30")])
+@pytest.mark.parametrize("opcoes,esperado", [("undefined", None), ("{aplicarCupom:true}", "pedro30")])
 def test_cupom_so_vai_para_a_cakto_quando_a_pagina_pede(opcoes, esperado):
     """A védica (sem opção) continua igual: o cupom vai só como utm_term. A
-    ocidental passa `coupon=`, que a Cakto aplica no checkout."""
+    ocidental passa `coupon=` em minúsculas (como a Cakto grava), que a Cakto
+    aplica no checkout."""
     js = (
         "global.location={search:'?cupom=PEDRO30',origin:'https://padmini.teste'};"
         "const st={};global.sessionStorage={getItem(k){return st[k]??null},setItem(k,v){st[k]=v}};global.window=global;"

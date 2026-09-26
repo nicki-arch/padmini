@@ -53,9 +53,6 @@ import pytest  # noqa: E402
 from test_app import app_mod, cliente  # noqa: E402
 
 SEM_REDE = ("preço do ofertas.yaml bate", "cabeçalhos de segurança")
-# Com a ocidental no ar e sem links de checkout (hoje), os botões ficam "em breve":
-# o smoke acusa — é exatamente o bloqueio que precisa sumir antes da virada.
-SO_COM_LINKS = ("botões de compra",)
 
 
 def _req_local(caminho, corpo=None, timeout=90):
@@ -73,9 +70,6 @@ def test_smoke_passa_no_app_local(versao, monkeypatch):
         for nome, f in smoke.CHECAGENS:
             if any(t in nome for t in SEM_REDE):
                 continue
-            if versao == "ocidental" and any(t in nome for t in SO_COM_LINKS):
-                assert not f(), f"{nome}: deveria acusar a falta de link de checkout"
-                continue
             if not f():
                 falhas.append(nome)
     finally:
@@ -87,3 +81,49 @@ def test_smoke_cobre_os_4_produtos():
     nomes = " ".join(n for n, _ in smoke.CHECAGENS)
     for trecho in ("amostras dos 4 produtos", "completos e PDFs dos 4 produtos", "numerologia e tarot"):
         assert trecho in nomes
+
+
+# ---------------------------------------------------------------------------
+# Rodada 3: cupom em % (a Cakto só aceita % inteiro) e o combo como order bump.
+# Trechos no formato do checkout real da sinastria (conferido em 26/set/2026).
+# ---------------------------------------------------------------------------
+SINASTRIA = ("<p>R$&nbsp;127,00 à vista</p><h2>SIM, QUERO O MAPA DE CADA UM</h2><p>R$&nbsp;40,00</p>"
+             "<p>Taxa de serviço R$&nbsp;0,99</p>")
+SINASTRIA_CUPOM = ("<p>R$&nbsp;127,00</p><p>R$&nbsp;96,52à vista</p><p>R$&nbsp;40,00</p>"
+                   "<p>pedro</p><p>Desconto (24%)-R$&nbsp;30,48</p>")
+OFERTAS_R3 = {
+    "compat": {"preco": 127, "cupom_percentual": 24, "cupom_codigos": ["pedro"],
+               "checkout": "https://pay.cakto.com.br/hrf7qtu_1141270"},
+    "bump_mapas_casal": {"preco": 167, "bump_de": "compat", "checkout": "https://pay.cakto.com.br/32vnvwx_1144252"},
+}
+
+
+def _cakto(com_cupom, sem_cupom=SINASTRIA):
+    def baixar(url):
+        assert "32vnvwx" not in url  # o bump não tem checkout próprio: nunca é aberto
+        return com_cupom if "coupon=pedro" in url else sem_cupom
+    return baixar
+
+
+def test_cupom_e_bump_conferem_com_a_cakto():
+    smoke.AVISOS.clear()
+    assert smoke.conferir_precos_na_cakto(OFERTAS_R3, baixar=_cakto(SINASTRIA_CUPOM)) == []
+    assert smoke.AVISOS == []
+
+
+def test_cupom_com_outro_percentual_reprova():
+    outro = SINASTRIA_CUPOM.replace("96,52", "101,60").replace("24%", "20%")
+    falhas = smoke.conferir_precos_na_cakto(OFERTAS_R3, baixar=_cakto(outro))
+    assert len(falhas) == 1 and "R$96,52" in falhas[0] and "20%" in falhas[0]
+
+
+def test_cupom_que_so_aparece_no_navegador_e_aviso():
+    smoke.AVISOS.clear()
+    assert smoke.conferir_precos_na_cakto(OFERTAS_R3, baixar=_cakto(SINASTRIA)) == []
+    assert any("cupom 'pedro'" in a for a in smoke.AVISOS)
+
+
+def test_bump_com_outro_valor_reprova():
+    falhas = smoke.conferir_precos_na_cakto(
+        OFERTAS_R3, baixar=_cakto(SINASTRIA_CUPOM.replace("40,00", "50,00"), SINASTRIA.replace("40,00", "50,00")))
+    assert any("bump_mapas_casal" in f and "R$40" in f for f in falhas)

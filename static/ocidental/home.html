@@ -131,31 +131,31 @@
       <div class="prod anchor">
         <span class="plab">{{ t.produtos.compat.etiqueta }}</span>
         <h3>{{ t.produtos.compat.titulo }}</h3>
-        {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco }} <small>R${{ ofertas.compat.preco_de }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
-        <p class="peco">Você economiza R${{ ofertas.compat.economia }}</p>
-        {% else %}<div class="pprice">R${{ ofertas.compat.preco }}</div>
+        {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco | moeda }} <small>R${{ ofertas.compat.preco_de | moeda }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
+        <p class="peco">Você economiza R${{ ofertas.compat.economia | moeda }}</p>
+        {% else %}<div class="pprice">R${{ ofertas.compat.preco | moeda }}</div>
         {% endif %}        <p>{{ t.produtos.compat.texto }}</p>
-        {% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco }}</p>{% endif %}
+        {% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco | moeda }}</p>{% endif %}
         <a class="btn btn-primary" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
       </div>
       <div class="prod">
         <span class="plab">{{ t.produtos.mapa.etiqueta }}</span>
         <h3>{{ t.produtos.mapa.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.mapa.preco }}</div>
+        <div class="pprice">R${{ ofertas.mapa.preco | moeda }}</div>
         <p>{{ t.produtos.mapa.texto }}</p>
         <a class="btn btn-outline" href="/mapa">{{ t.produtos.mapa.botao }}</a>
       </div>
       <div class="prod">
         <span class="plab">{{ t.produtos.numerologia.etiqueta }}</span>
         <h3>{{ t.produtos.numerologia.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.numerologia.preco }}</div>
+        <div class="pprice">R${{ ofertas.numerologia.preco | moeda }}</div>
         <p>{{ t.produtos.numerologia.texto }}</p>
         <a class="btn btn-outline" href="/numerologia">{{ t.produtos.numerologia.botao }}</a>
       </div>
       <div class="prod">
         <span class="plab">{{ t.produtos.tarot.etiqueta }}</span>
         <h3>{{ t.produtos.tarot.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.tarot.preco }}</div>
+        <div class="pprice">R${{ ofertas.tarot.preco | moeda }}</div>
         <p>{{ t.produtos.tarot.texto }}</p>
         <a class="btn btn-outline" href="/tarot">{{ t.produtos.tarot.botao }}</a>
       </div>

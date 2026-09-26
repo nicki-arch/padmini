@@ -40,7 +40,7 @@
   .posicao .rotulo-pos{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600}
   .posicao .frase{color:var(--ink-soft);font-size:15px;margin:0;max-width:26ch}
   .carta{width:100%;max-width:170px;aspect-ratio:3/5;border-radius:12px;background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid rgba(231,162,74,.45);box-shadow:0 0 0 5px var(--surface),0 0 0 6px var(--line);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 10px;box-sizing:border-box;animation:virar .5s ease both}
-  .carta .num{font-family:var(--serif);font-size:22px;color:var(--accent);line-height:1}
+  .carta .num{font-family:var(--serif);font-size:22px;color:var(--accent);line-height:1;min-height:1em}
   .carta svg{width:56%;height:auto}
   .carta .nome{font-family:var(--serif);font-size:19px;line-height:1.15;color:var(--ink)}
   .tiragem .posicao:nth-child(2) .carta{animation-delay:.15s}
@@ -99,7 +99,7 @@
 
   <section id="sobre">
     <h2>O que vem na leitura completa</h2>
-    <p class="sub">As cartas e uma frase de cada são grátis. A leitura completa (R${{ ofertas.tarot.preco }}) abre o resto.</p>
+    <p class="sub">As cartas e uma frase de cada são grátis. A leitura completa (R${{ ofertas.tarot.preco | moeda }}) abre o resto.</p>
     <ul class="lista-completo">
       <li>A leitura de cada carta na sua posição: Situação, Desafio e Conselho</li>
       <li>A leitura de conjunto: o que as três cartas dizem juntas</li>
@@ -116,7 +116,7 @@
 
 <script>
 const LINK_CHECKOUT = "{{ ofertas.tarot.checkout }}";
-const PRECO = "{{ ofertas.tarot.preco }}";
+const PRECO = "{{ ofertas.tarot.preco | moeda }}";
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const CHAVE_PERGUNTA = "pad_tarot_pergunta";

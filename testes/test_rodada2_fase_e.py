@@ -106,6 +106,10 @@ def test_venda_cruzada_do_casal_tem_os_mapas_e_a_numerologia(ocidental_com_links
     assert "Mapa natal de Ana" in bloco and "Mapa natal de Rui" in bloco and "/numerologia?" in bloco
 
 
-def test_sem_links_nao_ha_venda_cruzada_ocidental():
+def test_sem_links_nao_ha_venda_cruzada_ocidental(monkeypatch):
+    novas = json.loads(json.dumps(ofertas.POR_SISTEMA["ocidental"]))
+    for o in novas.values():
+        o["checkout"] = ""
+    monkeypatch.setitem(ofertas.POR_SISTEMA, "ocidental", novas)
     for produto in ("mapa", "compat", "numerologia", "tarot"):
         assert marketing.bloco_venda_cruzada(produto, {}, "ocidental") == ""

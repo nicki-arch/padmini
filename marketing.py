@@ -151,7 +151,7 @@ def _resumo_amostra(produto: str, amostra: dict) -> str:
 
 
 def email_amostra_html(produto: str, amostra: dict, dados: dict, email: str, nome: str = "") -> str:
-    preco = ofertas.preco(produto)
+    preco = ofertas.moeda(ofertas.oferta(produto).get("preco"))
     oque = ("as 8 dimensões com a nota de cada uma, os pontos de atenção clássicos e como "
             "fazer a relação funcionar" if produto == "compat" else
             "o mapa inteiro, os 9 planetas casa a casa, as 12 casas, as fases da vida e o PDF")
@@ -229,7 +229,7 @@ def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedi
             f'<p style="margin:10px 0"><a href="{_e(link_checkout("mapa", p, "pos_compra", sistema))}" '
             f'style="color:#e7a24a;font-weight:bold">Mapa individual de {_e(p.get("nome") or rotulo)} →</a></p>'
             for rotulo, p in (("Pessoa A", dados.get("a") or {}), ("Pessoa B", dados.get("b") or {})) if p)
-        texto = textos["compat"].format(preco=alvo.get("preco"))
+        texto = textos["compat"].format(preco=ofertas.moeda(alvo.get("preco")))
     else:
         alvo = ofertas.oferta("compat", sistema)
         if not alvo.get("checkout"):
@@ -267,7 +267,7 @@ def _venda_cruzada_ocidental(produto_comprado: str, dados: dict) -> str:
         # o mapa natal de cada um, com o checkout já preenchido (como na védica)
         alvo = ofertas.oferta("mapa", sistema)
         if alvo.get("checkout"):
-            linhas.append(_p(TEXTO_VENDA_CRUZADA[sistema]["compat"].format(preco=alvo.get("preco")),
+            linhas.append(_p(TEXTO_VENDA_CRUZADA[sistema]["compat"].format(preco=ofertas.moeda(alvo.get("preco"))),
                              "margin:0 0 6px;color:#c9b1a6"))
             linhas += [f'<p style="margin:10px 0"><a href="{_e(link_checkout("mapa", p, "pos_compra", sistema))}" '
                        f'style="color:#e7a24a;font-weight:bold">Mapa natal de {_e(p.get("nome") or rotulo)} →</a></p>'
@@ -281,7 +281,7 @@ def _venda_cruzada_ocidental(produto_comprado: str, dados: dict) -> str:
             titulo, texto = TEXTO_OUTRO_PRODUTO[k]
             linhas.append(f'<p style="margin:10px 0"><a href="{_e(link_site(k, "pos_compra"))}" '
                           f'style="color:#e7a24a;font-weight:bold">{titulo} →</a>'
-                          f'<br><span style="color:#c9b1a6;font-size:13px">{texto} · R${_e(o.get("preco"))}</span></p>')
+                          f'<br><span style="color:#c9b1a6;font-size:13px">{texto} · R${_e(ofertas.moeda(o.get("preco")))}</span></p>')
     if not linhas:
         return ""
     return '<div style="border-top:1px solid #4a3346;margin-top:26px;padding-top:18px">' + "".join(linhas) + "</div>"

@@ -213,31 +213,76 @@ def valores_do_checkout(html: str) -> set:
     return valores
 
 
+def _ofertas_py():
+    """ofertas.py do repositório (moeda e cálculo do cupom: a mesma conta do site)."""
+    import pathlib
+    raiz = str(pathlib.Path(__file__).resolve().parents[1])
+    if raiz not in sys.path:
+        sys.path.insert(0, raiz)
+    import ofertas
+    return ofertas
+
+
 def conferir_precos_na_cakto(ofertas: dict, baixar=None) -> list:
     """Para cada oferta com `checkout`, confere que `preco` aparece no checkout.
-    Devolve a lista de falhas (texto). Cakto fora do ar = aviso, não falha."""
+    Devolve a lista de falhas (texto). Cakto fora do ar = aviso, não falha.
+
+    - Order bump (`bump_de: compat`): não tem checkout próprio; o acréscimo
+      (preço do combo − preço de tabela da oferta-mãe) tem de aparecer no
+      checkout da oferta-mãe.
+    - Cupom (`cupom_percentual` + `cupom_codigos`): abre o checkout com
+      `?coupon=<código>`. Se a Cakto mostrar o desconto ("Desconto (24%)"), o
+      percentual e o preço com cupom (R$96,52) têm de ser os nossos; se a página
+      não trouxer o desconto (a Cakto pode aplicá-lo só no navegador), é aviso."""
+    import re
+
     def _baixar(url):
         r = urllib.request.Request(url, headers={"User-Agent": NAVEGADOR,
                                                  "Accept-Language": "pt-BR,pt;q=0.9"})
         with urllib.request.urlopen(r, timeout=45) as resp:
             return resp.read().decode("utf-8", "replace")
     baixar = baixar or _baixar
+    op = _ofertas_py()
     falhas = []
     for chave, oferta in ofertas.items():
-        url, preco = str(oferta.get("checkout") or ""), oferta.get("preco")
-        if not url or not preco:
+        mae = ofertas.get(oferta.get("bump_de") or "") or {}
+        url = str((mae if mae else oferta).get("checkout") or "")
+        preco = oferta.get("preco")
+        esperado = preco - mae["preco"] if mae and preco else preco
+        if not url or not preco or not oferta.get("checkout"):
             continue
         try:
-            valores = valores_do_checkout(baixar(url))
+            html = baixar(url)
+            valores = valores_do_checkout(html)
         except Exception as e:  # noqa: BLE001
             AVISOS.append(f"checkout de '{chave}' não respondeu ({e}); preço não conferido")
             continue
         if not valores:
             AVISOS.append(f"checkout de '{chave}' não mostrou nenhum valor; preço não conferido")
-        elif int(preco) not in valores:
-            falhas.append(f"'{chave}': site anuncia R${preco}, checkout mostra "
-                          + ", ".join(f"R${v}" for v in sorted(valores)))
+        elif int(esperado) not in valores:
+            falhas.append(f"'{chave}': site anuncia R${op.moeda(esperado)}"
+                          + (f" (bump no checkout de '{oferta['bump_de']}')" if mae else "")
+                          + ", checkout mostra " + ", ".join(f"R${v}" for v in sorted(valores)))
+        pct = oferta.get("cupom_percentual")
+        for codigo in [str(c).strip().lower() for c in oferta.get("cupom_codigos") or []] if pct else []:
+            com_cupom = op.moeda(op.com_desconto(preco, pct))
+            try:
+                texto = _normalizar(baixar(url + ("&" if "?" in url else "?") + "coupon=" + codigo))
+            except Exception as e:  # noqa: BLE001
+                AVISOS.append(f"checkout de '{chave}' com cupom '{codigo}' não respondeu ({e})")
+                continue
+            desconto = re.search(r"Desconto\s*\((\d+)%\)", texto)
+            if not desconto:
+                AVISOS.append(f"checkout de '{chave}' com cupom '{codigo}' não mostrou o desconto; "
+                              f"R${com_cupom} não conferido")
+            elif int(desconto.group(1)) != int(pct) or not re.search(rf"R\$\s?{re.escape(com_cupom)}(?!\d)", texto):
+                falhas.append(f"'{chave}' com cupom '{codigo}': site anuncia R${com_cupom} ({pct}%), checkout "
+                              f"mostra desconto de {desconto.group(1)}%")
     return falhas
+
+
+def _normalizar(html: str) -> str:
+    return html.replace("&nbsp;", " ").replace("\u00a0", " ").replace("\xa0", " ")
 
 
 @checar("preço do ofertas.yaml bate com o que a Cakto cobra (as duas versões)")

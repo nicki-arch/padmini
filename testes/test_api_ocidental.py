@@ -109,7 +109,10 @@ def test_pagina_do_mapa_na_versao_ocidental(versao):
     assert f"R${ofertas.preco('mapa', 'ocidental')}" in html
 
 
-def test_sem_checkout_o_botao_fica_em_breve(versao):
+def test_sem_checkout_o_botao_fica_em_breve(versao, monkeypatch):
+    novas = json.loads(json.dumps(ofertas.POR_SISTEMA["ocidental"]))
+    novas["mapa"]["checkout"] = ""
+    monkeypatch.setitem(ofertas.POR_SISTEMA, "ocidental", novas)
     versao("ocidental")
     assert ofertas.checkout("mapa", "ocidental") == ""
     html = cliente.get("/mapa").text

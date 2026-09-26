@@ -330,6 +330,8 @@ def _cartas(p: PedidoTarot) -> list[dict]:
     import tarot
     try:
         return tarot.cartas_da_tiragem(p.tiragem)
+    except tarot.SemSegredo:
+        raise HTTPException(503, "O tarot está indisponível no momento.")
     except ValueError as e:
         raise HTTPException(422, str(e))
 
@@ -339,7 +341,10 @@ def tarot_tirar(request: Request):
     """Sorteia no servidor (gerador criptográfico) e devolve o ID + a amostra."""
     import tarot
     limites.exigir(limites.CALCULO, request)
-    tiragem = tarot.tirar()
+    try:
+        tiragem = tarot.tirar()
+    except tarot.SemSegredo:  # falha fechada: sem segredo não há sorteio
+        raise HTTPException(503, "O tarot está indisponível no momento.")
     return {"nivel": "amostra", "sistema": VERSAO, "tiragem": tiragem,
             **mt.montar_tarot(tarot.cartas_da_tiragem(tiragem), "amostra")}
 

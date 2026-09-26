@@ -278,3 +278,32 @@ def test_sck_do_front_e_lido_pelo_back():
     sck = subprocess.run(["node", "-e", js], capture_output=True, text=True, check=True).stdout
     pd = cakto.coletar_pd({"data": {"sck": sck}})
     assert cakto.dados_nascimento(pd, "tarot") == {"tiragem": dados["tiragem"]}
+
+
+# ------------------------------------------------------------------ sem segredo (regra 4)
+def test_sem_segredo_o_tarot_recusa_tudo(monkeypatch):
+    """Sem PADMINI_SECRET não há selo: nada de sortear nem de abrir tiragem com
+    uma chave conhecida ("padmini-sem-segredo" era o que acontecia antes)."""
+    valida = tarot.tirar()
+    monkeypatch.setattr(acesso, "SEGREDO", "")
+    with pytest.raises(tarot.SemSegredo):
+        tarot.tirar()
+    with pytest.raises(tarot.SemSegredo):
+        tarot.cartas_da_tiragem(valida)
+    assert cliente.post("/api/ocidental/tarot/tirar").status_code == 503
+    assert cliente.post("/api/ocidental/tarot", json={"tiragem": valida}).status_code == 503
+    # uma tiragem selada com a chave antiga e conhecida também não passa
+    import hashlib
+    import hmac as _hmac
+    corpo = bytes([0, 1, 2]) + b"\0" * 5
+    selo = _hmac.new(b"padmini-sem-segredo", b"tarot|" + corpo, hashlib.sha256).digest()[:4]
+    forjada = base64.urlsafe_b64encode(corpo + selo).decode().rstrip("=")
+    assert cliente.post("/api/ocidental/tarot", json={"tiragem": forjada}).status_code == 503
+
+
+def test_figuras_nao_repetem_o_nome_no_rotulo():
+    figuras = [c for c in tarot.CARTAS if c["arcano"] == "menor" and c["numero"] > 10]
+    assert len(figuras) == 16 and all(c["rotulo"] == "" for c in figuras)
+    assert next(c for c in tarot.CARTAS if c["chave"] == "as_de_copas")["rotulo"] == "A"
+    assert next(c for c in tarot.CARTAS if c["chave"] == "dez_de_ouros")["rotulo"] == "10"
+    assert tarot.CARTAS[21]["rotulo"] == "XXI"

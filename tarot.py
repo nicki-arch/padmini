@@ -44,7 +44,9 @@ CARTAS: list[dict] = (
     [{"indice": i, "chave": c, "nome": n, "arcano": "maior", "numero": i, "rotulo": ROMANOS[i], "naipe": None}
      for i, (c, n) in enumerate(_MAIORES)]
     + [{"indice": 22 + 14 * j + k, "chave": f"{fc}_de_{nc}", "nome": f"{fn} de {nn}", "arcano": "menor",
-        "numero": k + 1, "rotulo": ("A" if k == 0 else str(k + 1)) if k < 10 else fn, "naipe": nc}
+        # figuras (Valete, Cavaleiro, Rainha, Rei): sem rótulo em cima, como no
+        # baralho impresso — o nome já está embaixo e repeti-lo poluía a carta
+        "numero": k + 1, "rotulo": ("A" if k == 0 else str(k + 1)) if k < 10 else "", "naipe": nc}
        for j, (nc, nn) in enumerate(NAIPES) for k, (fc, fn) in enumerate(_FIGURAS)]
 )
 assert len(CARTAS) == 78 and [c["indice"] for c in CARTAS] == list(range(78))
@@ -52,9 +54,15 @@ assert len(CARTAS) == 78 and [c["indice"] for c in CARTAS] == list(range(78))
 _TAM_NONCE, _TAM_SELO = 5, 4
 
 
+class SemSegredo(RuntimeError):
+    """PADMINI_SECRET não configurado: sem ele não há selo, e o tarot recusa tudo
+    (falha fechada, regra 4) em vez de assinar com uma chave que qualquer um conhece."""
+
+
 def _selo(corpo: bytes) -> bytes:
-    chave = (acesso.SEGREDO or "padmini-sem-segredo").encode("utf-8")
-    return hmac.new(chave, b"tarot|" + corpo, hashlib.sha256).digest()[:_TAM_SELO]
+    if not acesso.SEGREDO:
+        raise SemSegredo("PADMINI_SECRET não configurado — o tarot não sorteia nem abre tiragens.")
+    return hmac.new(acesso.SEGREDO.encode("utf-8"), b"tarot|" + corpo, hashlib.sha256).digest()[:_TAM_SELO]
 
 
 def tirar() -> str:
@@ -66,7 +74,8 @@ def tirar() -> str:
 
 def cartas_da_tiragem(tiragem: str) -> list[dict]:
     """As 3 cartas (na ordem Situação, Desafio, Conselho). ValueError se o ID não
-    foi emitido por nós (selo errado) ou está corrompido."""
+    foi emitido por nós (selo errado) ou está corrompido; SemSegredo se o servidor
+    não tem PADMINI_SECRET (aí nenhuma tiragem é aceita)."""
     try:
         bruto = base64.urlsafe_b64decode(str(tiragem) + "=" * (-len(str(tiragem)) % 4))
     except Exception:
