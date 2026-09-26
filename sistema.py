@@ -60,16 +60,16 @@ PAGINAS = {
         "/lista": ("lista.html", "lista"),
     },
     "ocidental": {
-        "/": ("ocidental/em-construcao.html", "home"),
-        "/mapa": ("ocidental/em-construcao.html", "home"),
-        "/compatibilidade": ("ocidental/em-construcao.html", "home"),
-        "/lista": ("ocidental/em-construcao.html", "home"),
+        "/": ("ocidental/home.html", "home"),
+        "/mapa": ("ocidental/mapa.html", "mapa"),
+        "/compatibilidade": ("ocidental/compatibilidade.html", "compatibilidade"),
+        "/lista": ("ocidental/lista.html", "lista"),
     },
 }
 
 # Página do modo live (/live). A védica é servida como arquivo puro, como
 # sempre foi; as outras são templates.
-LIVE = {"vedica": "live.html", "ocidental": "ocidental/em-construcao.html"}
+LIVE = {"vedica": "live.html", "ocidental": "ocidental/live.html"}
 
 # Linha de assinatura dos e-mails (entrega e marketing).
 ASSINATURA_EMAIL = {

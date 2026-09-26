@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#241522">
+<title>{{ t.seo.titulo }}</title>
+<meta name="description" content="{{ t.seo.descricao }}">
+<link rel="canonical" href="https://padmini.com.br/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Padmini">
+<meta property="og:title" content="{{ t.seo.og_titulo }}">
+<meta property="og:description" content="{{ t.seo.og_descricao }}">
+<meta property="og:image" content="https://padmini.com.br/static/og-home.png">
+<meta property="og:url" content="https://padmini.com.br/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<script src="/static/afiliado.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 5c3 4 4 8 0 14-4-6-3-10 0-14z' fill='%23e7a24a'/><path d='M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z' fill='%23e2a89d'/></svg>">
+<style>
+  /* específico da home (landing) — o resto vem de base.css */
+  .hero{padding-block:64px 40px}
+  h1{font-size:clamp(2.6rem,6.5vw,4.4rem);line-height:1.03}
+  h2{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.1}
+  .passos{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:p}
+  .passo{background:var(--ground-2);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .passo::before{counter-increment:p;content:counter(p);font-family:var(--serif);font-size:1.6rem;color:var(--saffron);display:block;margin-bottom:8px}
+  .passo p{margin:6px 0 0;color:var(--muted);font-size:14.5px}
+  .produtos{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
+  .prod{border:1px solid var(--line);border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:8px;background:var(--ground-2)}
+  .prod.anchor{background:linear-gradient(180deg,var(--ground-3),var(--ground-2));border-color:rgba(231,162,74,.38);box-shadow:0 20px 50px -26px rgba(0,0,0,.6)}
+  .prod .plab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--saffron)}
+  .prod .pprice{font-family:var(--serif);font-size:2.2rem;line-height:1;font-weight:500;margin:2px 0 2px}
+  .prod .pprice small{font-size:1rem;color:var(--muted);text-decoration:line-through;text-decoration-thickness:1.5px;margin-left:8px;font-family:var(--sans)}
+  .prod .poff{display:inline-block;margin-left:8px;padding:3px 8px;border-radius:999px;font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.03em;background:var(--saffron);color:var(--on-accent);vertical-align:middle}
+  .prod .peco{font-family:var(--sans);font-size:12.5px;color:var(--sage);margin:2px 0 0;font-weight:600}
+  .prod p{color:var(--muted);font-size:14.5px;margin:0}
+  .prod .btn{margin-top:auto}
+  .anchor2{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;background:var(--ground-2);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .badge{flex:none;width:54px;height:54px;border-radius:50%;background:var(--ground-3);display:grid;place-items:center}
+  @media(max-width:640px){.passos,.produtos{grid-template-columns:1fr}section{padding-block:44px}}
+  .cardc::after{content:none} /* o base.css desenha a marca em sânscrito no card */
+</style>
+</head>
+<body>
+{# Home da versão OCIDENTAL. Texto: conteudo/ocidental/home.yaml (variável `t`), inclusive o <head>.
+   Preço: conteudo/ocidental/ofertas.yaml. A home com os quatro produtos vem na Fase 5. #}
+<header class="wrap">
+  <div class="topbar">
+    <a class="marca" href="/">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 5c3 4 4 8 0 14-4-6-3-10 0-14z" fill="#e7a24a"/><path d="M4 14c5 0 9 3 12 7-5 2-10 0-12-7zM28 14c-5 0-9 3-12 7 5 2 10 0 12-7z" fill="#e2a89d"/></svg>
+      Padmini
+    </a>
+    <nav>
+      <a class="navlink" href="/compatibilidade">{{ t.menu.compatibilidade }}</a>
+      <a class="navlink" href="/mapa">{{ t.menu.mapa }}</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <p class="eyebrow">{{ t.hero.eyebrow }}</p>
+    <h1>{{ t.hero.titulo }}</h1>
+    <p class="lede">{{ t.hero.lede }}</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/compatibilidade">{{ t.hero.botao_principal }}</a>
+      <a class="btn btn-outline" href="/mapa">{{ t.hero.botao_secundario }}</a>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="wrap">
+    <h2>{{ t.como_funciona.titulo }}</h2>
+    <p class="sub">{{ t.como_funciona.sub }}</p>
+    <div class="passos">
+      {%- for passo in t.como_funciona.passos %}
+      <div class="passo"><h3>{{ passo.titulo }}</h3><p>{{ passo.texto }}</p></div>
+      {%- endfor %}
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="wrap">
+    <h2>{{ t.dimensoes.titulo }}</h2>
+    <p class="sub">{{ t.dimensoes.sub }}</p>
+    <div class="dims">
+      {%- for d in t.dimensoes.itens %}
+      <div class="dim"><svg class="dico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ d.icone }}</svg><div class="dn">{{ d.nome }}</div><div class="dt">{{ d.titulo }}</div><div class="dd">{{ d.texto }}</div></div>
+      {%- endfor %}
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="wrap">
+    <div class="share">
+      <div class="cardc">
+        <div class="top">
+          <span class="wm">padmini</span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e7a24a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 21c-4.5-1.5-8-4.5-8-8 2.5 0 4.5 1 6 2.5"/><path d="M12 21c4.5-1.5 8-4.5 8-8-2.5 0-4.5 1-6 2.5"/><path d="M12 21c-2-2-3-4.5-3-7.5 0-3 1.5-5.5 3-7.5 1.5 2 3 4.5 3 7.5 0 3-1 5.5-3 7.5Z"/>
+          </svg>
+        </div>
+        <div class="who">{{ t.card_exemplo.casal }}</div>
+        <div class="score">{{ t.card_exemplo.nota }}<span> / {{ t.card_exemplo.total }}</span></div>
+        <div class="scorelab">{{ t.card_exemplo.rotulo }}</div>
+        <div class="bar"><i style="width:{{ t.card_exemplo.barra_percentual }}%"></i></div>
+        <div class="insight">{{ t.card_exemplo.frase }}</div>
+      </div>
+    </div>
+    <p class="sub" style="text-align:center;margin:22px auto 0;max-width:44ch">{{ t.card_exemplo.legenda }}</p>
+  </section>
+
+  <hr class="rule">
+
+  <section class="wrap">
+    <h2>{{ t.produtos.titulo }}</h2>
+    <p class="sub">{{ t.produtos.sub }}</p>
+    <div class="produtos">
+      <div class="prod anchor">
+        <span class="plab">{{ t.produtos.compat.etiqueta }}</span>
+        <h3>{{ t.produtos.compat.titulo }}</h3>
+        {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco }} <small>R${{ ofertas.compat.preco_de }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
+        <p class="peco">Você economiza R${{ ofertas.compat.economia }}</p>
+        {% else %}<div class="pprice">R${{ ofertas.compat.preco }}</div>
+        {% endif %}        <p>{{ t.produtos.compat.texto }}</p>
+        <a class="btn btn-primary" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
+      </div>
+      <div class="prod">
+        <span class="plab">{{ t.produtos.mapa.etiqueta }}</span>
+        <h3>{{ t.produtos.mapa.titulo }}</h3>
+        <div class="pprice">R${{ ofertas.mapa.preco }}</div>
+        <p>{{ t.produtos.mapa.texto }}</p>
+        <a class="btn btn-outline" href="/mapa">{{ t.produtos.mapa.botao }}</a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="wrap">
+    <div class="anchor2">
+      <div class="badge">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e7a24a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 21c-4.5-1.5-8-4.5-8-8 2.5 0 4.5 1 6 2.5"/><path d="M12 21c4.5-1.5 8-4.5 8-8-2.5 0-4.5 1-6 2.5"/><path d="M12 21c-2-2-3-4.5-3-7.5 0-3 1.5-5.5 3-7.5 1.5 2 3 4.5 3 7.5 0 3-1 5.5-3 7.5Z"/>
+        </svg>
+      </div>
+      <div style="flex:1 1 260px">
+        <h3>{{ t.tradicao.titulo }}</h3>
+        <p style="color:var(--muted);margin-top:6px">{{ t.tradicao.texto }}</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="wrap">
+    <h2>{{ t.faq.titulo }}</h2>
+    <div class="faq">
+      {%- for item in t.faq.itens %}
+      <details{% if loop.first %} open{% endif %}><summary>{{ item.pergunta }}</summary><p>{{ item.resposta }}</p></details>
+      {%- endfor %}
+    </div>
+  </section>
+
+  <section class="wrap" style="text-align:center;padding-top:10px">
+    <h2>{{ t.fechamento.titulo }}</h2>
+    <p style="margin:0 auto 26px;color:var(--muted)">{{ t.fechamento.sub }}</p>
+    <a class="btn btn-primary" href="/compatibilidade">{{ t.fechamento.botao }}</a>
+  </section>
+</main>
+
+<footer>
+  {{ t.rodape.linha1 }}<br>
+  {{ t.rodape.linha2 }}<br>
+  <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
+</footer>
+</body>
+</html>

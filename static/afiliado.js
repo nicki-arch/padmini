@@ -81,7 +81,10 @@
 
   // monta o link do checkout carregando os dados de nascimento (no `sck`) +
   // a atribuição de afiliado/campanha, para a Cakto repassá-los ao webhook.
-  window.linkCheckout = function (base, dados) {
+  // `opcoes.aplicarCupom` (só a versão ocidental usa): repassa o cupom do afiliado
+  // no parâmetro `coupon`, que a Cakto aplica sozinha no checkout (ajuda da Cakto,
+  // "checkout pré-preenchido"). Sem a opção, nada muda em relação a antes.
+  window.linkCheckout = function (base, dados, opcoes) {
     if (!base) return base;
     var extra = {};
     var pacote = window.padEmpacotar(dados);
@@ -100,6 +103,7 @@
     }
     var cupom = attr.cupom || attr.coupon;
     if (cupom && !repassar.utm_term) repassar.utm_term = cupom;
+    if (cupom && opcoes && opcoes.aplicarCupom) extra.coupon = cupom;
     var todos = Object.assign({}, repassar, extra);
     var keys = Object.keys(todos);
     if (!keys.length) return base;

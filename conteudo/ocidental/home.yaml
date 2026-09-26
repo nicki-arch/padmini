@@ -1,0 +1,153 @@
+# Padmini (versão OCIDENTAL) — texto da home. FONTE ÚNICA da copy desta página,
+# inclusive o <head> (título e descrição para buscador e redes).
+# Mesma estrutura do conteudo/vedica/home.yaml; o desenho está em
+# static/ocidental/home.html. Rodada 1: mapa natal + sinastria. A home com os
+# quatro produtos (mapa, casal, numerologia, tarot) é a Fase 5.
+# Preço NÃO fica aqui: conteudo/ocidental/ofertas.yaml.
+
+seo:
+  titulo: Padmini — Astrologia para autoconhecimento
+  descricao: >-
+    Seu mapa natal e a sinastria do casal: Sol, Lua, Ascendente, planetas e
+    aspectos, cruzados em 8 dimensões. Amostra grátis.
+  og_titulo: A sinastria de vocês dois — Padmini
+  og_descricao: Os dois mapas natais cruzados em 8 dimensões. Amostra grátis.
+
+menu:
+  compatibilidade: Sinastria do casal
+  mapa: Mapa natal
+
+hero:
+  eyebrow: Padmini · Astrologia para autoconhecimento
+  titulo: Onde o mapa de um toca o mapa do <em>outro</em>.
+  lede: >-
+    Não é horóscopo de signo. A sinastria cruza os mapas natais de vocês dois
+    — o Sol, a Lua, Vênus e Marte de cada um — e mostra onde o encontro flui e
+    onde pede cuidado. Vejam a amostra agora, de graça.
+  botao_principal: Ver nossa sinastria →
+  botao_secundario: Fazer meu mapa natal
+
+como_funciona:
+  titulo: Como funciona
+  sub: Três passos. Leva dois minutos.
+  passos:
+    - titulo: Os nascimentos
+      texto: Você preenche data, hora e cidade — de você, ou do casal. Sem a hora também dá.
+    - titulo: A amostra grátis
+      texto: >-
+        Na hora, o essencial do mapa — ou o índice do casal com o ponto mais
+        forte e o de atenção, num card para compartilhar.
+    - titulo: O relatório completo
+      texto: Se quiser ir fundo, o completo abre tudo e chega no seu e-mail.
+
+dimensoes:
+  titulo: As oito dimensões do casal
+  sub: >-
+    A sinastria organiza o encontro dos dois mapas em oito frentes. Cada uma
+    olha para planetas diferentes de vocês dois.
+  itens:
+    - nome: Vênus × Marte
+      titulo: Atração
+      texto: A química e o desejo entre vocês.
+      icone: '<circle cx="12" cy="12" r="3"/><path d="M3.5 12H7M17 12h3.5M5.5 10l-2 2 2 2M18.5 10l2 2-2 2"/>'
+    - nome: Lua × Lua, Sol
+      titulo: Emoções
+      texto: Como os sentimentos de um tocam os do outro.
+      icone: '<path d="M12 4c3.6 0 6.5 3.6 6.5 8S15.6 20 12 20"/><path d="M12 4C8.4 4 5.5 7.6 5.5 12S8.4 20 12 20"/><path d="M12 4v16"/>'
+    - nome: Mercúrio
+      titulo: Comunicação
+      texto: O jeito de conversar e decidir juntos.
+      icone: '<path d="M4 9.5c2.7-2 5.3-2 8 0s5.3 2 8 0"/><path d="M4 15c2.7-2 5.3-2 8 0s5.3 2 8 0"/>'
+    - nome: Vênus × Vênus, Lua
+      titulo: Afeto e valores
+      texto: O jeito de dar carinho e o que cada um valoriza.
+      icone: '<ellipse cx="12" cy="9.3" rx="4.4" ry="5"/><ellipse cx="12" cy="14.7" rx="4.4" ry="5"/>'
+    - nome: Sol × Sol, Ascendente
+      titulo: Identidade
+      texto: Como o jeito de ser de um combina com o do outro.
+      icone: '<path d="M12 3 4 20h16L12 3Z"/><path d="M8.6 13h6.8"/>'
+    - nome: Júpiter
+      titulo: Crescimento
+      texto: O quanto um faz o outro se expandir.
+      icone: '<path d="M12 3.5 14 9.6h6.2l-5 3.8 1.9 6-5.1-3.7L6.9 19.4l1.9-6-5-3.8H10L12 3.5Z"/>'
+    - nome: Saturno
+      titulo: Compromisso
+      texto: Estabilidade, responsabilidade e o longo prazo.
+      icone: '<circle cx="12" cy="6" r="2.2"/><circle cx="6.5" cy="16" r="2.2"/><circle cx="17.5" cy="16" r="2.2"/><path d="M12 8.2 7.6 14M12 8.2 16.4 14M8.7 16h6.6"/>'
+    - nome: Ascendente e casas
+      titulo: Dia a dia
+      texto: A convivência, a rotina e a parceria prática.
+      icone: '<path d="M3 12h3.4l2.3-6 3 13 2.6-9.4 1.9 4.4H21"/>'
+
+# Cartão de exemplo: ilustração, não cliente real (nomes inventados).
+card_exemplo:
+  casal: Ana &amp; Rafael
+  nota: 78
+  total: 100
+  rotulo: Índice Padmini · método próprio
+  barra_percentual: 78
+  frase: >-
+    "O ponto mais forte de vocês: emoções."
+  legenda: >-
+    Toda sinastria termina num card assim — sobre vocês dois, feito para
+    compartilhar. O índice é um método próprio da Padmini, explicado no
+    relatório.
+
+produtos:
+  titulo: Escolha por onde começar
+  sub: Os dois têm amostra grátis. Você só paga se quiser o relatório completo.
+  compat:
+    etiqueta: Para o casal
+    titulo: Sinastria
+    texto: >-
+      As 8 dimensões, os aspectos entre os planetas de vocês e os planetas de
+      um nas casas do outro.
+    botao: Ver nossa sinastria →
+  mapa:
+    etiqueta: Para você
+    titulo: Mapa natal
+    texto: >-
+      Sol, Lua e Ascendente, todos os planetas em signos e casas, os aspectos
+      e o PDF para guardar.
+    botao: Fazer meu mapa →
+
+# PENDENTE: confirmar com o Pedro o texto exato sobre a família (a versão védica
+# dizia "quarenta anos de estudo").
+tradicao:
+  titulo: Uma tradição de família
+  texto: >-
+    Astrologia estudada e praticada em família, passada adiante por quem hoje
+    conduz a leitura. Não é um app frio: é gente por trás de cada texto.
+
+faq:
+  titulo: Perguntas
+  itens:
+    - pergunta: É a mesma coisa que o horóscopo?
+      resposta: >-
+        Não. O horóscopo de jornal usa só o signo do Sol. Aqui é o mapa natal
+        inteiro — todos os planetas no momento exato do nascimento — e, no
+        casal, o cruzamento dos dois mapas.
+    - pergunta: Preciso saber a hora exata de nascimento?
+      resposta: >-
+        Quanto mais exata, melhor: a hora define o Ascendente e as casas. Sem
+        ela dá para fazer assim mesmo, e a leitura avisa o que ficou de fora.
+    - pergunta: O que é o Índice Padmini?
+      resposta: >-
+        É um método próprio nosso para resumir a sinastria num número de 0 a
+        100, somando os aspectos entre os planetas de vocês em oito dimensões.
+        A astrologia tradicional não tem uma nota única para casais — por isso
+        explicamos o método no relatório.
+    - pergunta: E se o índice der baixo?
+      resposta: >-
+        Índice baixo não condena nada. Ele mostra onde vocês são diferentes em
+        coisas que importam — e o completo explica como lidar com isso.
+
+fechamento:
+  titulo: Descubram juntos.
+  sub: Comecem pela amostra grátis. Leva dois minutos.
+  botao: Ver nossa sinastria →
+
+rodape:
+  linha1: Padmini — astrologia para autoconhecimento.
+  linha2: >-
+    O conteúdo tem fins de reflexão e não substitui aconselhamento profissional.

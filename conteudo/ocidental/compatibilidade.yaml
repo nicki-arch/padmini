@@ -1,0 +1,8 @@
+# Página da sinastria (versão ocidental). Quase toda a copy está no HTML
+# (static/ocidental/compatibilidade.html) e em textos/sinastria.yaml.
+
+card:
+  # PERGUNTA EM ABERTO (Nicolas): o card compartilhável mostra o Índice
+  # Padmini (true) ou só os nomes e o ponto mais forte (false)? O relatório
+  # sempre mostra o índice, com o método explicado.
+  mostra_indice: true

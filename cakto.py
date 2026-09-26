@@ -349,15 +349,16 @@ def e_bump_mapas_do_casal(evento: dict) -> bool:
     return OFERTA_BUMP_MAPAS in {c.split("_")[0] for c in codigos if c}
 
 
-def dados_nascimento(pd: dict, produto: str):
-    """Monta os dados de nascimento a partir dos pd_*. Retorna dict ou None se faltar o essencial."""
+def dados_nascimento(pd: dict, produto: str, exige_hora: bool = True):
+    """Monta os dados de nascimento a partir dos pd_*. Retorna dict ou None se faltar o essencial.
+    `exige_hora=False` (versão ocidental): hora vazia = "não sei a hora"."""
     def campo(nome):
         return pd.get("pd_" + nome, "")
 
     if produto == "mapa":
         d = {"nome": campo("nome"), "data": campo("data"), "hora": campo("hora"),
              "lat": campo("lat"), "lon": campo("lon"), "cidade": campo("cidade")}
-        if not (d["data"] and d["hora"] and d["lat"] and d["lon"]):
+        if not (d["data"] and (d["hora"] or not exige_hora) and d["lat"] and d["lon"]):
             return None
         return d
     if produto == "compat":
@@ -366,7 +367,7 @@ def dados_nascimento(pd: dict, produto: str):
                     "hora": pd.get(f"pd_{px}_hora", ""), "lat": pd.get(f"pd_{px}_lat", ""),
                     "lon": pd.get(f"pd_{px}_lon", ""), "cidade": pd.get(f"pd_{px}_cidade", "")}
         a, b = pessoa("a"), pessoa("b")
-        if not (a["data"] and a["hora"] and a["lat"] and a["lon"] and b["data"] and b["hora"] and b["lat"] and b["lon"]):
+        if not all(p["data"] and (p["hora"] or not exige_hora) and p["lat"] and p["lon"] for p in (a, b)):
             return None
         return {"a": a, "b": b, "nome": a["nome"]}
     return None

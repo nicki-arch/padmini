@@ -1,0 +1,294 @@
+# Peças do mapa natal ocidental. Rascunho; revisar e trocar `revisado` para
+# true (ver LEIA.md).
+#
+# 1) ASPECTOS que não estão em aspectos_pessoais.yaml (ex.: Vênus–Saturno) são
+#    montados assim:
+#       "<dinamica com os temas dos dois pontos>" + " " + "<conselho>"
+#    Exemplo (Vênus quadratura Saturno): "Neste aspecto, há atrito entre o
+#    seu jeito de amar e o seu senso de responsabilidade..." Por isso os temas
+#    começam com "o seu"/"a sua", cabem no meio de uma frase e não têm "e".
+
+temas:
+  sol: {revisado: false, texto: a sua vontade de ser quem você é}
+  lua: {revisado: false, texto: as suas emoções}
+  mercurio: {revisado: false, texto: a sua mente}
+  venus: {revisado: false, texto: o seu jeito de amar}
+  marte: {revisado: false, texto: a sua energia de ação}
+  jupiter: {revisado: false, texto: a sua confiança}
+  saturno: {revisado: false, texto: o seu senso de responsabilidade}
+  urano: {revisado: false, texto: a sua sede de liberdade}
+  netuno: {revisado: false, texto: a sua imaginação}
+  plutao: {revisado: false, texto: a sua intensidade}
+  ascendente: {revisado: false, texto: o jeito como você se apresenta}
+  meio_do_ceu: {revisado: false, texto: a sua vocação}
+
+# {a} e {b} são trocados pelos temas acima. Frases escritas para não depender
+# do gênero dos temas ("cada lado", "um lado", nunca "juntos/juntas").
+dinamica:
+  conjuncao:
+    revisado: false
+    texto: >-
+      Neste aspecto, {a} e {b} se fundem: cada lado reforça o outro, e é
+      difícil para você acionar um lado sem o outro. Quem convive com você
+      percebe essa mistura no seu jeito de ser, para o bem e para o exagero.
+  sextil:
+    revisado: false
+    texto: >-
+      Neste aspecto, há uma porta aberta entre {a} e {b}: você tende a
+      conseguir usar um lado para ajudar o outro quando decide fazer isso, como
+      quem tem uma ferramenta à mão.
+  quadratura:
+    revisado: false
+    texto: >-
+      Neste aspecto, há atrito entre {a} e {b}: um lado parece pedir o que o
+      outro não quer dar, e você pode sentir essa tensão como impaciência ou
+      insatisfação em certas fases.
+  trigono:
+    revisado: false
+    texto: >-
+      Neste aspecto, {a} e {b} fluem em harmonia: o que um lado pede, o outro
+      costuma oferecer, e muitas vezes você nem percebe o talento que isso te
+      dá.
+  oposicao:
+    revisado: false
+    texto: >-
+      Neste aspecto, {a} e {b} ficam em pratos opostos da balança: você pode
+      oscilar entre um lado e o outro, ou perceber um deles aparecendo nas
+      pessoas ao seu redor.
+
+conselho:
+  conjuncao:
+    revisado: false
+    texto: >-
+      O caminho é perceber quando essa força está a seu favor e quando está
+      exagerada, e dosar de propósito. Pedir a opinião de alguém de fora
+      ajuda a enxergar a medida.
+  sextil:
+    revisado: false
+    texto: >-
+      Essa facilidade é uma oportunidade: ela rende quando você a usa de
+      propósito, e pode passar despercebida se você não a procurar. Vale
+      perguntar, diante de um desafio, como um lado pode ajudar o outro.
+  quadratura:
+    revisado: false
+    texto: >-
+      Essa fricção não é defeito: é motor. Ela costuma virar uma das suas
+      maiores forças quando você deixa de brigar consigo mesmo e combina,
+      conscientemente, um espaço para cada lado.
+  trigono:
+    revisado: false
+    texto: >-
+      O ponto de atenção é o conforto: o que vem fácil também pode ser deixado
+      de lado. Dar a esse talento uma direção concreta faz ele crescer.
+  oposicao:
+    revisado: false
+    texto: >-
+      O equilíbrio vem de reconhecer os dois lados como seus, e dar a cada um o
+      seu momento, em vez de escolher um e esconder o outro.
+
+# 2) ELEMENTOS e MODALIDADES: o que mais aparece nos seus planetas e
+#    Ascendente, e o elemento que falta (zero ou um ponto).
+elemento_dominante:
+  fogo:
+    revisado: false
+    texto: >-
+      O elemento que mais aparece no seu mapa é o Fogo. Isso indica entusiasmo,
+      iniciativa e vontade de fazer acontecer. Você tende a se animar rápido
+      com ideias novas, a agir antes de ter todas as respostas e a inspirar
+      quem está por perto. O ponto de atenção é a energia que queima rápido:
+      começos brilhantes e finais esquecidos. Ter alguém mais paciente por
+      perto, ou uma rotina simples, ajuda o seu fogo a render.
+  terra:
+    revisado: false
+    texto: >-
+      O elemento que mais aparece no seu mapa é a Terra. Isso indica senso
+      prático, constância e gosto pelo que é concreto. Você tende a pensar
+      em como fazer, a construir aos poucos e a ser a pessoa com quem os
+      outros contam quando é preciso resolver. O ponto de atenção é a
+      resistência ao que ainda não tem forma — ideias, sonhos, mudanças. Dar
+      espaço para o improviso de vez em quando — uma viagem sem roteiro, um
+      curso fora da área — areja a rotina.
+  ar:
+    revisado: false
+    texto: >-
+      O elemento que mais aparece no seu mapa é o Ar. Isso indica curiosidade,
+      facilidade com ideias e com pessoas. Você tende a entender as situações
+      conversando, a enxergar vários pontos de vista e a conectar gente
+      diferente. O ponto de atenção é viver mais na cabeça do que no corpo e
+      nas emoções: explicar o que sente em vez de sentir. Atividades físicas e
+      momentos sem conversa ajudam a equilibrar.
+  agua:
+    revisado: false
+    texto: >-
+      O elemento que mais aparece no seu mapa é a Água. Isso indica
+      sensibilidade, intuição e profundidade emocional. Você tende a perceber o
+      que os outros sentem antes de falarem, a se ligar com intensidade e a
+      guardar memórias afetivas. O ponto de atenção é se deixar levar pelo
+      humor do ambiente ou absorver o que não é seu. Ter rotinas e limites
+      claros dá margens a essa água, sem secá-la.
+
+elemento_ausente:
+  fogo:
+    revisado: false
+    texto: >-
+      Quase não há Fogo no seu mapa. Isso não é falta de energia, mas pode
+      indicar que o entusiasmo precisa de um empurrão de fora: um amigo que
+      anima, um prazo, um objetivo claro. Você tende a pensar antes de se
+      lançar. Buscar atividades que te despertem — um esporte, um desafio — é
+      um jeito de acender essa chama.
+  terra:
+    revisado: false
+    texto: >-
+      Quase não há Terra no seu mapa. Isso pode indicar que o lado prático —
+      rotina, prazos, organização — exige mais esforço consciente de você.
+      Ideias você tem; dar forma a elas é o desafio. Ferramentas simples, como
+      listas e agendas, e pessoas práticas por perto funcionam como chão.
+  ar:
+    revisado: false
+    texto: >-
+      Quase não há Ar no seu mapa. Isso pode indicar que colocar em palavras o
+      que você sente ou vê de fora uma situação exige mais esforço. Você tende
+      a viver as coisas de dentro. Conversar, escrever ou pedir a opinião de
+      alguém de confiança ajuda a ganhar distância quando precisa decidir.
+  agua:
+    revisado: false
+    texto: >-
+      Quase não há Água no seu mapa. Isso não quer dizer falta de sentimento,
+      mas pode indicar dificuldade de reconhecer ou mostrar as emoções. Você
+      tende a resolver pela ação ou pelo raciocínio. Reservar momentos para
+      perceber o que sente — antes de resolver — aprofunda seus vínculos.
+
+modalidade_dominante:
+  cardinal:
+    revisado: false
+    texto: >-
+      A modalidade que mais aparece no seu mapa é a Cardinal: você é alguém que
+      começa. Iniciar projetos, tomar decisões e abrir caminhos é natural para
+      você, e costuma ser quem dá o primeiro passo no grupo. O ponto de atenção
+      é o que vem depois da largada: manter e terminar. Parcerias com pessoas
+      mais persistentes completam o seu estilo.
+  fixo:
+    revisado: false
+    texto: >-
+      A modalidade que mais aparece no seu mapa é a Fixa: você é alguém que
+      sustenta. Constância, lealdade e capacidade de levar as coisas até o fim
+      são marcas suas, e você não desiste fácil. O ponto de atenção é a
+      resistência a mudar quando a situação já pede outro caminho. Revisar os
+      planos de tempos em tempos mantém a firmeza sem virar teimosia.
+  mutavel:
+    revisado: false
+    texto: >-
+      A modalidade que mais aparece no seu mapa é a Mutável: você é alguém que
+      se adapta. Flexibilidade, curiosidade e facilidade para mudar de rota
+      são marcas suas, e você lida bem com o imprevisto. O ponto de atenção é
+      a dispersão: mudar tanto que nada se firma. Escolher algumas prioridades
+      fixas dá direção à sua capacidade de adaptação.
+
+# 3) REGENTE DO ASCENDENTE (regentes modernos). Entra depois do texto do
+#    signo e da casa dele: "O regente do seu Ascendente é <planeta>..."
+regente_ascendente:
+  sol:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é o Sol. Isso quer dizer que a sua
+      identidade e a sua vontade conduzem o seu jeito de viver: quando você
+      está bem consigo, tudo em volta tende a fluir. Observe a casa do Sol no
+      seu mapa — é a área da vida em que você mais se realiza.
+  lua:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é a Lua. Isso quer dizer que as suas emoções
+      e a sua necessidade de segurança conduzem o seu jeito de viver: o seu
+      humor pesa muito nas suas escolhas. Observe a casa da Lua no seu mapa — é
+      a área da vida onde você precisa se sentir em casa.
+  mercurio:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é Mercúrio. Isso quer dizer que a mente, a
+      curiosidade e a comunicação conduzem o seu jeito de viver: você entende
+      o mundo conversando, lendo e aprendendo. Observe a casa de Mercúrio no
+      seu mapa — é onde a sua inteligência mais trabalha.
+  venus:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é Vênus. Isso quer dizer que o afeto, a
+      beleza e as relações conduzem o seu jeito de viver: você se orienta pelo
+      que te dá prazer e harmonia. Observe a casa de Vênus no seu mapa — é a
+      área da vida em que você mais busca equilíbrio.
+  marte:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é Marte. Isso quer dizer que a ação, a
+      coragem e o desejo conduzem o seu jeito de viver: você se descobre
+      fazendo. Observe a casa de Marte no seu mapa — é a área da vida em que
+      você mais põe energia e onde as batalhas importantes acontecem.
+  jupiter:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é Júpiter. Isso quer dizer que o crescimento,
+      o otimismo e a busca de sentido conduzem o seu jeito de viver: você
+      precisa de horizonte. Observe a casa de Júpiter no seu mapa — é a área da
+      vida em que você mais se expande.
+  saturno:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é Saturno. Isso quer dizer que a
+      responsabilidade, a estrutura e o tempo conduzem o seu jeito de viver:
+      você constrói devagar e com firmeza. Observe a casa de Saturno no seu
+      mapa — é a área da vida em que você mais amadurece.
+  urano:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é Urano. Isso quer dizer que a liberdade, a
+      originalidade e a mudança conduzem o seu jeito de viver: você precisa
+      fazer do seu jeito. Observe a casa de Urano no seu mapa — é a área da
+      vida em que você mais inova e onde as surpresas aparecem.
+  netuno:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é Netuno. Isso quer dizer que a imaginação, a
+      sensibilidade e a empatia conduzem o seu jeito de viver: você se orienta
+      pela intuição. Observe a casa de Netuno no seu mapa — é a área da vida em
+      que você mais sonha, e onde vale checar a realidade.
+  plutao:
+    revisado: false
+    texto: >-
+      O regente do seu Ascendente é Plutão. Isso quer dizer que a intensidade
+      e a capacidade de transformação conduzem o seu jeito de viver: você não
+      faz nada pela metade. Observe a casa de Plutão no seu mapa — é a área da
+      vida em que você passa pelas mudanças mais profundas.
+
+# 4) AVISOS e textos fixos
+avisos:
+  sem_hora:
+    revisado: false
+    texto: >-
+      Você não informou a hora de nascimento, então este mapa não tem
+      Ascendente, Meio do Céu nem casas — essas partes dependem da hora exata.
+      Os planetas nos signos e os aspectos entre eles valem para o dia inteiro
+      e estão aqui. Se descobrir a hora (ela costuma estar na certidão de
+      nascimento), vale refazer o mapa.
+  lua_incerta:
+    revisado: false
+    texto: >-
+      A Lua mudou de signo no dia em que você nasceu. Sem a hora, não dá para
+      saber em qual dos dois ela estava; por isso mostramos as duas
+      possibilidades e deixamos a Lua fora da contagem de elementos.
+  casas_porfirio:
+    revisado: false
+    texto: >-
+      Você nasceu perto de um dos polos, onde o sistema de casas Placidus não
+      funciona. Usamos o sistema de Porfírio, que divide o céu de forma
+      proporcional.
+  geracao:
+    revisado: false
+    texto: >-
+      Urano, Netuno e Plutão andam devagar: o signo deles é o mesmo para todos
+      que nasceram numa faixa de anos. O que torna essas posições pessoais é a
+      casa em que estão no seu mapa.
+  rodape:
+    revisado: false
+    texto: >-
+      Este mapa é uma ferramenta de autoconhecimento. Ele descreve tendências,
+      não destino: o que você faz com elas é seu. Não substitui orientação
+      profissional.

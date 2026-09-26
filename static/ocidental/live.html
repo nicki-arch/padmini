@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#241522">
+<meta name="robots" content="noindex, nofollow">
+<title>Modo live — Padmini</title>
+{# Versão ocidental do modo live (mapa natal e sinastria). #}
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<style>
+  /* Tela pensada para transmissão: fonte grande, muito contraste, pouca decoração. */
+  body { font-size: 17px; }
+  .barra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; margin-bottom: 18px; }
+  .abas { display: flex; gap: 8px; }
+  .aba { font: 600 15px Inter, sans-serif; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; min-height: 44px; cursor: pointer; }
+  .aba[aria-selected="true"] { color: var(--on-accent); background: var(--saffron); border-color: var(--saffron); }
+  .campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end; }
+  .campos .largo { grid-column: 1 / -1; }
+  button.acao { font: 600 16px Inter, sans-serif; color: var(--on-accent); background: var(--saffron); border: 0; border-radius: 10px; padding: 14px 20px; min-height: 48px; cursor: pointer; }
+  button.acao[disabled] { opacity: .6; cursor: default; }
+  fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 0 0 14px; }
+  legend { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--saffron); font-weight: 600; padding: 0 6px; }
+  .faixa { display: flex; align-items: center; gap: 10px; margin: 30px 0 16px; font: 600 13px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+  .faixa::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .35; }
+  .faixa.gratis { color: var(--sage); }
+  .faixa.pago { color: var(--saffron); }
+  .grande { font-family: var(--serif); font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.15; margin: 0 0 6px; }
+  .destaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .destaques div { background: var(--ground-3); border-radius: 12px; padding: 14px 16px; }
+  .destaques span { display: block; font-size: 12.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+  .destaques b { font-family: var(--serif); font-size: 1.5rem; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .08em; }
+  .rolagem { overflow-x: auto; }
+  .secao h3 { font-size: 1.35rem; margin: 20px 0 6px; }
+  .secao p { margin: 0 0 10px; }
+  .koota { display: flex; justify-content: space-between; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .koota b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .dica-live { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 14.5px; color: var(--ink); margin-bottom: 18px; }
+  @media (max-width: 480px) { .campos { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<main class="wrap" id="app">
+  <section id="tela-senha" style="max-width:420px">
+    <h1 style="font-size:2rem">Modo live</h1>
+    <p class="sub">Área do Pedro. Gera o relatório completo sem pagamento, para ler ao vivo.</p>
+    <form id="form-senha" class="card" novalidate>
+      <div class="campo largo">
+        <label for="senha">Senha</label>
+        <input id="senha" type="password" autocomplete="current-password" required>
+      </div>
+      <p class="erro" id="erro-senha" role="alert" hidden></p>
+      <button class="acao" id="botao-entrar" type="submit" style="width:100%">Entrar</button>
+    </form>
+  </section>
+
+  <section id="tela-live" hidden>
+    <div class="barra">
+      <div class="abas" role="tablist">
+        <button class="aba" id="aba-mapa" role="tab" aria-selected="true">Mapa individual</button>
+        <button class="aba" id="aba-casal" role="tab" aria-selected="false">Sinastria</button>
+      </div>
+      <button class="aba" id="botao-sair" type="button">Sair</button>
+    </div>
+
+    <p class="dica-live">Na live, leia só o que está acima da linha laranja. O que vem depois dela é o que a pessoa recebe pagando.</p>
+
+    <form id="form-mapa" class="card" novalidate>
+      <div class="campos">
+        <div class="campo"><label for="m-nome">Nome</label><input id="m-nome" autocomplete="off"></div>
+        <div class="campo"><label for="m-data">Nascimento</label><input id="m-data" inputmode="numeric" placeholder="dd/mm/aaaa"></div>
+        <div class="campo"><label for="m-hora">Hora <span class="dica">(vazio = não sabe)</span></label><input id="m-hora" inputmode="numeric" placeholder="hh:mm"></div>
+        <div class="campo largo auto"><label for="m-cidade">Cidade de nascimento</label><input id="m-cidade" autocomplete="off" placeholder="Comece a digitar"><ul id="m-cidade-lista" role="listbox" hidden></ul></div>
+      </div>
+      <p class="erro" id="erro-mapa" role="alert" hidden></p>
+      <button class="acao" id="gerar-mapa" type="submit">Gerar leitura</button>
+    </form>
+
+    <form id="form-casal" class="card" novalidate hidden>
+      <fieldset>
+        <legend>Pessoa A</legend>
+        <div class="campos">
+          <div class="campo"><label for="a-nome">Nome</label><input id="a-nome" autocomplete="off"></div>
+          <div class="campo"><label for="a-data">Nascimento</label><input id="a-data" inputmode="numeric" placeholder="dd/mm/aaaa"></div>
+          <div class="campo"><label for="a-hora">Hora</label><input id="a-hora" inputmode="numeric" placeholder="hh:mm"></div>
+          <div class="campo largo auto"><label for="a-cidade">Cidade</label><input id="a-cidade" autocomplete="off" placeholder="Comece a digitar"><ul id="a-cidade-lista" role="listbox" hidden></ul></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Pessoa B</legend>
+        <div class="campos">
+          <div class="campo"><label for="b-nome">Nome</label><input id="b-nome" autocomplete="off"></div>
+          <div class="campo"><label for="b-data">Nascimento</label><input id="b-data" inputmode="numeric" placeholder="dd/mm/aaaa"></div>
+          <div class="campo"><label for="b-hora">Hora</label><input id="b-hora" inputmode="numeric" placeholder="hh:mm"></div>
+          <div class="campo largo auto"><label for="b-cidade">Cidade</label><input id="b-cidade" autocomplete="off" placeholder="Comece a digitar"><ul id="b-cidade-lista" role="listbox" hidden></ul></div>
+        </div>
+      </fieldset>
+      <p class="erro" id="erro-casal" role="alert" hidden></p>
+      <button class="acao" id="gerar-casal" type="submit">Gerar sinastria</button>
+    </form>
+
+    <section id="resultado" aria-live="polite" hidden></section>
+  </section>
+</main>
+
+<script>
+// 14 → "14", 14.5 → "14,5"
+function nota(v) { return String(Math.round(Number(v) * 10) / 10).replace(".", ","); }
+
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const grau = (g) => { const d = Math.floor(g); const m = Math.round((g - d) * 60); return m === 60 ? `${d + 1}°00'` : `${d}°${String(m).padStart(2, "0")}'`; };
+const ano = (iso) => String(iso).slice(0, 4);
+
+function mascara(el, tamanhos, separador) {
+  el.addEventListener("input", () => {
+    const digitos = el.value.replace(/\D/g, "").slice(0, tamanhos.reduce((a, b) => a + b, 0));
+    let pos = 0;
+    el.value = tamanhos.map((t) => digitos.slice(pos, (pos += t))).filter(Boolean).join(separador);
+  });
+}
+function dataISO(br) { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(br.trim()); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; }
+
+// autocomplete de cidade, reaproveitável em cada campo
+function ligarCidade(idInput, idLista) {
+  const input = $(idInput), lista = $(idLista);
+  const estado = { escolhida: null };
+  let opcoes = [], ativa = -1, timer;
+  const fechar = () => { lista.hidden = true; ativa = -1; input.closest(".auto").style.marginBottom = ""; };
+  const desenhar = () => {
+    lista.innerHTML = opcoes.map((c, i) => `<li role="option" aria-selected="${i === ativa}" data-i="${i}">${esc(c.rotulo)}</li>`).join("");
+    lista.hidden = opcoes.length === 0;
+    input.closest(".auto").style.marginBottom = lista.hidden ? "" : `${Math.min(lista.scrollHeight, 280) + 4}px`;
+  };
+  const escolher = (i) => { estado.escolhida = opcoes[i]; input.value = opcoes[i].rotulo; fechar(); };
+  input.addEventListener("input", () => {
+    estado.escolhida = null; clearTimeout(timer);
+    const q = input.value.trim();
+    if (q.length < 2) { opcoes = []; return fechar(); }
+    timer = setTimeout(async () => {
+      try { opcoes = await (await fetch(`/api/cidades?q=${encodeURIComponent(q)}`)).json(); ativa = opcoes.length ? 0 : -1; desenhar(); }
+      catch { opcoes = []; fechar(); }
+    }, 180);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (lista.hidden) return;
+    if (e.key === "ArrowDown") { ativa = (ativa + 1) % opcoes.length; desenhar(); e.preventDefault(); }
+    else if (e.key === "ArrowUp") { ativa = (ativa - 1 + opcoes.length) % opcoes.length; desenhar(); e.preventDefault(); }
+    else if (e.key === "Enter" && ativa >= 0) { escolher(ativa); e.preventDefault(); }
+    else if (e.key === "Escape") fechar();
+  });
+  lista.addEventListener("mousedown", (e) => { const li = e.target.closest("li"); if (li) { e.preventDefault(); escolher(Number(li.dataset.i)); } });
+  input.addEventListener("blur", () => setTimeout(fechar, 120));
+  return estado;
+}
+
+["#m-data", "#a-data", "#b-data"].forEach((s) => mascara($(s), [2, 2, 4], "/"));
+["#m-hora", "#a-hora", "#b-hora"].forEach((s) => mascara($(s), [2, 2], ":"));
+const cidadeM = ligarCidade("#m-cidade", "#m-cidade-lista");
+const cidadeA = ligarCidade("#a-cidade", "#a-cidade-lista");
+const cidadeB = ligarCidade("#b-cidade", "#b-cidade-lista");
+
+function erro(id, msg) { const el = $(id); el.textContent = msg || ""; el.hidden = !msg; }
+
+// ---------- sessão ----------
+async function verSessao() {
+  try {
+    const s = await (await fetch("/api/live/sessao")).json();
+    mostrarLive(s.ativa);
+    if (!s.configurado) erro("#erro-senha", "Falta definir PADMINI_LIVE_SENHA no servidor.");
+  } catch { mostrarLive(false); }
+}
+function mostrarLive(ativa) {
+  $("#tela-senha").hidden = ativa;
+  $("#tela-live").hidden = !ativa;
+}
+$("#form-senha").addEventListener("submit", async (e) => {
+  e.preventDefault(); erro("#erro-senha", "");
+  const botao = $("#botao-entrar"); botao.disabled = true;
+  try {
+    const r = await fetch("/api/live/entrar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ senha: $("#senha").value }) });
+    if (!r.ok) throw new Error((await r.json()).detail || "Não foi possível entrar.");
+    $("#senha").value = "";
+    mostrarLive(true);
+  } catch (err) { erro("#erro-senha", err.message); }
+  finally { botao.disabled = false; }
+});
+$("#botao-sair").addEventListener("click", async () => {
+  await fetch("/api/live/sair", { method: "POST" });
+  $("#resultado").hidden = true; $("#resultado").innerHTML = "";
+  mostrarLive(false);
+});
+
+// ---------- abas ----------
+function aba(qual) {
+  const mapa = qual === "mapa";
+  $("#aba-mapa").setAttribute("aria-selected", String(mapa));
+  $("#aba-casal").setAttribute("aria-selected", String(!mapa));
+  $("#form-mapa").hidden = !mapa;
+  $("#form-casal").hidden = mapa;
+  $("#resultado").hidden = true; $("#resultado").innerHTML = "";
+}
+$("#aba-mapa").addEventListener("click", () => aba("mapa"));
+$("#aba-casal").addEventListener("click", () => aba("casal"));
+
+const DIVISOR = '<p class="faixa pago">Fim da amostra grátis — daqui para baixo é o relatório pago</p>';
+
+// ---------- mapa (versão ocidental) ----------
+$("#form-mapa").addEventListener("submit", async (e) => {
+  e.preventDefault(); erro("#erro-mapa", "");
+  const data = dataISO($("#m-data").value), hora = $("#m-hora").value.trim();
+  if (!data) return erro("#erro-mapa", "Data no formato dd/mm/aaaa.");
+  if (hora && !/^\d{2}:\d{2}$/.test(hora)) return erro("#erro-mapa", "Hora no formato hh:mm (ou deixe vazio).");
+  if (!cidadeM.escolhida) return erro("#erro-mapa", "Escolha a cidade na lista.");
+  const botao = $("#gerar-mapa"); botao.disabled = true; botao.textContent = "Gerando…";
+  const base = { nome: $("#m-nome").value.trim(), data, hora, lat: cidadeM.escolhida.lat, lon: cidadeM.escolhida.lon, cidade: cidadeM.escolhida.rotulo };
+  try {
+    const t = await pedir("/api/live/ocidental/token/mapa", base);
+    const r = await pedir("/api/ocidental/mapa", { ...base, nivel: "completo", token: t.token, texto_ia: false });
+    desenharMapa(r);
+  } catch (err) { erro("#erro-mapa", err.message); }
+  finally { botao.disabled = false; botao.textContent = "Gerar leitura"; }
+});
+
+async function pedir(url, corpo) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+  const dados = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof dados.detail === "string" ? dados.detail : "Não foi possível gerar agora.");
+  return dados;
+}
+
+function desenharMapa(d) {
+  const a = d.amostra;
+  const paragrafos = (c) => (Array.isArray(c) ? c : [c]).map((p) => `<p>${esc(p)}</p>`).join("");
+  const secoes = Object.entries(d.secoes || {}).filter(([t]) => t !== "Sol, Lua e Ascendente")
+    .map(([titulo, texto]) => `<h3>${esc(titulo)}</h3>${paragrafos(texto)}`).join("");
+  const planetas = d.pontos.map((g) => `<tr><td>${esc(g.nome)}${g.retrogrado ? " (R)" : ""}</td><td>${esc(g.signo_incerto ? g.signos_possiveis_pt.join(" ou ") : g.signo_pt)}</td><td>${esc(g.grau)}</td><td>${g.casa ?? "—"}</td></tr>`).join("");
+  $("#resultado").innerHTML = `
+    <h2 class="grande">${esc(d.nome || "Mapa")}</h2>
+    <p class="sub">${esc(d.cidade)}${d.tem_hora ? "" : " · sem hora de nascimento"}</p>
+    ${d.aviso_horario ? `<p class="aviso">${esc(d.aviso_horario)}</p>` : ""}
+    <p class="faixa gratis">Amostra grátis</p>
+    <div class="destaques">${a.triade.map((i) => `<div><span>${esc(i.nome)}</span><b>${esc(i.signo)}</b></div>`).join("")}</div>
+    <div class="secao">${a.triade.map((i) => `<h3>${esc(i.nome)} em ${esc(i.signo)}</h3><p>${esc(i.texto)}</p>`).join("")}
+      ${a.aspecto ? `<h3>${esc(a.aspecto.titulo)}</h3><p>${esc(a.aspecto.texto)}</p>` : ""}</div>
+    ${DIVISOR}
+    <div class="rolagem"><table><thead><tr><th>Ponto</th><th>Signo</th><th>Grau</th><th>Casa</th></tr></thead><tbody>${planetas}</tbody></table></div>
+    <div class="secao">${secoes}</div>`;
+  $("#resultado").hidden = false;
+  $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------- casal (sinastria) ----------
+$("#form-casal").addEventListener("submit", async (e) => {
+  e.preventDefault(); erro("#erro-casal", "");
+  const pessoas = [["a", cidadeA], ["b", cidadeB]].map(([p, cid]) => {
+    const data = dataISO($(`#${p}-data`).value), hora = $(`#${p}-hora`).value.trim();
+    return { p, data, hora, cid, nome: $(`#${p}-nome`).value.trim() };
+  });
+  for (const x of pessoas) {
+    const quem = x.p === "a" ? "Pessoa A" : "Pessoa B";
+    if (!x.data) return erro("#erro-casal", `Data da ${quem} no formato dd/mm/aaaa.`);
+    if (x.hora && !/^\d{2}:\d{2}$/.test(x.hora)) return erro("#erro-casal", `Hora da ${quem} no formato hh:mm (ou vazio).`);
+    if (!x.cid.escolhida) return erro("#erro-casal", `Escolha a cidade da ${quem} na lista.`);
+  }
+  const corpo = { a: pessoa(pessoas[0]), b: pessoa(pessoas[1]) };
+  const botao = $("#gerar-casal"); botao.disabled = true; botao.textContent = "Gerando…";
+  try {
+    const t = await pedir("/api/live/ocidental/token/sinastria", corpo);
+    const r = await pedir("/api/ocidental/sinastria", { ...corpo, nivel: "completo", token: t.token, texto_ia: false });
+    desenharCasal(r);
+  } catch (err) { erro("#erro-casal", err.message); }
+  finally { botao.disabled = false; botao.textContent = "Gerar sinastria"; }
+});
+function pessoa(x) { return { nome: x.nome, data: x.data, hora: x.hora, lat: x.cid.escolhida.lat, lon: x.cid.escolhida.lon, cidade: x.cid.escolhida.rotulo }; }
+
+function desenharCasal(d) {
+  const bloco = (titulo, texto) => `<div class="koota"><span><b>${esc(titulo)}</b><br><span class="sub">${esc(texto)}</span></span></div>`;
+  $("#resultado").innerHTML = `
+    <h2 class="grande">${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2>
+    ${(d.avisos || []).map((a) => `<p class="aviso">${esc(a)}</p>`).join("")}
+    <p class="faixa gratis">Amostra grátis</p>
+    <div class="destaques">
+      <div><span>Índice Padmini (método próprio)</span><b>${d.indice} / 100</b></div>
+      <div><span>Ponto mais forte</span><b>${esc(d.ponto_forte.titulo)}</b></div>
+      <div><span>Ponto de atenção</span><b>${esc(d.ponto_atencao.titulo)}</b></div>
+    </div>
+    <p>${esc(d.indice_texto)}</p>
+    <div class="secao"><h3>${esc(d.ponto_forte.titulo)}</h3><p>${esc(d.ponto_forte.texto)}</p>
+      <h3>${esc(d.ponto_atencao.titulo)}</h3><p>${esc(d.ponto_atencao.texto)}</p></div>
+    ${DIVISOR}
+    ${d.dimensoes.map((x) => `<div class="koota"><span><b>${esc(x.titulo)}</b><br><span class="sub">${esc(x.texto)}</span></span><b>${x.nota === null ? "—" : x.nota + "/100"}</b></div>`).join("")}
+    <div class="secao"><h3>Aspectos entre vocês</h3></div>
+    ${d.aspectos.map((x) => bloco(x.titulo, x.texto)).join("")}
+    ${d.casas.length ? `<div class="secao"><h3>Os planetas de um nas casas do outro</h3></div>${d.casas.map((x) => bloco(x.titulo, x.texto)).join("")}` : ""}`;
+  $("#resultado").hidden = false;
+  $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+verSessao();
+</script>
+</body>
+</html>
