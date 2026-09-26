@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /live
+Disallow: /api/
+Disallow: /*?token=
+Disallow: /static/*.html
+
+Sitemap: https://padmini.teste/sitemap.xml

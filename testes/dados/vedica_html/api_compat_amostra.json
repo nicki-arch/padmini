@@ -1,0 +1,36 @@
+{
+ "avisos_horario": {
+  "a": null,
+  "b": null
+ },
+ "categoria": "requer trabalho",
+ "maximo": 36,
+ "nivel": "amostra",
+ "nomes": {
+  "a": "Ana",
+  "b": "Bruno"
+ },
+ "snippets": {
+  "categoria": "requer trabalho",
+  "maximo": 36,
+  "moldura": "Com 14 de 36 pontos, vocês são diferentes em coisas que importam. Isso não quer dizer 'não vai dar certo' — quer dizer que a relação pede mais conversa e intenção do que a média. Muita gente com essa nota vive relações felizes; a diferença é escolher trabalhar os pontos abaixo.",
+  "nivel": "amostra",
+  "nomes": {
+   "a": "Ana",
+   "b": "Bruno"
+  },
+  "ponto_atencao": {
+   "koota": "Gana",
+   "tema": "temperamento",
+   "texto": "Vocês têm temperamentos de naturezas distintas, e é normal a mesma situação ser lida de formas opostas. Aqui, nomear a diferença ('a gente reage diferente a isso') evita que ela vire briga."
+  },
+  "ponto_forte": {
+   "koota": "Graha Maitri",
+   "tema": "sintonia mental e amizade",
+   "texto": "Tirando o romance, vocês seriam amigos: há sintonia mental e um respeito que sustenta a relação nos dias sem paixão. É uma das bases mais sólidas que um casal pode ter."
+  },
+  "total": 14.0
+ },
+ "texto_ia": null,
+ "total": 14.0
+}
