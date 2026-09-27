@@ -64,7 +64,8 @@
 </head>
 <body>
 {# Home da versão OCIDENTAL. Texto: conteudo/ocidental/home.yaml (variável `t`), inclusive o <head>.
-   Preço: conteudo/ocidental/ofertas.yaml. Quatro produtos: sinastria, mapa, numerologia e tarot. #}
+   Preço: conteudo/ocidental/ofertas.yaml. Quatro produtos, nesta ordem (rodada 6): mapa natal (a porta
+   de entrada), sinastria, numerologia e tarot. #}
 <header class="wrap">
   <div class="topbar">
     <a class="marca" href="/">
@@ -81,8 +82,8 @@
     <h1>{{ t.hero.titulo }}</h1>
     <p class="lede">{{ t.hero.lede }}</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="/compatibilidade">{{ t.hero.botao_principal }}</a>
-      <a class="btn btn-outline" href="/mapa">{{ t.hero.botao_secundario }}</a>
+      <a class="btn btn-primary" href="/mapa">{{ t.hero.botao_principal }}</a>
+      <a class="btn btn-outline" href="/compatibilidade">{{ t.hero.botao_secundario }}</a>
     </div>
   </section>
 
@@ -101,6 +102,47 @@
   <hr class="rule">
 
   <section class="wrap" data-revelar>
+    <h2>{{ t.produtos.titulo }}</h2>
+    <p class="sub">{{ t.produtos.sub }}</p>
+    <div class="produtos">
+      <div class="prod anchor">
+        <span class="plab">{{ t.produtos.mapa.etiqueta }}</span>
+        <h3>{{ t.produtos.mapa.titulo }}</h3>
+        <div class="pprice">R${{ ofertas.mapa.preco | moeda }}</div>
+        <p>{{ t.produtos.mapa.texto }}</p>
+        <a class="btn btn-primary" href="/mapa">{{ t.produtos.mapa.botao }}</a>
+      </div>
+      <div class="prod">
+        <span class="plab">{{ t.produtos.compat.etiqueta }}</span>
+        <h3>{{ t.produtos.compat.titulo }}</h3>
+        {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco | moeda }} <small>R${{ ofertas.compat.preco_de | moeda }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
+        <p class="peco">Você economiza R${{ ofertas.compat.economia | moeda }}</p>
+        {% else %}<div class="pprice">R${{ ofertas.compat.preco | moeda }}</div>
+        {% endif %}        <p>{{ t.produtos.compat.texto }}</p>
+        {% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco | moeda }}</p>{% endif %}
+        <a class="btn btn-outline" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
+      </div>
+      <div class="prod">
+        <span class="plab">{{ t.produtos.numerologia.etiqueta }}</span>
+        <h3>{{ t.produtos.numerologia.titulo }}</h3>
+        <div class="pprice">R${{ ofertas.numerologia.preco | moeda }}</div>
+        <p>{{ t.produtos.numerologia.texto }}</p>
+        <a class="btn btn-outline" href="/numerologia">{{ t.produtos.numerologia.botao }}</a>
+      </div>
+      <div class="prod">
+        <span class="plab">{{ t.produtos.tarot.etiqueta }}</span>
+        <h3>{{ t.produtos.tarot.titulo }}</h3>
+        <div class="pprice">R${{ ofertas.tarot.preco | moeda }}</div>
+        <p>{{ t.produtos.tarot.texto }}</p>
+        <a class="btn btn-outline" href="/tarot">{{ t.produtos.tarot.botao }}</a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="wrap" data-revelar>
+    <p class="eyebrow">{{ t.dimensoes.eyebrow }}</p>
     <h2>{{ t.dimensoes.titulo }}</h2>
     <p class="sub">{{ t.dimensoes.sub }}</p>
     <div class="dims">
@@ -130,46 +172,6 @@
     </div>
     <p class="sub" style="text-align:center;margin:22px auto 0;max-width:52ch">{{ t.card_exemplo.legenda }}</p>
     <p style="display:flex;justify-content:center;margin:14px 0 0"><a class="navlink" href="/compatibilidade#como-fica">{{ t.card_exemplo.link }}</a></p>
-  </section>
-
-  <hr class="rule">
-
-  <section class="wrap" data-revelar>
-    <h2>{{ t.produtos.titulo }}</h2>
-    <p class="sub">{{ t.produtos.sub }}</p>
-    <div class="produtos">
-      <div class="prod anchor">
-        <span class="plab">{{ t.produtos.compat.etiqueta }}</span>
-        <h3>{{ t.produtos.compat.titulo }}</h3>
-        {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco | moeda }} <small>R${{ ofertas.compat.preco_de | moeda }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
-        <p class="peco">Você economiza R${{ ofertas.compat.economia | moeda }}</p>
-        {% else %}<div class="pprice">R${{ ofertas.compat.preco | moeda }}</div>
-        {% endif %}        <p>{{ t.produtos.compat.texto }}</p>
-        {% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco | moeda }}</p>{% endif %}
-        <a class="btn btn-primary" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
-      </div>
-      <div class="prod">
-        <span class="plab">{{ t.produtos.mapa.etiqueta }}</span>
-        <h3>{{ t.produtos.mapa.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.mapa.preco | moeda }}</div>
-        <p>{{ t.produtos.mapa.texto }}</p>
-        <a class="btn btn-outline" href="/mapa">{{ t.produtos.mapa.botao }}</a>
-      </div>
-      <div class="prod">
-        <span class="plab">{{ t.produtos.numerologia.etiqueta }}</span>
-        <h3>{{ t.produtos.numerologia.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.numerologia.preco | moeda }}</div>
-        <p>{{ t.produtos.numerologia.texto }}</p>
-        <a class="btn btn-outline" href="/numerologia">{{ t.produtos.numerologia.botao }}</a>
-      </div>
-      <div class="prod">
-        <span class="plab">{{ t.produtos.tarot.etiqueta }}</span>
-        <h3>{{ t.produtos.tarot.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.tarot.preco | moeda }}</div>
-        <p>{{ t.produtos.tarot.texto }}</p>
-        <a class="btn btn-outline" href="/tarot">{{ t.produtos.tarot.botao }}</a>
-      </div>
-    </div>
   </section>
 
   <hr class="rule">
@@ -214,7 +216,7 @@
   <section class="wrap" style="text-align:center;padding-top:10px">
     <h2>{{ t.fechamento.titulo }}</h2>
     <p style="margin:0 auto 26px;color:var(--muted)">{{ t.fechamento.sub }}</p>
-    <a class="btn btn-primary" href="/compatibilidade">{{ t.fechamento.botao }}</a>
+    <a class="btn btn-primary" href="/mapa">{{ t.fechamento.botao }}</a>
   </section>
 </main>
 

@@ -383,11 +383,13 @@ def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedi
 
 # Versão ocidental: quatro produtos, cada e-mail oferece os outros que fazem
 # sentido (só os que já têm checkout configurado — sem link, nada aparece).
+# A escada da ocidental (rodada 6): mapa natal → sinastria → numerologia → tarot.
+# Cada compra sugere os próximos degraus que a pessoa ainda não tem, nessa ordem.
 VENDA_CRUZADA_OCIDENTAL = {
     "compat": ("numerologia",),
     "mapa": ("compat", "numerologia"),
     "numerologia": ("mapa", "tarot"),
-    "tarot": ("numerologia", "mapa"),
+    "tarot": ("mapa", "numerologia"),
 }
 TEXTO_OUTRO_PRODUTO = {
     "compat": ("Sinastria do casal", "o seu mapa cruzado com o de outra pessoa, em 8 dimensões"),
