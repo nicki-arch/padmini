@@ -79,7 +79,9 @@ def test_smoke_passa_no_app_local(versao, monkeypatch):
 
 def test_smoke_cobre_os_4_produtos():
     nomes = " ".join(n for n, _ in smoke.CHECAGENS)
-    for trecho in ("amostras dos 4 produtos", "completos e PDFs dos 4 produtos", "numerologia e tarot"):
+    # rodada 6: as amostras pedem e-mail (o smoke confere o 422); o tarot completo
+    # sai do 402 do smoke (sem sorteio não há tiragem) e fica em test_tarot
+    for trecho in ("amostras dos 4 produtos pedem o e-mail", "completos e PDFs trancados", "numerologia e tarot"):
         assert trecho in nomes
 
 

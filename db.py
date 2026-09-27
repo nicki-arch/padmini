@@ -113,6 +113,11 @@ CREATE INDEX IF NOT EXISTS abandonos_email_idx ON abandonos (lower(email));
 ALTER TABLE amostras_email ADD COLUMN IF NOT EXISTS sistema TEXT NOT NULL DEFAULT 'vedica';
 ALTER TABLE abandonos ADD COLUMN IF NOT EXISTS sistema TEXT NOT NULL DEFAULT 'vedica';
 
+-- Rodada 6: na ocidental a amostra só sai com e-mail, e a caixa "pode me mandar
+-- mais sobre a minha leitura (até 3 e-mails)" é gravada aqui. É a autorização da
+-- sequência de boas-vindas; linhas antigas ficam false.
+ALTER TABLE amostras_email ADD COLUMN IF NOT EXISTS aceita_sequencia BOOLEAN NOT NULL DEFAULT false;
+
 -- Quem clicou em "não quero mais receber": nenhum e-mail de marketing
 -- (lembrete, recuperação) sai para este endereço. E-mail de entrega de compra sai.
 CREATE TABLE IF NOT EXISTS email_optout (
@@ -367,15 +372,15 @@ def amostras_enviadas_hoje(email: str) -> int:
 
 
 def registrar_amostra_email(email: str, produto: str, dados: dict, aceita_lembrete: bool,
-                            origem: dict, sistema: str = "vedica") -> bool:
+                            origem: dict, sistema: str = "vedica", aceita_sequencia: bool = False) -> bool:
     if not ativo():
         return False
     try:
         with _conectar() as c:
-            c.execute("INSERT INTO amostras_email (email, produto, dados, aceita_lembrete, origem, sistema) "
-                      "VALUES (%s,%s,%s,%s,%s,%s)",
+            c.execute("INSERT INTO amostras_email (email, produto, dados, aceita_lembrete, origem, sistema, "
+                      "aceita_sequencia) VALUES (%s,%s,%s,%s,%s,%s,%s)",
                       (email, produto, json.dumps(dados, ensure_ascii=False), aceita_lembrete,
-                       json.dumps(origem or {}, ensure_ascii=False), sistema))
+                       json.dumps(origem or {}, ensure_ascii=False), sistema, aceita_sequencia))
         return True
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao registrar amostra por e-mail")

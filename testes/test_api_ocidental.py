@@ -30,7 +30,7 @@ def versao(monkeypatch):
 
 # ------------------------------------------------------------------ amostra
 def test_amostra_e_gratis_e_so_tem_a_triade():
-    r = cliente.post("/api/ocidental/mapa", json={**PESSOA, "nivel": "amostra"})
+    r = cliente.post("/api/ocidental/mapa", json={**PESSOA, "nivel": "amostra", "email": "teste@exemplo.com"})
     assert r.status_code == 200, r.text
     c = r.json()
     assert [i["ponto"] for i in c["amostra"]["triade"]] == ["sol", "lua", "ascendente"]
@@ -39,7 +39,7 @@ def test_amostra_e_gratis_e_so_tem_a_triade():
 
 
 def test_amostra_sem_hora_avisa_e_nao_tem_ascendente():
-    c = cliente.post("/api/ocidental/mapa", json={**SEM_HORA, "nivel": "amostra"}).json()
+    c = cliente.post("/api/ocidental/mapa", json={**SEM_HORA, "nivel": "amostra", "email": "teste@exemplo.com"}).json()
     assert c["tem_hora"] is False
     assert [i["ponto"] for i in c["amostra"]["triade"]] == ["sol", "lua"]
     assert any("hora" in a for a in c["amostra"]["avisos"])

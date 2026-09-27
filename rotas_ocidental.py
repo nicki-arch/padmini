@@ -13,12 +13,14 @@ Mesmas regras da védica: completo só com token (402 sem), IA só no completo e
 em cache no banco, limite de requisições por IP.
 """
 
+import logging
 import os
 import re
 import unicodedata
 from datetime import date
 
-from fastapi import APIRouter, HTTPException, Request, Response
+from fastapi import APIRouter, Body, HTTPException, Request, Response
+from pydantic import ValidationError
 from pydantic import BaseModel, Field
 
 import acesso
@@ -31,9 +33,107 @@ from nascimento import aviso_de_horario, validar_data, validar_datetime
 
 VERSAO = "ocidental"
 rotas = APIRouter()
+log = logging.getLogger("padmini.ocidental")
 
 
-class PedidoMapaOcidental(BaseModel):
+# --------------------------------------------------------------------------
+# E-MAIL ANTES DA AMOSTRA (rodada 6). Na ocidental, toda amostra grátis pede o
+# e-mail: uma parte aparece na tela e o resto chega por e-mail — é isso que
+# garante que o endereço é de verdade. A resposta da API leva SÓ a parte da
+# tela (senão bastaria abrir as ferramentas do navegador). Se o e-mail não sai
+# (Resend fora do ar, sem chave), a tela mostra tudo: a falha é nossa, não da
+# pessoa. O completo com token e o /live do Pedro não pedem e-mail.
+# --------------------------------------------------------------------------
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+MAX_AMOSTRAS_POR_EMAIL_DIA = 3  # o mesmo limite da amostra por e-mail da rodada 4
+ORIGEM_ACEITA = ("ref", "cupom", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term")
+
+
+class ComEmail(BaseModel):
+    """Campos da amostra: o e-mail (obrigatório no nível amostra) e a caixa
+    desmarcada "pode me mandar mais sobre a minha leitura" (até 3 e-mails)."""
+    email: str = Field("", max_length=160)
+    aceita_sequencia: bool = False
+    origem: dict = Field(default_factory=dict)
+
+
+def exigir_email(p: ComEmail) -> str:
+    """422 sem e-mail válido; 429 se o endereço já recebeu amostras demais hoje.
+    Vem ANTES do cálculo: sem e-mail, nada é calculado."""
+    email = (p.email or "").strip().lower()
+    if not EMAIL_RE.match(email):
+        raise HTTPException(422, "Deixe um e-mail válido: o resto da sua leitura chega nele.")
+    if db.amostras_enviadas_hoje(email) >= MAX_AMOSTRAS_POR_EMAIL_DIA:
+        raise HTTPException(429, "Este e-mail já recebeu várias amostras hoje. Tente amanhã.")
+    return email
+
+
+def entregar_amostra(request: Request, p: ComEmail, email: str, produto: str, dados: dict, nome: str,
+                     tela: dict, inteira: dict) -> dict:
+    """Manda a amostra inteira por e-mail, registra (com a caixa) e devolve só
+    a parte da tela. E-mail que não saiu = a tela mostra tudo, e a equipe é avisada."""
+    import alertas
+    import entrega
+    import marketing
+    limites.exigir(limites.AMOSTRA_EMAIL, request)
+    enviado = False
+    if os.environ.get("RESEND_API_KEY"):
+        try:
+            html = marketing.email_amostra_html(produto, montar_amostra_email(produto, dados), dados, email,
+                                                nome, VERSAO)
+            enviado = entrega.enviar_email(email, marketing.assunto("amostra", produto, VERSAO), html)
+        except Exception:  # noqa: BLE001
+            log.exception("amostra %s: falha ao montar/enviar o e-mail", produto)
+    if not enviado:
+        alertas.alertar("Amostra não saiu por e-mail",
+                        f"Uma amostra de {produto} não saiu por e-mail; a tela mostrou a leitura inteira.",
+                        chave="amostra_email_falhou", intervalo=3600)
+    origem = {k: str(v)[:80] for k, v in (p.origem or {}).items() if k in ORIGEM_ACEITA}
+    # aceita_lembrete acompanha a caixa: até a sequência nova existir, quem marcou
+    # recebe o lembrete de sempre (1 e-mail, dentro do "até 3" que autorizou).
+    db.registrar_amostra_email(email, produto, dados, p.aceita_sequencia, origem, VERSAO,
+                               aceita_sequencia=p.aceita_sequencia)
+    if enviado:
+        return {**tela, "parcial": True, "email": {"enviado": True, "para": email}}
+    return {**inteira, "email": {"enviado": False, "para": email}}
+
+
+def _pessoa_para_dados(x) -> dict:
+    return {"nome": x.nome.strip()[:80], "data": x.data.isoformat(), "hora": x.hora,
+            "lat": x.lat, "lon": x.lon, "cidade": x.cidade[:200]}
+
+
+# O que fica SÓ no e-mail, produto a produto (a tela tem valor sozinha e o card
+# compartilhável da sinastria continua na tela).
+def tela_mapa(amostra: dict) -> dict:
+    """Tela: o Sol inteiro (signo, grau e texto) e os NOMES da Lua e do Ascendente.
+    E-mail: os textos da Lua e do Ascendente e o aspecto mais exato."""
+    triade = [i if i["ponto"] == "sol" else {k: v for k, v in i.items() if k != "texto"}
+              for i in amostra["triade"]]
+    return {"triade": triade, "aspecto": None, "avisos": amostra["avisos"], "parcial": True}
+
+
+def tela_sinastria(rel: dict) -> dict:
+    """Tela: o Índice (com a frase dele), o card e o TÍTULO do ponto mais forte.
+    E-mail: o texto do ponto forte e o ponto de atenção."""
+    forte = {k: rel["ponto_forte"][k] for k in ("chave", "titulo", "nota")}
+    return {**{k: v for k, v in rel.items() if k not in ("ponto_forte", "ponto_atencao")},
+            "ponto_forte": forte, "ponto_atencao": None, "parcial": True}
+
+
+def tela_numerologia(rel: dict) -> dict:
+    """Tela: o número do Caminho de Vida (e o que é esse número). E-mail: o texto dele."""
+    cv = {k: v for k, v in rel["caminho_de_vida"].items() if k != "texto"}
+    return {**rel, "caminho_de_vida": cv, "parcial": True}
+
+
+def tela_tarot(rel: dict) -> dict:
+    """Tela: as 3 cartas (nome e posição). E-mail: a frase de cada carta."""
+    return {**rel, "cartas": [{k: v for k, v in c.items() if k != "frase"} for c in rel["cartas"]],
+            "parcial": True}
+
+
+class PedidoMapaOcidental(ComEmail):
     nome: str = Field("", max_length=80)
     data: date
     # hora vazia = "não sei a hora": sem Ascendente, Meio do Céu e casas
@@ -99,11 +199,18 @@ def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
     limites.exigir(limites.CALCULO, request)
     if p.texto_ia and p.nivel != "completo":
         raise HTTPException(402, "O texto por IA faz parte do mapa completo.")
+    email = exigir_email(p) if p.nivel == "amostra" else None
     mapa, aviso = calcular(p)
 
     if p.nivel == "amostra":
-        # Amostra grátis: a tríade (Sol, Lua, Ascendente) e o aspecto mais exato.
-        return {**_cabecalho(p, mapa, aviso, "amostra"), "amostra": mt.montar_amostra(mapa)}
+        # Amostra grátis: a tríade (Sol, Lua, Ascendente) e o aspecto mais exato —
+        # parte na tela, o resto por e-mail.
+        amostra = mt.montar_amostra(mapa)
+        cab = _cabecalho(p, mapa, aviso, "amostra")
+        dados = {"nome": p.nome.strip()[:80], "data": p.data.isoformat(), "hora": p.hora,
+                 "lat": p.lat, "lon": p.lon, "cidade": p.cidade[:200]}
+        return entregar_amostra(request, p, email, "mapa", dados, dados["nome"],
+                                {**cab, "amostra": tela_mapa(amostra)}, {**cab, "amostra": amostra})
 
     chave = chave_do_pedido(p)
     if not acesso.completo_liberado("mapa", chave, p.token, VERSAO):
@@ -168,7 +275,7 @@ class PessoaOcidental(BaseModel):
     cidade: str = Field("", max_length=200)
 
 
-class PedidoSinastria(BaseModel):
+class PedidoSinastria(ComEmail):
     a: PessoaOcidental
     b: PessoaOcidental
     nivel: str = Field("amostra", pattern=r"^(amostra|completo)$")
@@ -193,6 +300,7 @@ def sinastria_ocidental(p: PedidoSinastria, request: Request):
     limites.exigir(limites.CALCULO, request)
     if p.texto_ia and p.nivel != "completo":
         raise HTTPException(402, "O texto por IA faz parte do relatório completo.")
+    email = exigir_email(p) if p.nivel == "amostra" else None
     (ma, aviso_a), (mb, aviso_b) = _calcular_pessoa(p.a), _calcular_pessoa(p.b)
     chave = None
     if p.nivel == "completo":
@@ -201,6 +309,12 @@ def sinastria_ocidental(p: PedidoSinastria, request: Request):
             raise HTTPException(402, "O relatório completo requer pagamento.")
     nome_a, nome_b = p.a.nome.strip() or "Pessoa A", p.b.nome.strip() or "Pessoa B"
     rel = mt.montar_sinastria(si.calcular_sinastria(ma, mb), ma, mb, nome_a, nome_b, p.nivel)
+    if p.nivel == "amostra":
+        cab = {"nivel": "amostra", "sistema": VERSAO, "nomes": {"a": nome_a, "b": nome_b}, "maximo": 100,
+               "avisos_horario": {"a": aviso_a, "b": aviso_b}, "texto_ia": None}
+        dados = {"a": _pessoa_para_dados(p.a), "b": _pessoa_para_dados(p.b)}
+        return entregar_amostra(request, p, email, "compat", dados, dados["a"]["nome"],
+                                {**cab, **tela_sinastria(rel)}, {**cab, **rel})
 
     texto_ia = None
     if p.texto_ia:
@@ -236,7 +350,7 @@ def live_token_sinastria_ocidental(p: PedidoSinastria, request: Request):
 # --------------------------------------------------------------------------
 # NUMEROLOGIA (/numerologia) — nome completo de registro + data
 # --------------------------------------------------------------------------
-class PedidoNumerologia(BaseModel):
+class PedidoNumerologia(ComEmail):
     nome: str = Field(..., min_length=2, max_length=120)  # nome completo de REGISTRO
     data: date
     nivel: str = Field("amostra", pattern=r"^(amostra|completo)$")
@@ -263,10 +377,14 @@ def numerologia_ocidental(p: PedidoNumerologia, request: Request):
     limites.exigir(limites.CALCULO, request)
     if p.texto_ia and p.nivel != "completo":
         raise HTTPException(402, "O texto por IA faz parte da numerologia completa.")
+    email = exigir_email(p) if p.nivel == "amostra" else None
     res = _calcular_numerologia(p)
     base_resp = {"nivel": p.nivel, "sistema": VERSAO, "nome": p.nome.strip(), "data": p.data.isoformat()}
     if p.nivel == "amostra":
-        return {**base_resp, **mt.montar_numerologia(res, "amostra")}
+        rel = mt.montar_numerologia(res, "amostra")
+        nome = p.nome.strip()
+        return entregar_amostra(request, p, email, "numerologia", {"nome": nome, "data": p.data.isoformat()},
+                                nome.split(" ")[0], {**base_resp, **tela_numerologia(rel)}, {**base_resp, **rel})
     chave = chave_da_numerologia(p)
     if not acesso.completo_liberado("numerologia", chave, p.token, VERSAO):
         raise HTTPException(402, "A numerologia completa requer pagamento.")
@@ -322,7 +440,7 @@ def live_token_numerologia(p: PedidoNumerologia, request: Request):
 # completo: não vai para o banco, nem para o log, nem para o cache — texto
 # com pergunta é gerado na hora e não é guardado.
 # --------------------------------------------------------------------------
-class PedidoTarot(BaseModel):
+class PedidoTarot(ComEmail):
     tiragem: str = Field(..., min_length=10, max_length=40)
     nivel: str = Field("amostra", pattern=r"^(amostra|completo)$")
     texto_ia: bool = False
@@ -341,16 +459,29 @@ def _cartas(p: PedidoTarot) -> list[dict]:
 
 
 @rotas.post("/api/ocidental/tarot/tirar")
-def tarot_tirar(request: Request):
-    """Sorteia no servidor (gerador criptográfico) e devolve o ID + a amostra."""
+def tarot_tirar(request: Request, corpo: dict = Body(default={})):
+    """Sorteia no servidor (gerador criptográfico) e devolve o ID + a amostra.
+    Pede o e-mail como as outras amostras; no /live do Pedro (sessão válida),
+    não — lá o sorteio vira direto o token do completo."""
     import tarot
     limites.exigir(limites.CALCULO, request)
+    live = acesso.sessao_valida("live", request.cookies.get("pad_live"))
+    try:
+        p = ComEmail(**{k: v for k, v in (corpo or {}).items() if k in ComEmail.model_fields})
+    except ValidationError:
+        raise HTTPException(422, "Confira o e-mail.")
+    email = None if live else exigir_email(p)
     try:
         tiragem = tarot.tirar()
     except tarot.SemSegredo:  # falha fechada: sem segredo não há sorteio
         raise HTTPException(503, "O tarot está indisponível no momento.")
-    return {"nivel": "amostra", "sistema": VERSAO, "tiragem": tiragem,
-            **mt.montar_tarot(tarot.cartas_da_tiragem(tiragem), "amostra")}
+    rel = mt.montar_tarot(tarot.cartas_da_tiragem(tiragem), "amostra")
+    base_resp = {"nivel": "amostra", "sistema": VERSAO, "tiragem": tiragem}
+    if live:
+        return {**base_resp, **rel}
+    # só o número da tiragem vai para o banco e para o e-mail — a pergunta nem chega aqui
+    return entregar_amostra(request, p, email, "tarot", {"tiragem": tiragem}, "",
+                            {**base_resp, **tela_tarot(rel)}, {**base_resp, **rel})
 
 
 @rotas.post("/api/ocidental/tarot")
@@ -358,10 +489,13 @@ def tarot_ocidental(p: PedidoTarot, request: Request):
     limites.exigir(limites.CALCULO, request)
     if p.texto_ia and p.nivel != "completo":
         raise HTTPException(402, "O texto por IA faz parte da leitura completa.")
+    email = exigir_email(p) if p.nivel == "amostra" else None
     cartas = _cartas(p)
     base_resp = {"nivel": p.nivel, "sistema": VERSAO, "tiragem": p.tiragem}
     if p.nivel == "amostra":
-        return {**base_resp, **mt.montar_tarot(cartas, "amostra")}
+        rel = mt.montar_tarot(cartas, "amostra")
+        return entregar_amostra(request, p, email, "tarot", {"tiragem": p.tiragem}, "",
+                                {**base_resp, **tela_tarot(rel)}, {**base_resp, **rel})
     chave = acesso.chave_tarot(p.tiragem)
     if not acesso.completo_liberado("tarot", chave, p.token, VERSAO):
         raise HTTPException(402, "A leitura completa requer pagamento.")
