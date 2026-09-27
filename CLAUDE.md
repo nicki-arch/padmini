@@ -59,6 +59,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `scripts/gerar_og_ocidental.py` | Gera as imagens de compartilhamento `static/og-oc-*.png` da versão ocidental |
 | `tarot.py` | Tarot (versão ocidental): 78 cartas, sorteio no servidor, ID da tiragem com selo HMAC — o link pago abre as mesmas cartas da amostra |
 | `paleta.py` + `marca.py` | **Cores e fontes de cada versão, fonte única** (tela, e-mail, PDF, imagens) e o lótus em traço da ocidental. `static/ocidental/tema.css` é GERADO de `paleta.py` (`python scripts/gerar_tema_css.py`). Marca "Almanaque" e contrastes: `docs/marca-ocidental.md`; vitrine em `/estilo?previa=<PADMINI_PREVIA_CHAVE>` |
+| `exemplos_ocidental.py` + `static/ocidental/movimento.*` | Casais de exemplo da home e da página do casal (nascimentos fictícios, **calculados pelo motor**, nunca número à mão) e a rosa das 8 dimensões (SVG, também no completo). Movimento só com `prefers-reduced-motion: no-preference` |
 | `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o Índice Padmini (método próprio, pesos em `docs/ocidental.md`) |
 | `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
 | `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, termos/privacidade (`LEGAIS`), e-mails e tokens de cada versão |

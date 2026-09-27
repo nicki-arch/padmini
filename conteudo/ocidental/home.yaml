@@ -81,19 +81,21 @@ dimensoes:
       texto: A convivência, a rotina e a parceria prática.
       icone: '<path d="M3 12h3.4l2.3-6 3 13 2.6-9.4 1.9 4.4H21"/>'
 
-# Cartão de exemplo: ilustração, não cliente real (nomes inventados).
+# Casais de exemplo (round 5): nascimentos inventados, calculados pelo mesmo
+# método do site (exemplos_ocidental.py) — índice, rosa e ponto forte NÃO ficam
+# aqui, saem do cálculo. A legenda diz que são fictícios.
 card_exemplo:
-  casal: Ana &amp; Rafael
-  nota: 78
-  total: 100
+  titulo: Como fica a de vocês
+  sub: >-
+    Toda sinastria termina num card assim — o Índice Padmini, a rosa das oito
+    dimensões e o ponto mais forte do casal, feito para compartilhar.
   rotulo: Índice Padmini · método próprio
-  barra_percentual: 78
-  frase: >-
-    "O ponto mais forte de vocês: emoções."
+  frase: "O ponto mais forte de vocês:"
   legenda: >-
-    Toda sinastria termina num card assim — sobre vocês dois, feito para
-    compartilhar. O índice é um método próprio da Padmini, explicado no
-    relatório.
+    Exemplos com nascimentos fictícios, calculados pelo mesmo método que vai
+    calcular o de vocês. Na rosa, cada pétala é uma dimensão: quanto maior,
+    mais o encontro flui ali; a pétala colorida é o ponto mais forte.
+  link: Veja como fica um relatório completo →
 
 produtos:
   titulo: Escolha por onde começar

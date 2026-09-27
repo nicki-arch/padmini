@@ -48,3 +48,9 @@ def test_acha_a_copy_da_vedica_quando_ela_vaza(monkeypatch):
     monkeypatch.setattr(entrega, "email_completo_html", lambda *a, **k: "Padmini — astrologia védica")
     achados = pronto.paginas_com_vedica()
     assert achados and all("e-mail de entrega" in a and "védic" in a for a in achados)
+
+
+def test_tracejado_do_svg_nao_conta_como_dasha():
+    """Round 5: a rosa das dimensões usa stroke-dasharray, que não é o dasha védico."""
+    assert not pronto.VEDICO.search('style="stroke-dasharray:3 3"')
+    assert pronto.VEDICO.search("os períodos de Dasha")

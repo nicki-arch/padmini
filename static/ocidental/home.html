@@ -19,6 +19,8 @@
 <link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/ocidental/tema.css">
+<link rel="stylesheet" href="/static/ocidental/movimento.css">
+<script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 <link rel="icon" href="{{ marca.favicon_uri() }}">
@@ -46,6 +48,11 @@
   .prod .pcombo{font-size:13px;color:var(--muted);margin:0}
   nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
   @media(max-width:640px){.passos,.produtos{grid-template-columns:1fr}section{padding-block:44px}.so-largo{display:none}}
+  .galeria{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start}
+  .galeria .cardc{width:auto;max-width:none}
+  .rosa-mini{margin:14px auto 4px;max-width:170px}
+  .rosa-mini svg{width:100%;height:auto;display:block}
+  @media(max-width:900px){.galeria{grid-template-columns:1fr;max-width:360px;margin-inline:auto}}
   .cardc::after{content:none} /* o base.css desenha a marca em sânscrito no card */
 </style>
 </head>
@@ -80,7 +87,7 @@
 
   <hr class="rule">
 
-  <section class="wrap">
+  <section class="wrap" data-revelar>
     <h2>{{ t.como_funciona.titulo }}</h2>
     <p class="sub">{{ t.como_funciona.sub }}</p>
     <div class="passos">
@@ -92,7 +99,7 @@
 
   <hr class="rule">
 
-  <section class="wrap">
+  <section class="wrap" data-revelar>
     <h2>{{ t.dimensoes.titulo }}</h2>
     <p class="sub">{{ t.dimensoes.sub }}</p>
     <div class="dims">
@@ -104,26 +111,29 @@
 
   <hr class="rule">
 
-  <section class="wrap">
-    <div class="share">
-      <div class="cardc">
-        <div class="top">
-          <span class="wm">padmini</span>
-          {{ marca.svg(22) }}
-        </div>
-        <div class="who">{{ t.card_exemplo.casal }}</div>
-        <div class="score">{{ t.card_exemplo.nota }}<span> / {{ t.card_exemplo.total }}</span></div>
+  <section class="wrap" data-revelar>
+    <h2>{{ t.card_exemplo.titulo }}</h2>
+    <p class="sub">{{ t.card_exemplo.sub }}</p>
+    <div class="galeria">
+      {%- for c in exemplos.casais() %}
+      <div class="cardc exemplo">
+        <div class="top"><span class="wm">padmini</span>{{ marca.svg(22) }}</div>
+        <div class="who">{{ c.nomes.a }} &amp; {{ c.nomes.b }}</div>
+        <div class="score">{{ c.indice }}<span> / 100</span></div>
         <div class="scorelab">{{ t.card_exemplo.rotulo }}</div>
-        <div class="bar"><i style="width:{{ t.card_exemplo.barra_percentual }}%"></i></div>
-        <div class="insight">{{ t.card_exemplo.frase }}</div>
+        <div class="bar"><i style="width:{{ c.indice }}%"></i></div>
+        <div class="rosa-mini">{{ c.rosa }}</div>
+        <div class="insight">"{{ t.card_exemplo.frase }} {{ c.ponto_forte | lower }}."</div>
       </div>
+      {%- endfor %}
     </div>
-    <p class="sub" style="text-align:center;margin:22px auto 0;max-width:44ch">{{ t.card_exemplo.legenda }}</p>
+    <p class="sub" style="text-align:center;margin:22px auto 0;max-width:52ch">{{ t.card_exemplo.legenda }}</p>
+    <p style="display:flex;justify-content:center;margin:14px 0 0"><a class="navlink" href="/compatibilidade#como-fica">{{ t.card_exemplo.link }}</a></p>
   </section>
 
   <hr class="rule">
 
-  <section class="wrap">
+  <section class="wrap" data-revelar>
     <h2>{{ t.produtos.titulo }}</h2>
     <p class="sub">{{ t.produtos.sub }}</p>
     <div class="produtos">
@@ -163,7 +173,7 @@
 
   <hr class="rule">
 
-  <section class="wrap">
+  <section class="wrap" data-revelar>
     <div class="anchor2">
       <div class="badge">
         {{ marca.svg(26) }}

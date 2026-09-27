@@ -37,6 +37,7 @@ import alertas
 import cakto
 import db
 import entrega
+import exemplos_ocidental
 import limites
 import marketing
 import marca
@@ -177,6 +178,8 @@ def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:
             # cores, fontes e a marca da versão (paleta.py / marca.py): as páginas
             # da ocidental usam; as da védica não (e saem iguais a antes)
             cores=paleta.tela(versao), fontes=paleta.FONTES[versao], marca=marca,
+            # casais de exemplo calculados pelo motor (só a ocidental chama; calcula uma vez)
+            exemplos=exemplos_ocidental,
         )
     return Response(_paginas_prontas[(versao, arquivo)], media_type="text/html; charset=utf-8")
 
