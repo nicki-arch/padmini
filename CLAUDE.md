@@ -73,6 +73,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `limites.py` | Limite de requisições por IP (429): cálculo, PDF, IA, cidades, lista, senha do live |
 | `seguranca.py` | Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy). Serviço externo novo → incluir na CSP |
 | `marketing.py` + `static/amostra-email.js` | Amostra por e-mail, lembrete (`/api/tarefas/lembretes`), carrinho abandonado, venda cruzada, descadastro (`/descadastrar`). Nas duas versões: cada e-mail sai na versão **do registro** (coluna `sistema`), nunca na do ar; copy em `marketing.TEXTOS` |
+| `/minhas-leituras` (`app.py`) + `static/ocidental/minhas-leituras.html` | **Recuperar leituras sem login** (ocidental): um e-mail com todos os links de `pedidos`; resposta sempre igual (não revela quem comprou), envio em segundo plano, limites por IP e por e-mail |
 | `alertas.py` | E-mail para a equipe (`PADMINI_ALERTA_EMAIL`): pedido pago sem entrega, e-mail que não saiu, erro 500 |
 | `.github/workflows/` | `testes` (CI), `pos-deploy` (smoke de hora em hora; **nunca** no push, senão trava o deploy da Render), `tarefas` (lembretes diários + limpeza de marketing: descadastro ou 24 meses sem interação, `db.limpar_marketing`), `backup` (semanal, criptografado), `manter-ativo` |
 | `docs/melhorias-2026-09.md` | O que entrou em 25/set (preços, e-mails de venda, alertas, backup) e a configuração pendente |

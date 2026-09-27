@@ -236,3 +236,19 @@ nunca na que está no ar na hora do envio (a mesma regra dos links de entrega):
 - **Data de nascimento** continua em texto com máscara (dd/mm/aaaa), e não
   `type="date"`: no celular, o seletor nativo abre no dia de hoje, o que é ruim
   para quem nasceu em 1990.
+
+## Rodada 6, Fase C — Recuperar minhas leituras (sem login)
+
+`/minhas-leituras` (só com a ocidental no ar) e `POST /api/minhas-leituras`.
+A pessoa digita o e-mail e recebe UM e-mail com os links de tudo o que comprou
+com ele (os links gravados em `pedidos.link`; link da védica abre na védica).
+
+- Resposta sempre igual, exista compra ou não; o envio sai em segundo plano, para
+  nem o tempo de resposta revelar se o endereço comprou.
+- Limites: 10 por hora por IP (429) e 3 por hora por e-mail (silencioso: mesma
+  resposta, nada sai).
+- Pedido pendente (sem link, entrega manual) não entra. Reembolso não é
+  registrado hoje (o webhook só grava compra aprovada): um link reembolsado
+  continua sendo reenviado — o mesmo que já acontecia com o e-mail original.
+- Link para a página: rodapé das páginas ocidentais, e-mail de entrega da
+  ocidental e a mensagem de erro quando o link do completo falha.

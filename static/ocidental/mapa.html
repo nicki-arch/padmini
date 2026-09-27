@@ -158,7 +158,7 @@
 <footer>
   Mapa pelo zodíaco tropical, casas Placidus. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional.<br>
   Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos astronômicos: Swiss Ephemeris.<br>
-  <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
+  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
 </footer>
 
 <script>
@@ -449,7 +449,7 @@ async function pedirTextoIA() {
   const res = $("#resultado");
   res.hidden = false; res.innerHTML = '<p class="nota">Abrindo seu mapa completo…</p>';
   pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "completo" }).then(desenharResultado).catch((e) => {
-    res.innerHTML = `<p class="aviso">Não foi possível abrir o mapa completo: ${esc(e.message)} Se você já pagou, confira o link do e-mail ou fale com a gente.</p>`;
+    res.innerHTML = `<p class="aviso">Não foi possível abrir o mapa completo: ${esc(e.message)} Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a> ou fale com a gente.</p>`;
   });
 })();
 </script>
