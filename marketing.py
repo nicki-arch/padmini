@@ -59,19 +59,19 @@ def empacotar_sck(produto: str, dados: dict) -> str:
     return ""
 
 
+PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia": "numerologia", "tarot": "tarot"}
+
+
 def link_checkout(produto: str, dados: dict | None, campanha: str, sistema: str = "vedica") -> str:
     """Checkout da Cakto com os dados de nascimento no `sck` e utm de e-mail."""
     base = ofertas.checkout(produto, sistema)
-    if not base:
-        return f"{entrega.SITE_URL}/{'compatibilidade' if produto == 'compat' else 'mapa'}"
+    if not base:  # oferta sem link: a página do produto (vale para os 4)
+        return f"{entrega.SITE_URL}/{PAGINA_DO_PRODUTO.get(produto, 'mapa')}"
     q = {"utm_source": "email", "utm_medium": campanha, "utm_campaign": campanha}
     if dados:
         q["sck"] = empacotar_sck(produto, dados)
     sep = "&" if "?" in base else "?"
     return base + sep + urllib.parse.urlencode(q)
-
-
-PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia": "numerologia", "tarot": "tarot"}
 
 
 def link_site(produto: str, campanha: str) -> str:

@@ -231,9 +231,11 @@ def conferir_precos_na_cakto(ofertas: dict, baixar=None) -> list:
       (preço do combo − preço de tabela da oferta-mãe) tem de aparecer no
       checkout da oferta-mãe.
     - Cupom (`cupom_percentual` + `cupom_codigos`): abre o checkout com
-      `?coupon=<código>`. Se a Cakto mostrar o desconto ("Desconto (24%)"), o
-      percentual e o preço com cupom (R$96,52) têm de ser os nossos; se a página
-      não trouxer o desconto (a Cakto pode aplicá-lo só no navegador), é aviso."""
+      `?coupon=<código>`. Se o HTML trouxer o desconto ("Desconto (24%)"), o
+      percentual e o preço com cupom (R$96,52) têm de ser os nossos. Na prática a
+      página da Cakto é montada por JavaScript e o urllib não vê o desconto: aí
+      sai um AVISO pedindo a conferência à mão (não é falha). Não pôr navegador
+      no smoke/CI: ver docs/ocidental.md, "Cupom do Pedro"."""
     import re
 
     def _baixar(url):
@@ -273,8 +275,13 @@ def conferir_precos_na_cakto(ofertas: dict, baixar=None) -> list:
                 continue
             desconto = re.search(r"Desconto\s*\((\d+)%\)", texto)
             if not desconto:
-                AVISOS.append(f"checkout de '{chave}' com cupom '{codigo}' não mostrou o desconto; "
-                              f"R${com_cupom} não conferido")
+                # A página da Cakto é montada por JavaScript: sem navegador (e o smoke
+                # não tem, de propósito) o desconto nunca aparece no HTML. Não é
+                # falha, é limite do smoke: a conferência do cupom é à mão.
+                AVISOS.append(f"cupom '{codigo}' em '{chave}': não dá para conferir sem navegador (a página da "
+                              f"Cakto é montada por JavaScript). Confira à mão: abra "
+                              f"{url}{'&' if '?' in url else '?'}coupon={codigo} e veja se aparece "
+                              f"R${com_cupom} ({pct}% de desconto).")
             elif int(desconto.group(1)) != int(pct) or not re.search(rf"R\$\s?{re.escape(com_cupom)}(?!\d)", texto):
                 falhas.append(f"'{chave}' com cupom '{codigo}': site anuncia R${com_cupom} ({pct}%), checkout "
                               f"mostra desconto de {desconto.group(1)}%")
