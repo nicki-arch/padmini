@@ -41,16 +41,64 @@ def origens_posthog() -> list[str]:
     return sorted({api, assets})
 
 
+# Pixels de anúncio (rodada 6), só na versão ocidental. Cada ID vem de uma
+# variável de ambiente; vazio = o pixel não existe: nem carrega, nem entra na CSP.
+PIXELS = {
+    "meta_pixel": "PADMINI_META_PIXEL",          # ex.: 123456789012345
+    "tiktok_pixel": "PADMINI_TIKTOK_PIXEL",      # ex.: C1ABCD2EFGHIJK3LMNOP
+    "google_tag": "PADMINI_GOOGLE_TAG",          # ex.: G-XXXX,AW-123456789 (vírgula separa)
+    "google_ads_lead": "PADMINI_GOOGLE_ADS_LEAD",  # opcional: AW-123456789/rótulo da conversão "lead"
+}
+
+# Domínios de cada plataforma, das documentações oficiais (regra 5 do CLAUDE.md):
+# Meta: developers.facebook.com/docs/meta-pixel/advanced (Content Security Policy);
+# TikTok: business-api.tiktok.com/portal/docs/work-with-csp;
+# Google: developers.google.com/tag-platform/security/guides/csp (GA4 e Google Ads).
+CSP_PIXELS = {
+    "meta_pixel": {"script": ["https://connect.facebook.net"],
+                   "img": ["https://www.facebook.com"], "connect": ["https://www.facebook.com", "https://connect.facebook.net"]},
+    "tiktok_pixel": {"script": ["https://analytics.tiktok.com", "https://analytics-ipv6.tiktokw.us", "https://ads.tiktok.com"],
+                     "img": ["https://analytics.tiktok.com", "https://analytics-ipv6.tiktokw.us", "https://ads.tiktok.com"],
+                     "connect": ["https://analytics.tiktok.com", "https://analytics-ipv6.tiktokw.us", "https://ads.tiktok.com"],
+                     "frame": ["bytedance:", "sslocal:"]},
+    "google_tag": {"script": ["https://www.googletagmanager.com", "https://www.googleadservices.com", "https://www.google.com"],
+                   "img": ["https://www.googletagmanager.com", "https://*.google-analytics.com", "https://*.google.com",
+                           "https://*.google.com.br", "https://*.g.doubleclick.net", "https://www.googleadservices.com",
+                           "https://googleads.g.doubleclick.net", "https://pagead2.googlesyndication.com"],
+                   "connect": ["https://www.googletagmanager.com", "https://*.google-analytics.com",
+                               "https://*.analytics.google.com", "https://*.google.com", "https://*.google.com.br",
+                               "https://*.g.doubleclick.net", "https://pagead2.googlesyndication.com",
+                               "https://www.googleadservices.com", "https://googleads.g.doubleclick.net",
+                               "https://ad.doubleclick.net"],
+                   "frame": ["https://www.googletagmanager.com"]},
+}
+
+
+def pixels() -> dict[str, str]:
+    """IDs dos pixels para /api/config. Só com a ocidental no ar: a védica não tem
+    aviso de cookies, então nada de pixel nela (fica idêntica a antes)."""
+    import sistema
+    ligados = sistema.ativo() == "ocidental"
+    return {chave: (os.environ.get(var, "").strip() if ligados else "") for chave, var in PIXELS.items()}
+
+
+def _origens_pixels(tipo: str) -> str:
+    ids = pixels()
+    return " ".join(o for chave, dirs in CSP_PIXELS.items() if ids.get(chave) for o in dirs.get(tipo, []))
+
+
 def politica_csp() -> str:
     ph = " ".join(origens_posthog())
+    frames = _origens_pixels("frame")
     diretivas = [
         "default-src 'self'",
-        f"script-src 'self' 'unsafe-inline' {ph}",
+        f"script-src 'self' 'unsafe-inline' {ph} {_origens_pixels('script')}",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: blob:",
-        f"connect-src 'self' {ph}",
+        f"img-src 'self' data: blob: {_origens_pixels('img')}",
+        f"connect-src 'self' {ph} {_origens_pixels('connect')}",
         "worker-src 'self' blob:",
+        *([f"frame-src 'self' {frames}"] if frames else []),
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",

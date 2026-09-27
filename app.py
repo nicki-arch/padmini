@@ -582,6 +582,9 @@ def config():
         "data_abertura": os.environ.get("PADMINI_DATA_ABERTURA", ""),
         # "receber a amostra por e-mail" só aparece se o envio estiver configurado
         "amostra_email": bool(os.environ.get("RESEND_API_KEY")),
+        # Pixels de anúncio (rodada 6): só com a ocidental no ar, e o navegador só os
+        # carrega depois do "Aceitar" (static/ocidental/consentimento.js). Vazio = não carrega.
+        **seguranca.pixels(),
     }
 
 

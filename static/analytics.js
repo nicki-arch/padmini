@@ -88,9 +88,7 @@
     });
   };
 
-  fetch("/api/config").then(function (r) { return r.json(); }).then(function (c) {
-    if (c && c.posthog_key) iniciar(c.posthog_key, c.posthog_host);
-  }).catch(function () {}).finally(function () {
+  function descarregarFila() {
     pronto = true;
     if (ligado && window.posthog) {
       fila.forEach(function (ev) {
@@ -98,5 +96,31 @@
       });
     }
     fila = [];
-  });
+  }
+
+  // Versão ocidental (rodada 6): páginas com <meta name="pad-consentimento"> só
+  // ligam o PostHog depois do "Aceitar" do aviso de cookies (consentimento.js).
+  // Sem a marca (a védica), tudo como sempre foi.
+  var exigeConsentimento = false;
+  try { exigeConsentimento = !!document.querySelector('meta[name="pad-consentimento"]'); } catch (e) {}
+  function escolhaDeCookies() {
+    try {
+      var v = JSON.parse(localStorage.getItem("pad_consentimento") || "null");
+      if (v && Date.now() - v.em < 365 * 24 * 60 * 60 * 1000) return v.escolha;
+    } catch (e) {}
+    return null;
+  }
+
+  fetch("/api/config").then(function (r) { return r.json(); }).then(function (c) {
+    if (!(c && c.posthog_key)) return descarregarFila();
+    if (!exigeConsentimento || escolhaDeCookies() === "aceito") {
+      iniciar(c.posthog_key, c.posthog_host);
+      return descarregarFila();
+    }
+    if (escolhaDeCookies() === "recusado") return descarregarFila();  // nada carrega; a fila some
+    window.addEventListener("pad:consentimento", function (ev) {
+      if (ev.detail === "aceito" && !ligado) iniciar(c.posthog_key, c.posthog_host);
+      descarregarFila();
+    });
+  }).catch(function () { descarregarFila(); });
 })();
