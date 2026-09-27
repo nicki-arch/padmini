@@ -13,3 +13,9 @@
   .menu-produtos .navlink { min-height: 38px; padding: 7px 10px; font-size: 13px; }
   .menu-produtos .longo { display: none; }
 }
+
+/* e-mail antes da amostra (rodada 6): campo no formulário e o aviso depois */
+.campo-email { grid-column: 1 / -1; display: grid; gap: 6px; }
+.campo-email .check-seq { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--muted); font-weight: 400; margin-top: 4px; cursor: pointer; }
+.campo-email .check-seq input { width: auto; min-height: 0; margin-top: 3px; flex: none; }
+.aviso-email { border-color: var(--accent-borda); }
