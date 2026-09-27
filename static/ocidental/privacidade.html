@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/ocidental/tema.css">
 <link rel="icon" href="{{ marca.favicon_uri() }}">
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
 <style>
   .prosa{max-width:720px;margin:0 auto;padding-block:20px 40px}
   .prosa h1{font-size:clamp(2rem,5vw,2.8rem);margin:20px 0 6px}
@@ -76,15 +78,18 @@
     <li><strong>Supabase</strong> — banco de dados (pedidos e lista de espera).</li>
     <li><strong>Anthropic</strong> — geração do texto do relatório por inteligência artificial, quando você pede. Enviamos apenas o conteúdo da leitura (o mapa, os números ou as cartas); na sinastria, também os nomes que você digitou, para o texto falar de vocês dois; no tarot, a sua pergunta, se houver. <strong>Nunca e-mail, telefone ou dados de pagamento.</strong></li>
     <li><strong>Provedor de e-mail</strong> — envio do relatório e dos avisos.</li>
-    <li><strong>Ferramenta de métricas</strong> — estatísticas de navegação, quando ativa.</li>
+    <li><strong>PostHog</strong> — estatísticas de uso do site, só com o seu consentimento (seção 6).</li>
+    <li><strong>Meta, TikTok e Google</strong> — medição de visitas e de anúncios (Pixel da Meta, Pixel do TikTok, Google Analytics e Google Ads), só com o seu consentimento (seção 6). Recebem eventos como “página de produto vista” ou “amostra pedida”, sem dados de nascimento, nome, e-mail ou a pergunta do tarot.</li>
     <li>Autoridades públicas, quando exigido por lei ou ordem judicial.</li>
   </ul>
 
   <h2>5. Transferência internacional</h2>
   <p>Alguns desses prestadores armazenam ou processam dados fora do Brasil (por exemplo, nos Estados Unidos e no Canadá). Nesses casos, adotamos prestadores com garantias contratuais de proteção de dados, conforme o art. 33 da LGPD.</p>
 
-  <h2>6. Cookies e armazenamento no navegador</h2>
-  <p>Usamos armazenamento local do navegador e cookies para o funcionamento do site (por exemplo, guardar a indicação de um afiliado durante a sua visita) e para métricas agregadas. Você pode apagá-los nas configurações do navegador.</p>
+  <h2 id="cookies">6. Cookies e armazenamento no navegador</h2>
+  <p><strong>Necessários</strong> (sem pedir permissão, porque o site não funciona sem eles): guardar a indicação de um afiliado ou cupom durante a sua visita, a sua escolha sobre cookies, a sessão do modo ao vivo e a sua pergunta do tarot, que fica só neste aparelho.</p>
+  <p><strong>De medição e de anúncios</strong> (só com a sua permissão): quando você clica em “Aceitar” no aviso de cookies, carregamos o PostHog (estatísticas de uso do site), o Pixel da Meta (Facebook e Instagram), o Pixel do TikTok e a tag do Google (Google Analytics e Google Ads). Eles servem para medir as visitas e saber quais anúncios trazem pessoas ao site. Registram, por exemplo, que uma página de produto foi vista ou que uma amostra foi pedida — <strong>nunca</strong> os seus dados de nascimento, nome, e-mail ou a pergunta do tarot. Base legal: consentimento (art. 7º, I).</p>
+  <p>Se você recusar, nenhum deles é carregado e o site funciona do mesmo jeito. A sua escolha vale por 12 meses; para mudar a qualquer momento, use o link “Preferências de cookies” no rodapé das páginas. Ao retirar a permissão, apagamos os cookies que esses serviços gravaram neste site. O pagamento acontece na página da Cakto, que tem os próprios cookies e a própria política.</p>
 
   <h2>7. Por quanto tempo guardamos</h2>
   <ul>
