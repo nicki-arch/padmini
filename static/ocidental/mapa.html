@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/ocidental/tema.css">
 <script src="/static/afiliado.js" defer></script>
+<script src="/static/amostra-email.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 <link rel="icon" href="{{ marca.favicon_uri() }}">
 {# Versão ocidental (PADMINI_SISTEMA=ocidental ou link com token "oc-"). Preço e
@@ -284,6 +285,12 @@ function desenharAmostra(d) {
       <a class="navlink destaque" href="/compatibilidade">Ver a sinastria →</a></div>`;
   res.hidden = false;
   if (window.padTrack) padTrack("amostra_gerada", { produto: "mapa", sistema: "ocidental" });
+  // amostra por e-mail (+ lembrete opcional, caixa desmarcada): /static/amostra-email.js
+  res.insertAdjacentHTML("beforeend", '<div class="card amostra-email" id="amostra-email" hidden></div>');
+  if (window.padAmostraEmail && ultimoPedido) {
+    const { nome, data, hora, lat, lon, cidade } = ultimoPedido;
+    padAmostraEmail("#amostra-email", "mapa", () => ({ pessoa: { nome, data, hora, lat, lon, cidade } }));
+  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 

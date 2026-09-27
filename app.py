@@ -21,10 +21,11 @@ from zoneinfo import ZoneInfo
 import json
 
 import jinja2
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import Body, FastAPI, HTTPException, Query, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from base_significacoes import NOME_PT, SIGNO_PT
 from cidades import BuscaCidades
@@ -265,12 +266,43 @@ def pagina_estilo(request: Request):
     html = _jinja.get_template("ocidental/estilo.html").render(
         cores=t, fontes=paleta.FONTES["ocidental"], marca=marca, contrastes=paleta.contrastes("ocidental"),
         paleta_amostras=[{"token": k, "valor": t[k], "nome": n, "uso": u} for k, (n, u) in paleta.NOMES.items()],
-        cartas_exemplo=cartas, email_exemplo=email)
+        cartas_exemplo=cartas, email_exemplo=email, emails_marketing=_emails_de_exemplo_ocidental())
     resp = Response(html, media_type="text/html; charset=utf-8", headers={"X-Robots-Tag": "noindex, nofollow"})
     if request.query_params.get("previa") == chave:
         resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
                         secure=request.url.scheme == "https", samesite="lax")
     return resp
+
+
+def _emails_de_exemplo_ocidental() -> list[dict]:
+    """Os e-mails de marketing da ocidental montados com dados de exemplo (as
+    mesmas funções do envio de verdade), para aprovar a copy em /estilo."""
+    import tarot
+    ana = {"nome": "Ana", "data": "1990-05-15", "hora": "14:30", "lat": -23.5505, "lon": -46.6333,
+           "cidade": "São Paulo, SP"}
+    rafael = {"nome": "Rafael", "data": "1988-11-02", "hora": "08:15", "lat": -22.9068, "lon": -43.1729,
+              "cidade": "Rio de Janeiro, RJ"}
+    exemplos = {"mapa": ana, "compat": {"a": ana, "b": rafael},
+                "numerologia": {"nome": "Ana Maria da Silva", "data": "1990-05-15"}}
+    try:
+        exemplos["tarot"] = {"tiragem": tarot.tirar()}
+    except tarot.SemSegredo:
+        pass  # sem PADMINI_SECRET não há tiragem (falha fechada)
+    email = "ana@exemplo.com"
+    saida = []
+    for produto, dados in exemplos.items():
+        amostra = rotas_ocidental.montar_amostra_email(produto, dados)
+        nome = (dados.get("a") or dados).get("nome", "").split(" ")[0]
+        saida.append({"titulo": f"Amostra por e-mail · {produto}", "assunto": marketing.assunto("amostra", produto, "ocidental"),
+                      "html": marketing.email_amostra_html(produto, amostra, dados, email, nome, "ocidental")})
+        saida.append({"titulo": f"Lembrete · {produto}", "assunto": marketing.assunto("lembrete", produto, "ocidental"),
+                      "html": marketing.email_lembrete_html(produto, amostra, dados, email, "ocidental")})
+    for produto in ("mapa", "compat", "numerologia", "tarot"):
+        saida.append({"titulo": f"Carrinho abandonado · {produto}",
+                      "assunto": marketing.assunto("abandono", produto, "ocidental"),
+                      "html": marketing.email_abandono_html(produto, "Ana", marketing.link_site(produto, "abandono"),
+                                                            email, "ocidental")})
+    return saida
 
 
 @app.api_route("/lista", methods=["GET", "HEAD"])
@@ -812,6 +844,11 @@ def _tratar_abandono(evento: dict) -> dict:
     já comprou. Sempre responde 200: a Cakto não reenvia erro e não há o que refazer.
     `data` aqui tem outra forma (customerEmail, customerName, offer, checkoutUrl);
     no webhook V2 vem numa lista de um elemento.
+
+    Versão e produto saem da OFERTA (cakto.oferta_paga), e o e-mail sai na copy e
+    na paleta dessa versão. Se a versão da oferta não é a que está no ar, não
+    manda nada (mandar para uma página que vende outra coisa é pior que silêncio):
+    só registra, com email_enviado = false.
     """
     d = evento.get("data")
     if isinstance(d, list):
@@ -821,25 +858,37 @@ def _tratar_abandono(evento: dict) -> dict:
     email = str(d.get("customerEmail") or "").strip()
     if not _EMAIL_RE.match(email.lower()):
         return {"ok": True, "ignorado": "abandono sem e-mail"}
-    produto = cakto.produto_pago({"data": d})
-    if produto not in ("mapa", "compat"):
-        return {"ok": True, "ignorado": "abandono de oferta desconhecida"}
     oferta_id = str((d.get("offer") or {}).get("id") or "") if isinstance(d.get("offer"), dict) else ""
+    if oferta_id.split("_")[0] in _codigos_de_bump():
+        return {"ok": True, "ignorado": "bump do combo sozinho não é abandono"}
+    versao, produto = cakto.oferta_paga({"data": d})
+    if not versao or produto not in cakto.PRODUTOS:
+        return {"ok": True, "ignorado": "abandono de oferta desconhecida"}
     if db.descadastrado(email) or db.abandono_ja_tratado(email, oferta_id):
         return {"ok": True, "ignorado": "já tratado, comprou ou descadastrado"}
-    # O link do próprio checkout só serve se ainda carregar os dados de
-    # nascimento (sck); sem eles a compra viraria entrega manual. Aí manda
-    # para a página do produto, que refaz a amostra e monta o link certo.
     checkout = str(d.get("checkoutUrl") or "")
+    nome = str(d.get("customerName") or "").split(" ")[0]
+    if versao != sistema.ativo():
+        db.registrar_abandono(email, nome, oferta_id, checkout, False, versao)
+        return {"ok": True, "abandono": produto, "email_enviado": False,
+                "motivo": f"oferta da versão {versao}, que não está no ar"}
+    # O link do próprio checkout só serve se ainda carregar os dados (sck); sem
+    # eles a compra viraria entrega manual. Aí manda para a página do produto,
+    # que refaz a amostra e monta o link certo.
     if checkout.startswith("https://pay.cakto.com.br/") and "sck=" in checkout:
         link = checkout
     else:
         link = marketing.link_site(produto, "abandono")
-    nome = str(d.get("customerName") or "").split(" ")[0]
-    enviado = entrega.enviar_email(email, "Seu pedido na Padmini ficou pela metade",
-                                   marketing.email_abandono_html(produto, nome, link, email))
-    db.registrar_abandono(email, nome, oferta_id, checkout, enviado)
+    enviado = entrega.enviar_email(email, marketing.assunto("abandono", produto, versao),
+                                   marketing.email_abandono_html(produto, nome, link, email, versao))
+    db.registrar_abandono(email, nome, oferta_id, checkout, enviado, versao)
     return {"ok": True, "abandono": produto, "email_enviado": enviado}
+
+
+def _codigos_de_bump() -> set:
+    """Códigos das ofertas de order bump (combo casal + 2 mapas) das duas versões."""
+    codigos = {ofertas.codigo("bump_mapas_casal", s) for s in sistema.SISTEMAS} | {cakto.OFERTA_BUMP_MAPAS}
+    return {c for c in codigos if c}
 
 
 # ---------------------------------------------------------------------------
@@ -898,10 +947,19 @@ MAX_AMOSTRAS_POR_EMAIL_DIA = 3
 
 
 @app.post("/api/amostra/email")
-def amostra_por_email(pedido: PedidoAmostraEmail, request: Request):
+def amostra_por_email(request: Request, corpo: dict = Body(...)):
+    """Uma rota só para as duas versões, e a versão é decidida AQUI, no servidor
+    (sistema.ativo()): o navegador não escolhe. A versão viaja com o registro, e
+    o lembrete sai nela mesmo que o site troque de versão depois."""
     limites.exigir(limites.AMOSTRA_EMAIL, request)
     if not os.environ.get("RESEND_API_KEY"):
         raise HTTPException(503, "O envio por e-mail não está disponível agora.")
+    if sistema.ativo() == "ocidental":
+        return _amostra_por_email_ocidental(corpo)
+    try:
+        pedido = PedidoAmostraEmail(**corpo)
+    except ValidationError as erro:
+        raise RequestValidationError(erro.errors())
     email = pedido.email.strip().lower()
     if not _EMAIL_RE.match(email):
         raise HTTPException(422, "Confira o e-mail.")
@@ -916,19 +974,38 @@ def amostra_por_email(pedido: PedidoAmostraEmail, request: Request):
             raise HTTPException(422, "Faltam os dados de nascimento do casal.")
         dados = {"a": _dados_pessoa(pedido.a), "b": _dados_pessoa(pedido.b)}
         nome = dados["a"]["nome"]
+    return _enviar_amostra(email, pedido.produto, dados, nome, pedido.aceita_lembrete, pedido.origem,
+                           lambda: _montar_amostra(pedido.produto, dados), "vedica")
+
+
+def _amostra_por_email_ocidental(corpo: dict) -> dict:
+    try:
+        pedido = rotas_ocidental.PedidoAmostraEmailOcidental(**corpo)
+    except ValidationError as erro:
+        raise RequestValidationError(erro.errors())
+    email = pedido.email.strip().lower()
+    if not _EMAIL_RE.match(email):
+        raise HTTPException(422, "Confira o e-mail.")
+    dados, nome = rotas_ocidental.dados_da_amostra_email(pedido)
+    return _enviar_amostra(email, pedido.produto, dados, nome, pedido.aceita_lembrete, pedido.origem,
+                           lambda: rotas_ocidental.montar_amostra_email(pedido.produto, dados), "ocidental")
+
+
+def _enviar_amostra(email: str, produto: str, dados: dict, nome: str, aceita_lembrete: bool, origem: dict,
+                    montar, versao: str) -> dict:
+    """Parte comum às duas versões: limite por e-mail, envio e registro (com a versão)."""
     # Anti-spam: o formulário não pode virar um jeito de mandar e-mail em massa
     # com a nossa marca para endereços de terceiros.
     if db.amostras_enviadas_hoje(email) >= MAX_AMOSTRAS_POR_EMAIL_DIA:
         raise HTTPException(429, "Este e-mail já recebeu várias amostras hoje. Tente amanhã.")
-    amostra = _montar_amostra(pedido.produto, dados)
-    enviado = entrega.enviar_email(
-        email, "Sua amostra da Padmini" if pedido.produto == "mapa" else "A amostra de vocês na Padmini",
-        marketing.email_amostra_html(pedido.produto, amostra, dados, email, nome))
+    amostra = montar()
+    enviado = entrega.enviar_email(email, marketing.assunto("amostra", produto, versao),
+                                   marketing.email_amostra_html(produto, amostra, dados, email, nome, versao))
     if not enviado:
         raise HTTPException(503, "Não conseguimos enviar agora. Tente de novo em instantes.")
-    origem = {k: str(v)[:80] for k, v in (pedido.origem or {}).items()
+    origem = {k: str(v)[:80] for k, v in (origem or {}).items()
               if k in ("ref", "cupom", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term")}
-    db.registrar_amostra_email(email, pedido.produto, dados, pedido.aceita_lembrete, origem)
+    db.registrar_amostra_email(email, produto, dados, aceita_lembrete, origem, versao)
     return {"ok": True}
 
 
@@ -948,12 +1025,14 @@ def enviar_lembretes(request: Request):
     _chave_tarefas_ok(request)
     enviados, falhas = 0, 0
     for item in db.lembretes_pendentes():
+        # a versão do registro (a da página em que a pessoa estava), não a do ar
+        versao = item.get("sistema") or "vedica"
         try:
-            amostra = _montar_amostra(item["produto"], item["dados"])
+            amostra = (rotas_ocidental.montar_amostra_email(item["produto"], item["dados"]) if versao == "ocidental"
+                       else _montar_amostra(item["produto"], item["dados"]))
             ok = entrega.enviar_email(
-                item["email"], "Faltou uma parte do seu mapa" if item["produto"] == "mapa"
-                else "O resto da compatibilidade de vocês",
-                marketing.email_lembrete_html(item["produto"], amostra, item["dados"], item["email"]))
+                item["email"], marketing.assunto("lembrete", item["produto"], versao),
+                marketing.email_lembrete_html(item["produto"], amostra, item["dados"], item["email"], versao))
         except Exception:  # noqa: BLE001
             log.exception("lembrete: falha na amostra %s", item["id"])
             ok = False
@@ -972,7 +1051,21 @@ def enviar_lembretes(request: Request):
 # Descadastro (link em todo e-mail de marketing)
 # ---------------------------------------------------------------------------
 def _pagina_simples(titulo: str, corpo: str) -> Response:
+    """Páginas curtas (descadastro). Na védica, a de sempre; na ocidental, com o
+    tema, as fontes, o favicon e o lótus dela."""
     import html as _html
+    if sistema.ativo() == "ocidental":
+        cores, fontes = paleta.tela("ocidental"), paleta.FONTES["ocidental"]
+        pagina = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<meta name="theme-color" content="{cores['ground']}">
+<title>Padmini — {_html.escape(titulo)}</title><link href="{fontes['google']}" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css"><link rel="stylesheet" href="/static/ocidental/tema.css">
+<link rel="icon" href="{marca.favicon_uri()}"></head>
+<body><main style="max-width:520px;margin:12vh auto;padding:0 16px">
+<a class="marca" href="/">{marca.svg(30)} Padmini</a><h1>{_html.escape(titulo)}</h1>{corpo}
+<p><a href="/">Voltar para a Padmini</a></p></main></body></html>"""
+        return Response(pagina, media_type="text/html; charset=utf-8")
     pagina = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>Padmini — {_html.escape(titulo)}</title><link rel="stylesheet" href="/static/base.css"></head>

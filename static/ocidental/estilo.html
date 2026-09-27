@@ -144,6 +144,17 @@
     <p class="sub">Como chega na caixa de entrada (cores de <code>paleta.email("ocidental")</code>; o e-mail não baixa fonte: onde a Young Serif não existir, cai no Georgia).</p>
     <div class="email">{{ email_exemplo }}</div>
   </section>
+
+  <section>
+    <h2>E-mails de marketing</h2>
+    <p class="sub">Amostra por e-mail, o lembrete (só com a caixa marcada) e o de carrinho abandonado, montados com dados de exemplo pelas mesmas funções do envio de verdade. Clique para abrir.</p>
+    {%- for m in emails_marketing %}
+    <details class="card" style="margin:0 0 12px;max-width:600px">
+      <summary><b>{{ m.titulo }}</b> — <span class="nota">Assunto: {{ m.assunto }}</span></summary>
+      <div class="email" style="margin-top:14px">{{ m.html }}</div>
+    </details>
+    {%- endfor %}
+  </section>
 </main>
 
 <footer>Padmini — vitrine de estilo da versão ocidental. Não aparece no buscador.</footer>

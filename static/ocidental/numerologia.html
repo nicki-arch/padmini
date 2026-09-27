@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/ocidental/tema.css">
 <script src="/static/afiliado.js" defer></script>
+<script src="/static/amostra-email.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 <link rel="icon" href="{{ marca.favicon_uri() }}">
 {# Versão ocidental. Preço e checkout: conteudo/ocidental/ofertas.yaml (numerologia);
@@ -159,6 +160,12 @@ function desenharAmostra(d) {
     </div>`;
   res.hidden = false;
   if (window.padTrack) padTrack("amostra_gerada", { produto: "numerologia", sistema: "ocidental" });
+  // amostra por e-mail (+ lembrete opcional, caixa desmarcada): /static/amostra-email.js
+  res.insertAdjacentHTML("beforeend", '<div class="card amostra-email" id="amostra-email" hidden></div>');
+  if (window.padAmostraEmail && ultimoPedido) {
+    const { nome, data } = ultimoPedido;
+    padAmostraEmail("#amostra-email", "numerologia", () => ({ nome, data }));
+  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 

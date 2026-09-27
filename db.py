@@ -107,6 +107,12 @@ CREATE TABLE IF NOT EXISTS abandonos (
 );
 CREATE INDEX IF NOT EXISTS abandonos_email_idx ON abandonos (lower(email));
 
+-- Rodada 4: a versão do site (vedica | ocidental) viaja com o registro. O
+-- lembrete sai na versão em que a pessoa estava, não na que está no ar na hora
+-- do envio (mesma regra dos links de entrega). Linhas antigas ficam 'vedica'.
+ALTER TABLE amostras_email ADD COLUMN IF NOT EXISTS sistema TEXT NOT NULL DEFAULT 'vedica';
+ALTER TABLE abandonos ADD COLUMN IF NOT EXISTS sistema TEXT NOT NULL DEFAULT 'vedica';
+
 -- Quem clicou em "não quero mais receber": nenhum e-mail de marketing
 -- (lembrete, recuperação) sai para este endereço. E-mail de entrega de compra sai.
 CREATE TABLE IF NOT EXISTS email_optout (
@@ -361,15 +367,15 @@ def amostras_enviadas_hoje(email: str) -> int:
 
 
 def registrar_amostra_email(email: str, produto: str, dados: dict, aceita_lembrete: bool,
-                            origem: dict) -> bool:
+                            origem: dict, sistema: str = "vedica") -> bool:
     if not ativo():
         return False
     try:
         with _conectar() as c:
-            c.execute("INSERT INTO amostras_email (email, produto, dados, aceita_lembrete, origem) "
-                      "VALUES (%s,%s,%s,%s,%s)",
+            c.execute("INSERT INTO amostras_email (email, produto, dados, aceita_lembrete, origem, sistema) "
+                      "VALUES (%s,%s,%s,%s,%s,%s)",
                       (email, produto, json.dumps(dados, ensure_ascii=False), aceita_lembrete,
-                       json.dumps(origem or {}, ensure_ascii=False)))
+                       json.dumps(origem or {}, ensure_ascii=False), sistema))
         return True
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao registrar amostra por e-mail")
@@ -388,7 +394,7 @@ def lembretes_pendentes(limite: int = 50) -> list[dict]:
         with _conectar() as c:
             rows = c.execute(
                 """
-                SELECT DISTINCT ON (lower(a.email)) a.id, a.email, a.produto, a.dados
+                SELECT DISTINCT ON (lower(a.email)) a.id, a.email, a.produto, a.dados, a.sistema
                 FROM amostras_email a
                 WHERE a.aceita_lembrete AND a.lembrete_enviado_em IS NULL
                   AND a.criado_em < now() - interval '24 hours'
@@ -401,7 +407,7 @@ def lembretes_pendentes(limite: int = 50) -> list[dict]:
                 ORDER BY lower(a.email), a.criado_em DESC
                 LIMIT %s
                 """, (limite,)).fetchall()
-        return [{"id": r[0], "email": r[1], "produto": r[2], "dados": r[3]} for r in rows]
+        return [{"id": r[0], "email": r[1], "produto": r[2], "dados": r[3], "sistema": r[4]} for r in rows]
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao buscar lembretes")
         return []
@@ -438,13 +444,15 @@ def abandono_ja_tratado(email: str, oferta_id: str) -> bool:
         return True
 
 
-def registrar_abandono(email: str, nome: str, oferta_id: str, checkout: str, enviado: bool) -> bool:
+def registrar_abandono(email: str, nome: str, oferta_id: str, checkout: str, enviado: bool,
+                       sistema: str = "vedica") -> bool:
     if not ativo():
         return False
     try:
         with _conectar() as c:
-            c.execute("INSERT INTO abandonos (email, nome, oferta_id, checkout, email_enviado) "
-                      "VALUES (%s,%s,%s,%s,%s)", (email, nome or None, oferta_id or None, checkout or None, enviado))
+            c.execute("INSERT INTO abandonos (email, nome, oferta_id, checkout, email_enviado, sistema) "
+                      "VALUES (%s,%s,%s,%s,%s,%s)",
+                      (email, nome or None, oferta_id or None, checkout or None, enviado, sistema))
         return True
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao registrar abandono")

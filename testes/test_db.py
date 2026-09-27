@@ -264,3 +264,59 @@ def test_descadastro_bloqueia_marketing():
     assert db.descadastrado("x@t.com") is False
     assert db.descadastrar("X@t.com")
     assert db.descadastrado("x@T.com") is True
+
+
+# ---------------------------------------------------------------------------
+# Rodada 4: a versão do site viaja com o registro (amostras_email e abandonos)
+# ---------------------------------------------------------------------------
+def test_migracao_da_coluna_sistema_no_banco_que_ja_esta_no_ar():
+    """O banco de produção já tem amostras_email e abandonos sem a coluna (e com
+    linhas). A migração acrescenta `sistema` e as linhas antigas ficam 'vedica'."""
+    with db._conectar() as c:
+        c.execute("DROP TABLE amostras_email, abandonos")
+        c.execute("""CREATE TABLE amostras_email (id BIGSERIAL PRIMARY KEY, criado_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+                     email TEXT NOT NULL, produto TEXT NOT NULL, dados JSONB NOT NULL,
+                     aceita_lembrete BOOLEAN NOT NULL DEFAULT false, origem JSONB, lembrete_enviado_em TIMESTAMPTZ)""")
+        c.execute("""CREATE TABLE abandonos (id BIGSERIAL PRIMARY KEY, criado_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+                     email TEXT NOT NULL, nome TEXT, oferta_id TEXT, checkout TEXT,
+                     email_enviado BOOLEAN NOT NULL DEFAULT false)""")
+        c.execute("INSERT INTO amostras_email (email, produto, dados) VALUES ('velho@t.com', 'mapa', '{}')")
+        c.execute("INSERT INTO abandonos (email, oferta_id) VALUES ('velho@t.com', 'qo8uskp')")
+    assert db.iniciar() and db.iniciar()  # e roda de novo sem erro (a cada subida do app)
+    assert _linhas("SELECT sistema FROM amostras_email") == [("vedica",)]
+    assert _linhas("SELECT sistema FROM abandonos") == [("vedica",)]
+
+
+def test_amostra_do_tarot_no_banco_sem_a_pergunta(monkeypatch):
+    import tarot
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    monkeypatch.setenv("RESEND_API_KEY", "teste")
+    monkeypatch.setattr(entrega, "enviar_email", lambda *a: True)
+    t = tarot.tirar()
+    pergunta = "Ele volta para mim até o fim do ano?"
+    r = base.cliente.post("/api/amostra/email", json={"email": "t@teste.com", "produto": "tarot", "tiragem": t,
+                                                      "pergunta": pergunta, "aceita_lembrete": True})
+    assert r.status_code == 200, r.text
+    (dados, sistema, tudo), = _linhas("SELECT dados, sistema, row_to_json(amostras_email)::text FROM amostras_email")
+    assert dados == {"tiragem": t} and sistema == "ocidental"
+    assert pergunta not in tudo and "Ele volta" not in tudo
+
+
+def test_lembrete_pendente_traz_a_versao():
+    with db._conectar() as c:
+        c.execute("INSERT INTO amostras_email (email, produto, dados, aceita_lembrete, criado_em, sistema) "
+                  "VALUES ('n@t.com', 'numerologia', %s, true, now() - interval '30 hours', 'ocidental')",
+                  (json.dumps({"nome": "Ana Souza", "data": "1990-05-15"}),))
+    (item,) = db.lembretes_pendentes()
+    assert item["sistema"] == "ocidental" and item["produto"] == "numerologia"
+
+
+def test_abandono_grava_a_versao_da_oferta(monkeypatch):
+    import ofertas
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    monkeypatch.setattr(entrega, "enviar_email", lambda *a: True)
+    ev = {"event": "checkout_abandonment",
+          "data": {"customerName": "Bia", "customerEmail": "bia@teste.com",
+                   "offer": {"id": ofertas.codigo("mapa", "vedica")}, "checkoutUrl": ofertas.checkout("mapa", "vedica")}}
+    assert base._postar_webhook(ev).json()["email_enviado"] is False
+    assert _linhas("SELECT sistema, email_enviado FROM abandonos") == [("vedica", False)]
