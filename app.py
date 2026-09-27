@@ -355,6 +355,17 @@ def _emails_de_exemplo_ocidental() -> list[dict]:
                       "assunto": marketing.assunto("abandono", produto, "ocidental"),
                       "html": marketing.email_abandono_html(produto, "Ana", marketing.link_site(produto, "abandono"),
                                                             email, "ocidental")})
+    # Rodada 6: as sequências (boas-vindas por produto, pós-compra de um mapa natal)
+    import sequencias
+    for produto, dados in exemplos.items():
+        for passo in (1, 2, 3):
+            assunto, html = sequencias.email_boas_vindas(passo, produto, dados, email)
+            saida.append({"titulo": f"Boas-vindas {passo}/3 (D+{sequencias.DIAS_BOAS_VINDAS[passo]}) · {produto}",
+                          "assunto": assunto, "html": html})
+    for passo in (1, 2, 3):
+        assunto, html = sequencias.email_pos_compra(passo, "ocidental:mapa", "Ana Souza", email, ["ocidental:mapa"])
+        saida.append({"titulo": f"Pós-compra {passo}/3 (D+{sequencias.DIAS_POS_COMPRA[passo]}) · depois de um mapa natal",
+                      "assunto": assunto, "html": html})
     return saida
 
 
@@ -1116,6 +1127,20 @@ def limpar_dados_antigos(request: Request):
                         chave="limpeza", intervalo=24 * 3600)
         raise HTTPException(503, "Não deu para limpar agora.")
     return {"ok": True, "apagadas": apagadas}
+
+
+@app.post("/api/tarefas/sequencias")
+def enviar_sequencias(request: Request):
+    """Chamado 1x por dia pelo GitHub Actions (.github/workflows/tarefas.yml):
+    boas-vindas depois da amostra e pós-compra (sequencias.py)."""
+    _chave_tarefas_ok(request)
+    import sequencias
+    contagem = sequencias.rodar()
+    if contagem["falhou"]:
+        alertas.alertar("Sequências de e-mail com falha",
+                        f"{contagem['falhou']} e-mail(s) de sequência não saíram; {contagem['enviado']} saíram. "
+                        "Os que falharam tentam de novo amanhã.", chave="sequencias", intervalo=6 * 3600)
+    return {"ok": True, **contagem}
 
 
 # ---------------------------------------------------------------------------

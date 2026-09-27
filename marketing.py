@@ -187,6 +187,10 @@ def assunto(tipo: str, produto: str = "", sistema: str = "vedica") -> str:
 def _nome_do_registro(produto: str, dados: dict) -> str:
     if produto == "compat":
         return (dados.get("a") or {}).get("nome") or ""
+    if produto == "numerologia":
+        # o nome da numerologia é o completo de registro ("Ana Maria da Silva"): no
+        # "Olá", só o primeiro, como na amostra (rodada 6)
+        return (dados.get("nome") or "").strip().split(" ")[0]
     return dados.get("nome") or ""
 
 

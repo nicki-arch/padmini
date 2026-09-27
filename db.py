@@ -136,6 +136,23 @@ ALTER TABLE amostras_email ENABLE ROW LEVEL SECURITY;
 ALTER TABLE abandonos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE email_optout ENABLE ROW LEVEL SECURITY;
 
+-- Rodada 6: sequências de e-mail (boas-vindas depois da amostra, pós-compra).
+-- Uma linha por passo enviado; o índice único garante que o mesmo passo nunca
+-- sai duas vezes para o mesmo e-mail. A linha é gravada ANTES do envio (reserva);
+-- se o envio falha, ela é apagada e o passo tenta de novo no dia seguinte.
+CREATE TABLE IF NOT EXISTS envios_sequencia (
+    id          BIGSERIAL PRIMARY KEY,
+    enviado_em  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    email       TEXT NOT NULL,
+    sequencia   TEXT NOT NULL,
+    passo       INTEGER NOT NULL,
+    sistema     TEXT NOT NULL DEFAULT 'ocidental',
+    referencia  BIGINT,
+    pulado      BOOLEAN NOT NULL DEFAULT false
+);
+CREATE UNIQUE INDEX IF NOT EXISTS envios_sequencia_passo_idx ON envios_sequencia (lower(email), sequencia, passo);
+ALTER TABLE envios_sequencia ENABLE ROW LEVEL SECURITY;
+
 -- Defesa em profundidade (só existe no Supabase): tira das roles da API
 -- pública qualquer permissão nas tabelas, além do RLS.
 DO $$
@@ -402,6 +419,8 @@ def lembretes_pendentes(limite: int = 50) -> list[dict]:
                 SELECT DISTINCT ON (lower(a.email)) a.id, a.email, a.produto, a.dados, a.sistema
                 FROM amostras_email a
                 WHERE a.aceita_lembrete AND a.lembrete_enviado_em IS NULL
+                  -- rodada 6: quem marcou a caixa nova recebe a sequência de boas-vindas, não o lembrete
+                  AND NOT a.aceita_sequencia
                   AND a.criado_em < now() - interval '24 hours'
                   AND a.criado_em > now() - interval '72 hours'
                   AND NOT EXISTS (SELECT 1 FROM email_optout o WHERE o.email = lower(a.email))
@@ -466,7 +485,7 @@ def registrar_abandono(email: str, nome: str, oferta_id: str, checkout: str, env
 
 # Tabelas de marketing que a política de privacidade promete apagar (seção 7):
 # "até você se descadastrar ou até 24 meses sem nenhuma interação".
-TABELAS_MARKETING = ("leads", "amostras_email", "abandonos")
+TABELAS_MARKETING = ("leads", "amostras_email", "abandonos", "envios_sequencia")
 MESES_SEM_INTERACAO = 24
 
 # Última interação de cada e-mail com o site: entrar/atualizar a lista de espera,
@@ -506,3 +525,108 @@ def limpar_marketing() -> dict | None:
     except Exception:  # noqa: BLE001
         log.exception("banco: falha na limpeza de marketing")
         return None
+
+
+# ---------------------------------------------------------------- sequências (rodada 6)
+_MESMO_DIA = ("NOT e.pulado AND (e.enviado_em AT TIME ZONE 'America/Sao_Paulo')::date = "
+              "(now() AT TIME ZONE 'America/Sao_Paulo')::date")
+
+
+def candidatos_boas_vindas(limite: int = 200) -> list[dict]:
+    """A amostra mais recente de cada e-mail que marcou a caixa (ocidental), dos
+    últimos 30 dias, sem compra depois dela e sem descadastro — com quantos passos
+    da boas-vindas já saíram e se o e-mail já recebeu algo hoje."""
+    if not ativo():
+        return []
+    try:
+        with _conectar() as c:
+            rows = c.execute(
+                f"""
+                SELECT * FROM (
+                    SELECT DISTINCT ON (lower(a.email)) a.id, lower(a.email), a.produto, a.dados, a.sistema, a.criado_em
+                    FROM amostras_email a
+                    WHERE a.aceita_sequencia AND a.sistema = 'ocidental'
+                      AND a.criado_em > now() - interval '30 days'
+                    ORDER BY lower(a.email), a.criado_em DESC
+                ) u
+                WHERE NOT EXISTS (SELECT 1 FROM email_optout o WHERE o.email = u.lower)
+                  AND NOT EXISTS (SELECT 1 FROM pedidos p WHERE lower(p.email) = u.lower AND p.criado_em > u.criado_em)
+                LIMIT %s
+                """, (limite,)).fetchall()
+            saida = []
+            for r in rows:
+                feitos, hoje = c.execute(
+                    f"SELECT coalesce(max(passo) FILTER (WHERE sequencia = 'boas_vindas'), 0), "
+                    f"coalesce(bool_or({_MESMO_DIA}), false) FROM envios_sequencia e WHERE lower(e.email) = %s",
+                    (r[1],)).fetchone()
+                saida.append({"id": r[0], "email": r[1], "produto": r[2], "dados": r[3], "sistema": r[4],
+                              "criado_em": r[5], "feitos": int(feitos), "recebeu_hoje": bool(hoje)})
+        return saida
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao buscar a boas-vindas")
+        return []
+
+
+def candidatos_pos_compra(limite: int = 200) -> list[dict]:
+    """A compra mais recente (ocidental, entregue) de cada e-mail nos últimos 30
+    dias, sem descadastro — com o que o e-mail já comprou, quantos passos do
+    pós-compra já saíram e se recebeu algo hoje."""
+    if not ativo():
+        return []
+    try:
+        with _conectar() as c:
+            rows = c.execute(
+                """
+                SELECT * FROM (
+                    SELECT DISTINCT ON (lower(p.email)) p.id, lower(p.email), p.produto, p.criado_em, p.nome
+                    FROM pedidos p
+                    WHERE p.produto LIKE 'ocidental:%%' AND coalesce(p.link, '') <> '' AND p.email IS NOT NULL
+                      AND p.criado_em > now() - interval '30 days'
+                    ORDER BY lower(p.email), p.criado_em DESC
+                ) u
+                WHERE NOT EXISTS (SELECT 1 FROM email_optout o WHERE o.email = u.lower)
+                LIMIT %s
+                """, (limite,)).fetchall()
+            saida = []
+            for r in rows:
+                feitos, hoje = c.execute(
+                    f"SELECT coalesce(max(passo) FILTER (WHERE sequencia = 'pos_compra'), 0), "
+                    f"coalesce(bool_or({_MESMO_DIA}), false) FROM envios_sequencia e WHERE lower(e.email) = %s",
+                    (r[1],)).fetchone()
+                comprados = [x[0] for x in c.execute(
+                    "SELECT DISTINCT produto FROM pedidos WHERE lower(email) = %s", (r[1],)).fetchall()]
+                saida.append({"id": r[0], "email": r[1], "produto": r[2], "criado_em": r[3], "nome": r[4],
+                              "comprados": comprados, "feitos": int(feitos), "recebeu_hoje": bool(hoje)})
+        return saida
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao buscar o pós-compra")
+        return []
+
+
+def reservar_passo(email: str, sequencia: str, passo: int, referencia: int | None, pulado: bool = False,
+                   sistema: str = "ocidental") -> int | None:
+    """Grava o passo ANTES de enviar. Devolve o id da reserva, ou None se o passo
+    já existia (nunca o mesmo passo duas vezes) ou se o banco falhou."""
+    if not ativo():
+        return None
+    try:
+        with _conectar() as c:
+            row = c.execute(
+                "INSERT INTO envios_sequencia (email, sequencia, passo, sistema, referencia, pulado) "
+                "VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING RETURNING id",
+                (email.strip().lower(), sequencia, passo, sistema, referencia, pulado)).fetchone()
+        return row[0] if row else None
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao reservar passo de sequência")
+        return None
+
+
+def desfazer_reserva(id_reserva: int) -> None:
+    """O envio falhou: libera o passo para tentar de novo amanhã."""
+    if not ativo():
+        return
+    try:
+        with _conectar() as c:
+            c.execute("DELETE FROM envios_sequencia WHERE id = %s", (id_reserva,))
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao desfazer reserva de sequência")
