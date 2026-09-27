@@ -19,6 +19,7 @@
 <link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/ocidental/tema.css">
+<link rel="stylesheet" href="/static/ocidental/componentes.css">
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
@@ -53,6 +54,9 @@
     mask:no-repeat center/11px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E")}
   .oferta .preco{font-family:var(--serif);font-size:2rem}
   .oferta .preco small{font-size:1rem;color:var(--faint);text-decoration:line-through;margin-left:8px}
+  .cidade-status{display:block;margin-top:4px}
+  .cidade-status.ok{color:var(--sage)}
+  input.escolhida{border-color:var(--sage)}
   .honesty{font-size:13px;color:var(--faint);margin-top:8px;max-width:56ch}
   @media(max-width:640px){.duo,.pontos{grid-template-columns:1fr}}
   @media(max-width:480px){fieldset{padding:12px 12px 14px;border-radius:10px}}
@@ -80,9 +84,7 @@
       {{ marca.svg(30) }}
       Padmini
     </a>
-    <nav>
-      <a class="navlink" href="/mapa">Mapa natal</a>
-    </nav>
+    {% set atual = "/compatibilidade" %}{% include "ocidental/_menu.html" %}
   </div>
 </header>
 
@@ -98,22 +100,23 @@
           <legend>Pessoa A</legend>
           <div class="campo">
             <label for="nome-a">Nome <span class="dica">(opcional)</span></label>
-            <input id="nome-a" maxlength="80" autocomplete="off">
+            <input id="nome-a" name="nome-a" maxlength="80" autocomplete="off">
           </div>
           <div class="campo">
             <label for="data-a">Data de nascimento</label>
-            <input id="data-a" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
+            <input id="data-a" name="data-a" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
           </div>
           <div class="campo">
             <label for="hora-a">Hora de nascimento</label>
-            <input id="hora-a" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
+            <input id="hora-a" name="hora-a" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
           </div>
           <div class="campo">
             <label for="cidade-a" id="cidade-a-label">Cidade de nascimento</label>
             <div class="auto">
-              <input id="cidade-a" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-a" autocomplete="off" placeholder="ex.: Porto Alegre" required>
+              <input id="cidade-a" name="cidade-a" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-a" autocomplete="off" placeholder="ex.: Porto Alegre" required>
               <ul id="lista-a" role="listbox" aria-labelledby="cidade-a-label" hidden></ul>
             </div>
+            <span class="dica cidade-status" id="cidade-a-status" aria-live="polite"></span>
           </div>
         </fieldset>
 
@@ -121,22 +124,23 @@
           <legend>Pessoa B</legend>
           <div class="campo">
             <label for="nome-b">Nome <span class="dica">(opcional)</span></label>
-            <input id="nome-b" maxlength="80" autocomplete="off">
+            <input id="nome-b" name="nome-b" maxlength="80" autocomplete="off">
           </div>
           <div class="campo">
             <label for="data-b">Data de nascimento</label>
-            <input id="data-b" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
+            <input id="data-b" name="data-b" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
           </div>
           <div class="campo">
             <label for="hora-b">Hora de nascimento</label>
-            <input id="hora-b" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
+            <input id="hora-b" name="hora-b" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
           </div>
           <div class="campo">
             <label for="cidade-b" id="cidade-b-label">Cidade de nascimento</label>
             <div class="auto">
-              <input id="cidade-b" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-b" autocomplete="off" placeholder="ex.: Curitiba" required>
+              <input id="cidade-b" name="cidade-b" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-b" autocomplete="off" placeholder="ex.: Curitiba" required>
               <ul id="lista-b" role="listbox" aria-labelledby="cidade-b-label" hidden></ul>
             </div>
+            <span class="dica cidade-status" id="cidade-b-status" aria-live="polite"></span>
           </div>
         </fieldset>
       </div>
@@ -264,14 +268,19 @@ function criarAutocomplete(input, lista) {
     else input.removeAttribute("aria-activedescendant");
     input.closest(".auto").style.marginBottom = lista.hidden ? "" : `${Math.min(lista.scrollHeight, 260) + 4}px`;
   }
+  // o que aconteceu com a busca, embaixo do campo (nada achado / cidade escolhida)
+  const status = document.getElementById(input.id + "-status");
+  function avisar(texto, ok) { status.textContent = texto; status.classList.toggle("ok", !!ok); input.classList.toggle("escolhida", !!ok); }
   function escolher(i) {
     selecionada = opcoes[i];
     input.value = selecionada.rotulo;
     fechar();
+    avisar("✓ Cidade escolhida", true);
   }
   input.addEventListener("input", () => {
     selecionada = null;
     clearTimeout(timer);
+    avisar("");
     const q = input.value.trim();
     if (q.length < 2) { opcoes = []; fechar(); return; }
     timer = setTimeout(async () => {
@@ -280,7 +289,8 @@ function criarAutocomplete(input, lista) {
         opcoes = await r.json();
         ativa = opcoes.length ? 0 : -1;
         desenhar();
-      } catch { opcoes = []; fechar(); }
+        avisar(opcoes.length ? "" : "Nenhuma cidade encontrada. Tente só o começo do nome.");
+      } catch { opcoes = []; fechar(); avisar("Não deu para buscar agora. Tente de novo em instantes."); }
     }, 180);
   });
   input.addEventListener("keydown", (e) => {

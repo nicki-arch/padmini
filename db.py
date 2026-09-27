@@ -457,3 +457,47 @@ def registrar_abandono(email: str, nome: str, oferta_id: str, checkout: str, env
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao registrar abandono")
         return False
+
+
+# Tabelas de marketing que a política de privacidade promete apagar (seção 7):
+# "até você se descadastrar ou até 24 meses sem nenhuma interação".
+TABELAS_MARKETING = ("leads", "amostras_email", "abandonos")
+MESES_SEM_INTERACAO = 24
+
+# Última interação de cada e-mail com o site: entrar/atualizar a lista de espera,
+# pedir amostra, receber o lembrete, abandonar ou fazer uma compra.
+_ULTIMA_INTERACAO = """
+WITH ultima AS (
+    SELECT email, max(quando) AS quando FROM (
+        SELECT lower(email) AS email, atualizado_em AS quando FROM leads
+        UNION ALL SELECT lower(email), greatest(criado_em, coalesce(lembrete_enviado_em, criado_em)) FROM amostras_email
+        UNION ALL SELECT lower(email), criado_em FROM abandonos
+        UNION ALL SELECT lower(email), criado_em FROM pedidos WHERE email IS NOT NULL
+    ) x GROUP BY email
+),
+apagar AS (
+    SELECT email FROM ultima WHERE quando < now() - make_interval(months => %(meses)s)
+    UNION SELECT email FROM email_optout
+)
+"""
+
+
+def limpar_marketing() -> dict | None:
+    """Apaga os dados de marketing de quem se descadastrou ou está há 24 meses
+    sem nenhuma interação (lista de espera, amostras por e-mail, abandonos).
+    Não toca em `pedidos` (compra: prazo legal, em geral 5 anos) nem em
+    `email_optout` (é o que garante que a pessoa não recebe mais nada).
+    Devolve quantas linhas saíram de cada tabela; None sem banco ou com erro."""
+    if not ativo():
+        return None
+    try:
+        apagadas = {}
+        with _conectar() as c, c.transaction():
+            for tabela in TABELAS_MARKETING:
+                cur = c.execute(_ULTIMA_INTERACAO + f"DELETE FROM {tabela} t USING apagar a "
+                                f"WHERE lower(t.email) = a.email", {"meses": MESES_SEM_INTERACAO})
+                apagadas[tabela] = cur.rowcount
+        return apagadas
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha na limpeza de marketing")
+        return None

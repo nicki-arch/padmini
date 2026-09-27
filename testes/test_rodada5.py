@@ -142,3 +142,74 @@ def test_vedica_nao_carrega_movimento_nem_exemplos(monkeypatch):
             assert "movimento" not in html and 'id="como-fica"' not in html and 'class="rosa"' not in html
     finally:
         app_mod._paginas_prontas.clear()
+
+
+# ================================================================== Fase B
+def test_todo_campo_dos_formularios_tem_name(ocidental):
+    for rota in ("/compatibilidade", "/mapa", "/numerologia", "/tarot"):
+        html = cliente.get(rota).text
+        for tag in re.findall(r"<(?:input|textarea)\b[^>]*>", html):
+            assert " name=" in tag, f"{rota}: {tag}"
+
+
+def test_menu_com_os_quatro_produtos_em_todas_as_paginas(ocidental):
+    for rota in PAGINAS_OC:
+        html = cliente.get(rota).text
+        menu = re.search(r'<nav class="menu-produtos".*?</nav>', html, re.S).group(0)
+        for destino in ("/compatibilidade", "/mapa", "/numerologia", "/tarot"):
+            assert f'href="{destino}"' in menu, (rota, destino)
+        atual = re.findall(r'href="([^"]+)" aria-current="page"', menu)
+        assert atual == ([] if rota == "/" else [rota]), rota
+        assert "/static/ocidental/componentes.css" in html
+
+
+def test_busca_de_cidade_diz_o_que_aconteceu(ocidental):
+    for rota, ids in (("/mapa", ["cidade-status"]), ("/compatibilidade", ["cidade-a-status", "cidade-b-status"])):
+        html = cliente.get(rota).text
+        for i in ids:
+            assert f'id="{i}" aria-live="polite"' in html, (rota, i)
+        assert "Nenhuma cidade encontrada" in html and "Cidade escolhida" in html
+
+
+def test_json_ld_da_home_bate_com_a_pagina(ocidental):
+    import json
+    import textos
+    html = cliente.get("/").text
+    bloco = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S).group(1)
+    dados = json.loads(bloco)
+    tipos = {g["@type"] for g in dados["@graph"]}
+    assert tipos == {"Organization", "WebSite", "FAQPage"}
+    faq = next(g for g in dados["@graph"] if g["@type"] == "FAQPage")["mainEntity"]
+    t = textos.da_pagina("home", "ocidental")
+    assert [q["name"] for q in faq] == [i["pergunta"] for i in t["faq"]["itens"]]
+    assert "aggregateRating" not in bloco and "review" not in bloco.lower()  # não temos avaliações
+
+
+def test_json_ld_nao_fecha_o_script_antes_da_hora():
+    import dados_estruturados
+    t = {"seo": {"descricao": "x"}, "faq": {"itens": [{"pergunta": "a</script><b>", "resposta": "r"}]}}
+    saida = dados_estruturados.home(t)
+    assert saida.count("</script>") == 1
+
+
+def test_vedica_sem_menu_novo_nem_json_ld(monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", "vedica")
+    app_mod._paginas_prontas.clear()
+    try:
+        for rota in ("/", "/compatibilidade", "/mapa"):
+            html = cliente.get(rota).text
+            assert "menu-produtos" not in html and "application/ld+json" not in html
+    finally:
+        app_mod._paginas_prontas.clear()
+
+
+def test_tarefa_diaria_chama_a_limpeza():
+    wf = (RAIZ / ".github" / "workflows" / "tarefas.yml").read_text(encoding="utf-8")
+    assert "/api/tarefas/limpeza" in wf
+
+
+def test_limpeza_sem_chave_recusa(monkeypatch):
+    monkeypatch.delenv("PADMINI_TAREFAS_CHAVE", raising=False)
+    assert cliente.post("/api/tarefas/limpeza").status_code == 503
+    monkeypatch.setenv("PADMINI_TAREFAS_CHAVE", "certa")
+    assert cliente.post("/api/tarefas/limpeza", headers={"Authorization": "Bearer errada"}).status_code == 401

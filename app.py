@@ -35,6 +35,7 @@ from compatibilidade import calcular_compatibilidade, montar_snippets_compatibil
 import acesso
 import alertas
 import cakto
+import dados_estruturados
 import db
 import entrega
 import exemplos_ocidental
@@ -179,7 +180,7 @@ def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:
             # da ocidental usam; as da védica não (e saem iguais a antes)
             cores=paleta.tela(versao), fontes=paleta.FONTES[versao], marca=marca,
             # casais de exemplo calculados pelo motor (só a ocidental chama; calcula uma vez)
-            exemplos=exemplos_ocidental,
+            exemplos=exemplos_ocidental, ld=dados_estruturados,
         )
     return Response(_paginas_prontas[(versao, arquivo)], media_type="text/html; charset=utf-8")
 
@@ -1048,6 +1049,22 @@ def enviar_lembretes(request: Request):
         alertas.alertar("Lembretes com falha", f"{falhas} lembrete(s) não saíram; {enviados} saíram.",
                         chave="lembretes", intervalo=6 * 3600)
     return {"ok": True, "enviados": enviados, "falhas": falhas}
+
+
+@app.post("/api/tarefas/limpeza")
+def limpar_dados_antigos(request: Request):
+    """Chamado 1x por dia pelo GitHub Actions (.github/workflows/tarefas.yml).
+    Cumpre a seção 7 da política de privacidade: dados de marketing saem quando a
+    pessoa se descadastra ou após 24 meses sem nenhuma interação (db.limpar_marketing)."""
+    _chave_tarefas_ok(request)
+    if not db.ativo():
+        return {"ok": True, "apagadas": {}, "nota": "sem banco"}
+    apagadas = db.limpar_marketing()
+    if apagadas is None:
+        alertas.alertar("Limpeza de dados com falha", "A limpeza diária dos dados de marketing não rodou.",
+                        chave="limpeza", intervalo=24 * 3600)
+        raise HTTPException(503, "Não deu para limpar agora.")
+    return {"ok": True, "apagadas": apagadas}
 
 
 # ---------------------------------------------------------------------------
