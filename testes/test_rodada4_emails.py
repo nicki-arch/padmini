@@ -167,13 +167,12 @@ def test_sck_do_email_igual_ao_do_site(dados):
 @pytest.mark.parametrize("pagina,produto", [("mapa", "mapa"), ("compatibilidade", "compat"),
                                             ("numerologia", "numerologia"), ("tarot", "tarot")])
 def test_as_4_paginas_ocidentais_tem_a_caixa(pagina, produto, no_ar):
+    """Rodada 6: a caixa "amostra por e-mail" depois da amostra deixou de existir na
+    ocidental — o e-mail agora vem no próprio formulário (test_rodada6)."""
     no_ar("ocidental")
     html = cliente.get(f"/{pagina}").text
-    assert "/static/amostra-email.js" in html and 'id="amostra-email"' in html
-    assert f'padAmostraEmail("#amostra-email", "{produto}"' in html
-    if produto == "tarot":  # só o número da tiragem vai para o e-mail
-        chamada = html[html.index('padAmostraEmail("#amostra-email", "tarot"'):][:120]
-        assert "pergunta" not in chamada.lower()
+    assert 'id="amostra-email"' not in html and "padAmostraEmail(" not in html
+    assert 'id="email"' in html and 'id="aceita-sequencia"' in html
 
 
 # ------------------------------------------------------------------ lembrete
@@ -280,9 +279,12 @@ def test_descadastrar_com_o_tema_da_versao_no_ar(no_ar):
 def test_privacidade_diz_a_verdade_sobre_os_emails(versao, no_ar):
     no_ar(versao)
     html = cliente.get("/privacidade").text
-    for trecho in ("Enviar a amostra por e-mail", "art. 7º, V", "Um único lembrete", "vem desmarcada",
-                   "art. 7º, I", "Um e-mail de recuperação", "art. 7º, IX", "descadastrar",
-                   "Amostra por e-mail, lembrete e recuperação de carrinho", "24 meses"):
+    # rodada 6: na ocidental, o e-mail é condição da amostra e a caixa autoriza até 3 e-mails
+    trechos = (("Enviar a amostra por e-mail", "Um único lembrete", "Amostra por e-mail, lembrete e recuperação de carrinho")
+               if versao == "vedica" else
+               ("Enviar a amostra grátis", "Até 3 e-mails a mais", "Amostra grátis, e-mails sobre a leitura e recuperação de carrinho"))
+    for trecho in trechos + ("art. 7º, V", "vem desmarcada", "art. 7º, I", "Um e-mail de recuperação", "art. 7º, IX",
+                             "descadastrar", "24 meses"):
         assert trecho in html, (versao, trecho)
     if versao == "ocidental":
         assert "nunca a sua pergunta" in html and "nome completo de registro e a data" in html

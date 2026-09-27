@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
-<script src="/static/amostra-email.js" defer></script>
+<script src="/static/ocidental/amostra-email.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
@@ -147,6 +147,7 @@
         </fieldset>
       </div>
 
+      <div style="margin-top:16px">{% include "ocidental/_campo_email.html" %}</div>
       <p class="dica" style="margin-top:12px">Não sabe a hora de alguém? Deixe em branco: a sinastria sai assim mesmo, só sem o Ascendente e as casas dessa pessoa.</p>
       <p class="erro" id="erro" role="alert" hidden></p>
       <div class="enviar-linha">
@@ -232,6 +233,7 @@ document.addEventListener("DOMContentLoaded", () => { const el = document.getEle
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let ultimoCasal = null;  // guarda os dois nascimentos para o link do checkout
+let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
 
 // ---------- máscara ----------
 function aplicarMascara(el, tamanhos, separador) {
@@ -338,6 +340,8 @@ $("#form").addEventListener("submit", async (e) => {
   if (a.erro) return mostrarErro(a.erro);
   const b = coletarPessoa("b", autoB);
   if (b.erro) return mostrarErro(b.erro);
+  const contato = padEmail.ler();
+  if (contato.erro) return mostrarErro(contato.erro);
 
   const botao = $("#enviar");
   botao.disabled = true; botao.textContent = "Calculando…";
@@ -345,11 +349,12 @@ $("#form").addEventListener("submit", async (e) => {
     const r = await fetch("/api/ocidental/sinastria", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ a: a.pessoa, b: b.pessoa, nivel: "amostra", texto_ia: false }),
+      body: JSON.stringify({ a: a.pessoa, b: b.pessoa, ...contato, nivel: "amostra", texto_ia: false }),
     });
     const corpo = await r.json();
     if (!r.ok) throw new Error(typeof corpo.detail === "string" ? corpo.detail : "Confira os dados informados.");
     ultimoCasal = { a: a.pessoa, b: b.pessoa };
+    ultimoContato = contato;
     desenharAmostra(corpo);
   } catch (err) {
     mostrarErro(err.message || "Não foi possível calcular. Tente de novo.");
@@ -382,6 +387,12 @@ function blocoCard(d, comBotao) {
     </div>`;
 }
 function blocoPontos(d) {
+  // amostra com e-mail: na tela só o título do ponto forte; o texto e o ponto de atenção chegaram por e-mail
+  if (!d.ponto_atencao) {
+    return `<div class="pontos" style="grid-template-columns:1fr">
+      <div class="ponto forte"><div class="rot">Ponto mais forte</div><h3>${esc(d.ponto_forte.titulo)}</h3>
+      <p>O que isso quer dizer para vocês — e o ponto de atenção do casal — chegou no seu e-mail.</p></div></div>`;
+  }
   return `<div class="pontos">
       <div class="ponto forte"><div class="rot">Ponto mais forte</div><h3>${esc(d.ponto_forte.titulo)}</h3><p>${esc(d.ponto_forte.texto)}</p></div>
       <div class="ponto atencao"><div class="rot">Ponto de atenção</div><h3>${esc(d.ponto_atencao.titulo)}</h3><p>${esc(d.ponto_atencao.texto)}</p></div>
@@ -400,13 +411,15 @@ function desenharAmostra(d) {
   const cupom = cupomDoVisitante();
   const comCupom = cupom && PRECO_CUPOM;
   const ctaHref = LINK_CHECKOUT && ultimoCasal
-    ? linkCheckout(LINK_CHECKOUT, { produto: "compat", a: ultimoCasal.a, b: ultimoCasal.b }, { aplicarCupom: !!comCupom })
+    ? linkCheckout(LINK_CHECKOUT, { produto: "compat", a: ultimoCasal.a, b: ultimoCasal.b },
+                   { aplicarCupom: !!comCupom, email: ultimoContato && ultimoContato.email })
     : "";
   $("#resultado").innerHTML = `
     <div><h2>${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2><p class="moldura">${esc(d.indice_texto)}</p></div>
     ${blocoAvisos(d)}
     ${blocoCard(d, true)}
     ${blocoPontos(d)}
+    ${padEmail.aviso(d)}
     ${blocoMetodo(d)}
     <div class="card oferta">
       <h2>Ver a sinastria completa</h2>
@@ -429,13 +442,14 @@ function desenharAmostra(d) {
     </div>`;
   const res = $("#resultado");
   res.hidden = false;
+  padEmail.ligar(async () => {
+    const r = await fetch("/api/ocidental/sinastria", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...ultimoCasal, ...ultimoContato, nivel: "amostra", texto_ia: false }) });
+    const c = await r.json();
+    if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Não conseguimos reenviar agora.");
+    return c;
+  });
   if (window.padTrack) padTrack("amostra_gerada", { produto: "compat", sistema: "ocidental" });
-  // amostra por e-mail (+ lembrete opcional, caixa desmarcada): /static/amostra-email.js
-  res.insertAdjacentHTML("beforeend", '<div class="card amostra-email" id="amostra-email" hidden></div>');
-  if (window.padAmostraEmail && ultimoCasal) {
-    const casal = { a: ultimoCasal.a, b: ultimoCasal.b };
-    padAmostraEmail("#amostra-email", "compat", () => casal);
-  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
   const bc = document.getElementById("baixar-card");
   if (bc) bc.addEventListener("click", () => { if (window.padTrack) padTrack("card_baixado", { produto: "compat" }); baixarCard(d); });

@@ -96,7 +96,7 @@ def _token(nome=PEDIDO["nome"], data=PEDIDO["data"], versao="ocidental"):
 
 
 def test_amostra_so_o_caminho_de_vida():
-    r = cliente.post("/api/ocidental/numerologia", json=PEDIDO)
+    r = cliente.post("/api/ocidental/numerologia", json={**PEDIDO, "email": "teste@exemplo.com"})
     assert r.status_code == 200, r.text
     c = r.json()
     assert c["caminho_de_vida"]["valor"] == 11 and c["caminho_de_vida"]["mestre"]

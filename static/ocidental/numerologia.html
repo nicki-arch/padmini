@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
-<script src="/static/amostra-email.js" defer></script>
+<script src="/static/ocidental/amostra-email.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
@@ -86,6 +86,7 @@
         <label for="data">Data de nascimento</label>
         <input id="data" name="data" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" maxlength="10" required>
       </div>
+      {% include "ocidental/_campo_email.html" %}
       <p class="erro" id="erro" role="alert" hidden></p>
       <button id="enviar" type="submit">Ver meu Caminho de Vida</button>
     </form>
@@ -116,6 +117,7 @@ const PRECO = "{{ ofertas.numerologia.preco | moeda }}";
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let ultimoPedido = null;
+let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
 
 $("#data").addEventListener("input", (e) => {
   const d = e.target.value.replace(/\D/g, "").slice(0, 8);
@@ -131,7 +133,7 @@ async function pedir(url, corpo) {
 }
 function blocoNumero(x) {
   return `<article class="card relatorio"><div class="numero-grande"><div class="n">${x.valor ?? "—"}</div>
-    <div><h3>${esc(x.nome)}${x.mestre ? " · número mestre" : ""}</h3><p>${esc(x.descricao)}</p></div></div><p>${esc(x.texto)}</p></article>`;
+    <div><h3>${esc(x.nome)}${x.mestre ? " · número mestre" : ""}</h3><p>${esc(x.descricao)}</p></div></div>${x.texto ? `<p>${esc(x.texto)}</p>` : `<p class="nota">O que o seu ${esc(x.valor)} quer dizer chegou no seu e-mail.</p>`}</article>`;
 }
 
 $("#form").addEventListener("submit", async (e) => {
@@ -139,18 +141,21 @@ $("#form").addEventListener("submit", async (e) => {
   const nome = $("#nome").value.trim(), data = dataParaISO($("#data").value);
   if (nome.split(/\s+/).length < 2) return mostrarErro("Escreva o nome completo, como está na certidão.");
   if (!data) return mostrarErro("Preencha a data de nascimento no formato dd/mm/aaaa.");
+  const contato = padEmail.ler();
+  if (contato.erro) return mostrarErro(contato.erro);
   const botao = $("#enviar"); botao.disabled = true; botao.textContent = "Calculando…";
   try {
     ultimoPedido = { nome, data };
-    desenharAmostra(await pedir("/api/ocidental/numerologia", { ...ultimoPedido, nivel: "amostra" }));
+    ultimoContato = contato;
+    desenharAmostra(await pedir("/api/ocidental/numerologia", { ...ultimoPedido, ...contato, nivel: "amostra" }));
   } catch (err) { mostrarErro(err.message); }
   finally { botao.disabled = false; botao.textContent = "Ver meu Caminho de Vida"; }
 });
 
 function desenharAmostra(d) {
-  const cta = LINK_CHECKOUT ? linkCheckout(LINK_CHECKOUT, { produto: "numerologia", ...ultimoPedido }) : "";
+  const cta = LINK_CHECKOUT ? linkCheckout(LINK_CHECKOUT, { produto: "numerologia", ...ultimoPedido }, { email: ultimoContato && ultimoContato.email }) : "";
   const res = $("#resultado");
-  res.innerHTML = `<h2>${esc(d.nome)}</h2>${blocoNumero(d.caminho_de_vida)}
+  res.innerHTML = `<h2>${esc(d.nome)}</h2>${blocoNumero(d.caminho_de_vida)}${padEmail.aviso(d)}
     <div class="card oferta-ind">
       <h2>Ver a numerologia completa</h2>
       <ul class="lista-completo">
@@ -164,13 +169,8 @@ function desenharAmostra(d) {
             : `<span class="navlink destaque em-breve" aria-disabled="true">Em breve</span><p class="nota" style="margin-top:10px">O pagamento desta versão ainda está sendo configurado.</p>`}
     </div>`;
   res.hidden = false;
+  padEmail.ligar(() => pedir("/api/ocidental/numerologia", { ...ultimoPedido, ...ultimoContato, nivel: "amostra" }));
   if (window.padTrack) padTrack("amostra_gerada", { produto: "numerologia", sistema: "ocidental" });
-  // amostra por e-mail (+ lembrete opcional, caixa desmarcada): /static/amostra-email.js
-  res.insertAdjacentHTML("beforeend", '<div class="card amostra-email" id="amostra-email" hidden></div>');
-  if (window.padAmostraEmail && ultimoPedido) {
-    const { nome, data } = ultimoPedido;
-    padAmostraEmail("#amostra-email", "numerologia", () => ({ nome, data }));
-  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 

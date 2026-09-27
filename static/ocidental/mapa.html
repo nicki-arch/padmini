@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
-<script src="/static/amostra-email.js" defer></script>
+<script src="/static/ocidental/amostra-email.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
@@ -132,6 +132,7 @@
         </div>
         <span class="dica cidade-status" id="cidade-status" aria-live="polite"></span>
       </div>
+      {% include "ocidental/_campo_email.html" %}
       <p class="erro" id="erro" role="alert" hidden></p>
       <button id="enviar" type="submit">Gerar meu mapa</button>
     </form>
@@ -176,6 +177,7 @@ const MODALIDADE_PT = { cardinal:"Cardinal", fixo:"Fixo", mutavel:"Mutável" };
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let ultimoPedido = null;
+let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
 
 // ---------- máscara de data e hora ----------
 function aplicarMascara(el, tamanhos, separador) {
@@ -247,11 +249,14 @@ $("#form").addEventListener("submit", async (e) => {
   if (!data) return mostrarErro("Preencha a data de nascimento no formato dd/mm/aaaa.");
   if (!semHora && !/^\d{2}:\d{2}$/.test(hora)) return mostrarErro("Preencha a hora no formato hh:mm — ou marque \"Não sei a hora\".");
   if (!cidadeEscolhida) return mostrarErro("Escolha a cidade na lista de sugestões.");
+  const contato = padEmail.ler();
+  if (contato.erro) return mostrarErro(contato.erro);
   const botao = $("#enviar");
   botao.disabled = true; botao.textContent = "Calculando…";
   try {
     ultimoPedido = { nome: $("#nome").value, data, hora, lat: cidadeEscolhida.lat, lon: cidadeEscolhida.lon, cidade: cidadeEscolhida.rotulo };
-    desenharAmostra(await pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "amostra" }));
+    ultimoContato = contato;
+    desenharAmostra(await pedir("/api/ocidental/mapa", { ...ultimoPedido, ...contato, nivel: "amostra" }));
   } catch (err) {
     mostrarErro(err.message || "Não foi possível calcular o mapa. Tente de novo.");
   } finally {
@@ -269,16 +274,17 @@ function cabecalho(d) {
 }
 function triade(a) {
   const avisos = (a.avisos || []).map((t) => `<p class="aviso">${esc(t)}</p>`).join("");
+  // na amostra, só o Sol vem com texto; Lua e Ascendente chegam por e-mail
   return avisos + `<div class="triade">${a.triade.map((i) => `
-    <article class="card relatorio"><h3>${esc(i.nome)} em ${esc(i.signo)}</h3><p class="grau">${esc(i.grau)}</p><p>${esc(i.texto)}</p></article>`).join("")}</div>
+    <article class="card relatorio"><h3>${esc(i.nome)} em ${esc(i.signo)}</h3><p class="grau">${esc(i.grau)}</p>${i.texto ? `<p>${esc(i.texto)}</p>` : `<p class="nota">O texto chegou no seu e-mail.</p>`}</article>`).join("")}</div>
     ${a.aspecto ? `<article class="card relatorio"><h3>${esc(a.aspecto.titulo)}</h3><p class="nota" style="margin:0 0 8px">O aspecto mais exato do seu mapa.</p><p>${esc(a.aspecto.texto)}</p></article>` : ""}`;
 }
 
 // ---------- amostra ----------
 function desenharAmostra(d) {
-  const cta = LINK_CHECKOUT_INDIVIDUAL ? linkCheckout(LINK_CHECKOUT_INDIVIDUAL, { produto: "mapa", ...ultimoPedido }) : "";
+  const cta = LINK_CHECKOUT_INDIVIDUAL ? linkCheckout(LINK_CHECKOUT_INDIVIDUAL, { produto: "mapa", ...ultimoPedido }, { email: ultimoContato && ultimoContato.email }) : "";
   const res = $("#resultado");
-  res.innerHTML = `${cabecalho(d)}${triade(d.amostra)}
+  res.innerHTML = `${cabecalho(d)}${triade(d.amostra)}${padEmail.aviso(d)}
     <div class="card oferta-ind">
       <h2>Ver o mapa completo</h2>
       <p class="nota" style="margin-bottom:12px">A amostra mostra o essencial. O completo abre o mapa inteiro.</p>
@@ -298,13 +304,8 @@ function desenharAmostra(d) {
     <div class="cross"><div><h3>É um casal?</h3><p class="nota">A sinastria cruza os dois mapas em 8 dimensões — também com amostra grátis.</p></div>
       <a class="navlink destaque" href="/compatibilidade">Ver a sinastria →</a></div>`;
   res.hidden = false;
+  padEmail.ligar(() => pedir("/api/ocidental/mapa", { ...ultimoPedido, ...ultimoContato, nivel: "amostra" }));
   if (window.padTrack) padTrack("amostra_gerada", { produto: "mapa", sistema: "ocidental" });
-  // amostra por e-mail (+ lembrete opcional, caixa desmarcada): /static/amostra-email.js
-  res.insertAdjacentHTML("beforeend", '<div class="card amostra-email" id="amostra-email" hidden></div>');
-  if (window.padAmostraEmail && ultimoPedido) {
-    const { nome, data, hora, lat, lon, cidade } = ultimoPedido;
-    padAmostraEmail("#amostra-email", "mapa", () => ({ pessoa: { nome, data, hora, lat, lon, cidade } }));
-  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
