@@ -13,14 +13,29 @@
   var CHAVES = [PARAM_AFILIADO, "cupom", "coupon",
     "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
 
+  // Identificadores de clique dos anúncios (rodada 6, só na versão ocidental, que
+  // tem <meta name="pad-consentimento">): vão no link da Cakto para os pixels do
+  // checkout atribuírem a venda ao anúncio. Não entram no PostHog.
+  var CLIQUES = ["fbclid", "ttclid", "gclid"];
+  var ocidental = false;
+  try { ocidental = !!document.querySelector('meta[name="pad-consentimento"]'); } catch (e) {}
+
   // captura da URL atual e guarda (não sobrescreve com valor vazio)
   try {
     var p = new URLSearchParams(location.search);
-    CHAVES.forEach(function (k) {
+    CHAVES.concat(ocidental ? CLIQUES : []).forEach(function (k) {
       var v = p.get(k);
-      if (v) { try { sessionStorage.setItem("pad_" + k, v); } catch (e) {} }
+      if (v) { try { sessionStorage.setItem("pad_" + k, v.slice(0, 500)); } catch (e) {} }
     });
   } catch (e) {}
+  function cliques() {
+    var o = {};
+    if (!ocidental) return o;
+    try {
+      CLIQUES.forEach(function (k) { var v = sessionStorage.getItem("pad_" + k); if (v) o[k] = v; });
+    } catch (e) {}
+    return o;
+  }
 
   // { ref: "PEDRO", utm_source: "tiktok", ... } — para o checkout e o PostHog
   window.padAtribuicao = function () {
@@ -110,7 +125,7 @@
     if (cupom && !repassar.utm_term) repassar.utm_term = cupom;
     // a Cakto grava o código em minúsculas; mandamos sempre assim
     if (cupom && opcoes && opcoes.aplicarCupom) extra.coupon = String(cupom).trim().toLowerCase();
-    var todos = Object.assign({}, repassar, extra);
+    var todos = Object.assign({}, cliques(), repassar, extra);
     var keys = Object.keys(todos);
     if (!keys.length) return base;
     try {

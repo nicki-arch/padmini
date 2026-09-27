@@ -236,3 +236,31 @@ nunca na que está no ar na hora do envio (a mesma regra dos links de entrega):
 - **Data de nascimento** continua em texto com máscara (dd/mm/aaaa), e não
   `type="date"`: no celular, o seletor nativo abre no dia de hoje, o que é ruim
   para quem nasceu em 1990.
+
+## Rodada 6, Fase D — aviso de cookies e pixels de anúncio
+
+`static/ocidental/consentimento.js` + `seguranca.PIXELS` / `CSP_PIXELS`. Só na
+ocidental (páginas com `<meta name="pad-consentimento">`); a védica não tem aviso
+nem pixel.
+
+- **Variáveis na Render** (vazio = não carrega nem entra na CSP):
+  `PADMINI_META_PIXEL` (ID do pixel), `PADMINI_TIKTOK_PIXEL` (ID do pixel),
+  `PADMINI_GOOGLE_TAG` (IDs separados por vírgula: `G-…` do GA4, `AW-…` do Ads),
+  `PADMINI_GOOGLE_ADS_LEAD` (opcional: `AW-…/rótulo` da conversão de lead).
+- Nada de terceiro antes do "Aceitar" — nem o PostHog (o `analytics.js` espera o
+  evento `pad:consentimento`). "Aceitar" e "Recusar" com o mesmo destaque; a
+  escolha vale 12 meses; "Preferências de cookies" no rodapé reabre o aviso.
+  Retirar a permissão apaga os cookies deles e recarrega a página.
+- Sem nenhum ID nem PostHog configurados, o aviso nem aparece.
+- Eventos: PageView; ViewContent ao abrir mapa/sinastria/numerologia/tarot;
+  Lead quando a amostra é enviada (Meta `Lead`, TikTok `SubmitForm` — o TikTok não
+  tem "Lead" padrão —, GA4 `generate_lead` e, se configurada, a conversão do Ads),
+  com `event_id` único (dedup futura com o envio pelo servidor).
+- Só o nome do produto vai nos eventos. Meta sem configuração automática e sem
+  advanced matching. Em URL com dado pessoal (link de entrega), os pixels não
+  carregam.
+- Checkout e compra: pixels do painel da Cakto, não do site (não contar em dobro).
+  O link da Cakto leva `fbclid`, `ttclid` e `gclid` (guardados na sessão) para a
+  venda ser atribuída ao anúncio; eles não vão para o PostHog.
+- CSP: só os domínios de cada plataforma configurada, das docs oficiais (Meta:
+  meta-pixel/advanced; TikTok: work-with-csp; Google: tag-platform/security/csp).
