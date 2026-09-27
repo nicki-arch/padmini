@@ -1,0 +1,15 @@
+/* Padmini (ocidental) — peças comuns às páginas (round 5). */
+
+/* menu com os quatro produtos */
+.menu-produtos { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.menu-produtos .navlink { white-space: nowrap; }
+.menu-produtos .navlink.atual { border-color: var(--saffron); color: var(--saffron); }
+@media (max-width: 640px) {
+  .topbar { row-gap: 6px; }
+  .menu-produtos { flex: 1 0 100%; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto;
+    margin-inline: -16px; padding: 2px 16px 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .menu-produtos::-webkit-scrollbar { display: none; }
+  .menu-produtos { gap: 5px; }
+  .menu-produtos .navlink { min-height: 38px; padding: 7px 10px; font-size: 13px; }
+  .menu-produtos .longo { display: none; }
+}

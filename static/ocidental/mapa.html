@@ -19,6 +19,9 @@
 <link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/ocidental/tema.css">
+<link rel="stylesheet" href="/static/ocidental/componentes.css">
+<link rel="stylesheet" href="/static/ocidental/movimento.css">
+<script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/amostra-email.js" defer></script>
 <script src="/static/analytics.js" defer></script>
@@ -74,6 +77,9 @@
   .lista-completo li::before{content:"✓";color:var(--accent);font-weight:700}
   .preco-ind{font-family:var(--serif);font-size:34px;margin-bottom:8px}
   .em-breve{opacity:.55;pointer-events:none}
+  .cidade-status{display:block;margin-top:4px}
+  .cidade-status.ok{color:var(--sage)}
+  input.escolhida{border-color:var(--sage)}
 
   @media(max-width:640px){
     form{grid-template-columns:1fr}
@@ -92,7 +98,7 @@
       {{ marca.svg(30) }}
       Padmini
     </a>
-    <a class="navlink" href="/compatibilidade">Sinastria do casal →</a>
+    {% set atual = "/mapa" %}{% include "ocidental/_menu.html" %}
   </div>
 </header>
 
@@ -113,15 +119,16 @@
       <div class="campo">
         <label for="hora">Hora de nascimento</label>
         <input id="hora" name="hora" type="text" inputmode="numeric" autocomplete="off" placeholder="hh:mm" maxlength="5">
-        <label class="check-hora"><input type="checkbox" id="sem-hora"> Não sei a hora</label>
+        <label class="check-hora"><input type="checkbox" id="sem-hora" name="sem-hora"> Não sei a hora</label>
         <span class="dica">Use a hora da certidão. Ela define o Ascendente e as casas.</span>
       </div>
       <div class="campo largo">
         <label for="cidade" id="cidade-label">Cidade de nascimento</label>
         <div class="auto">
-          <input id="cidade" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cidades" autocomplete="off" placeholder="Comece a digitar, ex.: Porto Alegre" required>
+          <input id="cidade" name="cidade" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cidades" autocomplete="off" placeholder="Comece a digitar, ex.: Porto Alegre" required>
           <ul id="cidades" role="listbox" aria-labelledby="cidade-label" hidden></ul>
         </div>
+        <span class="dica cidade-status" id="cidade-status" aria-live="polite"></span>
       </div>
       <p class="erro" id="erro" role="alert" hidden></p>
       <button id="enviar" type="submit">Gerar meu mapa</button>
@@ -195,14 +202,19 @@ function desenharLista() {
   if (ativa >= 0) input.setAttribute("aria-activedescendant", `op-${ativa}`); else input.removeAttribute("aria-activedescendant");
   input.closest(".auto").style.marginBottom = lista.hidden ? "" : `${Math.min(lista.scrollHeight, 280) + 4}px`;
 }
-function escolher(i) { cidadeEscolhida = opcoes[i]; input.value = cidadeEscolhida.rotulo; fecharLista(); }
+// o que aconteceu com a busca, embaixo do campo (nada achado / cidade escolhida)
+function statusCidade(texto, ok) { const el = $("#cidade-status"); el.textContent = texto; el.classList.toggle("ok", !!ok); input.classList.toggle("escolhida", !!ok); }
+function escolher(i) { cidadeEscolhida = opcoes[i]; input.value = cidadeEscolhida.rotulo; fecharLista(); statusCidade("✓ Cidade escolhida", true); }
 input.addEventListener("input", () => {
-  cidadeEscolhida = null; clearTimeout(timer);
+  cidadeEscolhida = null; clearTimeout(timer); statusCidade("");
   const q = input.value.trim();
   if (q.length < 2) { opcoes = []; fecharLista(); return; }
   timer = setTimeout(async () => {
-    try { const r = await fetch(`/api/cidades?q=${encodeURIComponent(q)}`); opcoes = await r.json(); ativa = opcoes.length ? 0 : -1; desenharLista(); }
-    catch { opcoes = []; fecharLista(); }
+    try {
+      const r = await fetch(`/api/cidades?q=${encodeURIComponent(q)}`); opcoes = await r.json(); ativa = opcoes.length ? 0 : -1; desenharLista();
+      statusCidade(opcoes.length ? "" : "Nenhuma cidade encontrada. Tente só o começo do nome.");
+    }
+    catch { opcoes = []; fecharLista(); statusCidade("Não deu para buscar agora. Tente de novo em instantes."); }
   }, 180);
 });
 input.addEventListener("keydown", (e) => {

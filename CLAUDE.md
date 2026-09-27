@@ -59,6 +59,9 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `scripts/gerar_og_ocidental.py` | Gera as imagens de compartilhamento `static/og-oc-*.png` da versão ocidental |
 | `tarot.py` | Tarot (versão ocidental): 78 cartas, sorteio no servidor, ID da tiragem com selo HMAC — o link pago abre as mesmas cartas da amostra |
 | `paleta.py` + `marca.py` | **Cores e fontes de cada versão, fonte única** (tela, e-mail, PDF, imagens) e o lótus em traço da ocidental. `static/ocidental/tema.css` é GERADO de `paleta.py` (`python scripts/gerar_tema_css.py`). Marca "Almanaque" e contrastes: `docs/marca-ocidental.md`; vitrine em `/estilo?previa=<PADMINI_PREVIA_CHAVE>` |
+| `exemplos_ocidental.py` + `static/ocidental/movimento.*` | Casais de exemplo da home e da página do casal (nascimentos fictícios, **calculados pelo motor**, nunca número à mão) e a rosa das 8 dimensões (SVG, também no completo). Movimento só com `prefers-reduced-motion: no-preference` |
+| `static/ocidental/_menu.html` + `componentes.css` | Menu com os 4 produtos em todas as páginas ocidentais (no celular, linha própria); aviso da busca de cidade. `dados_estruturados.py`: JSON-LD da home (Organization, WebSite, FAQPage do YAML; nunca avaliação inventada) |
+| `blog.py` + `conteudo/ocidental/blog/` | Blog (só ocidental). Artigo só vai ao ar com `revisado: true`; rascunho abre com `?previa=`. `depoimentos.py` + `conteudo/ocidental/depoimentos.yaml`: só depoimento real com `autorizado_em`; vazio = seção some. Ver `docs/ocidental.md` (round 5) |
 | `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o Índice Padmini (método próprio, pesos em `docs/ocidental.md`) |
 | `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
 | `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, termos/privacidade (`LEGAIS`), e-mails e tokens de cada versão |
@@ -71,7 +74,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `seguranca.py` | Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy). Serviço externo novo → incluir na CSP |
 | `marketing.py` + `static/amostra-email.js` | Amostra por e-mail, lembrete (`/api/tarefas/lembretes`), carrinho abandonado, venda cruzada, descadastro (`/descadastrar`). Nas duas versões: cada e-mail sai na versão **do registro** (coluna `sistema`), nunca na do ar; copy em `marketing.TEXTOS` |
 | `alertas.py` | E-mail para a equipe (`PADMINI_ALERTA_EMAIL`): pedido pago sem entrega, e-mail que não saiu, erro 500 |
-| `.github/workflows/` | `testes` (CI), `pos-deploy` (smoke de hora em hora; **nunca** no push, senão trava o deploy da Render), `tarefas` (lembretes diários), `backup` (semanal, criptografado), `manter-ativo` |
+| `.github/workflows/` | `testes` (CI), `pos-deploy` (smoke de hora em hora; **nunca** no push, senão trava o deploy da Render), `tarefas` (lembretes diários + limpeza de marketing: descadastro ou 24 meses sem interação, `db.limpar_marketing`), `backup` (semanal, criptografado), `manter-ativo` |
 | `docs/melhorias-2026-09.md` | O que entrou em 25/set (preços, e-mails de venda, alertas, backup) e a configuração pendente |
 | `docs/seguranca.md` | **Revisão de segurança (25/set/2026)**: o que foi corrigido, limites, pendências |
 | `static/lista.html` + `/api/lista` | Lista de espera do lançamento. `PADMINI_CAPTURA=1` trava home/mapa/compat e manda para `/lista` (links de entrega com `token` e quem tem `?previa=<PADMINI_PREVIA_CHAVE>` passam) |

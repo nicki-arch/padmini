@@ -1,5 +1,7 @@
-# Tarefas agendadas do site. Hoje: o lembrete de quem pediu a amostra por
-# e-mail, autorizou lembrete e não comprou (marketing.py).
+# Tarefas agendadas do site: o lembrete de quem pediu a amostra por e-mail,
+# autorizou lembrete e não comprou (marketing.py), e a limpeza dos dados de
+# marketing prometida na política de privacidade (descadastro ou 24 meses sem
+# interação; db.limpar_marketing).
 #
 # Precisa do secret PADMINI_TAREFAS_CHAVE aqui no GitHub (Settings → Secrets
 # and variables → Actions) com o MESMO valor da variável de mesmo nome na Render.
@@ -26,6 +28,22 @@ jobs:
           for i in 1 2 3; do
             r=$(curl -s --max-time 120 -X POST -H "Authorization: Bearer $CHAVE" \
                 https://padmini.onrender.com/api/tarefas/lembretes) && break
+            sleep 20
+          done
+          echo "$r"
+          echo "$r" | grep -q '"ok":true'
+      - name: Limpar dados de marketing antigos
+        if: always()
+        env:
+          CHAVE: ${{ secrets.PADMINI_TAREFAS_CHAVE }}
+        run: |
+          if [ -z "$CHAVE" ]; then
+            echo "::warning::Secret PADMINI_TAREFAS_CHAVE não configurado — limpeza desligada."
+            exit 0
+          fi
+          for i in 1 2 3; do
+            r=$(curl -s --max-time 120 -X POST -H "Authorization: Bearer $CHAVE" \
+                https://padmini.onrender.com/api/tarefas/limpeza) && break
             sleep 20
           done
           echo "$r"

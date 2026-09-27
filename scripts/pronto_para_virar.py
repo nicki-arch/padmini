@@ -24,7 +24,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
 # Palavras que só a versão védica usa. "Padmini" (o nome da marca) pode.
-VEDICO = re.compile(r"v[ée]dic|jyotish|sideral|lahiri|nakshatra|dasha|guna milan|ashtakoot|kundli|पद्मिनी", re.I)
+VEDICO = re.compile(r"v[ée]dic|jyotish|sideral|lahiri|nakshatra|dasha(?!rray)|guna milan|ashtakoot|kundli|पद्मिनी", re.I)
 # Ofertas que não bloqueiam: sem link, a linha do combo simplesmente some da página.
 OPCIONAIS = {"bump_mapas_casal": "combo casal + 2 mapas: sem link, a oferta some da página do casal"}
 

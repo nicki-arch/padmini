@@ -320,3 +320,60 @@ def test_abandono_grava_a_versao_da_oferta(monkeypatch):
                    "offer": {"id": ofertas.codigo("mapa", "vedica")}, "checkoutUrl": ofertas.checkout("mapa", "vedica")}}
     assert base._postar_webhook(ev).json()["email_enviado"] is False
     assert _linhas("SELECT sistema, email_enviado FROM abandonos") == [("vedica", False)]
+
+
+# ---------------------------------------------------------------- round 5: limpeza de 24 meses
+def _semear_marketing():
+    """Três pessoas: uma recente, uma com tudo de 25 meses atrás e uma descadastrada."""
+    with db._conectar() as c:
+        c.execute("TRUNCATE leads")
+        velho = "now() - interval '25 months'"
+        c.execute(f"INSERT INTO leads (email, criado_em, atualizado_em) VALUES "
+                  f"('recente@x.com', now(), now()), ('Velho@x.com', {velho}, {velho}), ('sai@x.com', now(), now())")
+        for email, quando in (("recente@x.com", "now()"), ("velho@x.com", velho), ("sai@x.com", "now()")):
+            c.execute(f"INSERT INTO amostras_email (email, produto, dados, criado_em) "
+                      f"VALUES (%s, 'mapa', '{{}}', {quando})", (email,))
+            c.execute(f"INSERT INTO abandonos (email, criado_em) VALUES (%s, {quando})", (email,))
+        c.execute("INSERT INTO email_optout (email) VALUES ('sai@x.com')")
+
+
+def _emails(tabela):
+    return sorted(r[0].lower() for r in _linhas(f"SELECT email FROM {tabela}"))
+
+
+def test_limpeza_apaga_velhos_e_descadastrados_e_mantem_o_resto():
+    _semear_marketing()
+    apagadas = db.limpar_marketing()
+    assert apagadas == {"leads": 2, "amostras_email": 2, "abandonos": 2}
+    for tabela in db.TABELAS_MARKETING:
+        assert _emails(tabela) == ["recente@x.com"], tabela
+    assert _emails("email_optout") == ["sai@x.com"]  # o descadastro fica: é o que impede novos e-mails
+
+
+def test_limpeza_conta_qualquer_interacao_recente():
+    """Lead antigo, mas pediu amostra mês passado: nada sai."""
+    with db._conectar() as c:
+        c.execute("TRUNCATE leads")
+        c.execute("INSERT INTO leads (email, criado_em, atualizado_em) "
+                  "VALUES ('ana@x.com', now() - interval '30 months', now() - interval '30 months')")
+        c.execute("INSERT INTO amostras_email (email, produto, dados, criado_em) "
+                  "VALUES ('ANA@x.com', 'mapa', '{}', now() - interval '1 month')")
+    assert db.limpar_marketing() == {"leads": 0, "amostras_email": 0, "abandonos": 0}
+    assert _emails("leads") == ["ana@x.com"]
+
+
+def test_limpeza_nunca_apaga_pedidos():
+    _semear_marketing()
+    with db._conectar() as c:
+        c.execute("INSERT INTO pedidos (cakto_id, evento, produto, email, criado_em) "
+                  "VALUES ('velho-1', 'purchase_approved', 'mapa', 'velho@x.com', now() - interval '26 months')")
+    db.limpar_marketing()
+    assert len(_linhas("SELECT 1 FROM pedidos WHERE cakto_id = 'velho-1'")) == 1
+
+
+def test_rota_de_limpeza(monkeypatch):
+    _semear_marketing()
+    monkeypatch.setenv("PADMINI_TAREFAS_CHAVE", "k")
+    assert base.cliente.post("/api/tarefas/limpeza").status_code == 401
+    r = base.cliente.post("/api/tarefas/limpeza", headers={"Authorization": "Bearer k"})
+    assert r.status_code == 200 and r.json()["apagadas"]["leads"] == 2

@@ -34,9 +34,13 @@ from detectar_fatos import detectar_todos_os_fatos
 from compatibilidade import calcular_compatibilidade, montar_snippets_compatibilidade, nota_br
 import acesso
 import alertas
+import blog
 import cakto
+import dados_estruturados
 import db
+import depoimentos
 import entrega
+import exemplos_ocidental
 import limites
 import marketing
 import marca
@@ -177,6 +181,8 @@ def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:
             # cores, fontes e a marca da versão (paleta.py / marca.py): as páginas
             # da ocidental usam; as da védica não (e saem iguais a antes)
             cores=paleta.tela(versao), fontes=paleta.FONTES[versao], marca=marca,
+            # casais de exemplo calculados pelo motor (só a ocidental chama; calcula uma vez)
+            exemplos=exemplos_ocidental, ld=dados_estruturados, blog=blog, depoimentos=depoimentos,
         )
     return Response(_paginas_prontas[(versao, arquivo)], media_type="text/html; charset=utf-8")
 
@@ -246,6 +252,53 @@ def pagina_numerologia(request: Request):
 @app.api_route("/tarot", methods=["GET", "HEAD"])
 def pagina_tarot(request: Request):
     return _pagina_so_da_ocidental(request, "/tarot")
+
+
+def _tem_previa(request: Request) -> bool:
+    chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
+    return bool(chave and chave in (request.query_params.get("previa"), request.cookies.get("pad_previa")))
+
+
+def _pagina_do_blog(request: Request, artigo: dict | None, artigos: list[dict]) -> Response:
+    previa = _tem_previa(request)
+    html = _jinja.get_template("ocidental/blog.html").render(
+        artigo=artigo, artigos=artigos, rascunho=previa and (artigo is None or not artigo["revisado"]),
+        cores=paleta.tela("ocidental"), fontes=paleta.FONTES["ocidental"], marca=marca, blog=blog)
+    cab = {"X-Robots-Tag": "noindex, nofollow"} if previa and (artigo is None or not artigo["revisado"]) else {}
+    return Response(html, media_type="text/html; charset=utf-8", headers=cab)
+
+
+def _blog_liberado(request: Request):
+    """O blog só existe na ocidental; com a captura ligada, só com a prévia."""
+    if sistema.ativo() != "ocidental":
+        raise HTTPException(404, "Página não encontrada.")
+    if _captura_ligada() and not _tem_previa(request):
+        return RedirectResponse("/lista", status_code=302)
+    return None
+
+
+@app.api_route("/blog", methods=["GET", "HEAD"])
+def pagina_blog(request: Request):
+    """Lista do blog: só artigos revisados (blog.py); com a prévia, os rascunhos também.
+    Sem nenhum artigo revisado, a página não existe (404)."""
+    desvio = _blog_liberado(request)
+    if desvio:
+        return desvio
+    artigos = list(blog.todos()) if _tem_previa(request) else blog.publicados()
+    if not artigos:
+        raise HTTPException(404, "Página não encontrada.")
+    return _pagina_do_blog(request, None, artigos)
+
+
+@app.api_route("/blog/{slug}", methods=["GET", "HEAD"])
+def pagina_artigo(slug: str, request: Request):
+    desvio = _blog_liberado(request)
+    if desvio:
+        return desvio
+    artigo = blog.artigo(slug)
+    if artigo is None or not (artigo["revisado"] is True or _tem_previa(request)):
+        raise HTTPException(404, "Página não encontrada.")
+    return _pagina_do_blog(request, artigo, [])
 
 
 @app.api_route("/estilo", methods=["GET", "HEAD"])
@@ -469,6 +522,8 @@ def sitemap():
     # anunciar as três no sitemap faria o buscador indexar redirecionamento.
     # Na ocidental entram também numerologia e tarot (as rotas públicas de PAGINAS, sem a lista).
     publicas = [r for r in sistema.PAGINAS[sistema.ativo()] if r != "/lista"]
+    if sistema.ativo() == "ocidental" and blog.publicados():
+        publicas += ["/blog"] + [f"/blog/{a['slug']}" for a in blog.publicados()]
     caminhos = ["/lista"] if _captura_ligada() else publicas
     urls = "".join(f"  <url><loc>{entrega.SITE_URL}{c}</loc></url>\n" for c in caminhos)
     corpo = ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -1045,6 +1100,22 @@ def enviar_lembretes(request: Request):
         alertas.alertar("Lembretes com falha", f"{falhas} lembrete(s) não saíram; {enviados} saíram.",
                         chave="lembretes", intervalo=6 * 3600)
     return {"ok": True, "enviados": enviados, "falhas": falhas}
+
+
+@app.post("/api/tarefas/limpeza")
+def limpar_dados_antigos(request: Request):
+    """Chamado 1x por dia pelo GitHub Actions (.github/workflows/tarefas.yml).
+    Cumpre a seção 7 da política de privacidade: dados de marketing saem quando a
+    pessoa se descadastra ou após 24 meses sem nenhuma interação (db.limpar_marketing)."""
+    _chave_tarefas_ok(request)
+    if not db.ativo():
+        return {"ok": True, "apagadas": {}, "nota": "sem banco"}
+    apagadas = db.limpar_marketing()
+    if apagadas is None:
+        alertas.alertar("Limpeza de dados com falha", "A limpeza diária dos dados de marketing não rodou.",
+                        chave="limpeza", intervalo=24 * 3600)
+        raise HTTPException(503, "Não deu para limpar agora.")
+    return {"ok": True, "apagadas": apagadas}
 
 
 # ---------------------------------------------------------------------------

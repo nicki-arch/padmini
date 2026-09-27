@@ -19,6 +19,9 @@
 <link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/ocidental/tema.css">
+<link rel="stylesheet" href="/static/ocidental/componentes.css">
+<link rel="stylesheet" href="/static/ocidental/movimento.css">
+<script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/amostra-email.js" defer></script>
 <script src="/static/analytics.js" defer></script>
@@ -51,9 +54,26 @@
     mask:no-repeat center/11px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E")}
   .oferta .preco{font-family:var(--serif);font-size:2rem}
   .oferta .preco small{font-size:1rem;color:var(--faint);text-decoration:line-through;margin-left:8px}
+  .cidade-status{display:block;margin-top:4px}
+  .cidade-status.ok{color:var(--sage)}
+  input.escolhida{border-color:var(--sage)}
   .honesty{font-size:13px;color:var(--faint);margin-top:8px;max-width:56ch}
   @media(max-width:640px){.duo,.pontos{grid-template-columns:1fr}}
   @media(max-width:480px){fieldset{padding:12px 12px 14px;border-radius:10px}}
+  .como-fica{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:24px;align-items:center}
+  .rosa-grande{margin:0}
+  .rosa-grande svg,.rosa-completo svg{width:100%;height:auto;display:block}
+  .rosa-grande figcaption{font-size:13px;color:var(--faint);margin-top:8px;text-align:center}
+  .rosa-completo{max-width:460px;margin:0 auto}
+  .comparacao{width:100%;border-collapse:collapse;font-size:14.5px}
+  .comparacao th,.comparacao td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  .comparacao th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--saffron);font-weight:600}
+  .comparacao td{color:var(--muted)}
+  .comparacao .marca-c{text-align:center;color:var(--ink);width:24%}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .esmaecido{position:relative;max-height:9.5em;overflow:hidden;
+    -webkit-mask-image:linear-gradient(180deg,#000 35%,transparent);mask-image:linear-gradient(180deg,#000 35%,transparent)}
+  @media(max-width:760px){.como-fica{grid-template-columns:1fr}.rosa-grande{max-width:420px;margin:0 auto}}
   .cardc::after{content:none} /* o base.css desenha a marca em sânscrito no card */
 </style>
 </head>
@@ -64,9 +84,7 @@
       {{ marca.svg(30) }}
       Padmini
     </a>
-    <nav>
-      <a class="navlink" href="/mapa">Mapa natal</a>
-    </nav>
+    {% set atual = "/compatibilidade" %}{% include "ocidental/_menu.html" %}
   </div>
 </header>
 
@@ -82,22 +100,23 @@
           <legend>Pessoa A</legend>
           <div class="campo">
             <label for="nome-a">Nome <span class="dica">(opcional)</span></label>
-            <input id="nome-a" maxlength="80" autocomplete="off">
+            <input id="nome-a" name="nome-a" maxlength="80" autocomplete="off">
           </div>
           <div class="campo">
             <label for="data-a">Data de nascimento</label>
-            <input id="data-a" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
+            <input id="data-a" name="data-a" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
           </div>
           <div class="campo">
             <label for="hora-a">Hora de nascimento</label>
-            <input id="hora-a" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
+            <input id="hora-a" name="hora-a" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
           </div>
           <div class="campo">
             <label for="cidade-a" id="cidade-a-label">Cidade de nascimento</label>
             <div class="auto">
-              <input id="cidade-a" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-a" autocomplete="off" placeholder="ex.: Porto Alegre" required>
+              <input id="cidade-a" name="cidade-a" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-a" autocomplete="off" placeholder="ex.: Porto Alegre" required>
               <ul id="lista-a" role="listbox" aria-labelledby="cidade-a-label" hidden></ul>
             </div>
+            <span class="dica cidade-status" id="cidade-a-status" aria-live="polite"></span>
           </div>
         </fieldset>
 
@@ -105,22 +124,23 @@
           <legend>Pessoa B</legend>
           <div class="campo">
             <label for="nome-b">Nome <span class="dica">(opcional)</span></label>
-            <input id="nome-b" maxlength="80" autocomplete="off">
+            <input id="nome-b" name="nome-b" maxlength="80" autocomplete="off">
           </div>
           <div class="campo">
             <label for="data-b">Data de nascimento</label>
-            <input id="data-b" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
+            <input id="data-b" name="data-b" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
           </div>
           <div class="campo">
             <label for="hora-b">Hora de nascimento</label>
-            <input id="hora-b" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
+            <input id="hora-b" name="hora-b" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
           </div>
           <div class="campo">
             <label for="cidade-b" id="cidade-b-label">Cidade de nascimento</label>
             <div class="auto">
-              <input id="cidade-b" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-b" autocomplete="off" placeholder="ex.: Curitiba" required>
+              <input id="cidade-b" name="cidade-b" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-b" autocomplete="off" placeholder="ex.: Curitiba" required>
               <ul id="lista-b" role="listbox" aria-labelledby="cidade-b-label" hidden></ul>
             </div>
+            <span class="dica cidade-status" id="cidade-b-status" aria-live="polite"></span>
           </div>
         </fieldset>
       </div>
@@ -135,6 +155,42 @@
   </div>
 
   <section id="resultado" aria-live="polite" hidden></section>
+
+  {%- set ex = exemplos.casais()[0] %}
+  <section id="como-fica" data-revelar>
+    <h2>{{ t.como_fica.titulo }}</h2>
+    <p class="sub">{{ t.como_fica.sub | replace("{a}", ex.nomes.a) | replace("{b}", ex.nomes.b) }}</p>
+    <div class="como-fica">
+      <figure class="rosa-grande">
+        {{ ex.rosa_grande }}
+        <figcaption>{{ t.como_fica.rosa_legenda }}</figcaption>
+      </figure>
+      <table class="comparacao">
+        <thead><tr><th></th><th>Amostra grátis</th><th>Completo · R${{ ofertas.compat.preco | moeda }}</th></tr></thead>
+        <tbody>
+        {%- for linha in t.como_fica.comparacao %}
+          <tr><td>{{ linha.item }}</td><td class="marca-c">{{ "✓" if linha.amostra else "—" }}<span class="vh">{{ " incluído" if linha.amostra else " não incluído" }}</span></td><td class="marca-c">✓<span class="vh"> incluído</span></td></tr>
+        {%- endfor %}
+        </tbody>
+      </table>
+    </div>
+    <h3 style="margin-top:28px">{{ t.como_fica.trecho_titulo }}</h3>
+    <div class="pontos" style="grid-template-columns:1fr">
+      {%- for d in ex.relatorio.dimensoes %}
+      {%- if d.chave == ex.relatorio.ponto_forte.chave %}
+      <div class="ponto"><div class="rot">{{ d.titulo }} — {{ d.nota }}/100</div>
+        <p style="margin-bottom:6px"><i>{{ d.descricao }}</i></p><p>{{ d.texto }}</p></div>
+      {%- endif %}
+      {%- endfor %}
+      {%- for d in ex.relatorio.dimensoes if d.chave != ex.relatorio.ponto_forte.chave %}
+      {%- if loop.index <= 2 %}
+      <div class="ponto esmaecido" aria-hidden="true"><div class="rot">{{ d.titulo }} — {{ d.nota }}/100</div><p>{{ d.texto }}</p></div>
+      {%- endif %}
+      {%- endfor %}
+    </div>
+    <p class="sub" style="margin-top:14px">{{ t.como_fica.mais }}</p>
+    <p><a class="btn btn-outline" href="#form">Ver a de vocês, de graça →</a></p>
+  </section>
 </main>
 
 <footer>
@@ -212,14 +268,19 @@ function criarAutocomplete(input, lista) {
     else input.removeAttribute("aria-activedescendant");
     input.closest(".auto").style.marginBottom = lista.hidden ? "" : `${Math.min(lista.scrollHeight, 260) + 4}px`;
   }
+  // o que aconteceu com a busca, embaixo do campo (nada achado / cidade escolhida)
+  const status = document.getElementById(input.id + "-status");
+  function avisar(texto, ok) { status.textContent = texto; status.classList.toggle("ok", !!ok); input.classList.toggle("escolhida", !!ok); }
   function escolher(i) {
     selecionada = opcoes[i];
     input.value = selecionada.rotulo;
     fechar();
+    avisar("✓ Cidade escolhida", true);
   }
   input.addEventListener("input", () => {
     selecionada = null;
     clearTimeout(timer);
+    avisar("");
     const q = input.value.trim();
     if (q.length < 2) { opcoes = []; fechar(); return; }
     timer = setTimeout(async () => {
@@ -228,7 +289,8 @@ function criarAutocomplete(input, lista) {
         opcoes = await r.json();
         ativa = opcoes.length ? 0 : -1;
         desenhar();
-      } catch { opcoes = []; fechar(); }
+        avisar(opcoes.length ? "" : "Nenhuma cidade encontrada. Tente só o começo do nome.");
+      } catch { opcoes = []; fechar(); avisar("Não deu para buscar agora. Tente de novo em instantes."); }
     }, 180);
   });
   input.addEventListener("keydown", (e) => {
@@ -389,6 +451,7 @@ function desenharCompleto(d) {
     ${blocoCard(d, false)}
     ${blocoMetodo(d)}
     <h2>As oito dimensões</h2>
+    ${d.rosa ? `<div class="rosa-completo">${d.rosa}</div>` : ""}
     <div class="pontos" style="grid-template-columns:1fr">${dims}</div>
     ${aspectos ? `<h2>Os aspectos entre vocês</h2><div class="pontos" style="grid-template-columns:1fr">${aspectos}</div>` : ""}
     ${casas ? `<h2>Os planetas de um nas casas do outro</h2><div class="pontos" style="grid-template-columns:1fr">${casas}</div>` : ""}
@@ -413,6 +476,7 @@ function desenharCompleto(d) {
   const A = pessoa("a"), B = pessoa("b");
   if (!A.data || isNaN(A.lat) || !B.data || isNaN(B.lat)) return;
   const _fc = document.querySelector("main > .card"); if (_fc) _fc.hidden = true;
+  const _cf = document.getElementById("como-fica"); if (_cf) _cf.hidden = true;
   const res = $("#resultado");
   res.hidden = false;
   res.innerHTML = '<p class="nota">Abrindo a sinastria completa…</p>';

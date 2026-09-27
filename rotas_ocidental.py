@@ -214,6 +214,10 @@ def sinastria_ocidental(p: PedidoSinastria, request: Request):
             texto_ia = gerar_com_claude(mt.montar_prompt_sinastria(rel, nome_a, nome_b))
             db.guardar_texto_ia(chave_cache, f"{VERSAO}:compat", texto_ia,
                                 os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
+    if p.nivel == "completo":
+        # a rosa das oito dimensões, desenhada no servidor (o mesmo SVG da home)
+        import exemplos_ocidental as ex
+        rel["rosa"] = ex.rosa_svg({d["chave"]: d["nota"] for d in rel["dimensoes"]}, rel["ponto_forte"]["chave"])
     return {"nivel": p.nivel, "sistema": VERSAO, "nomes": {"a": nome_a, "b": nome_b},
             "maximo": 100, **rel, "avisos_horario": {"a": aviso_a, "b": aviso_b}, "texto_ia": texto_ia}
 
