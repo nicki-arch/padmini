@@ -82,9 +82,18 @@ def email_completo_html(produto: str, link: str, nome: str = "", extra: str = ""
   <p style="margin:26px 0"><a href="{link}" style="{estilo_botao(c)}">Ver meu relatório completo →</a></p>
   <p style="color:{c['suave']};font-size:13px;margin:0 0 4px">Se o botão não abrir, copie e cole este link no navegador:</p>
   <p style="color:{c['suave']};font-size:12px;word-break:break-all;margin:0">{link}</p>
-  {extra}
+  {extra}{_linha_minhas_leituras(sistema, c)}
   <p style="color:{c['fraco']};font-size:12px;margin-top:26px">{assinatura} Este link é pessoal; não o compartilhe.</p>
 </div>"""
+
+
+def _linha_minhas_leituras(sistema: str, c: dict) -> str:
+    """Rodada 6 (só ocidental): onde pedir de novo os links, se este e-mail se perder."""
+    if sistema != "ocidental":
+        return ""
+    return (f'<p style="color:{c["suave"]};font-size:13px;margin:22px 0 0">Perdeu este e-mail? Em '
+            f'<a href="{SITE_URL}/minhas-leituras" style="color:{c["acento"]}">{SITE_URL.split("//")[-1]}/minhas-leituras</a> '
+            f'você recebe de novo os links de todas as suas leituras.</p>')
 
 
 def estilo_botao(c: dict) -> str:
@@ -107,8 +116,48 @@ def email_mapas_do_casal_html(links: list, nome: str = "", sistema: str = "vedic
   <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
   <p style="margin:0 0 12px">{ola}</p>
   <p style="margin:0 0 8px">Os mapas individuais de vocês dois estão prontos — um para cada pessoa.</p>
-  {botoes}
+  {botoes}{_linha_minhas_leituras(sistema, c)}
   <p style="color:{c['fraco']};font-size:12px;margin-top:26px">{assinatura} Estes links são pessoais; não os compartilhe.</p>
+</div>"""
+
+
+# Nomes das leituras no e-mail de "minhas leituras". O `produto` do pedido é
+# "mapa", "compat" ou "mapas_casal" na védica e "ocidental:<produto>" na ocidental.
+NOME_LEITURA = {
+    "vedica": {"mapa": "Mapa védico", "compat": "Compatibilidade do casal", "mapas_casal": "Mapas védicos do casal"},
+    "ocidental": {"mapa": "Mapa natal", "compat": "Sinastria do casal", "numerologia": "Numerologia",
+                  "tarot": "Tarot", "mapas_casal": "Mapas natais do casal"},
+}
+
+
+def nome_da_leitura(produto: str) -> str:
+    versao, _, nome = produto.partition(":") if ":" in produto else ("vedica", "", produto)
+    return NOME_LEITURA.get(versao, {}).get(nome, "Leitura Padmini")
+
+
+def email_minhas_leituras_html(leituras: list[dict]) -> str:
+    """Todas as leituras compradas por um e-mail, cada uma com o seu link (que
+    abre na versão em que foi comprada). leituras: [{produto, criado_em, link}]."""
+    c = paleta.email("ocidental")
+    blocos = []
+    for item in leituras:
+        links = [l for l in str(item["link"]).split("\n") if l.strip()]
+        quando = item["criado_em"].strftime("%d/%m/%Y") if hasattr(item["criado_em"], "strftime") else ""
+        titulo = html.escape(nome_da_leitura(item["produto"]))
+        botoes = "".join(
+            f'<p style="margin:10px 0"><a href="{html.escape(l, quote=True)}" style="{estilo_botao(c)}">'
+            f'{"Abrir" if len(links) == 1 else f"Abrir o {i} de {len(links)}"} →</a></p>'
+            for i, l in enumerate(links, 1))
+        blocos.append(f'<div style="border-top:1px solid {c["fraco"]};padding:16px 0 6px">'
+                      f'<p style="margin:0;font-family:{c["fonte_marca"]};font-size:19px">{titulo}</p>'
+                      f'<p style="margin:2px 0 6px;color:{c["suave"]};font-size:13px">Comprada em {quando}</p>{botoes}</div>')
+    return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
+  <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
+  <p style="margin:0 0 12px">Olá,</p>
+  <p style="margin:0 0 18px">Você pediu os links das suas leituras. Aqui estão todas as que foram compradas com este e-mail:</p>
+  {"".join(blocos)}
+  <p style="color:{c['suave']};font-size:13px;margin:22px 0 0">Não foi você que pediu? Pode ignorar este e-mail: os links só chegam aqui, na sua caixa.</p>
+  <p style="color:{c['fraco']};font-size:12px;margin-top:26px">{_sistema.ASSINATURA_EMAIL["ocidental"]} Estes links são pessoais; não os compartilhe.</p>
 </div>"""
 
 

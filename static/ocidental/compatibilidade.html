@@ -200,7 +200,7 @@
   Padmini — astrologia para autoconhecimento.<br>
   Sinastria pelo zodíaco tropical, casas Placidus. O Índice Padmini é um método próprio, não uma regra da astrologia. Esta leitura é uma ferramenta de autoconhecimento, não uma previsão nem substituto de uma conversa honesta entre vocês.<br>
   Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos: Swiss Ephemeris.<br>
-  <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
+  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
 </footer>
 
 <script>
@@ -504,7 +504,7 @@ function desenharCompleto(d) {
     if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Link inválido.");
     desenharCompleto(c);
   }).catch((e) => {
-    res.innerHTML = `<p class="aviso">Não foi possível abrir a sinastria completa: ${esc(e.message)} Se você já pagou, confira o link do e-mail ou fale com a gente.</p>`;
+    res.innerHTML = `<p class="aviso">Não foi possível abrir a sinastria completa: ${esc(e.message)} Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a> ou fale com a gente.</p>`;
   });
 })();
 

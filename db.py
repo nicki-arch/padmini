@@ -630,3 +630,20 @@ def desfazer_reserva(id_reserva: int) -> None:
             c.execute("DELETE FROM envios_sequencia WHERE id = %s", (id_reserva,))
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao desfazer reserva de sequência")
+
+
+def leituras_do_email(email: str) -> list[dict]:
+    """As leituras compradas por um e-mail, com o link já entregue (rodada 6,
+    "recuperar minhas leituras"). Só pedidos com link: os pendentes de entrega
+    manual não entram. Do mais antigo ao mais novo."""
+    if not ativo():
+        return []
+    try:
+        with _conectar() as c:
+            rows = c.execute("SELECT produto, criado_em, link FROM pedidos "
+                             "WHERE lower(email) = lower(%s) AND coalesce(link, '') <> '' "
+                             "ORDER BY criado_em", (email,)).fetchall()
+        return [{"produto": r[0], "criado_em": r[1], "link": r[2]} for r in rows]
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao buscar as leituras de um e-mail")
+        return []
