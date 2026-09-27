@@ -130,6 +130,10 @@ produtos:
     botao: Tirar as cartas →
   combo: >-
     Sinastria com os mapas natais dos dois:
+# Só aparece com depoimento real e autorizado (conteudo/ocidental/depoimentos.yaml).
+depoimentos:
+  titulo: O que dizem
+
 # Texto confirmado pelo Nicolas em 26/set/2026.
 tradicao:
   titulo: Uma tradição de família

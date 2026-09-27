@@ -1,0 +1,9 @@
+# Depoimentos da home (versão ocidental). Regras em depoimentos.py:
+# só de cliente real, com autorização por escrito (guarde a mensagem).
+# Vazio = a seção não aparece. Exemplo de item (NÃO é um depoimento real):
+#
+#   - texto: A leitura explicou uma coisa que a gente sentia e não sabia dizer.
+#     nome: Marina S.
+#     produto: sinastria        # sinastria | mapa | numerologia | tarot
+#     autorizado_em: 2026-10-02 # data da autorização por escrito
+depoimentos: []

@@ -213,3 +213,113 @@ def test_limpeza_sem_chave_recusa(monkeypatch):
     assert cliente.post("/api/tarefas/limpeza").status_code == 503
     monkeypatch.setenv("PADMINI_TAREFAS_CHAVE", "certa")
     assert cliente.post("/api/tarefas/limpeza", headers={"Authorization": "Bearer errada"}).status_code == 401
+
+
+# ================================================================== Fase C
+import blog  # noqa: E402
+import depoimentos  # noqa: E402
+
+
+@pytest.fixture
+def previa(monkeypatch):
+    monkeypatch.setenv("PADMINI_PREVIA_CHAVE", "chave-previa")
+    return "chave-previa"
+
+
+def _publicar(monkeypatch, slug):
+    artigos = tuple({**a, "revisado": a["slug"] == slug} for a in blog.todos())
+    monkeypatch.setattr(blog, "todos", lambda: artigos)
+    app_mod._paginas_prontas.clear()
+
+
+def test_artigos_bem_formados_e_sem_nada_da_vedica():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("pronto", RAIZ / "scripts" / "pronto_para_virar.py")
+    pronto = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pronto)
+    assert len(blog.todos()) >= 3
+    for a in blog.todos():
+        texto = " ".join([a["titulo"], a["descricao"], a["abertura"]] +
+                         [s["titulo"] + " " + " ".join(s["paragrafos"]) for s in a["secoes"]])
+        assert not pronto.VEDICO.search(texto), a["slug"]
+        assert not re.search(r"R\$\s*\d", texto), a["slug"]  # preço nunca no texto (regra 12)
+        assert a["chamada"]["href"] in ("/compatibilidade", "/mapa", "/numerologia", "/tarot")
+        assert len(a["descricao"]) <= 200, a["slug"]
+
+
+def test_rascunho_nao_vai_ao_ar(ocidental, previa):
+    assert all(a["revisado"] is False for a in blog.todos())  # round 5: tudo rascunho até a família revisar
+    assert cliente.get("/blog").status_code == 404
+    assert cliente.get("/blog/como-ler-o-indice-padmini").status_code == 404
+    assert "/blog" not in cliente.get("/sitemap.xml").text
+    assert 'href="/blog"' not in cliente.get("/").text
+
+
+def test_rascunho_abre_com_a_previa_fora_do_buscador(ocidental, previa):
+    r = cliente.get(f"/blog/como-ler-o-indice-padmini?previa={previa}")
+    assert r.status_code == 200 and "noindex" in r.headers.get("x-robots-tag", "")
+    assert "rascunho, ainda não revisado" in r.text and '<meta name="robots" content="noindex' in r.text
+    lista = cliente.get(f"/blog?previa={previa}")
+    assert lista.status_code == 200 and lista.text.count("/blog/") >= 3
+
+
+def test_artigo_revisado_vai_ao_ar_com_sitemap_e_menu(ocidental, monkeypatch):
+    _publicar(monkeypatch, "o-que-e-sinastria")
+    r = cliente.get("/blog/o-que-e-sinastria")
+    assert r.status_code == 200 and "x-robots-tag" not in r.headers and 'class="faixa-rascunho"' not in r.text
+    assert '<link rel="canonical" href="https://padmini.com.br/blog/o-que-e-sinastria">' in r.text
+    assert cliente.get("/blog/mapa-natal-nao-e-horoscopo").status_code == 404  # o outro segue rascunho
+    lista = cliente.get("/blog").text
+    assert "/blog/o-que-e-sinastria" in lista and "/blog/mapa-natal-nao-e-horoscopo" not in lista
+    mapa = cliente.get("/sitemap.xml").text
+    assert "/blog</loc>" in mapa and "/blog/o-que-e-sinastria</loc>" in mapa
+    assert "/blog/mapa-natal-nao-e-horoscopo" not in mapa
+    assert 'href="/blog"' in cliente.get("/").text
+
+
+def test_blog_nao_existe_na_vedica(monkeypatch, previa):
+    monkeypatch.setenv("PADMINI_SISTEMA", "vedica")
+    _publicar(monkeypatch, "o-que-e-sinastria")
+    try:
+        assert cliente.get("/blog").status_code == 404
+        assert cliente.get(f"/blog/o-que-e-sinastria?previa={previa}").status_code == 404
+        assert "/blog" not in cliente.get("/sitemap.xml").text
+    finally:
+        app_mod._paginas_prontas.clear()
+
+
+def test_blog_com_a_captura_ligada_vai_para_a_lista(ocidental, monkeypatch):
+    _publicar(monkeypatch, "o-que-e-sinastria")
+    monkeypatch.setenv("PADMINI_CAPTURA", "1")
+    r = cliente.get("/blog/o-que-e-sinastria", follow_redirects=False)
+    assert r.status_code == 302 and r.headers["location"] == "/lista"
+
+
+def test_slug_invalido_404(ocidental):
+    assert cliente.get("/blog/..%2Fapp").status_code == 404
+    assert cliente.get("/blog/nao-existe").status_code == 404
+
+
+# ------------------------------------------------------------------ depoimentos
+def test_nenhum_depoimento_inventado_no_yaml():
+    """Todo item do YAML precisa estar completo e autorizado; hoje a lista está vazia."""
+    assert all(depoimentos.valido(d) for d in depoimentos.todos())
+
+
+def test_sem_depoimento_a_secao_nao_aparece(ocidental):
+    import textos
+    titulo = textos.da_pagina("home", "ocidental")["depoimentos"]["titulo"]
+    if not depoimentos.publicaveis():
+        assert titulo not in cliente.get("/").text
+
+
+def test_depoimento_sem_autorizacao_nao_aparece(ocidental, monkeypatch):
+    from datetime import date
+    itens = ({"texto": "Autorizado.", "nome": "Marina S.", "produto": "sinastria", "autorizado_em": date(2026, 10, 2)},
+             {"texto": "Sem autorização.", "nome": "Joana", "produto": "mapa"},
+             {"texto": "Produto errado.", "nome": "Lia", "produto": "vedica", "autorizado_em": date(2026, 10, 2)})
+    monkeypatch.setattr(depoimentos, "todos", lambda: itens)
+    app_mod._paginas_prontas.clear()
+    html = cliente.get("/").text
+    assert "“Autorizado.”" in html and "Marina S. · Sinastria" in html
+    assert "Sem autorização" not in html and "Produto errado" not in html

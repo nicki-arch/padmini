@@ -2,7 +2,10 @@
    também no celular (lá vira uma linha própria, rolável, embaixo da marca).
    Quem inclui define `atual` ("/", "/compatibilidade", "/mapa"…). #}
 <nav class="menu-produtos" aria-label="Produtos">
-  {%- for href, rotulo in (("/compatibilidade", "Sinastria<span class=\"longo\"> do casal</span>"), ("/mapa", "Mapa natal"), ("/numerologia", "Numerologia"), ("/tarot", "Tarot")) %}
+  {%- for href, rotulo in (("/compatibilidade", "Sinastria<span class=\"longo\">&nbsp;do casal</span>"), ("/mapa", "Mapa natal"), ("/numerologia", "Numerologia"), ("/tarot", "Tarot")) %}
   <a class="navlink{% if href == atual %} atual{% endif %}" href="{{ href }}"{% if href == atual %} aria-current="page"{% endif %}>{{ rotulo }}</a>
   {%- endfor %}
+  {%- if blog.publicados() %}
+  <a class="navlink{% if atual == "/blog" %} atual{% endif %}" href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>
+  {%- endif %}
 </nav>

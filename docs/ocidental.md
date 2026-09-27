@@ -210,3 +210,29 @@ nunca na que está no ar na hora do envio (a mesma regra dos links de entrega):
 - Copy e assuntos: `marketing.TEXTOS`; cores: `paleta.email(versão)`. Prévia de
   todos em `/estilo?previa=<chave>`.
 
+
+## Round 5 (27/set/2026) — vitrine, confiança e conteúdo
+
+- **Exemplos** (`exemplos_ocidental.py`): três casais com nascimentos
+  fictícios, calculados pelo motor. Índice, notas e textos nunca são escritos à
+  mão; se o motor mudar, os exemplos mudam junto. A página diz que são fictícios.
+- **Rosa das 8 dimensões**: uma pétala por dimensão, comprimento = nota; a
+  pétala do ponto mais forte na segunda tinta; dimensão sem dados = pétala
+  tracejada. Só no completo (a amostra continua sem as notas por dimensão).
+- **Blog** (`blog.py`, `conteudo/ocidental/blog/*.yaml`): só na ocidental. Para
+  publicar um artigo: alguém da família lê em `/blog/<nome>?previa=CHAVE`,
+  ajusta o texto no YAML e troca `revisado: false` para `revisado: true`. Depois
+  do deploy ele entra em `/blog`, no sitemap e no menu. Sem nenhum artigo
+  revisado, `/blog` não existe (404).
+- **Depoimentos** (`depoimentos.py`, `conteudo/ocidental/depoimentos.yaml`): só
+  de cliente real, com autorização por escrito (`autorizado_em`). Lista vazia =
+  a seção da home não aparece. Não há contador de "casais atendidos": não
+  guardamos as amostras geradas, e um número desses precisaria sair do banco.
+- **Limpeza** (`db.limpar_marketing`, `/api/tarefas/limpeza`, todo dia no
+  workflow `tarefas`): apaga lista de espera, amostras por e-mail e abandonos
+  de quem se descadastrou ou está há 24 meses sem nenhuma interação (qualquer
+  registro do mesmo e-mail, compra inclusive). Pedidos e a lista de descadastro
+  ficam.
+- **Data de nascimento** continua em texto com máscara (dd/mm/aaaa), e não
+  `type="date"`: no celular, o seletor nativo abre no dia de hoje, o que é ruim
+  para quem nasceu em 1990.

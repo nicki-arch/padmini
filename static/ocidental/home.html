@@ -55,6 +55,10 @@
   .rosa-mini{margin:14px auto 4px;max-width:170px}
   .rosa-mini svg{width:100%;height:auto;display:block}
   @media(max-width:900px){.galeria{grid-template-columns:1fr;max-width:360px;margin-inline:auto}}
+  .depoimentos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  .depo{margin:0;border-left:2px solid var(--saffron);padding:4px 0 4px 18px}
+  .depo blockquote{margin:0;font-family:var(--serif);font-size:1.15rem;line-height:1.45}
+  .depo figcaption{margin-top:10px;font-size:13px;color:var(--faint)}
   .cardc::after{content:none} /* o base.css desenha a marca em sânscrito no card */
 </style>
 </head>
@@ -169,6 +173,20 @@
   </section>
 
   <hr class="rule">
+
+  {%- set deps = depoimentos.publicaveis() %}
+  {%- if deps %}
+  <section class="wrap" data-revelar>
+    <h2>{{ t.depoimentos.titulo }}</h2>
+    <div class="depoimentos">
+      {%- for d in deps[:3] %}
+      <figure class="depo"><blockquote>“{{ d.texto }}”</blockquote><figcaption>{{ d.nome }} · {{ d.produto_nome }}</figcaption></figure>
+      {%- endfor %}
+    </div>
+  </section>
+
+  <hr class="rule">
+  {%- endif %}
 
   <section class="wrap" data-revelar>
     <div class="anchor2">
