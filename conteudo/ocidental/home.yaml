@@ -1,48 +1,51 @@
 # Padmini (versão OCIDENTAL) — texto da home. FONTE ÚNICA da copy desta página,
 # inclusive o <head> (título e descrição para buscador e redes).
 # Mesma estrutura do conteudo/vedica/home.yaml; o desenho está em
-# static/ocidental/home.html. Quatro produtos: sinastria, mapa natal,
-# numerologia e tarot (rodada 2).
+# static/ocidental/home.html. Quatro produtos, nesta ordem (rodada 6, decisão
+# do Nicolas de 27/set): mapa natal (a porta de entrada), sinastria,
+# numerologia e tarot.
 # Preço NÃO fica aqui: conteudo/ocidental/ofertas.yaml.
 
 seo:
   titulo: Padmini — Astrologia para autoconhecimento
   descricao: >-
-    Sinastria do casal, mapa natal, numerologia e tarot. Astrologia para
+    Mapa natal, sinastria do casal, numerologia e tarot. Astrologia para
     autoconhecimento, com amostra grátis em todos.
-  og_titulo: A sinastria de vocês dois — Padmini
-  og_descricao: Os dois mapas natais cruzados em 8 dimensões. Amostra grátis.
+  og_titulo: O seu mapa natal — Padmini
+  og_descricao: O Sol, a Lua e o Ascendente de quando você nasceu. Amostra grátis.
 
 menu:
-  compatibilidade: Sinastria do casal
   mapa: Mapa natal
+  compatibilidade: Sinastria do casal
   numerologia: Numerologia
   tarot: Tarot
 
 hero:
   eyebrow: Padmini · Astrologia para autoconhecimento
-  titulo: Onde o mapa de um toca o mapa do <em>outro</em>.
+  titulo: O céu de quando você <em>nasceu</em>, lido com cuidado.
   lede: >-
-    Não é horóscopo de signo. A sinastria cruza os mapas natais de vocês dois
-    — o Sol, a Lua, Vênus e Marte de cada um — e mostra onde o encontro flui e
-    onde pede cuidado. Vejam a amostra agora, de graça.
-  botao_principal: Ver nossa sinastria →
-  botao_secundario: Fazer meu mapa natal
+    Não é horóscopo de signo. O mapa natal parte da data, da hora e da cidade
+    do seu nascimento para mostrar onde estavam o Sol, a Lua e cada planeta —
+    e o que isso diz do seu jeito de sentir, de amar e de escolher. Veja o seu
+    Sol, a sua Lua e o seu Ascendente agora, de graça.
+  botao_principal: Ver meu mapa natal →
+  botao_secundario: Fazer a sinastria do casal
 
 como_funciona:
   titulo: Como funciona
   sub: Três passos. Leva dois minutos.
   passos:
-    - titulo: Os nascimentos
-      texto: Você preenche data, hora e cidade — de você, ou do casal. Sem a hora também dá.
+    - titulo: O seu nascimento
+      texto: Você preenche data, hora e cidade — as suas, ou as do casal. Sem a hora também dá.
     - titulo: A amostra grátis
       texto: >-
-        Na hora, o essencial do mapa — ou o índice do casal com o ponto mais
-        forte e o de atenção, num card para compartilhar.
+        Na hora, o seu Sol, a sua Lua e o seu Ascendente — ou, no casal, o
+        Índice Padmini e o ponto mais forte, num card para compartilhar.
     - titulo: O relatório completo
       texto: Se quiser ir fundo, o completo abre tudo e chega no seu e-mail.
 
 dimensoes:
+  eyebrow: Para o casal · Sinastria
   titulo: As oito dimensões do casal
   sub: >-
     A sinastria organiza o encontro dos dois mapas em oito frentes. Cada uma
@@ -108,7 +111,7 @@ produtos:
       um nas casas do outro.
     botao: Ver nossa sinastria →
   mapa:
-    etiqueta: Para você
+    etiqueta: Comece por aqui
     titulo: Mapa natal
     texto: >-
       Sol, Lua e Ascendente, todos os planetas em signos e casas, os aspectos
@@ -173,9 +176,9 @@ faq:
         o que pede atenção e uma direção possível. Quem decide é você.
 
 fechamento:
-  titulo: Descubram juntos.
-  sub: Comecem pela amostra grátis. Leva dois minutos.
-  botao: Ver nossa sinastria →
+  titulo: Comece pelo seu mapa.
+  sub: A amostra é grátis e sai na hora. Leva dois minutos.
+  botao: Ver meu mapa natal →
 
 rodape:
   linha1: Padmini — astrologia para autoconhecimento.
