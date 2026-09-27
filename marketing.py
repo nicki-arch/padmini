@@ -228,13 +228,18 @@ def _resumo_ocidental(produto: str, amostra: dict) -> str:
     de atenção; numerologia = o Caminho de Vida; tarot = as 3 cartas e a frase de cada."""
     c = _cor("ocidental")
     if produto == "mapa":
+        # Rodada 6: a tela mostra só o texto do Sol; o e-mail traz o texto de cada
+        # um (Sol, Lua e Ascendente) e o aspecto mais exato — é "o resto da leitura".
         partes = []
         for x in amostra.get("triade") or []:
             partes.append(_p(f'{_rotulo(x["nome"], c)}<br>'
                              f'<span style="font-family:{c["fonte_marca"]};font-size:22px">{_e(x["signo"])}</span>'
-                             + (f' <span style="color:{c["fraco"]}">{_e(x.get("grau", ""))}</span>' if x.get("grau") else "")))
-        primeiro = (amostra.get("triade") or [{}])[0]
-        partes.append(_p(_e(primeiro.get("texto", ""))))
+                             + (f' <span style="color:{c["fraco"]}">{_e(x.get("grau", ""))}</span>' if x.get("grau") else "")
+                             + (f'<br>{_e(x["texto"])}' if x.get("texto") else "")))
+        aspecto = amostra.get("aspecto") or {}
+        if aspecto.get("texto"):
+            partes.append(_p(f'{_rotulo("O aspecto mais exato do seu mapa", c)}<br>'
+                             f'<b>{_e(aspecto.get("titulo", ""))}</b><br>{_e(aspecto["texto"])}'))
         for aviso in amostra.get("avisos") or []:
             partes.append(_p(f'<span style="color:{c["suave"]};font-size:13px">{_e(aviso)}</span>'))
         return "".join(partes)

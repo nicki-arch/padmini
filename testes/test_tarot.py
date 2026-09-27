@@ -112,20 +112,22 @@ def test_leitura_de_conjunto_escolhe_as_pecas():
 
 # ------------------------------------------------------------------ API
 def test_amostra_tem_nome_e_frase_sem_a_leitura():
-    r = cliente.post("/api/ocidental/tarot/tirar")
+    r = cliente.post("/api/ocidental/tarot/tirar", json={"email": "teste@exemplo.com"})
     assert r.status_code == 200
     c = r.json()
     assert len(c["cartas"]) == 3 and all(x["frase"] and x["nome"] for x in c["cartas"])
     assert all("leitura" not in x for x in c["cartas"]) and "conjunto" not in c
     # reabrir a mesma tiragem (recarregar a página) mostra as mesmas cartas
-    de_novo = cliente.post("/api/ocidental/tarot", json={"tiragem": c["tiragem"]}).json()
+    de_novo = cliente.post("/api/ocidental/tarot", json={"tiragem": c["tiragem"], "email": "teste@exemplo.com"}).json()
     assert de_novo["cartas"] == c["cartas"]
 
 
 def test_completo_mostra_exatamente_as_cartas_da_amostra():
     """Amostra → pagamento (link de entrega) → completo: as mesmas 3 cartas, nas mesmas posições."""
+    import limites
     for _ in range(20):
-        amostra = cliente.post("/api/ocidental/tarot/tirar").json()
+        limites.limpar_todos()  # 20 sorteios seguidos passam do limite de amostras por IP
+        amostra = cliente.post("/api/ocidental/tarot/tirar", json={"email": "teste@exemplo.com"}).json()
         link = entrega.link_completo("tarot", {"tiragem": amostra["tiragem"]}, "ocidental")
         q = urllib.parse.parse_qs(urllib.parse.urlparse(link).query)
         assert q["t"] == [amostra["tiragem"]] and q["token"][0].startswith("oc-")
@@ -231,7 +233,7 @@ def oferta_tarot(monkeypatch):
 
 
 def test_webhook_entrega_as_mesmas_cartas(oferta_tarot):
-    amostra = cliente.post("/api/ocidental/tarot/tirar").json()
+    amostra = cliente.post("/api/ocidental/tarot/tirar", json={"email": "teste@exemplo.com"}).json()
     ev = {"event": "purchase_approved", "secret": "segredo-de-teste-webhook",
           "data": {"id": "tar-1", "status": "paid", "offer": {"id": "octar1"},
                    "sck": "t~" + amostra["tiragem"], "customer": {"email": "t@teste.com", "name": "Ana"}}}
@@ -290,15 +292,15 @@ def test_sem_segredo_o_tarot_recusa_tudo(monkeypatch):
         tarot.tirar()
     with pytest.raises(tarot.SemSegredo):
         tarot.cartas_da_tiragem(valida)
-    assert cliente.post("/api/ocidental/tarot/tirar").status_code == 503
-    assert cliente.post("/api/ocidental/tarot", json={"tiragem": valida}).status_code == 503
+    assert cliente.post("/api/ocidental/tarot/tirar", json={"email": "teste@exemplo.com"}).status_code == 503
+    assert cliente.post("/api/ocidental/tarot", json={"tiragem": valida, "email": "teste@exemplo.com"}).status_code == 503
     # uma tiragem selada com a chave antiga e conhecida também não passa
     import hashlib
     import hmac as _hmac
     corpo = bytes([0, 1, 2]) + b"\0" * 5
     selo = _hmac.new(b"padmini-sem-segredo", b"tarot|" + corpo, hashlib.sha256).digest()[:4]
     forjada = base64.urlsafe_b64encode(corpo + selo).decode().rstrip("=")
-    assert cliente.post("/api/ocidental/tarot", json={"tiragem": forjada}).status_code == 503
+    assert cliente.post("/api/ocidental/tarot", json={"tiragem": forjada, "email": "teste@exemplo.com"}).status_code == 503
 
 
 def test_figuras_nao_repetem_o_nome_no_rotulo():

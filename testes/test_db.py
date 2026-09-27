@@ -377,3 +377,25 @@ def test_rota_de_limpeza(monkeypatch):
     assert base.cliente.post("/api/tarefas/limpeza").status_code == 401
     r = base.cliente.post("/api/tarefas/limpeza", headers={"Authorization": "Bearer k"})
     assert r.status_code == 200 and r.json()["apagadas"]["leads"] == 2
+
+
+# ---------------------------------------------------------------- rodada 6: e-mail antes da amostra
+def test_amostra_ocidental_grava_a_caixa_da_sequencia(monkeypatch):
+    monkeypatch.setenv("RESEND_API_KEY", "teste")
+    monkeypatch.setattr(entrega, "enviar_email", lambda *a: True)
+    r = base.cliente.post("/api/ocidental/tarot/tirar",
+                          json={"email": "Seq@X.com", "aceita_sequencia": True, "pergunta": "segredo"})
+    assert r.status_code == 200 and r.json()["parcial"] is True
+    linha = _linhas("SELECT email, produto, sistema, aceita_sequencia, aceita_lembrete, dados FROM amostras_email")
+    assert len(linha) == 1
+    email, produto, sistema, seq, lembrete, dados = linha[0]
+    assert (email, produto, sistema, seq, lembrete) == ("seq@x.com", "tarot", "ocidental", True, True)
+    assert set(dados) == {"tiragem"} and "segredo" not in json.dumps(dados)
+
+
+def test_amostra_ocidental_respeita_o_limite_por_email(monkeypatch):
+    monkeypatch.setenv("RESEND_API_KEY", "teste")
+    monkeypatch.setattr(entrega, "enviar_email", lambda *a: True)
+    for _ in range(3):
+        assert base.cliente.post("/api/ocidental/tarot/tirar", json={"email": "lim@x.com"}).status_code == 200
+    assert base.cliente.post("/api/ocidental/tarot/tirar", json={"email": "lim@x.com"}).status_code == 429

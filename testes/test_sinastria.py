@@ -133,7 +133,7 @@ def test_textos_da_sinastria_completos_e_no_tamanho():
 
 # ------------------------------------------------------------------ API
 def test_amostra_gratis_so_com_indice_e_dois_pontos():
-    r = cliente.post("/api/ocidental/sinastria", json={"a": PESSOA, "b": PESSOA_B})
+    r = cliente.post("/api/ocidental/sinastria", json={"a": PESSOA, "b": PESSOA_B, "email": "teste@exemplo.com"})
     assert r.status_code == 200, r.text
     c = r.json()
     assert 0 <= c["indice"] <= 100 and c["maximo"] == 100
@@ -160,7 +160,7 @@ def test_ia_nao_sai_na_amostra():
 
 
 def test_sem_hora_de_um_funciona_e_avisa():
-    r = cliente.post("/api/ocidental/sinastria", json={"a": {**PESSOA, "hora": ""}, "b": PESSOA_B})
+    r = cliente.post("/api/ocidental/sinastria", json={"a": {**PESSOA, "hora": ""}, "b": PESSOA_B, "email": "teste@exemplo.com"})
     assert r.status_code == 200
     assert any("sem hora" in a for a in r.json()["avisos"])
 
