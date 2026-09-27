@@ -161,13 +161,18 @@ def email_minhas_leituras_html(leituras: list[dict]) -> str:
 </div>"""
 
 
-def enviar_email(destino: str, assunto: str, html: str) -> bool:
-    """Envia via Resend (RESEND_API_KEY). Retorna True se enviou; False se não configurado/falhou."""
+def enviar_email(destino: str, assunto: str, html: str, responder_para: str | None = None) -> bool:
+    """Envia via Resend (RESEND_API_KEY). Retorna True se enviou; False se não configurado/falhou.
+    `responder_para`: o Reply-To (campo `reply_to` da API do Resend), para e-mails que
+    convidam a responder — o remetente padrão é nao-responda@."""
     chave = os.environ.get("RESEND_API_KEY")
     remetente = os.environ.get("PADMINI_EMAIL_FROM", "Padmini <nao-responda@padmini.com.br>")
     if not chave or not destino:
         return False
-    payload = json.dumps({"from": remetente, "to": [destino], "subject": assunto, "html": html}).encode("utf-8")
+    corpo = {"from": remetente, "to": [destino], "subject": assunto, "html": html}
+    if responder_para:
+        corpo["reply_to"] = responder_para
+    payload = json.dumps(corpo).encode("utf-8")
     req = urllib.request.Request(
         "https://api.resend.com/emails", data=payload,
         headers={"Authorization": f"Bearer {chave}", "Content-Type": "application/json"})

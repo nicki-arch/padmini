@@ -344,8 +344,8 @@ def _emails(tabela):
 def test_limpeza_apaga_velhos_e_descadastrados_e_mantem_o_resto():
     _semear_marketing()
     apagadas = db.limpar_marketing()
-    assert apagadas == {"leads": 2, "amostras_email": 2, "abandonos": 2}
-    for tabela in db.TABELAS_MARKETING:
+    assert apagadas == {"leads": 2, "amostras_email": 2, "abandonos": 2, "envios_sequencia": 0}
+    for tabela in ("leads", "amostras_email", "abandonos"):
         assert _emails(tabela) == ["recente@x.com"], tabela
     assert _emails("email_optout") == ["sai@x.com"]  # o descadastro fica: é o que impede novos e-mails
 
@@ -358,7 +358,7 @@ def test_limpeza_conta_qualquer_interacao_recente():
                   "VALUES ('ana@x.com', now() - interval '30 months', now() - interval '30 months')")
         c.execute("INSERT INTO amostras_email (email, produto, dados, criado_em) "
                   "VALUES ('ANA@x.com', 'mapa', '{}', now() - interval '1 month')")
-    assert db.limpar_marketing() == {"leads": 0, "amostras_email": 0, "abandonos": 0}
+    assert db.limpar_marketing() == {"leads": 0, "amostras_email": 0, "abandonos": 0, "envios_sequencia": 0}
     assert _emails("leads") == ["ana@x.com"]
 
 

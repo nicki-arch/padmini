@@ -307,3 +307,20 @@ com ele (os links gravados em `pedidos.link`; link da védica abre na védica).
   continua sendo reenviado — o mesmo que já acontecia com o e-mail original.
 - Link para a página: rodapé das páginas ocidentais, e-mail de entrega da
   ocidental e a mensagem de erro quando o link do completo falha.
+
+## Rodada 6, Fase E — sequências de e-mail
+
+`sequencias.py`, tarefa diária `/api/tarefas/sequencias` (workflow `tarefas`),
+controle em `envios_sequencia` (índice único por e-mail + sequência + passo).
+
+| Sequência | Quem | Passos |
+|---|---|---|
+| Boas-vindas | amostra da ocidental com a caixa marcada (`aceita_sequencia`), nos últimos 30 dias; para se comprar ou se descadastrar | D+1 um trecho que a amostra não trazia (mapa: Vênus; sinastria: a melhor dimensão fora do forte/atenção; numerologia: Expressão; tarot: o começo da leitura de conjunto) · D+3 as partes do completo dela · D+6 o convite com o checkout já com os dados |
+| Pós-compra | compra da ocidental entregue, nos últimos 30 dias (legítimo interesse, com descadastro) | D+2 "fez sentido?" (Reply-To: `PADMINI_EMAIL_RESPOSTA`, padrão contato@…) · D+7 a próxima leitura da escada (mapa → sinastria → numerologia → tarot; quem tem tudo: passo pulado) · D+14 pedido de depoimento por resposta, publicado só com autorização por escrito |
+
+- Um e-mail de sequência por pessoa por dia (horário de Brasília); o mesmo passo
+  nunca duas vezes (a linha é reservada antes do envio e desfeita se o envio falha).
+- Quem marcou a caixa nova não recebe o lembrete antigo; quem já estava na base
+  com o lembrete continua com ele.
+- A limpeza de 24 meses leva também `envios_sequencia`.
+- Copy em `/estilo` para aprovar.
