@@ -120,7 +120,9 @@ def test_cupom_com_outro_percentual_reprova():
 def test_cupom_que_so_aparece_no_navegador_e_aviso():
     smoke.AVISOS.clear()
     assert smoke.conferir_precos_na_cakto(OFERTAS_R3, baixar=_cakto(SINASTRIA)) == []
-    assert any("cupom 'pedro'" in a for a in smoke.AVISOS)
+    aviso = next(a for a in smoke.AVISOS if "cupom 'pedro'" in a)
+    assert "não dá para conferir sem navegador" in aviso and "confira à mão" in aviso.lower()
+    assert "?coupon=pedro" in aviso and "R$96,52" in aviso
 
 
 def test_bump_com_outro_valor_reprova():

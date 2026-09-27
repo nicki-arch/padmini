@@ -95,8 +95,27 @@ enquanto a Cakto cobraria R$96,52.
 A página da sinastria mostra o preço com cupom só para quem chega com um código
 da lista (sem diferença de maiúsculas) e manda `coupon=pedro` (sempre em
 minúsculas) para a Cakto, que aplica o desconto no checkout
-(ajuda.cakto.com.br, "checkout pré-preenchido"). O smoke abre o checkout com o
-cupom e confere o percentual e o valor quando a página da Cakto os traz.
+(ajuda.cakto.com.br, "checkout pré-preenchido").
+
+**Conferência do cupom é à mão.** A página do checkout da Cakto é montada por
+JavaScript; o smoke abre com `urllib` (sem navegador, de propósito) e nunca vê o
+desconto, então deixa um AVISO pedindo a conferência à mão — não é falha (não
+pôr navegador no smoke nem no CI).
+
+Estado em 27/set/2026, com duas observações que não batem:
+- o Cowork conferiu num navegador de verdade e **o `?coupon=pedro` não estava
+  sendo aplicado** (tratado no painel da Cakto, pelo Cowork);
+- no mesmo dia, uma renderização automática com navegador (Firecrawl) do link
+  simples `https://pay.cakto.com.br/hrf7qtu_1141270?coupon=pedro` **e** do link
+  completo que o site gera (com `sck`, `utm_*` e `coupon=pedro`) mostrou o cupom
+  aplicado: "pedro · Remover Cupom · Desconto (24%) · R$ 96,52". Pode depender do
+  navegador ou da sessão (ex.: um cupom removido antes e lembrado pelo checkout):
+  conferir numa janela anônima. Nessa renderização a Cakto redirecionou para uma
+  URL **sem os `utm_*`** (ficaram `sck` e `coupon`); vale confirmar num pedido de
+  teste que os `utm_*` continuam chegando ao webhook.
+
+Enquanto isso, quem chega pelo link do Pedro vê R$96,52 no site e, se o cupom não
+vier aplicado, a página diz para digitar o código no checkout.
 
 **Link que o Pedro divulga:**
 

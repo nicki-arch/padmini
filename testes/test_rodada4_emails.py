@@ -296,3 +296,16 @@ def test_estilo_mostra_os_emails_de_marketing(monkeypatch):
         for tipo in ("Amostra por e-mail", "Lembrete", "Carrinho abandonado"):
             assert f"{tipo} · {produto}" in html
     _sem_nada_antigo(html, "/estilo")
+
+
+# ------------------------------------------------------------------ Fase B
+@pytest.mark.parametrize("produto,pagina", [("mapa", "/mapa"), ("compat", "/compatibilidade"),
+                                            ("numerologia", "/numerologia"), ("tarot", "/tarot")])
+def test_link_checkout_sem_oferta_vai_para_a_pagina_certa(produto, pagina, monkeypatch):
+    """Sem link de checkout, o fallback só conhecia /mapa e /compatibilidade: numerologia
+    e tarot caíam em /mapa."""
+    novas = json.loads(json.dumps(ofertas.POR_SISTEMA["ocidental"]))
+    for o in novas.values():
+        o["checkout"] = ""
+    monkeypatch.setitem(ofertas.POR_SISTEMA, "ocidental", novas)
+    assert marketing.link_checkout(produto, {}, "amostra", "ocidental") == entrega.SITE_URL + pagina
