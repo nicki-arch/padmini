@@ -114,6 +114,23 @@ def test_emails_da_ocidental(monkeypatch):
     _sem_nada_antigo(entrega.email_mapas_do_casal_html([("Ana", "https://x")], "Ana", "ocidental"), "mapas do casal")
 
 
+def test_emails_de_marketing_da_ocidental():
+    """Rodada 4: amostra por e-mail, lembrete e carrinho abandonado na paleta nova."""
+    import rotas_ocidental
+    import tarot
+    ana = {"nome": "Ana", "data": "1990-05-15", "hora": "14:30", "lat": -23.55, "lon": -46.63, "cidade": "SP"}
+    exemplos = {"mapa": ana, "compat": {"a": ana, "b": {**ana, "nome": "Rui", "hora": ""}},
+                "numerologia": {"nome": "Ana Souza", "data": "1990-05-15"}, "tarot": {"tiragem": tarot.tirar()}}
+    for produto, dados in exemplos.items():
+        amostra = rotas_ocidental.montar_amostra_email(produto, dados)
+        for nome, html in (
+                ("amostra", marketing.email_amostra_html(produto, amostra, dados, "a@b.c", "Ana", "ocidental")),
+                ("lembrete", marketing.email_lembrete_html(produto, amostra, dados, "a@b.c", "ocidental")),
+                ("abandono", marketing.email_abandono_html(produto, "Ana", "https://x", "a@b.c", "ocidental"))):
+            _sem_nada_antigo(html, f"{nome} {produto}")
+            assert paleta.EMAIL["ocidental"]["fundo"] in html and "Young Serif" in html, f"{nome} {produto}"
+
+
 def test_emails_da_vedica_continuam_com_as_cores_de_sempre():
     html = entrega.email_completo_html("mapa", "https://padmini.com.br/x", "Ana", "", "vedica")
     assert "background:#241522" in html and "background:#e7a24a;color:#2a1608" in html

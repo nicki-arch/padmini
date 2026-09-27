@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="/static/base.css">
 <link rel="stylesheet" href="/static/ocidental/tema.css">
 <script src="/static/afiliado.js" defer></script>
+<script src="/static/amostra-email.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 {# Versão ocidental (sinastria). Preço e checkout: conteudo/ocidental/ofertas.yaml;
    textos: conteudo/ocidental/textos/sinastria.yaml; API: /api/ocidental/sinastria. #}
@@ -365,6 +366,12 @@ function desenharAmostra(d) {
   const res = $("#resultado");
   res.hidden = false;
   if (window.padTrack) padTrack("amostra_gerada", { produto: "compat", sistema: "ocidental" });
+  // amostra por e-mail (+ lembrete opcional, caixa desmarcada): /static/amostra-email.js
+  res.insertAdjacentHTML("beforeend", '<div class="card amostra-email" id="amostra-email" hidden></div>');
+  if (window.padAmostraEmail && ultimoCasal) {
+    const casal = { a: ultimoCasal.a, b: ultimoCasal.b };
+    padAmostraEmail("#amostra-email", "compat", () => casal);
+  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
   const bc = document.getElementById("baixar-card");
   if (bc) bc.addEventListener("click", () => { if (window.padTrack) padTrack("card_baixado", { produto: "compat" }); baixarCard(d); });

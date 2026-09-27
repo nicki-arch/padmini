@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="/static/ocidental/tema.css">
 {% include "ocidental/_carta.html" %}
 <script src="/static/afiliado.js" defer></script>
+<script src="/static/amostra-email.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 <link rel="icon" href="{{ marca.favicon_uri() }}">
 {# Versão ocidental. Preço e checkout: conteudo/ocidental/ofertas.yaml (tarot);
@@ -166,6 +167,12 @@ function desenharAmostra(d) {
     </div>`;
   res.hidden = false; $("#sobre").hidden = true;
   if (window.padTrack) padTrack("amostra_gerada", { produto: "tarot", sistema: "ocidental" });
+  // amostra por e-mail (+ lembrete opcional, caixa desmarcada): /static/amostra-email.js
+  res.insertAdjacentHTML("beforeend", '<div class="card amostra-email" id="amostra-email" hidden></div>');
+  if (window.padAmostraEmail) {
+    const tiragem = d.tiragem;  // só a tiragem: a pergunta nunca sai do navegador aqui
+    padAmostraEmail("#amostra-email", "tarot", () => ({ tiragem }));
+  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 

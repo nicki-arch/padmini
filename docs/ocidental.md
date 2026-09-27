@@ -163,3 +163,31 @@ Textos: `conteudo/ocidental/textos/tarot.yaml` (leitura de cada carta com 40 a
   numerologia e tarot têm de dar 200 com a ocidental no ar e 404 com a védica.
 - **Pronto para virar?** `python scripts/pronto_para_virar.py`.
 
+## E-mails de marketing nas duas versões (rodada 4, 27/set/2026)
+
+Amostra por e-mail, lembrete e carrinho abandonado existem nas duas versões. Cada
+e-mail sai na copy, na paleta e nos links da **versão em que a pessoa estava**,
+nunca na que está no ar na hora do envio (a mesma regra dos links de entrega):
+
+- **A versão viaja com o registro:** coluna `sistema` em `amostras_email` e em
+  `abandonos` (migração `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` no `db.py`;
+  linhas antigas ficam `vedica`).
+- **Amostra por e-mail:** a caixa aparece depois da amostra nas 4 páginas
+  (`static/amostra-email.js`). A rota é a mesma da védica, `/api/amostra/email`,
+  e **o servidor decide a versão** (`sistema.ativo()`); um campo `sistema` mandado
+  pelo navegador é ignorado. Na ocidental, `produto` aceita mapa, compat,
+  numerologia e tarot; na védica, só mapa e compat. A amostra do e-mail é a da tela
+  (`rotas_ocidental.montar_amostra_email`, com as mesmas funções dos endpoints).
+  O botão de compra leva o `sck` no formato do `afiliado.js` (`m~`, `c~`, `n~`, `t~`).
+- **Tarot:** só o número da tiragem vai para o banco e para o e-mail; a pergunta,
+  nunca (há teste no banco e no e-mail).
+- **Numerologia:** guarda o nome da certidão e a data (o mesmo do `sck` `n~`).
+- **Lembrete:** um só, 24–72h, só com a caixa marcada (vem desmarcada), nunca para
+  quem comprou depois ou se descadastrou; lê `sistema` da linha.
+- **Carrinho abandonado:** versão e produto saem da oferta (`cakto.oferta_paga`).
+  O bump do combo sozinho não é abandono. Se a versão da oferta não é a que está no
+  ar, **não manda** (só registra, `email_enviado = false`): mandar para uma página
+  que vende outra coisa é pior que silêncio.
+- Copy e assuntos: `marketing.TEXTOS`; cores: `paleta.email(versão)`. Prévia de
+  todos em `/estilo?previa=<chave>`.
+

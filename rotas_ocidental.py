@@ -400,3 +400,86 @@ def live_token_tarot(p: PedidoTarot, request: Request):
     cartas = _cartas(p)
     db.registrar_live(f"{VERSAO}:tarot", " · ".join(c["nome"] for c in cartas)[:80], "", "")
     return {"token": acesso.emitir_token("tarot", acesso.chave_tarot(p.tiragem), VERSAO)}
+
+
+# --------------------------------------------------------------------------
+# AMOSTRA POR E-MAIL (versão ocidental). A rota é a mesma da védica,
+# /api/amostra/email, e quem decide a versão é o SERVIDOR (sistema.ativo(), no
+# app.py): o navegador não escolhe. Aqui ficam só a validação dos dados de cada
+# produto e a montagem da amostra — com as MESMAS funções das páginas.
+# --------------------------------------------------------------------------
+class PedidoAmostraEmailOcidental(BaseModel):
+    email: str = Field(..., max_length=160)
+    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot)$")
+    pessoa: PessoaOcidental | None = None          # mapa
+    a: PessoaOcidental | None = None               # sinastria
+    b: PessoaOcidental | None = None
+    nome: str | None = Field(None, max_length=120)  # numerologia: nome completo de registro
+    data: date | None = None                        # numerologia
+    tiragem: str | None = Field(None, max_length=40)  # tarot: SÓ o número da tiragem (nunca a pergunta)
+    aceita_lembrete: bool = False
+    origem: dict = Field(default_factory=dict)
+
+
+def _dados_pessoa(p: PessoaOcidental) -> dict:
+    if p.hora:
+        validar_datetime(p.data, p.hora)
+    else:
+        validar_data(p.data)
+    return {"nome": p.nome.strip()[:80], "data": p.data.isoformat(), "hora": p.hora,
+            "lat": p.lat, "lon": p.lon, "cidade": p.cidade[:200]}
+
+
+def dados_da_amostra_email(p: PedidoAmostraEmailOcidental) -> tuple[dict, str]:
+    """(dados que vão para o banco e para o `sck`, nome para o "Olá"). Só os
+    campos de cada produto — um campo a mais no pedido (ex.: a pergunta do
+    tarot) nunca chega aqui."""
+    import numerologia as nu
+    import tarot
+    if p.produto == "mapa":
+        if not p.pessoa:
+            raise HTTPException(422, "Faltam os dados de nascimento.")
+        dados = _dados_pessoa(p.pessoa)
+        return dados, dados["nome"]
+    if p.produto == "compat":
+        if not (p.a and p.b):
+            raise HTTPException(422, "Faltam os dados de nascimento do casal.")
+        dados = {"a": _dados_pessoa(p.a), "b": _dados_pessoa(p.b)}
+        return dados, dados["a"]["nome"]
+    if p.produto == "numerologia":
+        if not (p.nome and p.data):
+            raise HTTPException(422, "Faltam o nome e a data de nascimento.")
+        validar_data(p.data)
+        if not nu.normalizar_nome(p.nome):
+            raise HTTPException(422, "O nome precisa ter letras.")
+        nome = p.nome.strip()
+        return {"nome": nome, "data": p.data.isoformat()}, nome.split(" ")[0]
+    if not p.tiragem:
+        raise HTTPException(422, "Falta a tiragem.")
+    try:
+        tarot.cartas_da_tiragem(p.tiragem)
+    except tarot.SemSegredo:
+        raise HTTPException(503, "O tarot está indisponível no momento.")
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    return {"tiragem": p.tiragem}, ""
+
+
+def montar_amostra_email(produto: str, dados: dict) -> dict:
+    """A amostra do e-mail = a da tela (mesmas funções dos endpoints acima)."""
+    import numerologia as nu
+    import sinastria as si
+    import tarot
+    if produto == "mapa":
+        mapa, _ = calcular(PedidoMapaOcidental(**dados))
+        return mt.montar_amostra(mapa)
+    if produto == "compat":
+        ma, _ = calcular(PedidoMapaOcidental(**dados["a"]))
+        mb, _ = calcular(PedidoMapaOcidental(**dados["b"]))
+        nome_a, nome_b = dados["a"]["nome"] or "Pessoa A", dados["b"]["nome"] or "Pessoa B"
+        rel = mt.montar_sinastria(si.calcular_sinastria(ma, mb), ma, mb, nome_a, nome_b, "amostra")
+        return {"nomes": {"a": nome_a, "b": nome_b}, **rel}
+    if produto == "numerologia":
+        res = nu.calcular_numerologia(dados["nome"], date.fromisoformat(dados["data"]))
+        return mt.montar_numerologia(res, "amostra")
+    return mt.montar_tarot(tarot.cartas_da_tiragem(dados["tiragem"]), "amostra")
