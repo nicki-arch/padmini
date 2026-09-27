@@ -147,26 +147,27 @@ def _():
 NUMEROLOGIA = {"nome": "Smoke da Silva", "data": "1990-05-15"}
 
 
-@checar("[ocidental] amostras dos 4 produtos saem grátis")
+@checar("[ocidental] amostras dos 4 produtos pedem o e-mail (422 sem ele)")
 def _():
-    tiragem = req("/api/ocidental/tarot/tirar", {})
-    return (req("/api/ocidental/mapa", {**PESSOA, "nivel": "amostra"})[0] == 200
-            and req("/api/ocidental/sinastria", {"a": PESSOA, "b": PESSOA_B, "nivel": "amostra"})[0] == 200
-            and req("/api/ocidental/numerologia", {**NUMEROLOGIA, "nivel": "amostra"})[0] == 200
-            and tiragem[0] == 200 and len(json.loads(tiragem[1])["cartas"]) == 3)
+    # Rodada 6: sem e-mail não há amostra. O smoke confere o portão e NÃO pede
+    # amostra com e-mail — isso mandaria um e-mail de verdade e gravaria no banco
+    # a cada hora. A amostra com e-mail é coberta pelos testes (test_rodada6).
+    return (req("/api/ocidental/mapa", {**PESSOA, "nivel": "amostra"})[0] == 422
+            and req("/api/ocidental/sinastria", {"a": PESSOA, "b": PESSOA_B, "nivel": "amostra"})[0] == 422
+            and req("/api/ocidental/numerologia", {**NUMEROLOGIA, "nivel": "amostra"})[0] == 422
+            and req("/api/ocidental/tarot/tirar", {})[0] == 422)
 
 
-@checar("[ocidental] completos e PDFs dos 4 produtos trancados sem token (402)")
+@checar("[ocidental] completos e PDFs trancados sem token (402)")
 def _():
-    t = json.loads(req("/api/ocidental/tarot/tirar", {})[1])["tiragem"]
+    # O tarot sai desta lista: sem sorteio (que agora pede e-mail) não há tiragem
+    # válida para testar; o 402 dele fica nos testes (test_tarot).
     return all(req(c, corpo)[0] == 402 for c, corpo in [
         ("/api/ocidental/mapa", {**PESSOA, "nivel": "completo"}),
         ("/api/ocidental/pdf", {**PESSOA, "nivel": "completo"}),
         ("/api/ocidental/sinastria", {"a": PESSOA, "b": PESSOA_B, "nivel": "completo"}),
         ("/api/ocidental/numerologia", {**NUMEROLOGIA, "nivel": "completo"}),
         ("/api/ocidental/numerologia/pdf", {**NUMEROLOGIA, "nivel": "completo"}),
-        ("/api/ocidental/tarot", {"tiragem": t, "nivel": "completo"}),
-        ("/api/ocidental/tarot/pdf", {"tiragem": t, "nivel": "completo"}),
     ])
 
 

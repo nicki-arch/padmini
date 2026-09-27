@@ -24,7 +24,7 @@
 <script src="/static/ocidental/movimento.js" defer></script>
 {% include "ocidental/_carta.html" %}
 <script src="/static/afiliado.js" defer></script>
-<script src="/static/amostra-email.js" defer></script>
+<script src="/static/ocidental/amostra-email.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 <link rel="icon" href="{{ marca.favicon_uri() }}">
 {# Versão ocidental. Preço e checkout: conteudo/ocidental/ofertas.yaml (tarot);
@@ -91,6 +91,8 @@
         <textarea id="pergunta" name="pergunta" maxlength="140" placeholder="Ex.: o que eu preciso entender sobre o meu trabalho agora?"></textarea>
         <span class="dica">Até 140 caracteres. Fica só neste aparelho e só é usada para personalizar o texto da leitura completa — não guardamos a sua pergunta.</span>
       </div>
+      {% include "ocidental/_campo_email.html" %}
+      <p class="erro" id="erro" role="alert" hidden></p>
       <button id="enviar" type="submit">Tirar as cartas</button>
     </form>
   </div>
@@ -121,6 +123,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const CHAVE_PERGUNTA = "pad_tarot_pergunta";
 let ultimoPedido = null;
+let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
 
 function lerPergunta() { try { return localStorage.getItem(CHAVE_PERGUNTA) || ""; } catch { return ""; } }
 function gravarPergunta(p) { try { p ? localStorage.setItem(CHAVE_PERGUNTA, p) : localStorage.removeItem(CHAVE_PERGUNTA); } catch {} }
@@ -133,29 +136,41 @@ async function pedir(url, corpo) {
 }
 
 function tiragemHTML(cartas) {
+  // na amostra com e-mail, a frase de cada carta chega por e-mail
   return `<div class="tiragem">${cartas.map((c) => `<div class="posicao">${carta(c)}<div class="texto-pos">
-    <span class="rotulo-pos">${esc(c.posicao_pt)}</span><p class="frase">${esc(c.frase)}</p></div></div>`).join("")}</div>`;
+    <span class="rotulo-pos">${esc(c.posicao_pt)}</span>${c.frase ? `<p class="frase">${esc(c.frase)}</p>` : ""}</div></div>`).join("")}</div>`;
 }
 function perguntaHTML() { const p = lerPergunta(); return p ? `<p class="pergunta-vista">“${esc(p)}”</p>` : ""; }
 
 $("#pergunta").value = lerPergunta();
+// Tiragem que veio no link (/tarot?t=…, sem token): o formulário reabre ESSAS
+// cartas, com o e-mail, em vez de sortear outras.
+let tiragemDoLink = null;
+function erroForm(msg) { const el = $("#erro"); el.textContent = msg; el.hidden = !msg; }
 $("#form").addEventListener("submit", async (e) => {
   e.preventDefault();
+  erroForm("");
+  const contato = padEmail.ler();
+  if (contato.erro) return erroForm(contato.erro);
   gravarPergunta($("#pergunta").value.trim().slice(0, 140));
   const botao = $("#enviar"); botao.disabled = true; botao.textContent = "Embaralhando…";
   try {
-    const d = await pedir("/api/ocidental/tarot/tirar");
+    // só o e-mail e a caixa vão ao servidor: a pergunta fica neste aparelho
+    const d = tiragemDoLink
+      ? await pedir("/api/ocidental/tarot", { tiragem: tiragemDoLink, ...contato, nivel: "amostra" })
+      : await pedir("/api/ocidental/tarot/tirar", contato);
+    ultimoContato = contato;
     history.replaceState(null, "", "/tarot?t=" + encodeURIComponent(d.tiragem));
     desenharAmostra(d);
-  } catch (err) { mostrarErro(err.message); }
+  } catch (err) { erroForm(err.message); }
   finally { botao.disabled = false; botao.textContent = "Tirar as cartas"; }
 });
 
 function desenharAmostra(d) {
   ultimoPedido = { tiragem: d.tiragem };
-  const cta = LINK_CHECKOUT ? linkCheckout(LINK_CHECKOUT, { produto: "tarot", tiragem: d.tiragem }) : "";
+  const cta = LINK_CHECKOUT ? linkCheckout(LINK_CHECKOUT, { produto: "tarot", tiragem: d.tiragem }, { email: ultimoContato && ultimoContato.email }) : "";
   const res = $("#resultado");
-  res.innerHTML = `${perguntaHTML()}${tiragemHTML(d.cartas)}
+  res.innerHTML = `${perguntaHTML()}${tiragemHTML(d.cartas)}${padEmail.aviso(d)}
     <div class="card oferta-ind">
       <h2>Ver a leitura completa</h2>
       <ul class="lista-completo">
@@ -169,13 +184,9 @@ function desenharAmostra(d) {
             : `<span class="navlink destaque em-breve" aria-disabled="true">Em breve</span><p class="nota" style="margin-top:10px">O pagamento desta versão ainda está sendo configurado.</p>`}
     </div>`;
   res.hidden = false; $("#sobre").hidden = true;
+  // reenviar = as MESMAS cartas de novo, nunca um sorteio novo
+  padEmail.ligar(() => pedir("/api/ocidental/tarot", { tiragem: d.tiragem, ...ultimoContato, nivel: "amostra" }));
   if (window.padTrack) padTrack("amostra_gerada", { produto: "tarot", sistema: "ocidental" });
-  // amostra por e-mail (+ lembrete opcional, caixa desmarcada): /static/amostra-email.js
-  res.insertAdjacentHTML("beforeend", '<div class="card amostra-email" id="amostra-email" hidden></div>');
-  if (window.padAmostraEmail) {
-    const tiragem = d.tiragem;  // só a tiragem: a pergunta nunca sai do navegador aqui
-    padAmostraEmail("#amostra-email", "tarot", () => ({ tiragem }));
-  }
   res.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -226,7 +237,13 @@ async function pedirIA() {
   const tiragem = p.get("t"), token = p.get("token");
   if (!tiragem) return;
   ultimoPedido = token ? { tiragem, token } : { tiragem };
-  if (token) for (const sel of ["#caixa-tirar", "#sobre"]) { const el = document.querySelector(sel); if (el) el.hidden = true; }
+  if (!token) {
+    // amostra de uma tiragem já sorteada: pede o e-mail antes de mostrar (as mesmas cartas)
+    tiragemDoLink = tiragem;
+    $("#enviar").textContent = "Ver as minhas cartas";
+    return;
+  }
+  for (const sel of ["#caixa-tirar", "#sobre"]) { const el = document.querySelector(sel); if (el) el.hidden = true; }
   const res = $("#resultado");
   res.hidden = false; res.innerHTML = '<p class="nota">Abrindo a sua tiragem…</p>';
   const nivel = token ? "completo" : "amostra";

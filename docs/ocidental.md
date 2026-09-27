@@ -236,3 +236,30 @@ nunca na que está no ar na hora do envio (a mesma regra dos links de entrega):
 - **Data de nascimento** continua em texto com máscara (dd/mm/aaaa), e não
   `type="date"`: no celular, o seletor nativo abre no dia de hoje, o que é ruim
   para quem nasceu em 1990.
+
+## Rodada 6, Fase A — e-mail antes da amostra
+
+Decisão do Nicolas (27/set): nos 4 produtos, a amostra só sai depois do e-mail;
+parte aparece na tela e o resto chega por e-mail (é o que garante que o endereço
+é de verdade). `rotas_ocidental.entregar_amostra`.
+
+| Produto | Na tela (resposta da API) | Só no e-mail |
+|---|---|---|
+| Mapa natal | Sol (signo, grau e texto); signo e grau da Lua e do Ascendente | Textos da Lua e do Ascendente; o aspecto mais exato |
+| Sinastria | Índice e a frase dele, o card, o título do ponto mais forte, o método | Texto do ponto forte; o ponto de atenção |
+| Numerologia | O número do Caminho de Vida e o que é esse número | O texto do Caminho de Vida |
+| Tarot | As 3 cartas (nome e posição) | A frase de cada carta |
+
+- Sem e-mail válido: 422, antes de qualquer cálculo. Limites: 3 amostras por
+  e-mail em 24h (429) e o limite por IP da amostra por e-mail.
+- E-mail que não sai (Resend fora, sem `RESEND_API_KEY`): a tela mostra tudo e a
+  equipe recebe um alerta.
+- Não pedem e-mail: o completo com token, as rotas `/api/live/*` e o sorteio do
+  tarot com sessão do `/live` válida.
+- A caixa "pode me mandar mais sobre a minha leitura (até 3 e-mails)" vem
+  desmarcada e é gravada em `amostras_email.aceita_sequencia`.
+- Checkout: o link da Cakto sai com `email` e `confirmEmail` (checkout
+  pré-preenchido, doc da Cakto). Nome não: quem preencheu pode ter feito o mapa
+  de outra pessoa.
+- Smoke: confere que as amostras sem e-mail dão 422; não pede amostra com e-mail
+  (mandaria e-mail e gravaria no banco a cada hora).
