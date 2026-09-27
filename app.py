@@ -21,7 +21,7 @@ from zoneinfo import ZoneInfo
 import json
 
 import jinja2
-from fastapi import Body, FastAPI, HTTPException, Query, Request
+from fastapi import BackgroundTasks, Body, FastAPI, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -299,6 +299,51 @@ def pagina_artigo(slug: str, request: Request):
     if artigo is None or not (artigo["revisado"] is True or _tem_previa(request)):
         raise HTTPException(404, "Página não encontrada.")
     return _pagina_do_blog(request, artigo, [])
+
+
+# ---------------------------------------------------------------------------
+# Recuperar minhas leituras (rodada 6, ocidental). Sem login: a pessoa digita o
+# e-mail e recebe UM e-mail com os links de tudo o que comprou com ele. A
+# resposta é sempre a mesma — exista compra ou não, estoure ou não o limite por
+# e-mail —, e o envio sai em segundo plano: nem o texto nem o tempo de resposta
+# dizem se aquele endereço comprou.
+# ---------------------------------------------------------------------------
+RESPOSTA_MINHAS_LEITURAS = "Se houver leituras nesse e-mail, mandamos os links agora. Confira também o spam."
+
+
+@app.api_route("/minhas-leituras", methods=["GET", "HEAD"])
+def pagina_minhas_leituras():
+    if sistema.ativo() != "ocidental":
+        raise HTTPException(404, "Página não encontrada.")
+    return _pagina_montada("ocidental/minhas-leituras.html", "ocidental", "minhas-leituras")
+
+
+class PedidoMinhasLeituras(BaseModel):
+    email: str = Field(..., max_length=160)
+
+
+def _mandar_minhas_leituras(email: str) -> None:
+    leituras = db.leituras_do_email(email)
+    if not leituras:
+        return
+    if not entrega.enviar_email(email, "Os links das suas leituras na Padmini",
+                                entrega.email_minhas_leituras_html(leituras)):
+        alertas.alertar("\"Minhas leituras\" não saiu por e-mail",
+                        f"{len(leituras)} leitura(s) de um cliente não foram reenviadas. Conferir o Resend.",
+                        chave="minhas_leituras", intervalo=3600)
+
+
+@app.post("/api/minhas-leituras")
+def api_minhas_leituras(pedido: PedidoMinhasLeituras, request: Request, tarefas: BackgroundTasks):
+    if sistema.ativo() != "ocidental":
+        raise HTTPException(404, "Página não encontrada.")
+    limites.exigir(limites.MINHAS_LEITURAS, request)
+    email = pedido.email.strip().lower()
+    if not _EMAIL_RE.match(email):
+        raise HTTPException(422, "Confira o e-mail.")
+    if limites.MINHAS_LEITURAS_EMAIL.consumir(email):
+        tarefas.add_task(_mandar_minhas_leituras, email)
+    return {"ok": True, "mensagem": RESPOSTA_MINHAS_LEITURAS}
 
 
 @app.api_route("/estilo", methods=["GET", "HEAD"])

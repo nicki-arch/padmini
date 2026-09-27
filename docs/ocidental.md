@@ -291,3 +291,19 @@ nem pixel.
   venda ser atribuída ao anúncio; eles não vão para o PostHog.
 - CSP: só os domínios de cada plataforma configurada, das docs oficiais (Meta:
   meta-pixel/advanced; TikTok: work-with-csp; Google: tag-platform/security/csp).
+
+## Rodada 6, Fase C — Recuperar minhas leituras (sem login)
+
+`/minhas-leituras` (só com a ocidental no ar) e `POST /api/minhas-leituras`.
+A pessoa digita o e-mail e recebe UM e-mail com os links de tudo o que comprou
+com ele (os links gravados em `pedidos.link`; link da védica abre na védica).
+
+- Resposta sempre igual, exista compra ou não; o envio sai em segundo plano, para
+  nem o tempo de resposta revelar se o endereço comprou.
+- Limites: 10 por hora por IP (429) e 3 por hora por e-mail (silencioso: mesma
+  resposta, nada sai).
+- Pedido pendente (sem link, entrega manual) não entra. Reembolso não é
+  registrado hoje (o webhook só grava compra aprovada): um link reembolsado
+  continua sendo reenviado — o mesmo que já acontecia com o e-mail original.
+- Link para a página: rodapé das páginas ocidentais, e-mail de entrega da
+  ocidental e a mensagem de erro quando o link do completo falha.

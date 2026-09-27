@@ -399,3 +399,16 @@ def test_amostra_ocidental_respeita_o_limite_por_email(monkeypatch):
     for _ in range(3):
         assert base.cliente.post("/api/ocidental/tarot/tirar", json={"email": "lim@x.com"}).status_code == 200
     assert base.cliente.post("/api/ocidental/tarot/tirar", json={"email": "lim@x.com"}).status_code == 429
+
+
+# ---------------------------------------------------------------- rodada 6: minhas leituras
+def test_leituras_do_email_so_as_da_pessoa_e_com_link():
+    with db._conectar() as c:
+        c.execute("INSERT INTO pedidos (cakto_id, produto, email, link, criado_em) VALUES "
+                  "('p1', 'ocidental:mapa', 'Ana@X.com', 'https://l/1', now() - interval '2 days'),"
+                  "('p2', 'compat', 'ana@x.com', 'https://l/2', now()),"
+                  "('p3', 'ocidental:tarot', 'ana@x.com', NULL, now()),"      # pendente: sem link
+                  "('p4', 'ocidental:mapa', 'rui@x.com', 'https://l/rui', now())")
+    leituras = db.leituras_do_email("ANA@x.com")
+    assert [x["link"] for x in leituras] == ["https://l/1", "https://l/2"]
+    assert db.leituras_do_email("ninguem@x.com") == []

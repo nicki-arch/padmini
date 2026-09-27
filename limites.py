@@ -113,7 +113,14 @@ AMOSTRA_EMAIL = Limite("amostra_email", maximo=10, janela=10 * 60)
 LIVE_FALHAS_IP = Limite("live_falhas_ip", maximo=5, janela=15 * 60)
 LIVE_FALHAS_GLOBAL = Limite("live_falhas_global", maximo=30, janela=60 * 60)
 
-TODOS = (CALCULO, PDF, TEXTO_IA, CIDADES, LISTA, AMOSTRA_EMAIL, LIVE_FALHAS_IP, LIVE_FALHAS_GLOBAL)
+# "Recuperar minhas leituras" (rodada 6): cada pedido pode mandar um e-mail. Por IP
+# (429) e por e-mail — este, em silêncio: a resposta é a mesma, para a página não
+# revelar nada sobre o endereço.
+MINHAS_LEITURAS = Limite("minhas_leituras", maximo=10, janela=60 * 60)
+MINHAS_LEITURAS_EMAIL = Limite("minhas_leituras_email", maximo=3, janela=60 * 60)
+
+TODOS = (CALCULO, PDF, TEXTO_IA, CIDADES, LISTA, AMOSTRA_EMAIL, LIVE_FALHAS_IP, LIVE_FALHAS_GLOBAL,
+         MINHAS_LEITURAS, MINHAS_LEITURAS_EMAIL)
 
 
 def limpar_todos() -> None:

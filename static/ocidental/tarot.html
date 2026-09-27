@@ -115,7 +115,7 @@
 
 <footer>
   Tarot: baralho de 78 cartas (tradição Rider-Waite-Smith), cartas na posição normal. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional.<br>
-  <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
+  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
 </footer>
 
 <script>
@@ -251,7 +251,7 @@ async function pedirIA() {
   const nivel = token ? "completo" : "amostra";
   config.then(() => pedir("/api/ocidental/tarot", { ...ultimoPedido, nivel })).then(token ? desenharCompleto : desenharAmostra).catch((e) => {
     res.innerHTML = token
-      ? `<p class="aviso">Não foi possível abrir a leitura completa: ${esc(e.message)} Se você já pagou, confira o link do e-mail ou fale com a gente.</p>`
+      ? `<p class="aviso">Não foi possível abrir a leitura completa: ${esc(e.message)} Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a> ou fale com a gente.</p>`
       : `<p class="aviso">Esta tiragem não é válida. Tire as cartas de novo.</p>`;
   });
 })();

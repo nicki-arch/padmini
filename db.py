@@ -506,3 +506,20 @@ def limpar_marketing() -> dict | None:
     except Exception:  # noqa: BLE001
         log.exception("banco: falha na limpeza de marketing")
         return None
+
+
+def leituras_do_email(email: str) -> list[dict]:
+    """As leituras compradas por um e-mail, com o link já entregue (rodada 6,
+    "recuperar minhas leituras"). Só pedidos com link: os pendentes de entrega
+    manual não entram. Do mais antigo ao mais novo."""
+    if not ativo():
+        return []
+    try:
+        with _conectar() as c:
+            rows = c.execute("SELECT produto, criado_em, link FROM pedidos "
+                             "WHERE lower(email) = lower(%s) AND coalesce(link, '') <> '' "
+                             "ORDER BY criado_em", (email,)).fetchall()
+        return [{"produto": r[0], "criado_em": r[1], "link": r[2]} for r in rows]
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao buscar as leituras de um e-mail")
+        return []
