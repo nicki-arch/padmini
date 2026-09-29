@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="{{ cores.ground }}">
-{# Lista de espera da versão ocidental (cópia da védica com a copy trocada). #}
-<title>Padmini — Lista de espera</title>
-<meta name="description" content="Mapa natal e sinastria do casal. Entre na lista de espera e receba o aviso da abertura{% if ofertas.compat.preco_de %} com o preço de fundador{% endif %}.">
+{# Lista de espera da versão ocidental. Texto: conteudo/ocidental/lista.yaml (rodada 6.1). #}
+<title>{{ t.seo.titulo }}</title>
+<meta name="description" content="{{ t.seo.descricao }}">
 <link rel="canonical" href="https://padmini.com.br/lista">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Padmini">
-<meta property="og:title" content="A sinastria de vocês dois — Padmini">
-<meta property="og:description" content="Estamos abrindo. Entre na lista e {% if ofertas.compat.preco_de %}garanta o preço de fundador{% else %}seja avisado primeiro{% endif %}.">
+<meta property="og:title" content="{{ t.seo.og_titulo }}">
+<meta property="og:description" content="{{ t.seo.og_descricao }}">
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
 <meta property="og:url" content="https://padmini.com.br/lista">
 <meta name="twitter:card" content="summary_large_image">
@@ -36,8 +36,9 @@
   .beneficios .ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--saffron);font-weight:600;font-size:14px}
   .beneficios b{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
   .beneficios span{color:var(--muted);font-size:14.5px}
-  .preco-fundador{font-weight:600;color:var(--ink)}
-  .preco-fundador s{color:var(--faint);font-size:.9em;margin-left:4px}
+  .revisao{margin-top:26px;padding:16px 18px;border-left:3px solid var(--saffron);background:var(--accent-soft);border-radius:0 10px 10px 0}
+  .revisao b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
+  .revisao p{margin:0;color:var(--muted);font-size:14.5px}
   form{display:grid;gap:14px}
   .interesse{display:flex;flex-wrap:wrap;gap:8px;border:0;margin:0;padding:0}
   .interesse legend{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:8px;padding:0}
@@ -72,18 +73,20 @@
 
 <main class="wrap">
   <section class="hero">
-    <p class="eyebrow">Padmini · lista de espera</p>
+    <p class="eyebrow">{{ t.hero.eyebrow }}</p>
     <p class="data-abertura" id="data-abertura" hidden></p>
-    <h1>O que o mapa de vocês <em>dois</em> revela, está quase abrindo.</h1>
-    <p class="lede">A sinastria do casal em 8 dimensões e o seu mapa natal completo, calculados para o seu nascimento. Entre na lista e seja avisado primeiro{% if ofertas.compat.preco_de %}, com preço de fundador{% endif %}.</p>
+    <h1>{{ t.hero.titulo }}</h1>
+    <p class="lede">{{ t.hero.lede }}</p>
   </section>
 
   <div class="grade">
-    <ul class="beneficios" aria-label="O que você ganha entrando na lista">
-      <li><span class="ic" aria-hidden="true">1</span><div><b>Aviso no dia da abertura</b><span>Você fica sabendo antes de todo mundo, por e-mail (e pelo WhatsApp, se quiser).</span></div></li>
-      {% if ofertas.compat.preco_de %}<li><span class="ic" aria-hidden="true">2</span><div><b>Preço de fundador</b><span>Sinastria do casal por <span class="preco-fundador">R${{ ofertas.compat.preco | moeda }}</span> <s>R${{ ofertas.compat.preco_de | moeda }}</s>, só para quem está na lista e por tempo limitado.</span></div></li>{% else %}<li><span class="ic" aria-hidden="true">2</span><div><b>Preço claro, sem surpresa</b><span>Sinastria do casal por <span class="preco-fundador">R${{ ofertas.compat.preco | moeda }}</span> e mapa natal por R${{ ofertas.mapa.preco | moeda }}: o valor que aparece aqui é o que se paga.</span></div></li>{% endif %}
-      <li><span class="ic" aria-hidden="true">3</span><div><b>Amostra grátis, como sempre</b><span>Você vê a nota de vocês e o essencial antes de decidir qualquer coisa.</span></div></li>
-    </ul>
+    <div>
+      <ul class="beneficios" aria-label="O que você ganha entrando na lista">
+        {% for b in t.beneficios %}<li><span class="ic" aria-hidden="true">{{ loop.index }}</span><div><b>{{ b.titulo }}</b><span>{{ b.texto }}</span></div></li>
+        {% endfor %}
+      </ul>
+      <aside class="revisao"><b>{{ t.revisao.titulo }}</b><p>{{ t.revisao.texto }}</p></aside>
+    </div>
 
     <div class="card" id="caixa-form">
       <form id="form" novalidate>
@@ -100,24 +103,24 @@
           <input id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20">
         </div>
         <fieldset class="interesse">
-          <legend>O que mais te interessa?</legend>
-          <label><input type="radio" name="interesse" value="compat" checked><span>Sinastria do casal</span></label>
-          <label><input type="radio" name="interesse" value="mapa"><span>Meu mapa</span></label>
-          <label><input type="radio" name="interesse" value="ambos"><span>Os dois</span></label>
+          <legend>{{ t.formulario.interesse }}</legend>
+          <label><input type="radio" name="interesse" value="mapa" checked><span>{{ t.formulario.opcoes.mapa }}</span></label>
+          <label><input type="radio" name="interesse" value="compat"><span>{{ t.formulario.opcoes.compat }}</span></label>
+          <label><input type="radio" name="interesse" value="ambos"><span>{{ t.formulario.opcoes.ambos }}</span></label>
         </fieldset>
-        <label class="check"><input type="checkbox" id="aceita-email" required><span>Quero receber por e-mail o aviso da abertura{% if ofertas.compat.preco_de %} e o preço de fundador{% endif %}.</span></label>
-        <label class="check desligado" id="linha-zap"><input type="checkbox" id="aceita-whatsapp" disabled><span>Também quero o aviso pelo WhatsApp.</span></label>
+        <label class="check"><input type="checkbox" id="aceita-email" required><span>{{ t.formulario.aceita_email }}</span></label>
+        <label class="check desligado" id="linha-zap"><input type="checkbox" id="aceita-whatsapp" disabled><span>{{ t.formulario.aceita_whatsapp }}</span></label>
         <div class="hp" aria-hidden="true"><label for="site">Não preencha</label><input id="site" name="site" tabindex="-1" autocomplete="off"></div>
         <p class="erro" id="erro" role="alert" hidden></p>
-        <button class="btn btn-primary" type="submit" id="enviar">Entrar na lista</button>
-        <p class="miudo">Usamos seus dados só para avisar da abertura e das novidades do Padmini. Você sai da lista quando quiser. <a href="/privacidade">Política de Privacidade</a>.</p>
+        <button class="btn btn-primary" type="submit" id="enviar">{{ t.formulario.botao }}</button>
+        <p class="miudo">{{ t.formulario.miudo }} <a href="/privacidade">Política de Privacidade</a>.</p>
       </form>
 
       <div class="pronto" id="pronto" hidden>
         {{ marca.svg(44, classe="lotus") }}
-        <h2>Pronto, você está na lista.</h2>
-        <p id="pronto-texto">Vamos te avisar assim que abrir. Enquanto isso, chama quem você quer ver o resultado junto.</p>
-        <button class="btn btn-outline" type="button" id="compartilhar">Compartilhar a lista</button>
+        <h2>{{ t.pronto.titulo }}</h2>
+        <p id="pronto-texto">{{ t.pronto.texto }}</p>
+        <button class="btn btn-outline" type="button" id="compartilhar">{{ t.pronto.compartilhar }}</button>
         <p class="miudo" id="copiado" hidden>Link copiado.</p>
       </div>
     </div>
@@ -175,13 +178,13 @@ $("#form").addEventListener("submit", async (e) => {
   } catch (err) {
     erro(err.message);
   } finally {
-    botao.disabled = false; botao.textContent = "Entrar na lista";
+    botao.disabled = false; botao.textContent = {{ t.formulario.botao | tojson }};
   }
 });
 
 $("#compartilhar").addEventListener("click", async () => {
   const url = location.origin + "/lista";
-  const dados = { title: "Padmini", text: "A sinastria de vocês dois — entra na lista comigo:", url };
+  const dados = { title: "Padmini", text: {{ t.pronto.texto_compartilhar | tojson }}, url };
   try {
     if (navigator.share) { await navigator.share(dados); return; }
     await navigator.clipboard.writeText(url); $("#copiado").hidden = false;

@@ -1,0 +1,61 @@
+# Padmini (versão OCIDENTAL) — texto da lista de espera (/lista). FONTE ÚNICA da
+# copy desta página, inclusive o <head>. O desenho está em static/ocidental/lista.html.
+# Rodada 6.1 (29/set): com PADMINI_CAPTURA=1 esta é a única página aberta; quem
+# chega vem dos vídeos da Dona Valderez revisando os textos. O mapa natal é a
+# porta de entrada (como na home); a sinastria vem em segundo.
+# Sem preço aqui de propósito: a condição de quem está na lista é anunciada no
+# lançamento (sem prometer valor nem percentual). Preço, se voltar, só de
+# conteudo/ocidental/ofertas.yaml — e a Cakto soma R$0,99 de taxa no checkout.
+
+seo:
+  titulo: Padmini — Lista de espera
+  descricao: >-
+    O seu mapa natal e a sinastria do casal, com textos revisados por quem
+    estuda astrologia há mais de 40 anos. Entre na lista de espera e receba o
+    aviso da abertura.
+  og_titulo: O seu mapa natal — Padmini
+  og_descricao: Estamos abrindo. Entre na lista e seja avisado primeiro.
+
+hero:
+  eyebrow: Padmini · lista de espera
+  titulo: O céu de quando você <em>nasceu</em>, lido com cuidado. Está quase abrindo.
+  lede: >-
+    O seu mapa natal: o Sol, a Lua, o Ascendente e cada planeta, calculados
+    para a data, a hora e a cidade do seu nascimento. E, se quiser, a sinastria
+    do casal — o que os mapas de vocês dois dizem juntos. Entre na lista e seja
+    avisado primeiro.
+
+beneficios:
+  - titulo: Aviso no dia da abertura
+    texto: Você fica sabendo antes de todo mundo, por e-mail (e pelo WhatsApp, se quiser).
+  - titulo: Condição especial para quem está na lista
+    texto: No lançamento, quem entrou na lista tem uma condição de fundador. Os detalhes chegam no aviso da abertura.
+  - titulo: Amostra grátis, como sempre
+    texto: Você vê o seu Sol, a sua Lua e o seu Ascendente antes de decidir qualquer coisa.
+
+revisao:
+  titulo: Textos revisados pela Dona Valderez
+  texto: >-
+    Cada texto das leituras está passando pela revisão da Dona Valderez, que
+    estuda astrologia há mais de 40 anos. É ela quem aparece nos vídeos
+    explicando signo por signo.
+
+formulario:
+  interesse: O que mais te interessa?
+  # A ordem e o valor gravado ficam no HTML (mapa, compat, ambos); aqui, só o rótulo.
+  opcoes:
+    mapa: Meu mapa natal
+    compat: Sinastria do casal
+    ambos: Os dois
+  aceita_email: Quero receber por e-mail o aviso da abertura e a condição de quem está na lista.
+  aceita_whatsapp: Também quero o aviso pelo WhatsApp.
+  botao: Entrar na lista
+  miudo: >-
+    Usamos seus dados só para avisar da abertura e das novidades do Padmini.
+    Você sai da lista quando quiser.
+
+pronto:
+  titulo: Pronto, você está na lista.
+  texto: Vamos te avisar assim que abrir. Enquanto isso, chama quem você quer ver o resultado junto.
+  compartilhar: Compartilhar a lista
+  texto_compartilhar: "O mapa natal, lido com cuidado — entra na lista comigo:"
