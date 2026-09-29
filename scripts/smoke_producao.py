@@ -47,27 +47,63 @@ for rota in ("/", "/mapa", "/compatibilidade", "/privacidade", "/termos"):
     checar(f"página {rota} responde 200")(lambda rota=rota: req(rota)[0] == 200)
 
 
+class _SemSeguir(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *a, **k):
+        return None  # o 302 volta como HTTPError, com o Location
+
+
+def destino(caminho, timeout=90):
+    """(status, Location) de `caminho` SEM seguir o redirecionamento."""
+    try:
+        with urllib.request.build_opener(_SemSeguir).open(BASE + caminho, timeout=timeout) as resp:
+            return resp.status, ""
+    except urllib.error.HTTPError as e:
+        return e.code, e.headers.get("Location", "")
+
+
 def _captura_no_ar() -> bool:
-    """PADMINI_CAPTURA=1 no site: /mapa redireciona para a lista de espera (/lista).
+    """PADMINI_CAPTURA=1 no site: `/` responde 302 para a lista de espera (/lista).
 
     Com a captura ligada, as páginas de compra não mostram botão nem preço — de
     propósito. Sem isto o smoke reprovava de hora em hora (28/set/2026) sem nada
     quebrado. O AVISO no fim do smoke diz que ela está ligada, para ninguém
     esquecer."""
-    if b"/api/lista" not in req("/mapa")[1]:
+    st, onde = destino("/")
+    if not (st in (301, 302, 303, 307) and onde.split("?")[0].endswith("/lista")):
         return False
     if not any("captura ligada" in a for a in AVISOS):
-        AVISOS.append("captura ligada (PADMINI_CAPTURA=1): /mapa e /compatibilidade vão para /lista; "
-                      "botões de compra e preço das páginas não foram conferidos")
+        AVISOS.append("captura ligada (PADMINI_CAPTURA=1): as páginas vão para /lista; botões de compra e "
+                      "preço nas páginas não foram conferidos (voltam sozinhos quando a captura desligar)")
     return True
 
 
-@checar("com a captura ligada, a lista de espera responde")
+ORIGEM = "utm_source=smoke&utm_campaign=pos-deploy&ref=SMOKE"
+
+
+@checar("[captura] páginas redirecionam para /lista mantendo utm_* e ref")
+def _():
+    if not _captura_no_ar():
+        return True
+    paginas = ["/", "/mapa", "/compatibilidade"]
+    if _versao_no_ar() == "ocidental":
+        paginas += ["/numerologia", "/tarot"]  # com a védica no ar, 404 (conferido abaixo)
+    ok = True
+    for p in paginas:
+        st, onde = destino(f"{p}?{ORIGEM}")
+        if not (st == 302 and onde.split("?")[0].endswith("/lista") and onde.endswith("?" + ORIGEM)):
+            print(f"       {p}: {st} → {onde or '(sem Location)'}")
+            ok = False
+    return ok
+
+
+@checar("[captura] /lista responde e a inscrição sem autorização de e-mail é recusada (422)")
 def _():
     if not _captura_no_ar():
         return True
     st, corpo = req("/lista")
-    return st == 200 and b"/api/lista" in corpo and b"/api/lista" in req("/compatibilidade")[1]
+    # sem aceita_email a API recusa antes de gravar: nada entra na lista de verdade
+    recusa = req("/api/lista", {"email": "smoke@padmini.com.br", "aceita_email": False})[0]
+    return st == 200 and b"/api/lista" in corpo and recusa == 422
 
 
 @checar("botões de compra apontam para a Cakto")

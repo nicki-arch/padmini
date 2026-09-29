@@ -60,10 +60,22 @@ def _req_local(caminho, corpo=None, timeout=90):
     return r.status_code, r.content
 
 
+def _destino_local(caminho, timeout=90):
+    r = cliente.get(caminho, follow_redirects=False)
+    return r.status_code, r.headers.get("location", "")
+
+
+def _local(monkeypatch):
+    monkeypatch.setattr(smoke, "req", _req_local)
+    monkeypatch.setattr(smoke, "destino", _destino_local)
+
+
 @pytest.mark.parametrize("versao", ["vedica", "ocidental"])
 def test_smoke_passa_no_app_local(versao, monkeypatch):
     monkeypatch.setenv("PADMINI_SISTEMA", versao)
-    monkeypatch.setattr(smoke, "req", _req_local)
+    monkeypatch.delenv("PADMINI_CAPTURA", raising=False)
+    _local(monkeypatch)
+    smoke.AVISOS.clear()
     app_mod._paginas_prontas.clear()
     falhas = []
     try:
@@ -75,6 +87,7 @@ def test_smoke_passa_no_app_local(versao, monkeypatch):
     finally:
         app_mod._paginas_prontas.clear()
     assert falhas == []
+    assert not any("captura" in a for a in smoke.AVISOS)
 
 
 def test_smoke_cobre_os_4_produtos():
@@ -134,37 +147,75 @@ def test_bump_com_outro_valor_reprova():
 
 
 # ---------------------------------------------------------------------------
-# 28/set/2026: com PADMINI_CAPTURA=1 no ar, /mapa e /compatibilidade vão para
-# /lista e o smoke reprovava de hora em hora ("botões de compra", "preço do
-# casal") sem nada quebrado. Agora ele reconhece a captura, avisa e confere a lista.
+# 28/set/2026: com PADMINI_CAPTURA=1 no ar, as páginas vão para /lista e o smoke
+# reprovava de hora em hora ("botões de compra", "preço do casal") sem nada
+# quebrado. Agora ele reconhece a captura (302 de / para /lista), confere o
+# redirecionamento com utm/ref, a /lista e a recusa da inscrição sem autorização.
 # ---------------------------------------------------------------------------
-@pytest.mark.parametrize("versao", ["vedica", "ocidental"])
-def test_smoke_passa_com_a_captura_ligada_e_avisa(versao, monkeypatch):
-    monkeypatch.setenv("PADMINI_SISTEMA", versao)
+@pytest.fixture
+def captura(monkeypatch):
     monkeypatch.setenv("PADMINI_CAPTURA", "1")
-    monkeypatch.setattr(smoke, "req", _req_local)
+    _local(monkeypatch)
     app_mod._paginas_prontas.clear()
     smoke.AVISOS.clear()
-    try:
-        falhas = [n for n, f in smoke.CHECAGENS if not any(t in n for t in SEM_REDE) and not f()]
-    finally:
-        app_mod._paginas_prontas.clear()
+    yield
+    app_mod._paginas_prontas.clear()
+
+
+def _checagem(trecho):
+    return next(f for n, f in smoke.CHECAGENS if trecho in n)
+
+
+@pytest.mark.parametrize("versao", ["vedica", "ocidental"])
+def test_smoke_passa_com_a_captura_ligada_e_avisa(versao, captura, monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", versao)
+    falhas = [n for n, f in smoke.CHECAGENS if not any(t in n for t in SEM_REDE) and not f()]
     assert falhas == []
     assert sum("captura ligada" in a for a in smoke.AVISOS) == 1
 
 
-def test_captura_com_a_lista_fora_do_ar_reprova(monkeypatch):
-    monkeypatch.setenv("PADMINI_CAPTURA", "1")
+def test_captura_confere_os_5_redirecionamentos_com_utm_e_ref(captura, monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    vistos = []
 
+    def destino(caminho, timeout=90):
+        vistos.append(caminho.split("?")[0])
+        return _destino_local(caminho)
+    monkeypatch.setattr(smoke, "destino", destino)
+    assert _checagem("redirecionam para /lista")() is True
+    assert {"/", "/mapa", "/compatibilidade", "/numerologia", "/tarot"} <= set(vistos)
+
+
+def test_captura_que_perde_o_ref_reprova(captura, monkeypatch):
+    def destino(caminho, timeout=90):
+        st, onde = _destino_local(caminho)
+        return (st, "/lista") if caminho.startswith("/mapa") else (st, onde)
+    monkeypatch.setattr(smoke, "destino", destino)
+    assert _checagem("redirecionam para /lista")() is False
+
+
+def test_captura_com_a_lista_fora_do_ar_reprova(captura, monkeypatch):
     def req(caminho, corpo=None, timeout=90):
         return (500, b"erro") if caminho == "/lista" else _req_local(caminho, corpo, timeout)
     monkeypatch.setattr(smoke, "req", req)
-    checagem = dict(smoke.CHECAGENS)["com a captura ligada, a lista de espera responde"]
-    assert checagem() is False
+    assert _checagem("/lista responde")() is False
+
+
+def test_captura_com_a_lista_aceitando_sem_autorizacao_reprova(captura, monkeypatch):
+    def req(caminho, corpo=None, timeout=90):
+        return (200, b'{"ok": true}') if caminho == "/api/lista" else _req_local(caminho, corpo, timeout)
+    monkeypatch.setattr(smoke, "req", req)
+    assert _checagem("/lista responde")() is False
+
+
+def test_captura_nao_inscreve_ninguem(captura, monkeypatch):
+    gravados = []
+    monkeypatch.setattr(app_mod.db, "registrar_lead", lambda *a, **k: gravados.append(a) or True)
+    assert _checagem("/lista responde")() is True and gravados == []
 
 
 def test_sem_captura_nao_avisa(monkeypatch):
     monkeypatch.delenv("PADMINI_CAPTURA", raising=False)
-    monkeypatch.setattr(smoke, "req", _req_local)
+    _local(monkeypatch)
     smoke.AVISOS.clear()
     assert smoke._captura_no_ar() is False and smoke.AVISOS == []
