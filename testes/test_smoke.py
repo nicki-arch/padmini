@@ -131,3 +131,40 @@ def test_bump_com_outro_valor_reprova():
     falhas = smoke.conferir_precos_na_cakto(
         OFERTAS_R3, baixar=_cakto(SINASTRIA_CUPOM.replace("40,00", "50,00"), SINASTRIA.replace("40,00", "50,00")))
     assert any("bump_mapas_casal" in f and "R$40" in f for f in falhas)
+
+
+# ---------------------------------------------------------------------------
+# 28/set/2026: com PADMINI_CAPTURA=1 no ar, /mapa e /compatibilidade vão para
+# /lista e o smoke reprovava de hora em hora ("botões de compra", "preço do
+# casal") sem nada quebrado. Agora ele reconhece a captura, avisa e confere a lista.
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("versao", ["vedica", "ocidental"])
+def test_smoke_passa_com_a_captura_ligada_e_avisa(versao, monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", versao)
+    monkeypatch.setenv("PADMINI_CAPTURA", "1")
+    monkeypatch.setattr(smoke, "req", _req_local)
+    app_mod._paginas_prontas.clear()
+    smoke.AVISOS.clear()
+    try:
+        falhas = [n for n, f in smoke.CHECAGENS if not any(t in n for t in SEM_REDE) and not f()]
+    finally:
+        app_mod._paginas_prontas.clear()
+    assert falhas == []
+    assert sum("captura ligada" in a for a in smoke.AVISOS) == 1
+
+
+def test_captura_com_a_lista_fora_do_ar_reprova(monkeypatch):
+    monkeypatch.setenv("PADMINI_CAPTURA", "1")
+
+    def req(caminho, corpo=None, timeout=90):
+        return (500, b"erro") if caminho == "/lista" else _req_local(caminho, corpo, timeout)
+    monkeypatch.setattr(smoke, "req", req)
+    checagem = dict(smoke.CHECAGENS)["com a captura ligada, a lista de espera responde"]
+    assert checagem() is False
+
+
+def test_sem_captura_nao_avisa(monkeypatch):
+    monkeypatch.delenv("PADMINI_CAPTURA", raising=False)
+    monkeypatch.setattr(smoke, "req", _req_local)
+    smoke.AVISOS.clear()
+    assert smoke._captura_no_ar() is False and smoke.AVISOS == []

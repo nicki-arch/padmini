@@ -47,8 +47,33 @@ for rota in ("/", "/mapa", "/compatibilidade", "/privacidade", "/termos"):
     checar(f"página {rota} responde 200")(lambda rota=rota: req(rota)[0] == 200)
 
 
+def _captura_no_ar() -> bool:
+    """PADMINI_CAPTURA=1 no site: /mapa redireciona para a lista de espera (/lista).
+
+    Com a captura ligada, as páginas de compra não mostram botão nem preço — de
+    propósito. Sem isto o smoke reprovava de hora em hora (28/set/2026) sem nada
+    quebrado. O AVISO no fim do smoke diz que ela está ligada, para ninguém
+    esquecer."""
+    if b"/api/lista" not in req("/mapa")[1]:
+        return False
+    if not any("captura ligada" in a for a in AVISOS):
+        AVISOS.append("captura ligada (PADMINI_CAPTURA=1): /mapa e /compatibilidade vão para /lista; "
+                      "botões de compra e preço das páginas não foram conferidos")
+    return True
+
+
+@checar("com a captura ligada, a lista de espera responde")
+def _():
+    if not _captura_no_ar():
+        return True
+    st, corpo = req("/lista")
+    return st == 200 and b"/api/lista" in corpo and b"/api/lista" in req("/compatibilidade")[1]
+
+
 @checar("botões de compra apontam para a Cakto")
 def _():
+    if _captura_no_ar():
+        return True
     return (b"pay.cakto.com.br" in req("/mapa")[1]
             and b"pay.cakto.com.br" in req("/compatibilidade")[1])
 
@@ -135,6 +160,8 @@ def _versao_no_ar() -> str:
 @checar("página do casal mostra o preço do ofertas.yaml")
 def _():
     import re
+    if _captura_no_ar():
+        return True
     preco = _ofertas_do_yaml(_versao_no_ar())["compat"]["preco"]
     return re.search(rf"relatório completo por <b[^>]*>R\${preco}</b>".encode(), req("/compatibilidade")[1]) is not None
 
@@ -184,7 +211,7 @@ def _():
 
 @checar("[ocidental no ar] botões de compra dos 4 produtos apontam para a Cakto")
 def _():
-    if _versao_no_ar() != "ocidental":
+    if _versao_no_ar() != "ocidental" or _captura_no_ar():
         return True  # só vale com a ocidental no ar (a védica é conferida acima)
     return all(b"pay.cakto.com.br" in req(p)[1] for p in ("/mapa", "/compatibilidade", "/numerologia", "/tarot"))
 
