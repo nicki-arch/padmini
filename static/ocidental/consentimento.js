@@ -136,31 +136,29 @@
     });
   }
 
-  var ESTILO = ".aviso-cookies{position:fixed;left:16px;right:16px;bottom:16px;z-index:50;max-width:620px;margin:0 auto;" +
-    "background:var(--ground-2);color:var(--ink);border:1px solid var(--accent-borda);border-radius:14px;" +
-    "padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:14.5px}" +
-    ".aviso-cookies p{margin:0 0 12px}.aviso-cookies a{color:var(--saffron)}" +
-    ".aviso-cookies-botoes{display:flex;gap:10px;flex-wrap:wrap}.aviso-cookies-botoes .btn{flex:1 1 140px}";
-  function estilo() {
-    if (document.getElementById("estilo-aviso-cookies")) return;
-    var st = document.createElement("style"); st.id = "estilo-aviso-cookies"; st.textContent = ESTILO;
-    document.head.appendChild(st);
+  // O visual é o do pacote de design da Valderez (.cookie, em /static/valderez/casca.css):
+  // "Aceitar" e "Recusar" com o mesmo tamanho e o mesmo destaque. O bloco herda
+  // o tema da página (claro nas páginas novas; escuro nas que ainda usam o base.css).
+  function tema() {
+    var t = document.documentElement.getAttribute("data-theme") || (document.body && document.body.getAttribute("data-theme"));
+    return t === "light" ? "light" : "dark";
   }
 
   function fecharAviso() { var el = document.getElementById("aviso-cookies"); if (el) el.remove(); }
   function mostrarAviso() {
     if (document.getElementById("aviso-cookies")) return;
-    estilo();
-    var el = document.createElement("div");
-    el.id = "aviso-cookies"; el.className = "aviso-cookies"; el.setAttribute("role", "dialog");
-    el.setAttribute("aria-label", "Cookies"); el.setAttribute("aria-live", "polite");
+    var el = document.createElement("aside");
+    el.id = "aviso-cookies"; el.className = "cookie"; el.setAttribute("role", "dialog");
+    el.setAttribute("data-theme", tema());
+    el.setAttribute("aria-labelledby", "aviso-cookies-titulo"); el.setAttribute("aria-live", "polite");
     el.innerHTML =
-      '<p><b>Cookies.</b> Com a sua permissão, usamos cookies para medir as visitas e o resultado dos nossos ' +
+      '<h2 id="aviso-cookies-titulo">Cookies</h2>' +
+      '<p>Com a sua permissão, usamos cookies para medir as visitas e o resultado dos nossos ' +
       'anúncios (Meta, TikTok e Google). Sem ela, nada disso é ativado e o site funciona igual. ' +
       '<a href="/privacidade#cookies">Saiba mais</a>.</p>' +
-      '<div class="aviso-cookies-botoes">' +
-      '<button type="button" class="btn btn-outline" data-cookies="recusado">Recusar</button>' +
-      '<button type="button" class="btn btn-outline" data-cookies="aceito">Aceitar</button></div>';
+      '<div class="cookie-actions">' +
+      '<button type="button" class="button" data-cookies="aceito">Aceitar</button>' +
+      '<button type="button" class="button" data-cookies="recusado">Recusar</button></div>';
     el.addEventListener("click", function (ev) {
       var b = ev.target.closest("[data-cookies]");
       if (!b) return;
@@ -173,13 +171,19 @@
   }
 
   function linkNoRodape() {
-    var rodape = document.querySelector("footer");
-    if (!rodape || document.getElementById("preferencias-cookies")) return;
-    var a = document.createElement("a");
-    a.href = "#"; a.id = "preferencias-cookies"; a.textContent = "Preferências de cookies";
+    // O rodapé da Valderez (_rodape.html) já traz o link, escondido até haver o
+    // que consentir; em página sem ele, o link é criado no fim do rodapé.
+    var a = document.getElementById("preferencias-cookies");
+    if (a && a.getAttribute("data-ligado")) return;
+    if (!a) {
+      var rodape = document.querySelector("footer nav") || document.querySelector("footer");
+      if (!rodape) return;
+      a = document.createElement("a");
+      a.href = "#"; a.id = "preferencias-cookies"; a.textContent = "Preferências de cookies";
+      rodape.appendChild(a);
+    }
+    a.hidden = false; a.setAttribute("data-ligado", "1");
     a.addEventListener("click", function (ev) { ev.preventDefault(); mostrarAviso(); });
-    rodape.appendChild(document.createTextNode(" · "));
-    rodape.appendChild(a);
   }
 
   window.padConsentimento = { escolha: escolhaGuardada, mostrar: mostrarAviso };

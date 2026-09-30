@@ -6,16 +6,12 @@
 <meta name="theme-color" content="{{ cores.ground }}">
 {# Rodada 6: recuperar os links das leituras compradas, sem login (app.py, /api/minhas-leituras).
    A resposta é sempre a mesma: a página não revela quem comprou. #}
-<title>Padmini — Minhas leituras</title>
-<meta name="description" content="Receba de novo, no seu e-mail, os links de todas as leituras que você comprou na Padmini.">
+<title>Valderez Astrologia — Minhas leituras</title>
+<meta name="description" content="Receba de novo, no seu e-mail, os links de todas as leituras que você comprou na Valderez Astrologia.">
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
-<link rel="stylesheet" href="/static/ocidental/tema.css">
+{% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/ocidental/componentes.css">
-<link rel="icon" href="{{ marca.favicon_uri() }}">
 <style>
   .caixa{max-width:520px}
   form{display:grid;gap:14px}
@@ -23,14 +19,9 @@
 </style>
 </head>
 <body>
-<header class="wrap">
-  <div class="topbar">
-    <a class="marca" href="/">{{ marca.svg(30) }} Padmini</a>
-    {% set atual = "/minhas-leituras" %}{% include "ocidental/_menu.html" %}
-  </div>
-</header>
+{% set atual = "/minhas-leituras" %}{% include "ocidental/_cabecalho.html" %}
 
-<main class="wrap">
+<main id="conteudo" class="wrap">
   <p class="eyebrow">Suas leituras</p>
   <h1>Recuperar minhas leituras</h1>
   <p class="lede">Perdeu o e-mail com o link? Digite o e-mail que você usou na compra e mandamos de novo os links de todas as suas leituras — sem senha, sem cadastro.</p>
@@ -49,10 +40,7 @@
   <p class="nota" style="margin-top:18px">Os links chegam só no e-mail da compra. Não achou nada? Confira o spam e se é o mesmo e-mail que você usou no pagamento — ou escreva para <a href="mailto:contato@pedrosperbmonteiro.com.br">contato@pedrosperbmonteiro.com.br</a>.</p>
 </main>
 
-<footer>
-  Padmini — astrologia para autoconhecimento.<br>
-  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
-</footer>
+{% include "ocidental/_rodape.html" %}
 <script>
 const $ = (s) => document.querySelector(s);
 $("#form").addEventListener("submit", async (e) => {

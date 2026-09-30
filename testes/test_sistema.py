@@ -86,7 +86,7 @@ def test_ocidental_troca_as_paginas(versao):
     versao("ocidental")
     for rota in ("/", "/mapa", "/compatibilidade", "/lista"):
         html = cliente.get(rota).text
-        assert "Padmini" in html
+        assert "Valderez Astrologia" in html  # a marca pública da ocidental (29/set/2026)
         assert "védica" not in html.lower() and "पद्मिनी" not in html, rota
 
 

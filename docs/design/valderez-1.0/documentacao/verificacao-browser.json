@@ -1,0 +1,143 @@
+{
+  "screens": [
+    {
+      "screen": "404.html",
+      "width": 1440,
+      "scroll": 1440,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "home.html",
+      "width": 1440,
+      "scroll": 1440,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "leitura-completa.html",
+      "width": 1440,
+      "scroll": 1440,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "lista.html",
+      "width": 1440,
+      "scroll": 1440,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "mapa-amostra.html",
+      "width": 1440,
+      "scroll": 1440,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "mapa-carregando.html",
+      "width": 1440,
+      "scroll": 1440,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "mapa-formulario.html",
+      "width": 1440,
+      "scroll": 1440,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "404.html",
+      "width": 400,
+      "scroll": 400,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "home.html",
+      "width": 400,
+      "scroll": 400,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "leitura-completa.html",
+      "width": 400,
+      "scroll": 400,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "lista.html",
+      "width": 400,
+      "scroll": 400,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "mapa-amostra.html",
+      "width": 400,
+      "scroll": 400,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "mapa-carregando.html",
+      "width": 400,
+      "scroll": 400,
+      "images": true,
+      "fonts": true
+    },
+    {
+      "screen": "mapa-formulario.html",
+      "width": 400,
+      "scroll": 400,
+      "images": true,
+      "fonts": true
+    }
+  ],
+  "interactions": [
+    {
+      "name": "FAQ abre por clique",
+      "pass": true
+    },
+    {
+      "name": "FAQ fecha por Enter",
+      "pass": true
+    },
+    {
+      "name": "Menu mobile abre",
+      "pass": true
+    },
+    {
+      "name": "Cookies botões iguais",
+      "pass": true,
+      "sizes": [
+        {
+          "w": 145,
+          "h": 48
+        },
+        {
+          "w": 145,
+          "h": 48
+        }
+      ]
+    },
+    {
+      "name": "Movimento reduzido sem animação",
+      "pass": true
+    },
+    {
+      "name": "Campo foco visível",
+      "pass": true
+    },
+    {
+      "name": "Datalist cidade conectado",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

@@ -1,3 +1,6 @@
+> **Substituída em 29/set/2026** pela marca **Valderez Astrologia** (ver `docs/valderez.md`).
+> A tela já usa a marca nova; e-mails e PDF ainda usam o "Almanaque" até a fase B.
+
 # Marca da versão ocidental — "Almanaque" (rodada 3, 26/set/2026)
 
 ## Por quê

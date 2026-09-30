@@ -39,7 +39,8 @@ def test_ordem_dos_cards_e_do_menu(ocidental):
     assert re.findall(r'<a class="btn[^"]*" href="(/[a-z]+)"', cards) == ORDEM
     assert 'class="prod anchor"' in cards[:cards.index("/compatibilidade")]  # o destaque é do mapa
     for rota in ("/", "/mapa", "/tarot"):
-        menu = re.search(r'<nav class="menu-produtos".*?</nav>', cliente.get(rota).text, re.S).group(0)
+        menu = re.search(r'<nav class="nav-desktop".*?</nav>', cliente.get(rota).text, re.S).group(0)
+        menu = re.sub(r'<a class="button"[^>]*>.*?</a>', "", menu)  # o botão do cabeçalho não é item do menu
         assert re.findall(r'href="(/[a-z]+)"', menu) == ORDEM, rota
 
 
@@ -51,7 +52,7 @@ def test_sinastria_continua_na_home_mais_abaixo(ocidental):
 
 def test_head_e_json_ld_falam_do_mapa(ocidental):
     html = cliente.get("/").text
-    assert '<meta property="og:title" content="O seu mapa natal — Padmini">' in html
+    assert '<meta property="og:title" content="O seu mapa natal — Valderez Astrologia">' in html
     bloco = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S).group(1)
     org = next(g for g in json.loads(bloco)["@graph"] if g["@type"] == "Organization")
     assert org["description"].startswith("Mapa natal")

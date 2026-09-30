@@ -1,11 +1,9 @@
-{# Menu da versão ocidental (round 5): os quatro produtos em todas as páginas,
-   também no celular (lá vira uma linha própria, rolável, embaixo da marca).
-   Quem inclui define `atual` ("/", "/compatibilidade", "/mapa"…). #}
-<nav class="menu-produtos" aria-label="Produtos">
-  {%- for href, rotulo in (("/mapa", "Mapa natal"), ("/compatibilidade", "Sinastria<span class=\"longo\">&nbsp;do casal</span>"), ("/numerologia", "Numerologia"), ("/tarot", "Tarot")) %}
-  <a class="navlink{% if href == atual %} atual{% endif %}" href="{{ href }}"{% if href == atual %} aria-current="page"{% endif %}>{{ rotulo }}</a>
-  {%- endfor %}
-  {%- if blog.publicados() %}
-  <a class="navlink{% if atual == "/blog" %} atual{% endif %}" href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>
-  {%- endif %}
-</nav>
+{# Os links do menu da versão ocidental (os quatro produtos e o blog), usados
+   pelo cabeçalho (_cabecalho.html) no desktop e no painel do celular. Quem
+   inclui define `atual` ("/", "/compatibilidade", "/mapa"…). #}
+{%- for href, rotulo in (("/mapa", "Mapa natal"), ("/compatibilidade", "Sinastria do casal"), ("/numerologia", "Numerologia"), ("/tarot", "Tarot")) %}
+<a href="{{ href }}"{% if href == atual %} aria-current="page"{% endif %}>{{ rotulo }}</a>
+{%- endfor %}
+{%- if blog.publicados() %}
+<a href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>
+{%- endif %}

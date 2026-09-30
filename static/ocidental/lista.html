@@ -1,136 +1,101 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="{{ cores.ground }}">
-{# Lista de espera da versão ocidental. Texto: conteudo/ocidental/lista.yaml (rodada 6.1). #}
+{# Lista de espera da versão ocidental (marca Valderez Astrologia). Texto:
+   conteudo/ocidental/lista.yaml. Desenho: docs/design/valderez-1.0/telas/lista.html,
+   com as seções que o pacote não desenhou (vantagens, revisão da Dona Valderez,
+   WhatsApp, interesse) vestidas com os mesmos componentes. No celular, o
+   formulário vem logo depois do título (antes das vantagens e da ilustração). #}
 <title>{{ t.seo.titulo }}</title>
 <meta name="description" content="{{ t.seo.descricao }}">
 <link rel="canonical" href="https://padmini.com.br/lista">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Padmini">
+<meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{{ t.seo.og_titulo }}">
 <meta property="og:description" content="{{ t.seo.og_descricao }}">
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
 <meta property="og:url" content="https://padmini.com.br/lista">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="{{ fontes.google }}" rel="stylesheet">
-<link rel="stylesheet" href="/static/base.css">
-<link rel="stylesheet" href="/static/ocidental/tema.css">
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/componentes.css">
 <script src="/static/afiliado.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-<link rel="icon" href="{{ marca.favicon_uri() }}">
-<style>
-  /* específico da lista de espera — o resto vem de base.css */
-  .hero{padding-block:40px 8px}
-  h1{font-size:clamp(2.4rem,6.2vw,3.8rem);line-height:1.05}
-  .data-abertura{display:inline-block;margin:0 0 18px;padding:6px 14px;border-radius:999px;border:1px solid color-mix(in srgb, var(--saffron) 45%, transparent);color:var(--saffron);font-size:13px;font-weight:600;letter-spacing:.02em}
-  .grade{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:start;padding-block:12px 56px}
-  .beneficios{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:16px}
-  .beneficios li{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start}
-  .beneficios .ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--saffron);font-weight:600;font-size:14px}
-  .beneficios b{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
-  .beneficios span{color:var(--muted);font-size:14.5px}
-  .revisao{margin-top:26px;padding:16px 18px;border-left:3px solid var(--saffron);background:var(--accent-soft);border-radius:0 10px 10px 0}
-  .revisao b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
-  .revisao p{margin:0;color:var(--muted);font-size:14.5px}
-  form{display:grid;gap:14px}
-  .interesse{display:flex;flex-wrap:wrap;gap:8px;border:0;margin:0;padding:0}
-  .interesse legend{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:8px;padding:0}
-  .interesse label{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 14px;border:1px solid var(--line-forte);border-radius:999px;font-size:14px;color:var(--muted);cursor:pointer}
-  .interesse input{position:absolute;inset:0;width:1px;height:1px;min-height:0;padding:0;margin:0;border:0;opacity:0;pointer-events:none}
-  .interesse input:checked + span{color:var(--ink)}
-  .interesse label:has(input:checked){border-color:var(--saffron);background:var(--accent-soft)}
-  .interesse label:has(input:focus-visible){outline:2px solid var(--saffron);outline-offset:2px}
-  .check{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;font-size:14px;color:var(--muted);cursor:pointer}
-  .check input{width:20px;height:20px;min-height:0;margin:1px 0 0;accent-color:var(--saffron)}
-  .check.desligado{opacity:.5}
-  .miudo{font-size:12.5px;color:var(--faint);margin:0}
-  .miudo a{color:inherit}
-  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-  .pronto{text-align:center;display:grid;gap:12px;justify-items:center;padding:12px 4px}
-  .pronto h2{font-size:1.9rem;margin:0}
-  .pronto p{color:var(--muted);margin:0;max-width:34ch}
-  .lotus{width:44px;height:44px}
-  @media (max-width:760px){ .grade{grid-template-columns:1fr;gap:22px} }
-</style>
 </head>
 <body>
+{% set sem_menu = true %}{% include "ocidental/_cabecalho.html" %}
 
-<header class="wrap">
-  <div class="topbar">
-    <a class="marca" href="/lista" aria-label="Padmini">
-      {{ marca.svg(30) }}
-      Padmini
-    </a>
-  </div>
-</header>
+<main id="conteudo">
+  <section class="section container">
+    <div class="lista-grade">
+      <div class="lista-intro">
+        <p class="eyebrow">{{ t.hero.eyebrow }}</p>
+        <p class="chip" id="data-abertura" hidden></p>
+        <h1>{{ t.hero.titulo }}</h1>
+        <p class="lede">{{ t.hero.lede }}</p>
+      </div>
 
-<main class="wrap">
-  <section class="hero">
-    <p class="eyebrow">{{ t.hero.eyebrow }}</p>
-    <p class="data-abertura" id="data-abertura" hidden></p>
-    <h1>{{ t.hero.titulo }}</h1>
-    <p class="lede">{{ t.hero.lede }}</p>
-  </section>
+      <div class="lista-form">
+        <div class="card" id="caixa-form">
+          <form id="form" class="stack" novalidate aria-labelledby="titulo-form">
+            <h2 id="titulo-form">{{ t.formulario.titulo }}</h2>
+            <div class="field">
+              <label for="nome">Nome <span class="opcional">(opcional)</span></label>
+              <input id="nome" name="nome" autocomplete="given-name" maxlength="80">
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required aria-describedby="erro">
+            </div>
+            <div class="field">
+              <label for="whatsapp">WhatsApp <span class="opcional">(opcional, com DDD)</span></label>
+              <input id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20">
+            </div>
+            <fieldset class="escolha">
+              <legend>{{ t.formulario.interesse }}</legend>
+              <div class="opcoes">
+                <label><input type="radio" name="interesse" value="mapa" checked><span>{{ t.formulario.opcoes.mapa }}</span></label>
+                <label><input type="radio" name="interesse" value="compat"><span>{{ t.formulario.opcoes.compat }}</span></label>
+                <label><input type="radio" name="interesse" value="ambos"><span>{{ t.formulario.opcoes.ambos }}</span></label>
+              </div>
+            </fieldset>
+            <div>
+              <label class="consent"><input type="checkbox" id="aceita-email" required><span>{{ t.formulario.aceita_email }}</span></label>
+              <label class="consent" id="linha-zap"><input type="checkbox" id="aceita-whatsapp" disabled><span>{{ t.formulario.aceita_whatsapp }}</span></label>
+            </div>
+            <div class="honeypot" aria-hidden="true"><label for="site">Não preencha</label><input id="site" name="site" tabindex="-1" autocomplete="off"></div>
+            <p class="form-erro" id="erro" role="alert" hidden></p>
+            <button class="button" type="submit" id="enviar">{{ t.formulario.botao }}</button>
+            <p class="caption">{{ t.formulario.miudo }} <a href="/privacidade">Política de Privacidade</a>.</p>
+          </form>
 
-  <div class="grade">
-    <div>
-      <ul class="beneficios" aria-label="O que você ganha entrando na lista">
-        {% for b in t.beneficios %}<li><span class="ic" aria-hidden="true">{{ loop.index }}</span><div><b>{{ b.titulo }}</b><span>{{ b.texto }}</span></div></li>
-        {% endfor %}
-      </ul>
-      <aside class="revisao"><b>{{ t.revisao.titulo }}</b><p>{{ t.revisao.texto }}</p></aside>
-    </div>
-
-    <div class="card" id="caixa-form">
-      <form id="form" novalidate>
-        <div class="campo">
-          <label for="nome">Nome <span class="dica">(opcional)</span></label>
-          <input id="nome" name="nome" autocomplete="given-name" maxlength="80">
+          <div class="pronto" id="pronto" hidden>
+            <span class="brand-mark" aria-hidden="true">{{ marca.svg(48) }}</span>
+            <h2 id="pronto-titulo" tabindex="-1">{{ t.pronto.titulo }}</h2>
+            <p id="pronto-texto" class="secondary">{{ t.pronto.texto }}</p>
+            <button class="button button--secondary" type="button" id="compartilhar">{{ t.pronto.compartilhar }}</button>
+            <p class="caption" id="copiado" role="status" hidden>Link copiado.</p>
+          </div>
         </div>
-        <div class="campo">
-          <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required>
-        </div>
-        <div class="campo">
-          <label for="whatsapp">WhatsApp <span class="dica">(opcional, com DDD)</span></label>
-          <input id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20">
-        </div>
-        <fieldset class="interesse">
-          <legend>{{ t.formulario.interesse }}</legend>
-          <label><input type="radio" name="interesse" value="mapa" checked><span>{{ t.formulario.opcoes.mapa }}</span></label>
-          <label><input type="radio" name="interesse" value="compat"><span>{{ t.formulario.opcoes.compat }}</span></label>
-          <label><input type="radio" name="interesse" value="ambos"><span>{{ t.formulario.opcoes.ambos }}</span></label>
-        </fieldset>
-        <label class="check"><input type="checkbox" id="aceita-email" required><span>{{ t.formulario.aceita_email }}</span></label>
-        <label class="check desligado" id="linha-zap"><input type="checkbox" id="aceita-whatsapp" disabled><span>{{ t.formulario.aceita_whatsapp }}</span></label>
-        <div class="hp" aria-hidden="true"><label for="site">Não preencha</label><input id="site" name="site" tabindex="-1" autocomplete="off"></div>
-        <p class="erro" id="erro" role="alert" hidden></p>
-        <button class="btn btn-primary" type="submit" id="enviar">{{ t.formulario.botao }}</button>
-        <p class="miudo">{{ t.formulario.miudo }} <a href="/privacidade">Política de Privacidade</a>.</p>
-      </form>
+      </div>
 
-      <div class="pronto" id="pronto" hidden>
-        {{ marca.svg(44, classe="lotus") }}
-        <h2>{{ t.pronto.titulo }}</h2>
-        <p id="pronto-texto">{{ t.pronto.texto }}</p>
-        <button class="btn btn-outline" type="button" id="compartilhar">{{ t.pronto.compartilhar }}</button>
-        <p class="miudo" id="copiado" hidden>Link copiado.</p>
+      <div class="lista-mais">
+        <ol class="vantagens" aria-label="O que você ganha entrando na lista">
+          {% for b in t.beneficios %}<li><span class="num" aria-hidden="true">{{ loop.index }}</span><div><b>{{ b.titulo }}</b><span>{{ b.texto }}</span></div></li>
+          {% endfor %}
+        </ol>
+        <aside class="destaque"><b>{{ t.revisao.titulo }}</b><p>{{ t.revisao.texto }}</p></aside>
+        <img class="lista-arte" src="/static/valderez/celeste.svg" alt="" width="540" height="520">
       </div>
     </div>
-  </div>
+  </section>
 </main>
 
-<footer>
-  Padmini — astrologia para autoconhecimento. O conteúdo tem fins de reflexão e não substitui aconselhamento profissional.<br>
-  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
-</footer>
+{% include "ocidental/_rodape.html" %}
 
 <script>
 const $ = (s) => document.querySelector(s);
@@ -153,15 +118,20 @@ zap.addEventListener("input", () => {
   if (!tem) aceitaZap.checked = false;
 });
 
-function erro(msg) { const el = $("#erro"); el.textContent = msg || ""; el.hidden = !msg; }
+// mensagem de erro; `campo` recebe o foco (e aria-invalid) para quem usa leitor de tela
+function erro(msg, campo) {
+  const el = $("#erro"); el.textContent = msg || ""; el.hidden = !msg;
+  $("#email").removeAttribute("aria-invalid");
+  if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
+}
 
 $("#form").addEventListener("submit", async (e) => {
   e.preventDefault();
   erro("");
   const email = $("#email").value.trim();
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return erro("Confira o e-mail.");
-  if (!$("#aceita-email").checked) return erro("Marque a autorização para receber o aviso por e-mail.");
-  const botao = $("#enviar"); botao.disabled = true; botao.textContent = "Enviando…";
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return erro("Confira o e-mail.", $("#email"));
+  if (!$("#aceita-email").checked) return erro("Marque a autorização para receber o aviso por e-mail.", $("#aceita-email"));
+  const botao = $("#enviar"); botao.disabled = true; botao.setAttribute("aria-busy", "true"); botao.textContent = "Enviando…";
   try {
     const corpo = {
       nome: $("#nome").value.trim(), email, whatsapp: zap.value,
@@ -173,18 +143,18 @@ $("#form").addEventListener("submit", async (e) => {
     const r = await fetch("/api/lista", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : "Não conseguimos salvar agora. Tente de novo.");
-    $("#form").hidden = true; $("#pronto").hidden = false;
+    $("#form").hidden = true; $("#pronto").hidden = false; $("#pronto-titulo").focus();
     if (window.padTrack) padTrack("lista_inscricao", { interesse: corpo.interesse, whatsapp: !!corpo.whatsapp });
   } catch (err) {
     erro(err.message);
   } finally {
-    botao.disabled = false; botao.textContent = {{ t.formulario.botao | tojson }};
+    botao.disabled = false; botao.removeAttribute("aria-busy"); botao.textContent = {{ t.formulario.botao | tojson }};
   }
 });
 
 $("#compartilhar").addEventListener("click", async () => {
   const url = location.origin + "/lista";
-  const dados = { title: "Padmini", text: {{ t.pronto.texto_compartilhar | tojson }}, url };
+  const dados = { title: "Valderez Astrologia", text: {{ t.pronto.texto_compartilhar | tojson }}, url };
   try {
     if (navigator.share) { await navigator.share(dados); return; }
     await navigator.clipboard.writeText(url); $("#copiado").hidden = false;

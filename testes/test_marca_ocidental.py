@@ -1,5 +1,6 @@
 """
-Rodada 3, Fase B: a identidade "Almanaque" da versão ocidental.
+Rodada 3, Fase B: a identidade "Almanaque" da versão ocidental — desde 29/set/2026
+a marca Valderez Astrologia (rodada visual; ver também test_valderez_fase_a.py).
 
 - Nada da ocidental (páginas, e-mails, PDFs, imagens) usa as cores ou as fontes
   antigas, nem devanágari.
@@ -61,11 +62,18 @@ def test_tokens_da_vedica_no_base_css_batem_com_a_paleta():
 
 
 def test_contrastes_da_ocidental_seguem_a_regra():
+    """Valderez: os 44 pares aprovados do pacote passam (texto ≥ 4,5; contorno ≥ 3)."""
     linhas = paleta.contrastes("ocidental")
     ruins = [f"{c['texto']} sobre {c['fundo']}: {c['razao']}" for c in linhas if not c["passa"]]
-    assert ruins == []
-    t = paleta.tela("ocidental")
-    assert 10 <= paleta.contraste(t["ink"], t["ground"]) <= 13
+    assert ruins == [] and len(linhas) == 44
+
+
+def test_nomes_antigos_da_ocidental_sao_cores_do_tema_escuro():
+    """As páginas ainda no base.css usam --ground, --ink…: só cores do tema escuro da Valderez."""
+    escuro = {v.lower() for v in paleta.VALDEREZ["dark"].values()}
+    for k, v in paleta.TELA["ocidental"].items():
+        if isinstance(v, str) and v.startswith("#"):
+            assert v.lower() in escuro, k
 
 
 def test_nada_de_roxo_na_tinta_da_ocidental():
@@ -81,7 +89,7 @@ def test_paginas_da_ocidental_sem_cor_fonte_nem_devanagari_antigos(ocidental):
     for rota in rotas:
         html = cliente.get(rota).text
         _sem_nada_antigo(html, rota)
-        assert "/static/ocidental/tema.css" in html and "Young+Serif" in html, rota
+        assert "/static/ocidental/tema.css" in html and "/static/valderez/casca.css" in html, rota
     for arquivo in ("tema.css", "_carta.html"):
         _sem_nada_antigo((RAIZ / "static" / "ocidental" / arquivo).read_text(encoding="utf-8"), arquivo)
 
@@ -96,11 +104,15 @@ def test_paginas_da_vedica_nao_carregam_o_tema(monkeypatch):
         app_mod._paginas_prontas.clear()
 
 
-def test_marca_em_traco_sem_preenchimento_de_dois_tons():
+def test_simbolo_da_valderez():
+    """Círculo, oito raios e a estrela de quatro pontas (docs/design/valderez-1.0/marca/simbolo-claro.svg)."""
     svg = marca.svg(30)
-    assert "fill:none" in svg and svg.count("<path") == 2  # o contorno (sem preenchimento) + o astro
+    assert 'fill="none"' in svg and "<circle" in svg and svg.count("<path") == 2 and "currentColor" in svg
+    ref = (RAIZ / "docs" / "design" / "valderez-1.0" / "marca" / "simbolo-claro.svg").read_text(encoding="utf-8")
+    assert "M32 5v54M5 32h54M13 13l38 38M13 51l38-38" in ref and 'r="24"' in ref  # o mesmo desenho
     uri = marca.favicon_uri()
-    assert uri.startswith("data:image/svg+xml,") and paleta.TELA["ocidental"]["saffron"][1:] in uri
+    assert uri.startswith("data:image/svg+xml,") and paleta.VALDEREZ["dark"]["rose"][1:] in uri
+    assert (RAIZ / "static" / "valderez" / "favicon.svg").read_text(encoding="utf-8") == marca.favicon_svg()
 
 
 # ------------------------------------------------------------------ e-mails
@@ -183,7 +195,7 @@ def test_og_images_da_ocidental(nome):
     assert img.size == (1200, 630)
     cores = dict((c, n) for n, c in img.getcolors(1200 * 630))
     fundo = max(cores, key=cores.get)
-    assert fundo == paleta._rgb(paleta.TELA["ocidental"]["ground"])
+    assert fundo == paleta._rgb(paleta.VALDEREZ["dark"]["background"])
     for antiga in ("#241522", "#e7a24a", "#e2a89d", "#2b1a29"):
         assert paleta._rgb(antiga) not in cores, f"og-oc-{nome}.png tem {antiga}"
 
@@ -198,8 +210,9 @@ def test_estilo_so_com_a_chave_de_previa(monkeypatch):
     assert r.status_code == 200 and "noindex" in r.headers.get("x-robots-tag", "")
     html = r.text
     assert '<meta name="robots" content="noindex, nofollow">' in html
-    for trecho in ("Paleta e contrastes", "Young Serif", "Source Sans 3", "btn-primary", "<input",
-                   "As cartas do tarot", "cardc", "Seu pagamento foi confirmado", "12.56:1"):
+    for trecho in ("Paleta e contrastes", "Cormorant Garamond", "Inter", 'class="button"', "<input",
+                   "Cidade", "Consentimento", "Cartão de resultado", "Preço", "Aviso de cookies", "Menu",
+                   "Perguntas frequentes", "Artigo", "Seu pagamento foi confirmado", "14.55:1"):
         assert trecho in html, trecho
     _sem_nada_antigo(html, "/estilo")
 

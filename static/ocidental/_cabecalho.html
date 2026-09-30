@@ -1,0 +1,30 @@
+{# Cabeçalho da versão ocidental (marca Valderez Astrologia, pacote de design
+   docs/design/valderez-1.0/componentes/menu.html). Bloco escuro (data-theme).
+   Variáveis de quem inclui:
+     atual     rota da página (marca o link do menu com aria-current)
+     sem_menu  true na /lista: com a captura ligada, as outras páginas levam
+               de volta para a lista, então não há menu a mostrar.
+   O símbolo é SVG (marca.py) e o nome vai em HTML, com a fonte do site. #}
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<header class="header" data-theme="dark">
+  <div class="container header-inner">
+    <a class="brand" href="{{ '/lista' if sem_menu is defined and sem_menu else '/' }}" aria-label="Valderez Astrologia, início">
+      <span class="brand-mark" aria-hidden="true">{{ marca.svg() }}</span>
+      <span class="brand-name">Valderez<small>Astrologia</small></span>
+    </a>
+    {%- if not (sem_menu is defined and sem_menu) %}
+    <nav class="nav-desktop" aria-label="Principal">
+      {% include "ocidental/_menu.html" %}
+      {%- if atual != "/mapa" %}
+      <a class="button" href="/mapa">Fazer meu mapa natal</a>
+      {%- endif %}
+    </nav>
+    <details class="nav-mobile">
+      <summary>Menu</summary>
+      <nav aria-label="Principal no celular">
+        {% include "ocidental/_menu.html" %}
+      </nav>
+    </details>
+    {%- endif %}
+  </div>
+</header>

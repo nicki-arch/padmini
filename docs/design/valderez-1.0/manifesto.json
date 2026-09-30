@@ -1,0 +1,347 @@
+[
+  {
+    "path": "assets/css/components.css",
+    "bytes": 10771,
+    "sha256": "f5f2d7f1abc7952936ff6f0d9bab4607637287da504aafc3f87f4b4bb103bd9c"
+  },
+  {
+    "path": "assets/css/tokens.css",
+    "bytes": 1669,
+    "sha256": "1a9c7af8eb581f8853d00b63f592e4f6c557cd1d1d3a89ffb82018e900c70a49"
+  },
+  {
+    "path": "assets/fonts/Cormorant-Medium.ttf",
+    "bytes": 77120,
+    "sha256": "f372d662a48554b94189673e28eb5a0cbd75bb0b4662df3a26d60efb46dd7073"
+  },
+  {
+    "path": "assets/fonts/Cormorant-SemiBold.ttf",
+    "bytes": 77100,
+    "sha256": "3909eccfc31f9419c1823f64205d22b794f3e76582ad888933d32e8ff904078f"
+  },
+  {
+    "path": "assets/fonts/Inter-Regular.ttf",
+    "bytes": 66912,
+    "sha256": "7c7c718a62e315a83fb5b5b0b086028bae10fc153701cf0f0b168e5f5a0c28f9"
+  },
+  {
+    "path": "assets/fonts/Inter-SemiBold.ttf",
+    "bytes": 67144,
+    "sha256": "fb6efb6500fe6531b73c7a06d025ceaefc562ee03e9d840c76d48ee11e85b998"
+  },
+  {
+    "path": "assets/fonts/OFL-CormorantGaramond.txt",
+    "bytes": 4387,
+    "sha256": "60700d351cac4650c51f3f9db318d2a420f8b45052dba2715eb5fec41f0f6956"
+  },
+  {
+    "path": "assets/fonts/OFL-Inter.txt",
+    "bytes": 4377,
+    "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57"
+  },
+  {
+    "path": "assets/img/celeste.svg",
+    "bytes": 873,
+    "sha256": "57bf62b7bb4893384ca6f3b88ca449fa97d7722d1de6df21489b835e01e3ec96"
+  },
+  {
+    "path": "assets/img/papeis.svg",
+    "bytes": 193603,
+    "sha256": "5aaf229502682181a8a8a403facf1fa681459190b0c5b109f3938dd9c64b836d"
+  },
+  {
+    "path": "componentes/artigo.html",
+    "bytes": 1384,
+    "sha256": "f689a392b9e8bfb182d19f3c0e1ae47cc52ffb06c25d3b44510c6ee7dcf621f6"
+  },
+  {
+    "path": "componentes/botoes.html",
+    "bytes": 1718,
+    "sha256": "f1b75c7de114c02ba6f631d017685b4b0aaa1f3012906b4bf5c0374f1d976fe3"
+  },
+  {
+    "path": "componentes/campos.html",
+    "bytes": 6777,
+    "sha256": "5b940067b8b255b5d2bc8ad3400247337b7db6a2e30e823cf36f2dbb42588c91"
+  },
+  {
+    "path": "componentes/cidade.html",
+    "bytes": 5301,
+    "sha256": "a0fb199bb96ef368b804a8a0109e5e457e16c5eb93c12e6437df29da37e9f642"
+  },
+  {
+    "path": "componentes/consentimento.html",
+    "bytes": 1109,
+    "sha256": "475c2d785c6aeab9f2c06e5af2b462812792e7937cc1813ec6d2f099125e0b3e"
+  },
+  {
+    "path": "componentes/cookies.html",
+    "bytes": 484,
+    "sha256": "78f40215695cd86028f7da6d38573f4031d06b871085d1a57290bb6aa1284d6a"
+  },
+  {
+    "path": "componentes/erro-campo.html",
+    "bytes": 594,
+    "sha256": "8bdaf0bdd8388e4a04e6f13d4f0d2b9d70ee03a00d96b1ee27aa40d5ef17baf3"
+  },
+  {
+    "path": "componentes/escuro.html",
+    "bytes": 25879,
+    "sha256": "170ac9ca52ea0a6dca83c383392f29847108a23c22250d4cbe55294d4b6cc6fc"
+  },
+  {
+    "path": "componentes/faq.html",
+    "bytes": 460,
+    "sha256": "f97d2562a18bcdd9f7bcc2c98f1f1fa7d2b8a9f65dbcc37aa5f3250cec4284c8"
+  },
+  {
+    "path": "componentes/index.html",
+    "bytes": 25943,
+    "sha256": "b83d78be0357f1fa5949ef9b85997f0499a670483d88cbb34f8278b9e7272c2d"
+  },
+  {
+    "path": "componentes/menu.html",
+    "bytes": 1346,
+    "sha256": "5e5b584af129e0d6e552efe155ebe9002bb37392e997cff0164d761c34b1629a"
+  },
+  {
+    "path": "componentes/preco.html",
+    "bytes": 2064,
+    "sha256": "bbd466d3a2fb31cfd711f6acb62566d20dd259b6934d9c3c282f9f5e8ef0b009"
+  },
+  {
+    "path": "componentes/resultado.html",
+    "bytes": 935,
+    "sha256": "3464ef656039d91eb5e41dcaec1dab54bf144d5060471d2336ab33e13a835c12"
+  },
+  {
+    "path": "componentes/rodape.html",
+    "bytes": 965,
+    "sha256": "b2084b68fbb52b8ca8b874223cc3130ca0053142f44cbcef69034c51597da3c4"
+  },
+  {
+    "path": "documentacao/alteracoes.md",
+    "bytes": 1129,
+    "sha256": "3727f3c7216b119fd4fe2b6b398858110cdf911eb7d3489132c8659d061c1acd"
+  },
+  {
+    "path": "documentacao/estados.md",
+    "bytes": 1965,
+    "sha256": "8dd37ca6dfb6a0bdf8ca6287403c45eb3521d116d8689a2d5dfa6fdbe5aa093c"
+  },
+  {
+    "path": "documentacao/integracao-fastapi.md",
+    "bytes": 5843,
+    "sha256": "6a3361b41ec81127627af347b96234d321b9481e5bee5b78a46519936960f073"
+  },
+  {
+    "path": "documentacao/proveniencia.md",
+    "bytes": 919,
+    "sha256": "518d14fd930752f4c113b1f30d0d712bec2d6f79bf3778de54fd1b3fb381385b"
+  },
+  {
+    "path": "documentacao/verificacao-browser.json",
+    "bytes": 2555,
+    "sha256": "c2ad2f1d6131da99ae776063f0e2f0d0a13489b07b75a6f0ea09f76b99f22364"
+  },
+  {
+    "path": "documentacao/verificacao.md",
+    "bytes": 1091,
+    "sha256": "2c97769b0c028e1e021a9d52728763d2ac0977a18fe9e65c404dcc548b45f4d1"
+  },
+  {
+    "path": "index.html",
+    "bytes": 2363,
+    "sha256": "466695f11e8683ef9a14f01dab47925fcf4f3ae711dd57ece5e6994553e84878"
+  },
+  {
+    "path": "LEIA-ME.md",
+    "bytes": 2945,
+    "sha256": "513f1b8862464f76db7e18b69e5b05a078d44085a69e6fd4273cbb14a8910045"
+  },
+  {
+    "path": "marca/compartilhamento-1200x630.png",
+    "bytes": 58282,
+    "sha256": "83ecda4a785cdbbeb77851361356f7b20aac8e0a89edf15e20077dc83a95c66b"
+  },
+  {
+    "path": "marca/compartilhamento-1200x630.svg",
+    "bytes": 193682,
+    "sha256": "b1b112ae4981fee7e222e47dd2c6ed6488be582b553bffe5b06aa933d9bfde11"
+  },
+  {
+    "path": "marca/favicon.svg",
+    "bytes": 502,
+    "sha256": "b0111fe115fda01b8c0a448b59f72613b195732e3f25b3468d207b7ed23eff28"
+  },
+  {
+    "path": "marca/logo-horizontal-claro.svg",
+    "bytes": 193033,
+    "sha256": "63f3374bc7c41b51e06305655e15e0dfe715a5aba1d24d58168c73711db4e836"
+  },
+  {
+    "path": "marca/logo-horizontal-escuro.svg",
+    "bytes": 193033,
+    "sha256": "94f4e09391334768f6f578d379f4a73c7f731fa8a9c7e7332b55b997da5981c2"
+  },
+  {
+    "path": "marca/simbolo-claro.svg",
+    "bytes": 457,
+    "sha256": "ad0ef1cbfa487d96849e974c507e4c1baa95f8cf0ccce5b2b5b04b567b7223c6"
+  },
+  {
+    "path": "marca/simbolo-escuro.svg",
+    "bytes": 457,
+    "sha256": "0b93df322f1b2404432f8470266eb6bc29a5fdf6415f6f0cfb4d271ff6fd6ea0"
+  },
+  {
+    "path": "previas-400/404.html",
+    "bytes": 924,
+    "sha256": "18764cf1b73f005de5a4bdf228d01493fb1e495db7f78950454b17f4cf5a368e"
+  },
+  {
+    "path": "previas-400/home.html",
+    "bytes": 869,
+    "sha256": "9ccf78a3c8a4b2bb714b72c4768fdba1de2876afb151c348b7f19f89074f9bcb"
+  },
+  {
+    "path": "previas-400/leitura-completa.html",
+    "bytes": 944,
+    "sha256": "bbecce71ff9f461cbba7fb02223ed6609632d0bab369794ddbefbf4685c9611b"
+  },
+  {
+    "path": "previas-400/lista.html",
+    "bytes": 904,
+    "sha256": "5d62f0c487cfd7cb2fc58568e9ec0cce3218820d2609a7a0962ad580fad4b0ea"
+  },
+  {
+    "path": "previas-400/mapa-amostra.html",
+    "bytes": 936,
+    "sha256": "f277b228e9d16240f1ffe7f05b64e3d34b7fa3dacb2e7c3eb49c6e7704175d43"
+  },
+  {
+    "path": "previas-400/mapa-carregando.html",
+    "bytes": 951,
+    "sha256": "1beaeb82cba1a87c6b6341f66a99c0db472e34c9c1ec3625720a4bea376a0a35"
+  },
+  {
+    "path": "previas-400/mapa-formulario.html",
+    "bytes": 954,
+    "sha256": "87969ebd79664191aeb9e28fd980653addb20827a218b0765bafb310c8687e34"
+  },
+  {
+    "path": "referencias-visuais/404-1440.png",
+    "bytes": 110625,
+    "sha256": "2455c1d9b05a9c797ef824a7172b60cdeb34af5838d5a541904f92f8d688949e"
+  },
+  {
+    "path": "referencias-visuais/404-400.png",
+    "bytes": 72274,
+    "sha256": "4a5e01a5025b1f82b3c916fb823004659366d5e48ac195e4086efc1c15ace29f"
+  },
+  {
+    "path": "referencias-visuais/home-1440.png",
+    "bytes": 258144,
+    "sha256": "a4b62cbdd3fc0c8ba847d799d4353bf03ad4cde5763bcbb6ef40dc223e73ec18"
+  },
+  {
+    "path": "referencias-visuais/home-400.png",
+    "bytes": 200630,
+    "sha256": "179a9f77fe614055dfe266803240a56d87c6dec11472f8c859bd0f650abaf44a"
+  },
+  {
+    "path": "referencias-visuais/leitura-completa-1440.png",
+    "bytes": 458463,
+    "sha256": "46d899ad576cd62b57f7dd977b8b3efc0f02b612ea9c0102e4159b83704b8c07"
+  },
+  {
+    "path": "referencias-visuais/leitura-completa-400.png",
+    "bytes": 481430,
+    "sha256": "65f9d05cd6064248238eed5d029d755dc6a15ac8e497307450beb47ed805b937"
+  },
+  {
+    "path": "referencias-visuais/lista-1440.png",
+    "bytes": 153853,
+    "sha256": "94db157586de8b49cf4f2aa6aef5d86ab6a657b910e2593e1135e9ba14578fea"
+  },
+  {
+    "path": "referencias-visuais/lista-400.png",
+    "bytes": 112748,
+    "sha256": "068e917a2c24c980c861e1a06cacfeb1b623a4498903b8d598690901bd6d40f9"
+  },
+  {
+    "path": "referencias-visuais/mapa-amostra-1440.png",
+    "bytes": 145961,
+    "sha256": "7047b37eb822aef0e54d077ee5975ee5fae11e5231f4c0e6edcc76cec423ff32"
+  },
+  {
+    "path": "referencias-visuais/mapa-amostra-400.png",
+    "bytes": 163812,
+    "sha256": "c2056b6a998ddc26d569bb38a1603b1036a02c62facb5aac3efc5841d0b86612"
+  },
+  {
+    "path": "referencias-visuais/mapa-carregando-1440.png",
+    "bytes": 75480,
+    "sha256": "94ae89789fff3ea9505ea018a82ce673a70e857af80a65fa2df30cf9adc61519"
+  },
+  {
+    "path": "referencias-visuais/mapa-carregando-400.png",
+    "bytes": 60531,
+    "sha256": "1989063db5a2adfe6754dd836aab37f6f94f78132aa41fc130ac015f87bbed18"
+  },
+  {
+    "path": "referencias-visuais/mapa-formulario-1440.png",
+    "bytes": 175100,
+    "sha256": "67f719c27d9689de1676a43c59f0e05c833430c12611fe874f985b5619306dd4"
+  },
+  {
+    "path": "referencias-visuais/mapa-formulario-400.png",
+    "bytes": 150768,
+    "sha256": "a44535c0e46f04df4f0776589f8d613179aa6aa2a63040173a71e67882b0d942"
+  },
+  {
+    "path": "telas/404.html",
+    "bytes": 3114,
+    "sha256": "38ff06221963b09ecb54b83a90e06d2c888c42e11b3ea8a212d2c6c877533a28"
+  },
+  {
+    "path": "telas/home.html",
+    "bytes": 5121,
+    "sha256": "84e552b6053c5e840c26b610c96ef9b5eebf309c17e08a7a513dd41046c55fa3"
+  },
+  {
+    "path": "telas/leitura-completa.html",
+    "bytes": 8285,
+    "sha256": "be2785d21d367118e40b1e6dc2c4acd9a3311366b6a7d90296a824f8397e1aff"
+  },
+  {
+    "path": "telas/lista.html",
+    "bytes": 3963,
+    "sha256": "22a3b78093be7c8b56252b6648d91a8c5a817c42b44926f23f587fc7786f7a55"
+  },
+  {
+    "path": "telas/mapa-amostra.html",
+    "bytes": 4495,
+    "sha256": "801c52ac8936d027486e1de8ed42e2c641cede734706c9dff45e36fde35b9a89"
+  },
+  {
+    "path": "telas/mapa-carregando.html",
+    "bytes": 3269,
+    "sha256": "20a873d0f1403c799c3dffcb16087fd6258131bdbd0c001697bcc60559805dd2"
+  },
+  {
+    "path": "telas/mapa-formulario.html",
+    "bytes": 5353,
+    "sha256": "ebf3888d57c3b4e2d5c204c26459ce33a9955f6d74dff3294724e51a722a9e19"
+  },
+  {
+    "path": "tokens/contrastes.md",
+    "bytes": 2970,
+    "sha256": "f46513f96e3eca33e9611b3e332cd951a31195c897283f425f2e9be5c4b0335c"
+  },
+  {
+    "path": "tokens/tokens.json",
+    "bytes": 17433,
+    "sha256": "f8169b6ed14f3e4c1fa7fee59e82221816486489763401c76d58af2d02111629"
+  }
+]

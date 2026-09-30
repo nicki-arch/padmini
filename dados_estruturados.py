@@ -1,5 +1,5 @@
 """
-Padmini (versão ocidental) — dados estruturados (JSON-LD, schema.org) para o
+Valderez Astrologia (versão ocidental da Padmini) — dados estruturados (JSON-LD, schema.org) para o
 buscador (round 5). Só o que é verdade na página: quem somos (Organization),
 o site (WebSite) e as perguntas da home (FAQPage), tiradas do mesmo YAML que a
 página mostra. Nada de nota/avaliação (não temos avaliações públicas).
@@ -23,9 +23,9 @@ def _script(dados: dict) -> str:
 def home(t: dict) -> str:
     """O bloco da home ocidental, a partir de conteudo/ocidental/home.yaml."""
     return _script({"@context": "https://schema.org", "@graph": [
-        {"@type": "Organization", "@id": f"{SITE}/#org", "name": "Padmini", "url": f"{SITE}/",
+        {"@type": "Organization", "@id": f"{SITE}/#org", "name": "Valderez Astrologia", "url": f"{SITE}/",
          "logo": f"{SITE}/static/og-oc-home.png", "description": _texto(t["seo"]["descricao"])},
-        {"@type": "WebSite", "@id": f"{SITE}/#site", "name": "Padmini", "url": f"{SITE}/",
+        {"@type": "WebSite", "@id": f"{SITE}/#site", "name": "Valderez Astrologia", "url": f"{SITE}/",
          "inLanguage": "pt-BR", "publisher": {"@id": f"{SITE}/#org"}},
         {"@type": "FAQPage", "@id": f"{SITE}/#perguntas", "mainEntity": [
             {"@type": "Question", "name": _texto(i["pergunta"]),
