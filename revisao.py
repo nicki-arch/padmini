@@ -28,6 +28,7 @@ import yaml
 
 import mapa_ocidental as mo
 import montar_texto_ocidental as mt
+import textos
 
 # --------------------------------------------------------------------------
 # Regras de tom (as mesmas dos testes)
@@ -122,9 +123,9 @@ def onde_aparece(arquivo: str, c: tuple) -> str:
         if c[0] == "casas":
             return f"Sinastria · planetas de um na casa {c[1]} do outro"
         if c[0] == "indice":
-            return f"Sinastria · Índice Padmini ({ {'alta': 'alto', 'media': 'médio', 'baixa': 'baixo'}[c[1]] })"
+            return f"Sinastria · {textos.NOME_INDICE} ({ {'alta': 'alto', 'media': 'médio', 'baixa': 'baixo'}[c[1]] })"
         grupo = {"temas": "tema usado nos aspectos", "dinamica": "frase de aspecto",
-                 "conselho": "conselho de aspecto", "metodo": "como o Índice Padmini é calculado",
+                 "conselho": "conselho de aspecto", "metodo": f"como o {textos.NOME_INDICE} é calculado",
                  "sem_dados": "aviso de dimensão que precisa da hora de nascimento"
                  }.get(c[0], c[0].replace("_", " "))
         return f"Sinastria · {grupo}{': ' + _pt(c[-1]) if len(c) > 1 else ''}"

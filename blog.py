@@ -19,6 +19,8 @@ from pathlib import Path
 
 import yaml
 
+import textos
+
 PASTA = Path(__file__).resolve().parent / "conteudo" / "ocidental" / "blog"
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 OBRIGATORIOS = ("titulo", "descricao", "data", "revisado", "abertura", "secoes", "chamada")
@@ -29,7 +31,7 @@ def todos() -> tuple[dict, ...]:
     """Todos os artigos (rascunhos inclusive), do mais novo para o mais velho."""
     artigos = []
     for arq in sorted(PASTA.glob("*.yaml")):
-        dados = yaml.safe_load(arq.read_text(encoding="utf-8")) or {}
+        dados = textos.com_indice(yaml.safe_load(arq.read_text(encoding="utf-8")) or {})
         faltando = [k for k in OBRIGATORIOS if k not in dados]
         if faltando or not SLUG.match(arq.stem):
             raise ValueError(f"blog/{arq.name}: campos faltando {faltando} ou nome de arquivo inválido")

@@ -26,6 +26,7 @@ import entrega
 import ofertas
 import paleta
 import sistema as _sistema
+import textos
 
 CATEGORIA_LABEL = {
     "excepcional": "Excepcional",
@@ -228,7 +229,7 @@ def _rotulo(texto: str, c: dict) -> str:
 
 def _resumo_ocidental(produto: str, amostra: dict) -> str:
     """A amostra da versão ocidental, com o mesmo conteúdo da página:
-    mapa = Sol, Lua e Ascendente; sinastria = Índice Padmini com o ponto forte e o
+    mapa = Sol, Lua e Ascendente; sinastria = o índice (textos.NOME_INDICE) com o ponto forte e o
     de atenção; numerologia = o Caminho de Vida; tarot = as 3 cartas e a frase de cada."""
     c = _cor("ocidental")
     if produto == "mapa":
@@ -255,7 +256,7 @@ def _resumo_ocidental(produto: str, amostra: dict) -> str:
                f'{_e(nomes["a"]).upper()} &amp; {_e(nomes["b"]).upper()}</span><br>'
                f'<span style="font-family:{c["fonte_marca"]};font-size:44px">{_e(amostra["indice"])}</span>'
                f'<span style="color:{c["fraco"]}"> / 100</span><br>'
-               f'<span style="font-size:12px;color:{c["acento2"]};letter-spacing:2px">ÍNDICE PADMINI · MÉTODO PRÓPRIO</span>')
+               f'<span style="font-size:12px;color:{c["acento2"]};letter-spacing:2px">{_e(textos.NOME_INDICE.upper())} · MÉTODO PRÓPRIO</span>')
             + _p(_e(amostra.get("indice_texto", "")))
             + (_p(f'<b style="color:{c["acento"]}">Ponto mais forte — {_e(forte.get("titulo", ""))}</b><br>'
                   f'{_e(forte.get("texto", ""))}') if forte else "")
@@ -308,7 +309,7 @@ def _gancho_lembrete(produto: str, amostra: dict, sistema: str) -> str:
         return f"Na sua amostra, você viu {vistos}. Isso é só o começo: o completo abre {abre}."
     if produto == "compat":
         atencao = (amostra.get("ponto_atencao") or {}).get("titulo") or "um ponto de atenção"
-        return (f"Na amostra que vocês geraram, o Índice Padmini deu <b>{_e(amostra.get('indice'))}/100</b> e "
+        return (f"Na amostra que vocês geraram, o {textos.NOME_INDICE} deu <b>{_e(amostra.get('indice'))}/100</b> e "
                 f"apareceu um ponto de atenção: <b>{_e(atencao)}</b>. O completo abre {abre}.")
     if produto == "numerologia":
         cv = (amostra.get("caminho_de_vida") or {}).get("valor")

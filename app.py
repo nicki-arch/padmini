@@ -189,6 +189,8 @@ _jinja = jinja2.Environment(
 )
 # Preço sempre no formato brasileiro ("R$96,52", nunca "R$96.52"): {{ x | moeda }}.
 _jinja.filters["moeda"] = ofertas.moeda
+# Nome do índice da sinastria (ocidental), fonte única em conteudo/ocidental/marca.yaml.
+_jinja.globals["indice"] = textos.NOME_INDICE
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:

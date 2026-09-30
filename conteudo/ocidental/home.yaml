@@ -46,7 +46,7 @@ como_funciona:
     - titulo: A amostra grátis
       texto: >-
         Na hora, o seu Sol, a sua Lua e o seu Ascendente — ou, no casal, o
-        Índice Padmini e o ponto mais forte, num card para compartilhar.
+        {indice} e o ponto mais forte, num card para compartilhar.
     - titulo: O relatório completo
       texto: Se quiser ir fundo, o completo abre tudo e chega no seu e-mail.
 
@@ -96,9 +96,9 @@ dimensoes:
 card_exemplo:
   titulo: Como fica a de vocês
   sub: >-
-    Toda sinastria termina num card assim — o Índice Padmini, a rosa das oito
+    Toda sinastria termina num card assim — o {indice}, a rosa das oito
     dimensões e o ponto mais forte do casal, feito para compartilhar.
-  rotulo: Índice Padmini · método próprio
+  rotulo: "{indice} · método próprio"
   frase: "O ponto mais forte de vocês:"
   legenda: >-
     Exemplos com nascimentos fictícios, calculados pelo mesmo método que vai
@@ -162,7 +162,7 @@ faq:
       resposta: >-
         Quanto mais exata, melhor: a hora define o Ascendente e as casas. Sem
         ela dá para fazer assim mesmo, e a leitura avisa o que ficou de fora.
-    - pergunta: O que é o Índice Padmini?
+    - pergunta: O que é o {indice}?
       resposta: >-
         É um método próprio nosso para resumir a sinastria num número de 0 a
         100, somando os aspectos entre os planetas de vocês em oito dimensões.

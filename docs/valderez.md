@@ -36,7 +36,23 @@ da Valderez — ficam coerentes até serem vestidas de novo.
   PDF, e-mails (marca, cores e o nome no remetente), `/minhas-leituras`, termos/privacidade
   (a marca trocada no texto; responsável e CNPJ iguais), 404 da tela do pacote (HTTP 404),
   a taxa da plataforma no bloco de preço, a CSP da ocidental sem Google Fonts.
-- **C:** compatibilidade, numerologia, tarot, blog, `/live`; nome do "Índice Padmini" numa chave só.
+- **C (feita):** compatibilidade, numerologia, tarot, blog (lista e artigo) e `/live` com os
+  componentes do pacote, sem fluxo novo; o nome do índice da sinastria numa chave só. Nenhuma
+  página da ocidental usa mais o `base.css` (o antigo `static/ocidental/componentes.css` saiu).
+
+### Fase C: como ficou
+- **Nome do índice**: `conteudo/ocidental/marca.yaml` → `indice:`. Nos YAMLs de texto (páginas,
+  `textos/sinastria.yaml`, blog) ele é escrito `{indice}` (como os `{a}`/`{b}` que os textos já
+  usam); `textos.com_indice()` troca na leitura. O código lê `textos.NOME_INDICE`; os templates,
+  a variável `indice`. Para renomear: a linha da `marca.yaml` + `python scripts/gerar_og_ocidental.py`
+  (a imagem da sinastria tem o nome) + deploy. O endereço do artigo
+  (`/blog/como-ler-o-indice-padmini`) não muda, para link compartilhado não quebrar.
+- **Rosa das 8 dimensões, cartas do tarot e card do casal** ainda desenham com os nomes antigos
+  (tema escuro): ficam em blocos `data-theme="dark"` (`.rosa-bloco`, `.mesa`, `.cardc`).
+- **`/live`** é todo no tema escuro do pacote (tela de transmissão). A linha que separa o grátis
+  do pago ficou dourada (`gold`); o aviso diz "linha dourada" (antes, "laranja").
+- **Card do casal (imagem)**: Cormorant + Inter do site, cores do tema escuro, símbolo novo,
+  "Valderez" no topo, arquivo `valderez-<a>-<b>.png`.
 
 ### Fase B: como ficou
 - **Estados do `/mapa`** (`#estado-form`, `#estado-carregando`, `#resultado`): a mesma página;

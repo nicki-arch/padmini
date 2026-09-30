@@ -1,11 +1,10 @@
 {# Rodada 6: o e-mail vem no MESMO formulário dos dados, antes do botão. Parte da
    amostra aparece na tela e o resto chega nele (rotas_ocidental.entregar_amostra).
    A caixa é desmarcada: é a autorização da sequência de e-mails (até 3).
-   Classes dos dois jeitos: `field`/`help`/`consent` (páginas no pacote da Valderez,
-   componentes.css) e `campo`/`dica`/`check-seq` (páginas ainda no base.css). #}
-<div class="field campo largo campo-email">
+   Visual: componentes do pacote da Valderez (static/valderez/componentes.css). #}
+<div class="field campo-email">
   <label for="email">Seu e-mail</label>
   <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required placeholder="voce@exemplo.com" aria-describedby="email-ajuda">
-  <span class="help dica" id="email-ajuda">Parte da leitura aparece aqui na hora; o resto chega nesse e-mail.</span>
-  <label class="consent check-seq"><input type="checkbox" id="aceita-sequencia" name="aceita-sequencia"><span>Pode me mandar mais sobre a minha leitura nos próximos dias (até 3 e-mails; dá para sair quando quiser)</span></label>
+  <span class="help" id="email-ajuda">Parte da leitura aparece aqui na hora; o resto chega nesse e-mail.</span>
+  <label class="consent"><input type="checkbox" id="aceita-sequencia" name="aceita-sequencia"><span>Pode me mandar mais sobre a minha leitura nos próximos dias (até 3 e-mails; dá para sair quando quiser)</span></label>
 </div>

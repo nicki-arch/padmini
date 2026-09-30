@@ -39,7 +39,8 @@ Arquivos:
 - `aspectos_pessoais.yaml` — Sol, Lua, Mercúrio, Vênus e Marte entre si, 5 aspectos cada par
 - `pecas.yaml` — peças para montar os aspectos dos outros pares, elementos,
   modalidades, regente do Ascendente e avisos
-- `sinastria.yaml` — dimensões, casas, Índice Padmini e peças da sinastria
+- `sinastria.yaml` — dimensões, casas, o índice e peças da sinastria. O nome do índice
+  não é escrito nos textos: é `{indice}`, trocado pelo nome de `conteudo/ocidental/marca.yaml`
 - `numerologia.yaml` — descrição curta de cada número + 12 textos para cada um dos 6 números
 - `tarot.yaml` — as 78 cartas (frase da amostra + leitura de 40 a 90 palavras),
   a moldura de cada posição (Situação, Desafio, Conselho) e as peças da leitura

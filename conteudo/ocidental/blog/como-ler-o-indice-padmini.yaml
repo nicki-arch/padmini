@@ -1,15 +1,15 @@
 # RASCUNHO escrito pelo Claude Code (round 5) para a família revisar.
 # Os números do método batem com docs/ocidental.md (sinastria.py). Só vai ao ar
 # com `revisado: true`.
-titulo: Como ler o Índice Padmini
+titulo: Como ler o {indice}
 descricao: >-
-  O Índice Padmini resume a sinastria de um casal num número de 0 a 100. Veja
+  O {indice} resume a sinastria de um casal num número de 0 a 100. Veja
   como ele é calculado, o que um número alto e um baixo querem dizer — e o que
   eles não querem dizer.
 data: 2026-09-27
 revisado: false
 abertura: >-
-  A astrologia tradicional não tem uma nota única para casais. O Índice Padmini
+  A astrologia tradicional não tem uma nota única para casais. O {indice}
   é um método nosso, e por isso a gente mostra como ele é feito — para que o
   número ajude a conversa, e não a substitua.
 secoes:
@@ -49,6 +49,6 @@ secoes:
         apoiar; o ponto de atenção é onde uma conversa honesta costuma render
         mais.
 chamada:
-  texto: Vejam o Índice Padmini de vocês, com o ponto mais forte e o de atenção.
+  texto: Vejam o {indice} de vocês, com o ponto mais forte e o de atenção.
   botao: Ver nossa sinastria →
   href: /compatibilidade

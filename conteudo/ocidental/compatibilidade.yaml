@@ -3,7 +3,7 @@
 
 card:
   # Decisão do Nicolas (26/set/2026): o card compartilhável mostra o Índice
-  # Padmini, sempre com o rótulo "ÍNDICE PADMINI · MÉTODO PRÓPRIO". O relatório
+  # (nome em conteudo/ocidental/marca.yaml), sempre com o rótulo "<NOME> · MÉTODO PRÓPRIO". O relatório
   # também mostra, com o método explicado.
   mostra_indice: true
 
@@ -22,7 +22,7 @@ como_fica:
     E segue assim pelas oito dimensões, com os aspectos entre os planetas de
     vocês, um a um, e os planetas de um nas casas do outro.
   comparacao:
-    - item: O Índice Padmini e o que ele diz sobre vocês
+    - item: O {indice} e o que ele diz sobre vocês
       amostra: true
     - item: O ponto mais forte e o ponto de atenção
       amostra: true

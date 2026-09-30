@@ -1,51 +1,65 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="{{ cores.ground }}">
 <meta name="robots" content="noindex, nofollow">
 <title>Modo live — Valderez Astrologia</title>
-{# Versão ocidental do modo live (mapa natal e sinastria). #}
-<link rel="stylesheet" href="/static/base.css">
+{# Versão ocidental do modo live (mapa natal, sinastria, numerologia, tarot). Marca
+   Valderez Astrologia (rodada visual, fase C): tema ESCURO do pacote de ponta a ponta
+   (tela de transmissão: muito contraste, pouca decoração), componentes do pacote,
+   sem base.css. Os nomes de classe de antes (campo, dica, erro, sub) ganham o visual
+   do pacote aqui embaixo; o JavaScript e a proteção por senha são os mesmos. #}
 {% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/componentes.css">
 <style>
   /* Tela pensada para transmissão: fonte grande, muito contraste, pouca decoração. */
   body { font-size: 17px; }
-  .barra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; margin-bottom: 18px; }
-  .abas { display: flex; gap: 8px; }
-  .aba { font: 600 15px var(--sans); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; min-height: 44px; cursor: pointer; }
-  .aba[aria-selected="true"] { color: var(--on-accent); background: var(--saffron); border-color: var(--saffron); }
-  .campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end; }
+  main#app { padding-block: 32px 64px; }
+  .campo { display: grid; gap: 8px; align-content: start; min-width: 0; }
+  .campo label { font-weight: 600; }
+  .campo input { width: 100%; min-height: 52px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--background); color: var(--text); font: inherit; }
+  .campo input:hover { border-color: var(--accent); }
+  .dica { font-weight: 400; color: var(--text-muted); font-size: 14px; }
+  .erro { margin: 16px 0 0; padding: 12px 16px; border: 1px solid currentColor; border-radius: var(--radius-control); color: var(--error); font-size: 14px; }
+  .sub { color: var(--text-secondary); }
+  .barra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; margin-bottom: 24px; }
+  .abas { display: flex; flex-wrap: wrap; gap: 8px; }
+  .aba { font: 600 15px/20px var(--font-sans); color: var(--text-secondary); background: transparent; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 11px 18px; min-height: 44px; cursor: pointer; }
+  .aba[aria-selected="true"] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+  .campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; align-items: end; }
   .campos .largo { grid-column: 1 / -1; }
-  button.acao { font: 600 16px var(--sans); color: var(--on-accent); background: var(--saffron); border: 0; border-radius: 10px; padding: 14px 20px; min-height: 48px; cursor: pointer; }
-  button.acao[disabled] { opacity: .6; cursor: default; }
-  fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 0 0 14px; }
-  legend { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--saffron); font-weight: 600; padding: 0 6px; }
-  .faixa { display: flex; align-items: center; gap: 10px; margin: 30px 0 16px; font: 600 13px var(--sans); letter-spacing: .1em; text-transform: uppercase; }
-  .faixa::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .35; }
-  .faixa.gratis { color: var(--sage); }
-  .faixa.pago { color: var(--blush); }  /* a "linha laranja" do Pedro: zarcão */
-  .grande { font-family: var(--serif); font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.15; margin: 0 0 6px; }
-  .destaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 18px; }
-  .destaques div { background: var(--ground-3); border-radius: 12px; padding: 14px 16px; }
-  .destaques span { display: block; font-size: 12.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
-  .destaques b { font-family: var(--serif); font-size: 1.5rem; font-weight: 500; }
+  button.acao { margin-top: 20px; display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 13px 24px; border: 0; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent); font: 600 15px/20px var(--font-sans); cursor: pointer; }
+  button.acao:hover { background: var(--accent-hover); }
+  button.acao[disabled] { cursor: wait; background: var(--surface); color: var(--text-muted); border: 1px dashed var(--border); }
+  fieldset { border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; margin: 0 0 16px; }
+  legend { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--rose); font-weight: 600; padding: 0 8px; }
+  .faixa { display: flex; align-items: center; gap: 12px; margin: 32px 0 16px; font: 600 14px var(--font-sans); letter-spacing: .1em; text-transform: uppercase; }
+  .faixa::after { content: ""; flex: 1; height: 2px; background: currentColor; }
+  .faixa.gratis { color: var(--success); }
+  .faixa.pago { color: var(--gold); }  /* a linha que separa o grátis do pago (o que o Pedro não lê na live) */
+  .grande { font: 600 clamp(1.8rem, 4vw, 2.6rem)/1.15 var(--font-editorial); margin: 0 0 8px; }
+  .destaques { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .destaques div { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-control); padding: 14px 16px; }
+  .destaques span { display: block; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+  .destaques b { font: 600 1.6rem/1.2 var(--font-editorial); font-variant-numeric: lining-nums; }
   table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); }
-  th { font-size: 12.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .08em; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); }
+  th { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
   .rolagem { overflow-x: auto; }
-  .secao h3 { font-size: 1.35rem; margin: 20px 0 6px; }
-  .secao p { margin: 0 0 10px; }
-  .koota { display: flex; justify-content: space-between; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .secao h3 { margin: 24px 0 8px; }
+  .secao p { margin: 0 0 12px; }
+  .koota { display: flex; justify-content: space-between; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .koota b { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .dica-live { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 14.5px; color: var(--ink); margin-bottom: 18px; }
+  .dica-live { background: var(--surface); border-left: 3px solid var(--gold); border-radius: var(--radius-control); padding: 12px 16px; font-size: 15px; margin-bottom: 20px; }
+  #resultado { margin-top: 32px; }
   @media (max-width: 480px) { .campos { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<main class="wrap" id="app">
+<main class="container" id="app">
   <section id="tela-senha" style="max-width:420px">
     <h1 style="font-size:2rem">Modo live</h1>
     <p class="sub">Área do Pedro. Gera o relatório completo sem pagamento, para ler ao vivo.</p>
@@ -70,7 +84,7 @@
       <button class="aba" id="botao-sair" type="button">Sair</button>
     </div>
 
-    <p class="dica-live">Na live, leia só o que está acima da linha laranja. O que vem depois dela é o que a pessoa recebe pagando.</p>
+    <p class="dica-live">Na live, leia só o que está acima da linha dourada. O que vem depois dela é o que a pessoa recebe pagando.</p>
 
     <form id="form-mapa" class="card" novalidate>
       <div class="campos">
@@ -304,7 +318,7 @@ function desenharCasal(d) {
     ${(d.avisos || []).map((a) => `<p class="aviso">${esc(a)}</p>`).join("")}
     <p class="faixa gratis">Amostra grátis</p>
     <div class="destaques">
-      <div><span>Índice Padmini (método próprio)</span><b>${d.indice} / 100</b></div>
+      <div><span>{{ indice }} (método próprio)</span><b>${d.indice} / 100</b></div>
       <div><span>Ponto mais forte</span><b>${esc(d.ponto_forte.titulo)}</b></div>
       <div><span>Ponto de atenção</span><b>${esc(d.ponto_atencao.titulo)}</b></div>
     </div>

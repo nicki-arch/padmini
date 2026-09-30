@@ -16,6 +16,8 @@ from pathlib import Path
 
 import yaml
 
+import textos
+
 import mapa_ocidental as mo
 
 PASTA = Path(__file__).parent / "conteudo" / "ocidental" / "textos"
@@ -34,7 +36,9 @@ def base(arquivo: str) -> dict:
 
 
 def _t(no) -> str:
-    return (no or {}).get("texto", "") if isinstance(no, dict) else ""
+    # {indice} → o nome do índice (conteudo/ocidental/marca.yaml); a base guarda o
+    # marcador, que é o que a planilha de revisão mostra
+    return textos.com_indice((no or {}).get("texto", "")) if isinstance(no, dict) else ""
 
 
 def cada_texto():
@@ -209,7 +213,7 @@ def montar_secoes(mapa: dict) -> dict:
 # --------------------------------------------------------------------------
 # IA: só reescreve (mesma regra da védica)
 # --------------------------------------------------------------------------
-INSTRUCAO_LLM = """Você escreve o Mapa Natal da Padmini (astrologia ocidental, zodíaco tropical), em português do Brasil.
+INSTRUCAO_LLM = """Você escreve o Mapa Natal da Valderez Astrologia (astrologia ocidental, zodíaco tropical), em português do Brasil.
 
 Regras:
 - Use SOMENTE as informações do material abaixo. Não acrescente nenhum fato astrológico, posição, previsão ou traço de personalidade que não esteja nele.
@@ -324,11 +328,11 @@ def montar_sinastria(sin: dict, ma: dict, mb: dict, a: str, b: str, nivel: str) 
     return r
 
 
-INSTRUCAO_LLM_SINASTRIA = """Você escreve a Sinastria de casal da Padmini (astrologia ocidental), em português do Brasil.
+INSTRUCAO_LLM_SINASTRIA = f"""Você escreve a Sinastria de casal da Valderez Astrologia (astrologia ocidental), em português do Brasil.
 
 Regras:
-- Use SOMENTE as informações do material abaixo (o Índice Padmini, as oito dimensões, os aspectos e as casas). Não acrescente nenhum fato astrológico, previsão ou traço que não esteja nele.
-- O Índice Padmini é um método próprio da Padmini, não uma regra tradicional: nunca o apresente como tradição astrológica.
+- Use SOMENTE as informações do material abaixo (o {textos.NOME_INDICE}, as oito dimensões, os aspectos e as casas). Não acrescente nenhum fato astrológico, previsão ou traço que não esteja nele.
+- O {textos.NOME_INDICE} é um método próprio, não uma regra tradicional: nunca o apresente como tradição astrológica.
 - Escreva sobre o casal usando os nomes fornecidos. Tom acolhedor e adulto. NUNCA condene o casal: nota baixa é "ponto de atenção", nunca "não vai dar certo".
 - Estrutura: o índice e o que ele significa; as oito dimensões, uma a uma; os aspectos mais marcantes; as casas; uma síntese prática de como fazer a relação funcionar.
 - Nada de promessas, garantias ou previsão de eventos, saúde ou dinheiro. Nunca mencione "o material" ou como o texto foi feito.
@@ -337,7 +341,7 @@ Regras:
 
 
 def montar_prompt_sinastria(rel: dict, a: str, b: str) -> str:
-    partes = [f"# {a} & {b} — Índice Padmini {rel['indice']}/100", rel["indice_texto"], rel["metodo"]]
+    partes = [f"# {a} & {b} — {textos.NOME_INDICE} {rel['indice']}/100", rel["indice_texto"], rel["metodo"]]
     for d in rel["dimensoes"]:
         partes.append(f"## {d['titulo']} ({d['nota'] if d['nota'] is not None else 'sem dados'}/100)\n\n{d['texto']}")
     partes += [f"## {x['titulo']}\n\n{x['texto']}" for x in rel["aspectos"]]
@@ -368,7 +372,7 @@ def montar_numerologia(res: dict, nivel: str) -> dict:
     return r
 
 
-INSTRUCAO_LLM_NUMEROLOGIA = """Você escreve a Numerologia da Padmini (numerologia pitagórica), em português do Brasil.
+INSTRUCAO_LLM_NUMEROLOGIA = """Você escreve a Numerologia da Valderez Astrologia (numerologia pitagórica), em português do Brasil.
 
 Regras:
 - Use SOMENTE as informações do material abaixo (os seis números e seus textos). Não acrescente números, cálculos, previsões ou traços que não estejam nele.
@@ -421,7 +425,7 @@ def montar_tarot(cartas: list[dict], nivel: str) -> dict:
     return r
 
 
-INSTRUCAO_LLM_TAROT = """Você escreve a leitura de Tarot da Padmini (tiragem de 3 cartas: Situação, Desafio, Conselho), em português do Brasil.
+INSTRUCAO_LLM_TAROT = """Você escreve a leitura de Tarot da Valderez Astrologia (tiragem de 3 cartas: Situação, Desafio, Conselho), em português do Brasil.
 
 Regras:
 - Use SOMENTE as cartas e os textos do material abaixo. Não troque cartas, não acrescente cartas nem significados que não estejam nele.

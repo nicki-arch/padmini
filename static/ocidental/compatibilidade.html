@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="{{ cores.ground }}">
 <title>Valderez Astrologia — Sinastria do casal</title>
-<meta name="description" content="A sinastria de vocês dois: os mapas natais cruzados em 8 dimensões, com o Índice Padmini. Amostra grátis.">
+<meta name="description" content="A sinastria de vocês dois: os mapas natais cruzados em 8 dimensões, com o {{ indice }}. Amostra grátis.">
 <link rel="canonical" href="https://padmini.com.br/compatibilidade">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
@@ -14,9 +14,8 @@
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-compatibilidade.png">
 <meta property="og:url" content="https://padmini.com.br/compatibilidade">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="/static/base.css">
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/ocidental/componentes.css">
+<link rel="stylesheet" href="/static/valderez/componentes.css">
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
@@ -24,153 +23,110 @@
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-{# Versão ocidental (sinastria). Preço e checkout: conteudo/ocidental/ofertas.yaml;
-   textos: conteudo/ocidental/textos/sinastria.yaml; API: /api/ocidental/sinastria. #}
-<style>
-  /* específico da compatibilidade — o resto vem de base.css */
-  .duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  fieldset{border:1px solid var(--line);border-radius:12px;padding:16px;margin:0;background:var(--ground)}
-  legend{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--saffron);font-weight:600;padding:0 6px}
-  .campo{margin-bottom:12px}
-  .campo:last-child{margin-bottom:0}
-  .enviar-linha{margin-top:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-  .price-note{font-size:13px;color:var(--faint)}
-  .price-note b{color:var(--ink);font-weight:600}
-  #resultado{margin:30px 0;display:grid;gap:22px}
-  .moldura{font-family:var(--serif);font-size:clamp(1.2rem,2.6vw,1.5rem);line-height:1.4;color:var(--ink);max-width:52ch}
-  .pontos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .ponto{border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--ground-2)}
-  .ponto .rot{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
-  .ponto.forte .rot{color:var(--sage)}
-  .ponto.atencao .rot{color:var(--saffron)}
-  .ponto h3{font-size:1.3rem;margin:0 0 6px}
-  .ponto p{margin:0;color:var(--muted);font-size:14.5px}
-  .oferta ul{list-style:none;padding:0;margin:12px 0 18px;display:grid;gap:10px}
-  .oferta li{display:flex;gap:10px;color:var(--muted);font-size:14.5px}
-  .oferta li::before{content:"";flex:none;width:16px;height:16px;margin-top:3px;border-radius:50%;background:var(--saffron);
-    -webkit-mask:no-repeat center/11px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
-    mask:no-repeat center/11px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E")}
-  .oferta .preco{font-family:var(--serif);font-size:2rem}
-  .oferta .preco small{font-size:1rem;color:var(--faint);text-decoration:line-through;margin-left:8px}
-  .cidade-status{display:block;margin-top:4px}
-  .cidade-status.ok{color:var(--sage)}
-  input.escolhida{border-color:var(--sage)}
-  .honesty{font-size:13px;color:var(--faint);margin-top:8px;max-width:56ch}
-  @media(max-width:640px){.duo,.pontos{grid-template-columns:1fr}}
-  @media(max-width:480px){fieldset{padding:12px 12px 14px;border-radius:10px}}
-  .como-fica{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:24px;align-items:center}
-  .rosa-grande{margin:0}
-  .rosa-grande svg,.rosa-completo svg{width:100%;height:auto;display:block}
-  .rosa-grande figcaption{font-size:13px;color:var(--faint);margin-top:8px;text-align:center}
-  .rosa-completo{max-width:460px;margin:0 auto}
-  .comparacao{width:100%;border-collapse:collapse;font-size:14.5px}
-  .comparacao th,.comparacao td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-  .comparacao th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--saffron);font-weight:600}
-  .comparacao td{color:var(--muted)}
-  .comparacao .marca-c{text-align:center;color:var(--ink);width:24%}
-  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .esmaecido{position:relative;max-height:9.5em;overflow:hidden;
-    -webkit-mask-image:linear-gradient(180deg,#000 35%,transparent);mask-image:linear-gradient(180deg,#000 35%,transparent)}
-  @media(max-width:760px){.como-fica{grid-template-columns:1fr}.rosa-grande{max-width:420px;margin:0 auto}}
-  .cardc::after{content:none} /* o base.css desenha a marca em sânscrito no card */
-</style>
+{# Versão ocidental (sinastria), marca Valderez Astrologia (rodada visual, fase C:
+   componentes do pacote, sem fluxo novo). Preço, taxa e checkout:
+   conteudo/ocidental/ofertas.yaml; textos: conteudo/ocidental/textos/sinastria.yaml;
+   nome do índice: conteudo/ocidental/marca.yaml (variável `indice`); API: /api/ocidental/sinastria. #}
 </head>
 <body>
 {% set atual = "/compatibilidade" %}{% include "ocidental/_cabecalho.html" %}
 
-<main id="conteudo" class="wrap">
+<main id="conteudo">
+  <section class="section container">
   <p class="eyebrow">Sinastria · o mapa do casal</p>
   <h1>Onde o mapa de um toca o mapa do <em>outro</em>.</h1>
-  <p class="sub">A sinastria cruza os dois mapas natais — o Sol, a Lua, Vênus e Marte de um com os do outro — e organiza o encontro em oito dimensões, da atração ao dia a dia. Preencha os dois nascimentos e veja a amostra na hora, de graça.</p>
+  <p class="lede">A sinastria cruza os dois mapas natais — o Sol, a Lua, Vênus e Marte de um com os do outro — e organiza o encontro em oito dimensões, da atração ao dia a dia. Preencha os dois nascimentos e veja a amostra na hora, de graça.</p>
 
-  <div class="card">
-    <form id="form" novalidate>
-      <div class="duo">
-        <fieldset>
+  <div class="card" id="caixa-form" style="margin-top:32px">
+    <form id="form" class="stack" novalidate aria-label="Nascimentos do casal">
+      <div class="grid grid--2">
+        <fieldset class="pessoa">
           <legend>Pessoa A</legend>
-          <div class="campo">
-            <label for="nome-a">Nome <span class="dica">(opcional)</span></label>
+          <div class="field">
+            <label for="nome-a">Nome <span class="opcional">(opcional)</span></label>
             <input id="nome-a" name="nome-a" maxlength="80" autocomplete="off">
           </div>
-          <div class="campo">
+          <div class="field">
             <label for="data-a">Data de nascimento</label>
-            <input id="data-a" name="data-a" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
+            <input id="data-a" name="data-a" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required aria-describedby="erro">
           </div>
-          <div class="campo">
+          <div class="field">
             <label for="hora-a">Hora de nascimento</label>
             <input id="hora-a" name="hora-a" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
           </div>
-          <div class="campo">
+          <div class="field">
             <label for="cidade-a" id="cidade-a-label">Cidade de nascimento</label>
             <div class="auto">
               <input id="cidade-a" name="cidade-a" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-a" autocomplete="off" placeholder="ex.: Porto Alegre" required>
               <ul id="lista-a" role="listbox" aria-labelledby="cidade-a-label" hidden></ul>
             </div>
-            <span class="dica cidade-status" id="cidade-a-status" aria-live="polite"></span>
+            <p class="cidade-status" id="cidade-a-status" aria-live="polite"></p>
           </div>
         </fieldset>
-
-        <fieldset>
+        <fieldset class="pessoa">
           <legend>Pessoa B</legend>
-          <div class="campo">
-            <label for="nome-b">Nome <span class="dica">(opcional)</span></label>
+          <div class="field">
+            <label for="nome-b">Nome <span class="opcional">(opcional)</span></label>
             <input id="nome-b" name="nome-b" maxlength="80" autocomplete="off">
           </div>
-          <div class="campo">
+          <div class="field">
             <label for="data-b">Data de nascimento</label>
-            <input id="data-b" name="data-b" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required>
+            <input id="data-b" name="data-b" type="text" inputmode="numeric" placeholder="dd/mm/aaaa" maxlength="10" required aria-describedby="erro">
           </div>
-          <div class="campo">
+          <div class="field">
             <label for="hora-b">Hora de nascimento</label>
             <input id="hora-b" name="hora-b" type="text" inputmode="numeric" placeholder="hh:mm" maxlength="5">
           </div>
-          <div class="campo">
+          <div class="field">
             <label for="cidade-b" id="cidade-b-label">Cidade de nascimento</label>
             <div class="auto">
               <input id="cidade-b" name="cidade-b" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="lista-b" autocomplete="off" placeholder="ex.: Curitiba" required>
               <ul id="lista-b" role="listbox" aria-labelledby="cidade-b-label" hidden></ul>
             </div>
-            <span class="dica cidade-status" id="cidade-b-status" aria-live="polite"></span>
+            <p class="cidade-status" id="cidade-b-status" aria-live="polite"></p>
           </div>
         </fieldset>
       </div>
 
-      <div style="margin-top:16px">{% include "ocidental/_campo_email.html" %}</div>
-      <p class="dica" style="margin-top:12px">Não sabe a hora de alguém? Deixe em branco: a sinastria sai assim mesmo, só sem o Ascendente e as casas dessa pessoa.</p>
-      <p class="erro" id="erro" role="alert" hidden></p>
-      <div class="enviar-linha">
-        <button id="enviar" type="submit" class="btn btn-primary">Ver nossa sinastria →</button>
-        <span class="price-note">Amostra <b>grátis</b> · relatório completo por <b id="preco-nota">R${{ ofertas.compat.preco | moeda }}</b></span>
+      {% include "ocidental/_campo_email.html" %}
+      <p class="help">Não sabe a hora de alguém? Deixe em branco: a sinastria sai assim mesmo, só sem o Ascendente e as casas dessa pessoa.</p>
+      <p class="form-erro" id="erro" role="alert" hidden></p>
+      <div class="row">
+        <button id="enviar" type="submit" class="button">Ver nossa sinastria →</button>
+        <span class="caption">Amostra <b>grátis</b> · relatório completo por <b id="preco-nota">R${{ ofertas.compat.preco | moeda }}</b></span>
       </div>
     </form>
   </div>
+  </section>
 
-  <section id="resultado" aria-live="polite" hidden></section>
+  <section class="section container" id="resultado" aria-live="polite" hidden></section>
 
   {%- set ex = exemplos.casais()[0] %}
-  <section id="como-fica" data-revelar>
+  <section class="section container" id="como-fica" data-revelar>
     <h2>{{ t.como_fica.titulo }}</h2>
-    <p class="sub">{{ t.como_fica.sub | replace("{a}", ex.nomes.a) | replace("{b}", ex.nomes.b) }}</p>
+    <p class="secondary">{{ t.como_fica.sub | replace("{a}", ex.nomes.a) | replace("{b}", ex.nomes.b) }}</p>
     <div class="como-fica">
-      <figure class="rosa-grande">
+      <figure class="rosa-bloco" data-theme="dark">
         {{ ex.rosa_grande }}
         <figcaption>{{ t.como_fica.rosa_legenda }}</figcaption>
       </figure>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Amostra grátis e completo">
       <table class="comparacao">
-        <thead><tr><th></th><th>Amostra grátis</th><th>Completo · R${{ ofertas.compat.preco | moeda }}</th></tr></thead>
+        <thead><tr><th scope="col"><span class="sr-only">O que vem</span></th><th scope="col">Amostra grátis</th><th scope="col">Completo · R${{ ofertas.compat.preco | moeda }}</th></tr></thead>
         <tbody>
         {%- for linha in t.como_fica.comparacao %}
-          <tr><td>{{ linha.item }}</td><td class="marca-c">{{ "✓" if linha.amostra else "—" }}<span class="vh">{{ " incluído" if linha.amostra else " não incluído" }}</span></td><td class="marca-c">✓<span class="vh"> incluído</span></td></tr>
+          <tr><td>{{ linha.item }}</td><td class="marca-c">{{ "✓" if linha.amostra else "—" }}<span class="sr-only">{{ " incluído" if linha.amostra else " não incluído" }}</span></td><td class="marca-c">✓<span class="sr-only"> incluído</span></td></tr>
         {%- endfor %}
         </tbody>
       </table>
+      </div>
     </div>
-    <h3 style="margin-top:28px">{{ t.como_fica.trecho_titulo }}</h3>
-    <div class="pontos" style="grid-template-columns:1fr">
+    <h3 style="margin-top:48px">{{ t.como_fica.trecho_titulo }}</h3>
+    <div class="pontos">
       {%- for d in ex.relatorio.dimensoes %}
       {%- if d.chave == ex.relatorio.ponto_forte.chave %}
       <div class="ponto"><div class="rot">{{ d.titulo }} — {{ d.nota }}/100</div>
-        <p style="margin-bottom:6px"><i>{{ d.descricao }}</i></p><p>{{ d.texto }}</p></div>
+        <p><i>{{ d.descricao }}</i></p><p>{{ d.texto }}</p></div>
       {%- endif %}
       {%- endfor %}
       {%- for d in ex.relatorio.dimensoes if d.chave != ex.relatorio.ponto_forte.chave %}
@@ -179,12 +135,12 @@
       {%- endif %}
       {%- endfor %}
     </div>
-    <p class="sub" style="margin-top:14px">{{ t.como_fica.mais }}</p>
-    <p><a class="btn btn-outline" href="#form">Ver a de vocês, de graça →</a></p>
+    <p class="secondary" style="margin-top:24px">{{ t.como_fica.mais }}</p>
+    <p><a class="button button--secondary" href="#form">Ver a de vocês, de graça →</a></p>
   </section>
 </main>
 
-{% set nota_rodape %}Sinastria pelo zodíaco tropical, casas Placidus. O Índice Padmini é um método próprio, não uma regra da astrologia. Esta leitura é uma ferramenta de autoconhecimento, não uma previsão nem substituto de uma conversa honesta entre vocês. Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos: Swiss Ephemeris.{% endset %}{% include "ocidental/_rodape.html" %}
+{% set nota_rodape %}Sinastria pelo zodíaco tropical, casas Placidus. O {{ indice }} é um método próprio, não uma regra da astrologia. Esta leitura é uma ferramenta de autoconhecimento, não uma previsão nem substituto de uma conversa honesta entre vocês. Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos: Swiss Ephemeris.{% endset %}{% include "ocidental/_rodape.html" %}
 
 <script>
 // Tudo de conteudo/ocidental/ofertas.yaml (trocado no servidor). Não escrever à mão.
@@ -193,10 +149,14 @@
 // `coupon=pedro`, o parâmetro da Cakto que já aplica o cupom (ajuda.cakto.com.br,
 // "checkout pré-preenchido"). O preço com cupom é calculado do percentual no servidor.
 const CORES = {{ cores | tojson }};
-const LOTUS_TRACOS = "{{ marca.tracos_d() }}", LOTUS_ASTRO = "{{ marca.astro_d() }}";
+const SIMBOLO_TRACOS = "{{ marca.tracos_d() }}", SIMBOLO_ASTRO = "{{ marca.astro_d() }}";
 const LINK_CHECKOUT = "{{ ofertas.compat.checkout }}";
 const PRECO = "{{ ofertas.compat.preco | moeda }}";
 const PRECO_CUPOM = "{{ ofertas.compat.preco_cupom | moeda }}";
+// taxa que a Cakto soma no checkout (ofertas.yaml → taxa_plataforma); vazio = não mostra a linha
+const TAXA = "{{ ofertas.compat.taxa_plataforma | moeda }}";
+// nome do índice: conteudo/ocidental/marca.yaml (fonte única)
+const NOME_INDICE = "{{ indice | replace('"', '') }}";
 const CUPOM_PERCENTUAL = "{{ ofertas.compat.cupom_percentual or '' }}";
 const CUPONS = {{ ofertas.compat.cupom_codigos | tojson }};
 // Combo "casal completo" (order bump no checkout): a diferença entre o total do
@@ -298,15 +258,21 @@ const autoA = criarAutocomplete($("#cidade-a"), $("#lista-a"));
 const autoB = criarAutocomplete($("#cidade-b"), $("#lista-b"));
 
 // ---------- envio ----------
-function mostrarErro(msg) { const el = $("#erro"); el.textContent = msg; el.hidden = !msg; }
+// mensagem de erro; `campo` (o primeiro com problema) recebe o foco e aria-invalid
+function mostrarErro(msg, campo) {
+  const el = $("#erro"); el.textContent = msg; el.hidden = !msg;
+  document.querySelectorAll("#form [aria-invalid]").forEach((x) => x.removeAttribute("aria-invalid"));
+  if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
+}
+function focar(el) { if (!el) return; el.setAttribute("tabindex", "-1"); el.focus({ preventScroll: true }); el.scrollIntoView({ behavior: "smooth", block: "start" }); }
 
 function coletarPessoa(p, auto) {
   const data = dataParaISO($(`#data-${p}`).value);
   const hora = $(`#hora-${p}`).value;
   const rotulo = p === "a" ? "Pessoa A" : "Pessoa B";
-  if (!data) return { erro: `Preencha a data de nascimento da ${rotulo} (dd/mm/aaaa).` };
-  if (hora && !/^\d{2}:\d{2}$/.test(hora)) return { erro: `A hora da ${rotulo} vai no formato hh:mm (ou deixe em branco).` };
-  if (!auto.selecionada) return { erro: `Escolha a cidade da ${rotulo} na lista de sugestões.` };
+  if (!data) return { erro: `Preencha a data de nascimento da ${rotulo} (dd/mm/aaaa).`, campo: $(`#data-${p}`) };
+  if (hora && !/^\d{2}:\d{2}$/.test(hora)) return { erro: `A hora da ${rotulo} vai no formato hh:mm (ou deixe em branco).`, campo: $(`#hora-${p}`) };
+  if (!auto.selecionada) return { erro: `Escolha a cidade da ${rotulo} na lista de sugestões.`, campo: $(`#cidade-${p}`) };
   return {
     pessoa: {
       nome: $(`#nome-${p}`).value.trim(),
@@ -320,14 +286,14 @@ $("#form").addEventListener("submit", async (e) => {
   e.preventDefault();
   mostrarErro("");
   const a = coletarPessoa("a", autoA);
-  if (a.erro) return mostrarErro(a.erro);
+  if (a.erro) return mostrarErro(a.erro, a.campo);
   const b = coletarPessoa("b", autoB);
-  if (b.erro) return mostrarErro(b.erro);
+  if (b.erro) return mostrarErro(b.erro, b.campo);
   const contato = padEmail.ler();
-  if (contato.erro) return mostrarErro(contato.erro);
+  if (contato.erro) return mostrarErro(contato.erro, $("#email"));
 
   const botao = $("#enviar");
-  botao.disabled = true; botao.textContent = "Calculando…";
+  botao.disabled = true; botao.setAttribute("aria-busy", "true"); botao.textContent = "Calculando…";
   try {
     const r = await fetch("/api/ocidental/sinastria", {
       method: "POST",
@@ -340,9 +306,9 @@ $("#form").addEventListener("submit", async (e) => {
     ultimoContato = contato;
     desenharAmostra(corpo);
   } catch (err) {
-    mostrarErro(err.message || "Não foi possível calcular. Tente de novo.");
+    mostrarErro(err.message || "Não foi possível calcular. Tente de novo.", $("#erro"));
   } finally {
-    botao.disabled = false; botao.textContent = "Ver nossa sinastria →";
+    botao.disabled = false; botao.removeAttribute("aria-busy"); botao.textContent = "Ver nossa sinastria →";
   }
 });
 
@@ -355,28 +321,28 @@ const FAIXA_LABEL = { alta: "encontro forte", media: "equilibrada", baixa: "pede
 
 function blocoCard(d, comBotao) {
   const a = esc(d.nomes.a), b = esc(d.nomes.b);
-  return `<div class="share" style="flex-direction:column;gap:16px">
-      <div class="cardc">
-        <div class="top"><span class="wm">padmini</span></div>
+  return `<div class="share">
+      <div class="cardc" data-theme="dark">
+        <div class="top"><span class="wm">Valderez</span>{{ marca.svg(22) }}</div>
         <div class="who">${a} &amp; ${b}</div>
         ${CARD_MOSTRA_INDICE
           ? `<div class="score">${d.indice}<span> / 100</span></div>
-             <div class="scorelab">Índice Padmini · método próprio</div>
+             <div class="scorelab">${esc(NOME_INDICE)} · método próprio</div>
              <div class="bar"><i style="width:${d.indice}%"></i></div>`
           : `<div class="scorelab">Sinastria</div>`}
         <div class="insight">Ponto mais forte: ${esc(d.ponto_forte.titulo)}</div>
       </div>
-      ${comBotao ? `<button type="button" class="btn btn-outline" id="baixar-card">${navigator.canShare ? "Compartilhar card ↗" : "Baixar card ↓"}</button>` : ""}
+      ${comBotao ? `<button type="button" class="button button--secondary" id="baixar-card">${navigator.canShare ? "Compartilhar card ↗" : "Baixar card ↓"}</button>` : ""}
     </div>`;
 }
 function blocoPontos(d) {
   // amostra com e-mail: na tela só o título do ponto forte; o texto e o ponto de atenção chegaram por e-mail
   if (!d.ponto_atencao) {
-    return `<div class="pontos" style="grid-template-columns:1fr">
+    return `<div class="pontos">
       <div class="ponto forte"><div class="rot">Ponto mais forte</div><h3>${esc(d.ponto_forte.titulo)}</h3>
       <p>O que isso quer dizer para vocês — e o ponto de atenção do casal — chegou no seu e-mail.</p></div></div>`;
   }
-  return `<div class="pontos">
+  return `<div class="pontos pontos--2">
       <div class="ponto forte"><div class="rot">Ponto mais forte</div><h3>${esc(d.ponto_forte.titulo)}</h3><p>${esc(d.ponto_forte.texto)}</p></div>
       <div class="ponto atencao"><div class="rot">Ponto de atenção</div><h3>${esc(d.ponto_atencao.titulo)}</h3><p>${esc(d.ponto_atencao.texto)}</p></div>
     </div>`;
@@ -387,7 +353,7 @@ function blocoAvisos(d) {
   return lista.length ? `<p class="aviso">${lista.map(esc).join("<br>")}</p>` : "";
 }
 function blocoMetodo(d) {
-  return `<details class="card"><summary><b>Como o Índice Padmini é calculado</b></summary><p class="honesty" style="max-width:none">${esc(d.metodo)}</p></details>`;
+  return `<details class="faq"><summary>Como o ${esc(NOME_INDICE)} é calculado</summary><p>${esc(d.metodo)}</p></details>`;
 }
 
 function desenharAmostra(d) {
@@ -398,30 +364,40 @@ function desenharAmostra(d) {
                    { aplicarCupom: !!comCupom, email: ultimoContato && ultimoContato.email })
     : "";
   $("#resultado").innerHTML = `
-    <div><h2>${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2><p class="moldura">${esc(d.indice_texto)}</p></div>
+    <p class="eyebrow">Sua amostra</p>
+    <h2 id="titulo-resultado" tabindex="-1">${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2><p class="moldura">${esc(d.indice_texto)}</p>
+    ${padEmail.aviso(d)}
     ${blocoAvisos(d)}
+    <div class="stack">
     ${blocoCard(d, true)}
     ${blocoPontos(d)}
-    ${padEmail.aviso(d)}
     ${blocoMetodo(d)}
-    <div class="card oferta">
-      <h2>Ver a sinastria completa</h2>
-      <p class="sub" style="margin-bottom:12px">A amostra mostra o essencial. O completo abre as oito dimensões e o que fazer com elas.</p>
-      <ul>
-        <li>As 8 dimensões com a nota e a leitura de cada uma</li>
-        <li>Os aspectos entre os planetas de vocês, um a um</li>
-        <li>Os planetas de um nas casas do outro</li>
-        <li>Como fazer essa relação funcionar, na prática</li>
-      </ul>
-      <div class="preco">R$${esc(comCupom ? PRECO_CUPOM : PRECO)}${comCupom ? ` <small>R$${esc(PRECO)}</small>` : ""}</div>
-      ${PRECO_BUMP_MAPAS ? `<p class="sub" style="margin:4px 0 14px">No checkout, dá para incluir <b>o mapa natal de cada um</b> por mais ${esc(PRECO_BUMP_MAPAS)} — os dois chegam no mesmo e-mail.</p>` : ""}
-      ${comCupom ? `<p class="sub" style="margin:4px 0 14px">Com o cupom <b>${esc(cupom.toUpperCase())}</b> (${esc(CUPOM_PERCENTUAL)}% de desconto), já aplicado no checkout. Se ele não aparecer aplicado, digite no campo de cupom.</p>` : ""}
-      <div class="enviar-linha">
-        ${ctaHref
-          ? `<a class="btn btn-primary" href="${esc(ctaHref)}" id="cta-completo" onclick="window.padTrack&&padTrack('checkout_click',{produto:'compat',sistema:'ocidental'})">Quero a sinastria completa →</a>`
-          : `<span class="btn btn-primary" aria-disabled="true" style="opacity:.55;pointer-events:none">Em breve</span>`}
+    </div>
+    <div class="split section">
+      <div>
+        <h2>Ver a sinastria completa</h2>
+        <p class="secondary">A amostra mostra o essencial. O completo abre as oito dimensões e o que fazer com elas.</p>
+        <ul class="lista-check">
+          <li>As 8 dimensões com a nota e a leitura de cada uma</li>
+          <li>Os aspectos entre os planetas de vocês, um a um</li>
+          <li>Os planetas de um nas casas do outro</li>
+          <li>Como fazer essa relação funcionar, na prática</li>
+        </ul>
+        <p class="honesty">Nenhum índice é uma sentença: nota baixa é onde vocês precisam de atenção, não "não vai dar certo".</p>
       </div>
-      <p class="honesty">${ctaHref ? "Garantia de 7 dias." : "O pagamento desta versão ainda está sendo configurado."} Nenhum índice é uma sentença: nota baixa é onde vocês precisam de atenção, não "não vai dar certo".</p>
+      <aside class="card price-card oferta" aria-labelledby="oferta-titulo">
+        <p class="eyebrow">Leitura completa</p>
+        <h3 id="oferta-titulo">Sinastria do casal</h3>
+        <p class="price preco">R$${esc(comCupom ? PRECO_CUPOM : PRECO)}${comCupom ? ` <small style="font-size:18px;text-decoration:line-through;color:var(--text-muted)">R$${esc(PRECO)}</small>` : ""}</p>
+        ${TAXA ? `<p class="caption ptaxa">+ R$${esc(TAXA)} de taxa da plataforma</p>` : ""}
+        ${PRECO_BUMP_MAPAS ? `<p class="help">No checkout, dá para incluir <b>o mapa natal de cada um</b> por mais ${esc(PRECO_BUMP_MAPAS)} — os dois chegam no mesmo e-mail.</p>` : ""}
+        ${comCupom ? `<p class="help">Com o cupom <b>${esc(cupom.toUpperCase())}</b> (${esc(CUPOM_PERCENTUAL)}% de desconto), já aplicado no checkout. Se ele não aparecer aplicado, digite no campo de cupom.</p>` : ""}
+        ${ctaHref
+          ? `<p class="help">Pagamento único. Garantia de 7 dias.</p>
+             <a class="button" href="${esc(ctaHref)}" id="cta-completo" onclick="window.padTrack&&padTrack('checkout_click',{produto:'compat',sistema:'ocidental'})">Quero a sinastria completa →</a>`
+          : `<p class="help">O pagamento desta versão ainda está sendo configurado.</p>
+             <button type="button" class="button" disabled>Em breve</button>`}
+      </aside>
     </div>`;
   const res = $("#resultado");
   res.hidden = false;
@@ -433,7 +409,7 @@ function desenharAmostra(d) {
     return c;
   });
   if (window.padTrack) padTrack("amostra_gerada", { produto: "compat", sistema: "ocidental" });
-  res.scrollIntoView({ behavior: "smooth", block: "start" });
+  focar($("#titulo-resultado"));
   const bc = document.getElementById("baixar-card");
   if (bc) bc.addEventListener("click", () => { if (window.padTrack) padTrack("card_baixado", { produto: "compat" }); baixarCard(d); });
 }
@@ -441,26 +417,34 @@ function desenharAmostra(d) {
 function desenharCompleto(d) {
   const dims = d.dimensoes.map((x) => `<div class="ponto">
       <div class="rot">${esc(x.titulo)}${x.nota === null ? "" : ` — ${x.nota}/100 · ${FAIXA_LABEL[faixaDe(x.nota)]}`}</div>
-      <p style="margin-bottom:6px"><i>${esc(x.descricao)}</i></p><p>${esc(x.texto)}</p></div>`).join("");
+      <p><i>${esc(x.descricao)}</i></p><p>${esc(x.texto)}</p></div>`).join("");
   const aspectos = d.aspectos.map((x) => `<div class="ponto"><div class="rot">${esc(x.titulo)}</div><p>${esc(x.texto)}</p></div>`).join("");
   const casas = d.casas.map((x) => `<div class="ponto"><div class="rot">${esc(x.titulo)}</div><p>${esc(x.texto)}</p></div>`).join("");
   $("#resultado").innerHTML = `
-    <div><h2>${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2><p class="moldura">${esc(d.indice_texto)}</p></div>
+    <p class="eyebrow">Leitura completa</p>
+    <h1 id="titulo-resultado" tabindex="-1">${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h1><p class="moldura">${esc(d.indice_texto)}</p>
     ${blocoAvisos(d)}
-    ${blocoCard(d, false)}
-    ${blocoMetodo(d)}
-    <h2>As oito dimensões</h2>
-    ${d.rosa ? `<div class="rosa-completo">${d.rosa}</div>` : ""}
-    <div class="pontos" style="grid-template-columns:1fr">${dims}</div>
-    ${aspectos ? `<h2>Os aspectos entre vocês</h2><div class="pontos" style="grid-template-columns:1fr">${aspectos}</div>` : ""}
-    ${casas ? `<h2>Os planetas de um nas casas do outro</h2><div class="pontos" style="grid-template-columns:1fr">${casas}</div>` : ""}
-    <p class="honesty">Nenhum índice é uma sentença: nota baixa é onde vocês precisam de atenção, não "não vai dar certo".</p>
-    <div class="card feedback" id="feedback-compat"></div>`;
+    <div class="reading-layout" style="margin-top:32px">
+      <nav class="toc" aria-label="Sumário"><strong>Sumário</strong>
+        <a href="#card-casal">O card de vocês</a><a href="#dimensoes">As oito dimensões</a>
+        ${aspectos ? '<a href="#aspectos">Os aspectos entre vocês</a>' : ""}${casas ? '<a href="#casas">Os planetas nas casas</a>' : ""}
+      </nav>
+      <article class="stack" style="min-width:0">
+        <div id="card-casal" class="stack">${blocoCard(d, false)}${blocoMetodo(d)}</div>
+        <section id="dimensoes" class="bloco"><h2>As oito dimensões</h2>
+          ${d.rosa ? `<figure class="rosa-bloco" data-theme="dark" style="margin-bottom:24px">${d.rosa}</figure>` : ""}
+          <div class="pontos">${dims}</div></section>
+        ${aspectos ? `<section id="aspectos" class="bloco"><h2>Os aspectos entre vocês</h2><div class="pontos">${aspectos}</div></section>` : ""}
+        ${casas ? `<section id="casas" class="bloco"><h2>Os planetas de um nas casas do outro</h2><div class="pontos">${casas}</div></section>` : ""}
+        <p class="honesty">Nenhum índice é uma sentença: nota baixa é onde vocês precisam de atenção, não "não vai dar certo".</p>
+        <div class="card feedback" id="feedback-compat"></div>
+      </article>
+    </div>`;
   const res = $("#resultado");
   res.hidden = false;
   if (window.padTrack) padTrack("completo_aberto", { produto: "compat", sistema: "ocidental" });
   if (window.padFeedback) padFeedback("#feedback-compat", "compat");
-  res.scrollIntoView({ behavior: "smooth", block: "start" });
+  focar($("#titulo-resultado"));
 }
 
 // entrega por link: /compatibilidade?a_data=..&a_hora=..(pode vir vazia)&a_lat=..&...&token=oc-..
@@ -474,11 +458,11 @@ function desenharCompleto(d) {
   });
   const A = pessoa("a"), B = pessoa("b");
   if (!A.data || isNaN(A.lat) || !B.data || isNaN(B.lat)) return;
-  const _fc = document.querySelector("main > .card"); if (_fc) _fc.hidden = true;
+  const _fc = document.querySelector("#caixa-form"); if (_fc) _fc.closest("section").hidden = true;
   const _cf = document.getElementById("como-fica"); if (_cf) _cf.hidden = true;
   const res = $("#resultado");
   res.hidden = false;
-  res.innerHTML = '<p class="nota">Abrindo a sinastria completa…</p>';
+  res.innerHTML = '<div class="card loading" aria-busy="true"><span class="spinner" aria-hidden="true"></span><p role="status">Abrindo a sinastria completa…</p></div>';
   fetch("/api/ocidental/sinastria", {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ a: A, b: B, nivel: "completo", texto_ia: false, token }),
@@ -487,7 +471,7 @@ function desenharCompleto(d) {
     if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Link inválido.");
     desenharCompleto(c);
   }).catch((e) => {
-    res.innerHTML = `<p class="aviso">Não foi possível abrir a sinastria completa: ${esc(e.message)} Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a> ou fale com a gente.</p>`;
+    res.innerHTML = `<p class="notice notice--error" role="alert">Não foi possível abrir a sinastria completa: ${esc(e.message)} Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a> ou fale com a gente.</p>`;
   });
 })();
 
@@ -521,41 +505,41 @@ async function montarCanvasCard(d) {
   c.width = W; c.height = H;
   const x = c.getContext("2d");
   // cores e fontes da versão (paleta.py → cores); o lótus é o mesmo desenho da marca (marca.py)
-  const C = CORES, SERIF = '"Young Serif", Georgia, serif', SANS = '"Source Sans 3", sans-serif';
+  // (fontes do próprio site: Cormorant Garamond e Inter, em static/valderez/fontes/)
+  const C = CORES, SERIF = '"Cormorant Garamond", Georgia, serif', SANS = 'Inter, Arial, sans-serif';
   try {
     await document.fonts.ready;
-    await Promise.all([document.fonts.load('400 220px "Young Serif"'), document.fonts.load('600 28px "Source Sans 3"'),
-                       document.fonts.load('400 28px "Source Sans 3"')]);
+    await Promise.all([document.fonts.load('600 220px "Cormorant Garamond"'), document.fonts.load('500 46px "Cormorant Garamond"'),
+                       document.fonts.load('600 28px Inter'), document.fonts.load('400 28px Inter')]);
   } catch (e) {}
-  x.fillStyle = C["ground"]; x.fillRect(0, 0, W, H);           // tinta chapada, sem brilho
-  x.strokeStyle = C["saffron"]; x.lineWidth = 2; x.strokeRect(28, 28, W - 56, H - 56);   // filete duplo de almanaque
-  x.lineWidth = 1; x.strokeRect(40, 40, W - 80, H - 80);
-  x.save(); x.translate(PX, 96); x.scale(2.4, 2.4);             // lótus em traço (32×32 → 77px)
-  x.strokeStyle = C["saffron"]; x.lineWidth = 1.5; x.lineCap = "round"; x.lineJoin = "round";
-  x.stroke(new Path2D(LOTUS_TRACOS)); x.fillStyle = C["blush"]; x.fill(new Path2D(LOTUS_ASTRO)); x.restore();
+  x.fillStyle = C["ground"]; x.fillRect(0, 0, W, H);           // azul-noite do tema escuro
+  x.save(); x.translate(PX, 96); x.scale(2.4, 2.4);             // o símbolo da marca (32×32 → 77px)
+  x.strokeStyle = C["blush"]; x.lineWidth = 1.2; x.lineCap = "round"; x.lineJoin = "round";
+  x.stroke(new Path2D(SIMBOLO_TRACOS)); x.fillStyle = C["blush"]; x.fill(new Path2D(SIMBOLO_ASTRO)); x.restore();
   x.textAlign = "left"; x.textBaseline = "alphabetic";
-  x.font = "400 46px " + SERIF; x.fillStyle = C["saffron"]; x.fillText("Valderez", PX + 96, 160);
+  x.font = "500 46px " + SERIF; x.fillStyle = C["ink"]; x.fillText("Valderez", PX + 96, 160);
   _setLS(x, "5px"); x.font = "600 26px " + SANS; x.fillStyle = C["muted"]; x.fillText("SINASTRIA DO CASAL", PX, 250);
   x.font = "600 34px " + SANS; x.fillStyle = C["ink"]; _setLS(x, "1px");
   x.fillText((nomeA + "  &  " + nomeB).toUpperCase(), PX, 330); _setLS(x, "0px");
   const barW = W - 2 * PX;
   let y = 590;
   if (CARD_MOSTRA_INDICE) {
-    x.font = "400 220px " + SERIF; x.fillStyle = C["ink"];
+    x.font = "600 220px " + SERIF; x.fillStyle = C["ink"];
     const num = String(d.indice); x.fillText(num, PX, 590);
     const numW = x.measureText(num).width;
-    x.font = "400 86px " + SERIF; x.fillStyle = C["faint"]; x.fillText(" / 100", PX + numW + 12, 590);
+    x.font = "500 86px " + SERIF; x.fillStyle = C["faint"]; x.fillText(" / 100", PX + numW + 12, 590);
     _setLS(x, "3px"); x.font = "600 28px " + SANS; x.fillStyle = C["blush"];
-    x.fillText("ÍNDICE PADMINI · MÉTODO PRÓPRIO", PX, 660); _setLS(x, "0px");
-    const barY = 705, barH = 10;
+    // a Cormorant desenha algarismos "antigos" (descem abaixo da linha): o rótulo vai mais para baixo
+    x.fillText((NOME_INDICE + " · método próprio").toUpperCase(), PX, 700); _setLS(x, "0px");
+    const barY = 740, barH = 10;
     x.fillStyle = C["bar-trilha"]; x.fillRect(PX, barY, barW, barH);                     // barra reta, de régua
-    x.fillStyle = C["saffron"]; x.fillRect(PX, barY, Math.max(barH, barW * d.indice / 100), barH);
-    y = 850;
+    x.fillStyle = C["blush"]; x.fillRect(PX, barY, Math.max(barH, barW * d.indice / 100), barH);
+    y = 880;
   } else { y = 520; }
-  x.font = "400 52px " + SERIF; x.fillStyle = C["ink"];
+  x.font = "500 52px " + SERIF; x.fillStyle = C["ink"];
   _wrap(x, "“O ponto mais forte de vocês: " + d.ponto_forte.titulo.toLowerCase() + ".”", PX, y, barW, 70);
   x.font = "400 30px " + SANS; x.fillStyle = C["muted"]; x.fillText("Façam a de vocês, de graça:", PX, H - 150);
-  x.font = "600 52px " + SANS; x.fillStyle = C["saffron"]; x.fillText("padmini.com.br", PX, H - 85);
+  x.font = "600 52px " + SANS; x.fillStyle = C["blush"]; x.fillText("padmini.com.br", PX, H - 85);
   return c;
 }
 
@@ -565,7 +549,7 @@ async function baixarCard(d) {
   if (bc) { bc.disabled = true; bc.textContent = "Gerando…"; }
   try {
     const c = await montarCanvasCard(d);
-    const nome = "padmini-" + _slug(d.nomes.a) + "-" + _slug(d.nomes.b) + ".png";
+    const nome = "valderez-" + _slug(d.nomes.a) + "-" + _slug(d.nomes.b) + ".png";
     const blob = await new Promise((ok) => c.toBlob(ok, "image/png"));
     const arquivo = new File([blob], nome, { type: "image/png" });
     if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {

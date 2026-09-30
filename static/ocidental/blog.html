@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,40 +11,27 @@
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{% if artigo %}{{ artigo.titulo | e }}{% else %}Blog — Valderez Astrologia{% endif %}">
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
-<link rel="stylesheet" href="/static/base.css">
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/ocidental/componentes.css">
+<link rel="stylesheet" href="/static/valderez/componentes.css">
 <script src="/static/afiliado.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-{# Blog da versão ocidental (blog.py). Uma página para a lista e para o artigo. #}
+{# Blog da versão ocidental (blog.py), marca Valderez Astrologia (rodada visual, fase C:
+   lista em cartões, artigo com a tipografia de artigo do pacote). Uma página para os dois. #}
 <style>
-  .faixa-rascunho{background:var(--blush);color:var(--on-accent);text-align:center;padding:8px 16px;font-weight:600;font-size:14px}
-  .lista-blog{list-style:none;padding:0;margin:24px 0;display:grid;gap:16px}
-  .lista-blog li{border:1px solid var(--line);border-radius:14px;padding:22px;background:var(--ground-2)}
-  .lista-blog h2{font-size:1.5rem;margin:4px 0 8px}
-  .lista-blog h2 a{color:var(--ink);text-decoration:none}
-  .lista-blog h2 a:hover{color:var(--saffron)}
-  .lista-blog p{margin:0;color:var(--muted)}
-  .quando{font-size:13px;color:var(--faint)}
-  .rascunho-tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--blush);font-weight:600;margin-left:8px}
-  article.texto{max-width:66ch}
-  article.texto h1{font-size:clamp(2.1rem,5vw,3rem);line-height:1.08}
-  article.texto h2{font-size:1.55rem;margin:34px 0 8px}
-  article.texto p{margin:0 0 14px;line-height:1.7}
-  article.texto .lede{margin-bottom:22px}
-  .chamada{margin-top:34px}
+  /* só a faixa da prévia (quem tem PADMINI_PREVIA_CHAVE vê rascunhos); o resto é o componentes.css */
+  .faixa-rascunho{background:var(--surface);color:var(--error);border-bottom:1px solid var(--border);text-align:center;padding:8px 16px;font-weight:600;font-size:14px}
 </style>
 </head>
 <body>
 {% if rascunho %}<div class="faixa-rascunho">Prévia — {% if artigo and not artigo.revisado %}rascunho, ainda não revisado: não está no ar{% else %}lista com rascunhos{% endif %}</div>{% endif %}
 {% set atual = "/blog" %}{% include "ocidental/_cabecalho.html" %}
 
-<main id="conteudo" class="wrap">
+<main id="conteudo" class="section container">
 {% if artigo %}
-  <article class="texto">
-    <p class="eyebrow"><a href="/blog" style="color:inherit;text-decoration:none">Blog</a> · <span class="quando">{{ artigo.data_br }}</span></p>
+  <article class="article" style="margin-inline:auto">
+    <p class="eyebrow"><a href="/blog" style="color:inherit;text-decoration:none">Blog</a> · {{ artigo.data_br }}</p>
     <h1>{{ artigo.titulo }}</h1>
     <p class="lede">{{ artigo.abertura }}</p>
     {%- for s in artigo.secoes %}
@@ -54,18 +41,18 @@
     {%- endfor %}
     {%- endfor %}
     <div class="card chamada">
-      <p style="margin:0 0 14px">{{ artigo.chamada.texto }}</p>
-      <a class="btn btn-primary" href="{{ artigo.chamada.href }}">{{ artigo.chamada.botao }}</a>
+      <p>{{ artigo.chamada.texto }}</p>
+      <a class="button" href="{{ artigo.chamada.href }}">{{ artigo.chamada.botao }}</a>
     </div>
   </article>
 {% else %}
   <p class="eyebrow">Valderez Astrologia · Blog</p>
   <h1>Para ler com calma.</h1>
   <p class="lede">Textos sobre sinastria, mapa natal, numerologia e tarot — como as coisas funcionam, sem promessa e sem horóscopo de jornal.</p>
-  <ul class="lista-blog">
+  <ul class="artigos lista-blog" style="list-style:none;padding:0;margin:48px 0 0">
     {%- for a in artigos %}
-    <li><span class="quando">{{ a.data_br }}</span>{% if not a.revisado %}<span class="rascunho-tag">rascunho</span>{% endif %}
-      <h2><a href="/blog/{{ a.slug }}">{{ a.titulo }}</a></h2><p>{{ a.descricao }}</p></li>
+    <li class="card artigo-card"><p class="caption">{{ a.data_br }}{% if not a.revisado %} · <span style="color:var(--error);font-weight:600">rascunho</span>{% endif %}</p>
+      <h2><a href="/blog/{{ a.slug }}">{{ a.titulo }}</a></h2><p class="secondary">{{ a.descricao }}</p></li>
     {%- endfor %}
   </ul>
 {% endif %}

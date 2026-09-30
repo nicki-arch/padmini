@@ -7,9 +7,9 @@ Reaproveita o motor do mapa natal (mapa_ocidental.py). Três camadas:
      Saturno e Ascendente, com os mesmos orbes do mapa natal.
   2. SOBREPOSIÇÃO DE CASAS: planetas de A nas casas de B e vice-versa. Só
      existe para quem tem hora de nascimento (casas dependem dela).
-  3. OITO DIMENSÕES e o ÍNDICE PADMINI (0 a 100).
+  3. OITO DIMENSÕES e o ÍNDICE (0 a 100; o nome dele: conteudo/ocidental/marca.yaml).
 
-ÍNDICE PADMINI — MÉTODO PRÓPRIO. A sinastria tradicional não tem uma nota
+O ÍNDICE — MÉTODO PRÓPRIO. A sinastria tradicional não tem uma nota
 canônica; esta é nossa, e a página diz isso com todas as letras. Como é feito:
 
   - Cada aspecto cruzado vale PESO_ASPECTO[tipo] × exatidão, onde exatidão vai

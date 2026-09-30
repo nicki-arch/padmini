@@ -49,7 +49,8 @@ def test_combo_na_pagina_anuncia_a_diferenca_do_preco_de_tabela(ocidental_com_bu
     html = cliente.get("/compatibilidade").text
     assert 'const PRECO_BUMP_MAPAS = "R$40";' in html  # 167 − 127
     assert 'const PRECO = "127";' in html and 'const PRECO_CUPOM = "96,52";' in html
-    assert "ÍNDICE PADMINI · MÉTODO PRÓPRIO" in html and "const CARD_MOSTRA_INDICE = true;" in html
+    # o nome do índice vem de conteudo/ocidental/marca.yaml (fase C da rodada visual)
+    assert '(NOME_INDICE + " · método próprio").toUpperCase()' in html and "const CARD_MOSTRA_INDICE = true;" in html
 
 
 def test_sem_checkout_do_bump_a_linha_do_combo_some(monkeypatch):
