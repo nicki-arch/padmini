@@ -28,7 +28,7 @@ def test_mapa_natal_e_a_porta_de_entrada(lista):
     assert "nasceu" in h1 and "dois" not in h1
     lede = re.search(r'<p class="lede">(.*?)</p>', lista, re.S).group(1)
     assert lede.index("mapa natal") < lede.index("sinastria")
-    assert "O seu mapa natal — Padmini" in lista and "A sinastria de vocês dois" not in lista
+    assert "O seu mapa natal — Valderez Astrologia" in lista and "A sinastria de vocês dois" not in lista
 
 
 def test_interesse_mapa_primeiro_e_marcado(lista):

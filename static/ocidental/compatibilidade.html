@@ -4,21 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="{{ cores.ground }}">
-<title>Padmini — Sinastria do casal</title>
+<title>Valderez Astrologia — Sinastria do casal</title>
 <meta name="description" content="A sinastria de vocês dois: os mapas natais cruzados em 8 dimensões, com o Índice Padmini. Amostra grátis.">
 <link rel="canonical" href="https://padmini.com.br/compatibilidade">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Padmini">
-<meta property="og:title" content="A sinastria de vocês dois — Padmini">
+<meta property="og:site_name" content="Valderez Astrologia">
+<meta property="og:title" content="A sinastria de vocês dois — Valderez Astrologia">
 <meta property="og:description" content="Os dois mapas natais cruzados em 8 dimensões. Amostra grátis para o casal.">
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-compatibilidade.png">
 <meta property="og:url" content="https://padmini.com.br/compatibilidade">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
-<link rel="stylesheet" href="/static/ocidental/tema.css">
+{% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/ocidental/componentes.css">
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
@@ -29,7 +26,6 @@
 <script src="/static/analytics.js" defer></script>
 {# Versão ocidental (sinastria). Preço e checkout: conteudo/ocidental/ofertas.yaml;
    textos: conteudo/ocidental/textos/sinastria.yaml; API: /api/ocidental/sinastria. #}
-<link rel="icon" href="{{ marca.favicon_uri() }}">
 <style>
   /* específico da compatibilidade — o resto vem de base.css */
   .duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -80,17 +76,9 @@
 </style>
 </head>
 <body>
-<header class="wrap">
-  <div class="topbar">
-    <a class="marca" href="/">
-      {{ marca.svg(30) }}
-      Padmini
-    </a>
-    {% set atual = "/compatibilidade" %}{% include "ocidental/_menu.html" %}
-  </div>
-</header>
+{% set atual = "/compatibilidade" %}{% include "ocidental/_cabecalho.html" %}
 
-<main class="wrap">
+<main id="conteudo" class="wrap">
   <p class="eyebrow">Sinastria · o mapa do casal</p>
   <h1>Onde o mapa de um toca o mapa do <em>outro</em>.</h1>
   <p class="sub">A sinastria cruza os dois mapas natais — o Sol, a Lua, Vênus e Marte de um com os do outro — e organiza o encontro em oito dimensões, da atração ao dia a dia. Preencha os dois nascimentos e veja a amostra na hora, de graça.</p>
@@ -196,12 +184,7 @@
   </section>
 </main>
 
-<footer>
-  Padmini — astrologia para autoconhecimento.<br>
-  Sinastria pelo zodíaco tropical, casas Placidus. O Índice Padmini é um método próprio, não uma regra da astrologia. Esta leitura é uma ferramenta de autoconhecimento, não uma previsão nem substituto de uma conversa honesta entre vocês.<br>
-  Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos: Swiss Ephemeris.<br>
-  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
-</footer>
+{% set nota_rodape %}Sinastria pelo zodíaco tropical, casas Placidus. O Índice Padmini é um método próprio, não uma regra da astrologia. Esta leitura é uma ferramenta de autoconhecimento, não uma previsão nem substituto de uma conversa honesta entre vocês. Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos: Swiss Ephemeris.{% endset %}{% include "ocidental/_rodape.html" %}
 
 <script>
 // Tudo de conteudo/ocidental/ofertas.yaml (trocado no servidor). Não escrever à mão.
@@ -551,7 +534,7 @@ async function montarCanvasCard(d) {
   x.strokeStyle = C["saffron"]; x.lineWidth = 1.5; x.lineCap = "round"; x.lineJoin = "round";
   x.stroke(new Path2D(LOTUS_TRACOS)); x.fillStyle = C["blush"]; x.fill(new Path2D(LOTUS_ASTRO)); x.restore();
   x.textAlign = "left"; x.textBaseline = "alphabetic";
-  x.font = "400 46px " + SERIF; x.fillStyle = C["saffron"]; x.fillText("Padmini", PX + 96, 160);
+  x.font = "400 46px " + SERIF; x.fillStyle = C["saffron"]; x.fillText("Valderez", PX + 96, 160);
   _setLS(x, "5px"); x.font = "600 26px " + SANS; x.fillStyle = C["muted"]; x.fillText("SINASTRIA DO CASAL", PX, 250);
   x.font = "600 34px " + SANS; x.fillStyle = C["ink"]; _setLS(x, "1px");
   x.fillText((nomeA + "  &  " + nomeB).toUpperCase(), PX, 330); _setLS(x, "0px");

@@ -8,18 +8,15 @@
 <meta name="description" content="{{ t.seo.descricao }}">
 <link rel="canonical" href="https://padmini.com.br/">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Padmini">
+<meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{{ t.seo.og_titulo }}">
 <meta property="og:description" content="{{ t.seo.og_descricao }}">
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
 <meta property="og:url" content="https://padmini.com.br/">
 <meta name="twitter:card" content="summary_large_image">
 {{ ld.home(t) }}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
-<link rel="stylesheet" href="/static/ocidental/tema.css">
+{% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/ocidental/componentes.css">
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
@@ -27,7 +24,6 @@
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-<link rel="icon" href="{{ marca.favicon_uri() }}">
 <style>
   /* específico da home (landing) — o resto vem de base.css */
   .hero{padding-block:64px 40px}
@@ -68,17 +64,9 @@
 {# Home da versão OCIDENTAL. Texto: conteudo/ocidental/home.yaml (variável `t`), inclusive o <head>.
    Preço: conteudo/ocidental/ofertas.yaml. Quatro produtos, nesta ordem (rodada 6): mapa natal (a porta
    de entrada), sinastria, numerologia e tarot. #}
-<header class="wrap">
-  <div class="topbar">
-    <a class="marca" href="/">
-      {{ marca.svg(30) }}
-      Padmini
-    </a>
-    {% set atual = "/" %}{% include "ocidental/_menu.html" %}
-  </div>
-</header>
+{% set atual = "/" %}{% include "ocidental/_cabecalho.html" %}
 
-<main>
+<main id="conteudo">
   <section class="hero wrap">
     <p class="eyebrow">{{ t.hero.eyebrow }}</p>
     <h1>{{ t.hero.titulo }}</h1>
@@ -222,10 +210,6 @@
   </section>
 </main>
 
-<footer>
-  {{ t.rodape.linha1 }}<br>
-  {{ t.rodape.linha2 }}<br>
-  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
-</footer>
+{% set nota_rodape %}{{ t.rodape.linha1 }} {{ t.rodape.linha2 }}{% endset %}{% include "ocidental/_rodape.html" %}
 </body>
 </html>

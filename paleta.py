@@ -7,16 +7,19 @@ gerar_pdf_ocidental.py), imagens de compartilhamento
   - "vedica": os valores de sempre ("Lótus à meia-luz": ameixa, açafrão). O CSS
     dela continua sendo o static/base.css; aqui estão os mesmos números, para o
     e-mail e o PDF.
-  - "ocidental": "Almanaque" (rodada 3). A astrologia ocidental, o tarot e a
-    numerologia chegaram ao Brasil pelos almanaques, pelos atlas celestes e pelo
-    baralho Rider-Waite (1909, litografia de cores chapadas com contorno): azul
-    de tinta de impressão, papel creme, ouro velho e zarcão. O CSS dela é o
+  - "ocidental": marca "Valderez Astrologia" (29/set/2026; pacote de design em
+    docs/design/valderez-1.0/). Tema claro para leitura e formulários e blocos
+    escuros (cabeçalho, rodapé, abertura) marcados com `data-theme`, sem seguir o
+    tema do sistema. Os tokens são os de docs/design/valderez-1.0/tokens/tokens.json
+    (`VALDEREZ` abaixo; há teste que confere). O CSS dela é o
     static/ocidental/tema.css, GERADO daqui (python scripts/gerar_tema_css.py;
-    há teste que confere que o arquivo está em dia).
+    há teste que confere que o arquivo está em dia). A rodada 3 ("Almanaque")
+    ficou no histórico do git.
 
-Contrastes (WCAG) estão em docs/marca-ocidental.md e na página /estilo, calculados
-por `contraste()` abaixo. Regra do base.css: texto de corpo entre 10:1 e 13:1 e
-nada legível abaixo de 4,5:1.
+Contrastes (WCAG): a védica segue a regra do base.css (texto de corpo entre 10:1 e
+13:1, nada legível abaixo de 4,5:1); a ocidental só usa os pares aprovados no
+tokens.json do pacote (`PARES_APROVADOS`), todos AA. Calculados por `contraste()`
+abaixo e mostrados em /estilo.
 """
 
 # ---------------------------------------------------------------------------
@@ -32,23 +35,27 @@ TELA = {
         "card-a": "#301d2d", "card-b": "#3f2740", "bar-base": "#f4e9dc",
         "card-marca": '"पद्मिनी"', "glow-alfa": .10,
     },
+    # Ocidental: as páginas ainda no base.css (as que as fases B e C da rodada
+    # visual vão vestir de novo) usam os nomes antigos. Eles apontam para o tema
+    # ESCURO da Valderez (VALDEREZ["dark"], abaixo): mesma estrutura de antes
+    # (fundo escuro, texto claro, um acento), só com as cores e os pares aprovados.
     "ocidental": {
-        "ground": "#121a2b",    # azul-tinta profundo (tinta de impressão, não céu de aplicativo)
-        "ground-2": "#19223a",  # superfície
-        "ground-3": "#212c45",  # superfície elevada / campos
-        "ink": "#e6dac3",       # papel creme quente
-        "muted": "#c6b99e",
-        "faint": "#a59a82",
-        "saffron": "#d4a23a",   # ouro velho (fosco, sem brilho): botão e destaque
-        "blush": "#e2744f",     # zarcão queimado: segundo acento
-        "sage": "#9aab84",      # sálvia de apoio
-        "on-accent": "#17120a", # texto sobre o botão ouro
-        "accent-hover": "#e0b456",
-        "erro": "#f2a493",
-        "card-a": "#19223a", "card-b": "#212c45",  # o card do casal: mesma tinta, sem roxo
-        "bar-base": "#e6dac3",
+        "ground": "#091321",    # dark.background
+        "ground-2": "#122034",  # dark.surface
+        "ground-3": "#122034",  # dark.surface (o pacote tem dois níveis; campos têm borda)
+        "ink": "#F8F3EF",       # dark.text
+        "muted": "#C8CCD8",     # dark.textSecondary
+        "faint": "#A8B1C4",     # dark.textMuted
+        "saffron": "#D9B9D0",   # dark.accent: botão e destaque
+        "blush": "#DCB1CF",     # dark.rose: segundo acento
+        "sage": "#9CD8B4",      # dark.success
+        "on-accent": "#142234", # dark.onAccent
+        "accent-hover": "#EAD3E3",
+        "erro": "#FFADB9",
+        "card-a": "#122034", "card-b": "#091321",
+        "bar-base": "#F8F3EF",
         "card-marca": "none",   # nada de devanágari na ocidental
-        "glow-alfa": 0,         # sem brilho: fundo chapado, como papel impresso
+        "glow-alfa": 0,
     },
 }
 
@@ -57,27 +64,59 @@ _ALFA = {"line": .18, "line-2": .10, "line-forte": .26}
 _ALFA_ACENTO = {"accent-soft": .14, "accent-hl": .16, "accent-borda": .32, "card-marca-cor": .09}
 
 # ---------------------------------------------------------------------------
-# Fontes (CSS). A ocidental troca Cormorant Garamond + Inter por:
-#   - Young Serif (títulos): serifa de impressão antiga, de tipo "inchado" de
-#     tinta, que aguenta tamanho pequeno no fundo escuro (o nome das cartas sai a
-#     15px). IM Fell English é mais "almanaque", mas imita o defeito da impressão
-#     e fica borrada em tela e em tamanho pequeno; Newsreader é boa, mas neutra
-#     demais para marcar a mudança. Young Serif só tem o peso 400 e não tem
-#     itálico: a ênfase vira a segunda tinta (zarcão), como na impressão a duas
-#     cores, e `font-synthesis: none` impede negrito/itálico falsos.
-#   - Source Sans 3 (corpo): sans humanista, de leitura longa, com acentos do
-#     português completos. Figtree é mais geométrica.
+# Fontes (CSS). A ocidental (Valderez) usa Cormorant Garamond (títulos e marca,
+# pesos 500 e 600) e Inter (texto, formulário, navegação, pesos 400 e 600) —
+# as mesmas famílias da védica, mas servidas pelo próprio site em WOFF2
+# (static/valderez/fontes/, com as licenças OFL), sem Google Fonts. São os
+# mesmos arquivos de fontes/ (o PDF usa os TTF de lá).
 # ---------------------------------------------------------------------------
 FONTES = {
     "vedica": {"serif": "'Cormorant Garamond', Georgia, 'Times New Roman', serif",
                "sans": "'Inter', system-ui, -apple-system, sans-serif",
                "google": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500"
                          "&family=Inter:wght@400;500;600&display=swap"},
-    "ocidental": {"serif": "'Young Serif', Georgia, 'Times New Roman', serif",
-                  "sans": "'Source Sans 3', 'Segoe UI', system-ui, -apple-system, sans-serif",
-                  "google": "https://fonts.googleapis.com/css2?family=Young+Serif"
-                            "&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap"},
+    "ocidental": {"serif": "'Cormorant Garamond', Georgia, serif",
+                  "sans": "Inter, Arial, sans-serif",
+                  # (família, peso, arquivo em static/valderez/fontes/)
+                  "arquivos": [("Inter", 400, "Inter-Regular.woff2"), ("Inter", 600, "Inter-SemiBold.woff2"),
+                               ("Cormorant Garamond", 500, "Cormorant-Medium.woff2"),
+                               ("Cormorant Garamond", 600, "Cormorant-SemiBold.woff2")]},
 }
+
+# ---------------------------------------------------------------------------
+# Valderez Astrologia (ocidental): os tokens do pacote de design, com os nomes do
+# tokens.json. "light" é o tema da página; "dark" vale dentro de blocos com
+# data-theme="dark" (cabeçalho, rodapé, abertura). Não combinar tokens à toa:
+# só os pares de PARES_APROVADOS (texto ≥ 4,5:1; contorno e foco ≥ 3:1).
+# ---------------------------------------------------------------------------
+VALDEREZ = {
+    "light": {"background": "#F7F3F0", "surface": "#FFFFFF", "text": "#142234", "textSecondary": "#495365",
+              "textMuted": "#656474", "accent": "#715078", "accentHover": "#593C61", "onAccent": "#FFFFFF",
+              "border": "#827587", "error": "#A12D46", "success": "#216342", "focus": "#715078",
+              "rose": "#80506F", "gold": "#796039"},
+    "dark": {"background": "#091321", "surface": "#122034", "text": "#F8F3EF", "textSecondary": "#C8CCD8",
+             "textMuted": "#A8B1C4", "accent": "#D9B9D0", "accentHover": "#EAD3E3", "onAccent": "#142234",
+             "border": "#8692A9", "error": "#FFADB9", "success": "#9CD8B4", "focus": "#E2BCD9",
+             "rose": "#DCB1CF", "gold": "#D9BE8D"},
+}
+
+# Os pares aprovados do tokens.json: (primeiro plano, fundo, mínimo). Os mesmos
+# nos dois temas.
+_TEXTOS = ("text", "textSecondary", "textMuted", "accent", "error", "success", "rose", "gold")
+PARES_APROVADOS = ([(c, f, 4.5) for c in _TEXTOS for f in ("background", "surface")]
+                   + [("onAccent", "accent", 4.5), ("onAccent", "accentHover", 4.5)]
+                   + [(c, f, 3.0) for c in ("border", "focus") for f in ("background", "surface")])
+
+# Medidas do pacote (tokens.json): tipografia (tamanho/entrelinha em px, celular
+# e a partir de 1100px), raios, sombras, espaçamento, layout.
+TIPOGRAFIA = {"h1": ((42, 46), (64, 68)), "h2": ((34, 40), (44, 50)), "h3": ((28, 34), (30, 36)),
+              "h4": ((24, 30), (24, 30)), "body": ((16, 28), (16, 28)), "caption": ((14, 22), (14, 22)),
+              "button": ((14, 20), (14, 20))}
+ESPACOS = {"xs": 4, "sm": 8, "md": 12, "lg": 16, "xl": 24, "2xl": 32, "3xl": 48, "4xl": 64, "5xl": 96}
+RAIOS = {"control": 8, "card": 16, "pill": 999}
+SOMBRAS = {"card": "0 12px 32px rgba(9,19,33,.10)", "paper": "0 20px 42px rgba(9,19,33,.18)"}
+LAYOUT = {"container": 1200, "article": 720, "gutter": (24, 32, 40)}  # gutter: celular, tablet, desktop
+
 
 # ---------------------------------------------------------------------------
 # E-mail (HTML de e-mail: cor fixa, sem CSS externo nem fonte baixada).
@@ -115,10 +154,13 @@ PAPEL = {
                   "fonte_corpo_forte": ("SourceSans3-SemiBold", "SourceSans3-SemiBold.ttf")},
 }
 
-# Cores e fontes que eram da marca védica e não podem aparecer na ocidental
-# (o teste procura por elas nas páginas, e-mails, PDFs e imagens).
+# Cores que eram da marca védica e não podem aparecer na ocidental (o teste
+# procura por elas nas páginas, e-mails, PDFs e imagens). As FAMÍLIAS de fonte
+# saíram da lista na rodada visual da Valderez: o pacote de design usa Cormorant
+# Garamond + Inter, como a védica — mas servidas pelo site, nunca pelo Google
+# (o link do Google Fonts continua proibido na ocidental).
 ANTIGAS = ["#e7a24a", "#e2a89d", "#2b1a29", "#241522", "#3a2438", "#482d45", "#efb161", "#e08a3c",
-           "rgba(231,162,74", "231,162,74", "Cormorant", "family=Inter", "'Inter'", "पद्मिनी"]
+           "rgba(231,162,74", "231,162,74", "fonts.googleapis", "fonts.gstatic", "पद्मिनी"]
 
 
 def _rgb(hexa: str) -> tuple[int, int, int]:
@@ -167,17 +209,30 @@ def contraste(a: str, b: str) -> float:
     return round((la + 0.05) / (lb + 0.05), 2)
 
 
-NOMES = {"ground": ("Tinta (fundo)", "fundo da página"), "ground-2": ("Tinta clara", "cards e superfícies"),
-         "ground-3": ("Tinta elevada", "campos e superfície elevada"), "ink": ("Papel", "texto principal"),
-         "muted": ("Papel envelhecido", "texto secundário"), "faint": ("Papel apagado", "notas e placeholder"),
-         "saffron": ("Ouro velho", "botão, destaque, traço da marca"), "blush": ("Zarcão", "segundo acento, ênfase"),
-         "sage": ("Sálvia", "apoio (ok/positivo)"), "on-accent": ("Tinta do botão", "texto sobre o ouro"),
+NOMES = {"ground": ("Fundo", "fundo da página"), "ground-2": ("Superfície", "cards e superfícies"),
+         "ground-3": ("Superfície elevada", "campos e superfície elevada"), "ink": ("Texto", "texto principal"),
+         "muted": ("Texto secundário", "texto secundário"), "faint": ("Texto apagado", "notas e placeholder"),
+         "saffron": ("Acento", "botão, destaque"), "blush": ("Segundo acento", "ênfase"),
+         "sage": ("Apoio", "apoio (ok/positivo)"), "on-accent": ("Texto do botão", "texto sobre o acento"),
          "erro": ("Erro", "mensagens de erro")}
 
 
 def contrastes(sistema: str = "ocidental") -> list[dict]:
-    """Cada cor de texto contra cada fundo, com a regra do base.css: corpo entre
-    10:1 e 13:1; o resto (e o texto do botão) nada abaixo de 4,5:1."""
+    """Os contrastes da versão.
+
+    Ocidental (Valderez): cada par aprovado no tokens.json, nos dois temas, com o
+    mínimo dele (4,5:1 texto; 3:1 contorno e foco).
+    Védica: cada cor de texto contra cada fundo, com a regra do base.css (corpo
+    entre 10:1 e 13:1; o resto e o texto do botão, nada abaixo de 4,5:1)."""
+    if sistema == "ocidental":
+        linhas = []
+        for tema in ("light", "dark"):
+            v = VALDEREZ[tema]
+            for cor, fundo, minimo in PARES_APROVADOS:
+                r = contraste(v[cor], v[fundo])
+                linhas.append({"tema": tema, "texto": cor, "fundo": fundo, "cor_texto": v[cor], "cor_fundo": v[fundo],
+                               "razao": r, "regra": f"≥ {minimo:g}".replace(".", ","), "passa": r >= minimo})
+        return linhas
     t = tela(sistema)
     fundos = ("ground", "ground-2", "ground-3")
     linhas = []
@@ -192,3 +247,10 @@ def contrastes(sistema: str = "ocidental") -> list[dict]:
     linhas.append({"texto": NOMES["on-accent"][0], "fundo": NOMES["saffron"][0], "razao": r, "regra": "≥ 4,5",
                    "passa": r >= 4.5})
     return linhas
+
+
+def valderez_css(tema: str) -> dict:
+    """Os tokens de um tema da Valderez com os nomes do CSS do pacote
+    (textSecondary → --text-secondary)."""
+    import re
+    return {re.sub(r"([A-Z])", lambda m: "-" + m.group(1).lower(), k): v for k, v in VALDEREZ[tema].items()}

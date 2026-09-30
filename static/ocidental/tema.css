@@ -1,59 +1,160 @@
 /* ==========================================================================
-   Padmini — tema "Almanaque" da versão OCIDENTAL.
+   Valderez Astrologia — tokens da versão OCIDENTAL.
    GERADO por scripts/gerar_tema_css.py a partir de paleta.py: não editar à mão.
-   Carregado depois do base.css; só troca tokens e detalhes de impressão.
-   Contrastes (WCAG):
-     ink     #e6dac3  12.56:1 no fundo · 10.05:1 na superfície elevada
-     muted   #c6b99e  8.97:1 no fundo · 7.17:1 na superfície elevada
-     faint   #a59a82  6.24:1 no fundo · 4.99:1 na superfície elevada
-     saffron #d4a23a  7.47:1 no fundo · 5.98:1 na superfície elevada
-     blush   #e2744f  5.66:1 no fundo · 4.53:1 na superfície elevada
-     sage    #9aab84  7.06:1 no fundo · 5.65:1 na superfície elevada
-     botão   #17120a sobre #d4a23a  8.01:1
+   Pacote de design: docs/design/valderez-1.0/. Pares de contraste aprovados (WCAG):
+     light text          sobre background  14.55:1 (≥ 4,5)
+     light text          sobre surface     16.05:1 (≥ 4,5)
+     light textSecondary sobre background  7.03:1 (≥ 4,5)
+     light textSecondary sobre surface     7.75:1 (≥ 4,5)
+     light textMuted     sobre background  5.25:1 (≥ 4,5)
+     light textMuted     sobre surface     5.79:1 (≥ 4,5)
+     light accent        sobre background  6.1:1 (≥ 4,5)
+     light accent        sobre surface     6.73:1 (≥ 4,5)
+     light error         sobre background  6.39:1 (≥ 4,5)
+     light error         sobre surface     7.05:1 (≥ 4,5)
+     light success       sobre background  6.5:1 (≥ 4,5)
+     light success       sobre surface     7.17:1 (≥ 4,5)
+     light rose          sobre background  5.78:1 (≥ 4,5)
+     light rose          sobre surface     6.37:1 (≥ 4,5)
+     light gold          sobre background  5.37:1 (≥ 4,5)
+     light gold          sobre surface     5.92:1 (≥ 4,5)
+     light onAccent      sobre accent      6.73:1 (≥ 4,5)
+     light onAccent      sobre accentHover 9.36:1 (≥ 4,5)
+     light border        sobre background  3.93:1 (≥ 3)
+     light border        sobre surface     4.34:1 (≥ 3)
+     light focus         sobre background  6.1:1 (≥ 3)
+     light focus         sobre surface     6.73:1 (≥ 3)
+     dark  text          sobre background  16.91:1 (≥ 4,5)
+     dark  text          sobre surface     14.87:1 (≥ 4,5)
+     dark  textSecondary sobre background  11.61:1 (≥ 4,5)
+     dark  textSecondary sobre surface     10.21:1 (≥ 4,5)
+     dark  textMuted     sobre background  8.65:1 (≥ 4,5)
+     dark  textMuted     sobre surface     7.61:1 (≥ 4,5)
+     dark  accent        sobre background  10.47:1 (≥ 4,5)
+     dark  accent        sobre surface     9.21:1 (≥ 4,5)
+     dark  error         sobre background  10.59:1 (≥ 4,5)
+     dark  error         sobre surface     9.31:1 (≥ 4,5)
+     dark  success       sobre background  11.44:1 (≥ 4,5)
+     dark  success       sobre surface     10.06:1 (≥ 4,5)
+     dark  rose          sobre background  9.97:1 (≥ 4,5)
+     dark  rose          sobre surface     8.76:1 (≥ 4,5)
+     dark  gold          sobre background  10.38:1 (≥ 4,5)
+     dark  gold          sobre surface     9.13:1 (≥ 4,5)
+     dark  onAccent      sobre accent      9.02:1 (≥ 4,5)
+     dark  onAccent      sobre accentHover 11.41:1 (≥ 4,5)
+     dark  border        sobre background  5.94:1 (≥ 3)
+     dark  border        sobre surface     5.23:1 (≥ 3)
+     dark  focus         sobre background  11.03:1 (≥ 3)
+     dark  focus         sobre surface     9.7:1 (≥ 3)
    ========================================================================== */
-:root {
-  --ground: #121a2b;
-  --ground-2: #19223a;
-  --ground-3: #212c45;
-  --ink: #e6dac3;
-  --muted: #c6b99e;
-  --faint: #a59a82;
-  --saffron: #d4a23a;
-  --blush: #e2744f;
-  --sage: #9aab84;
-  --line: rgba(230,218,195,0.18);
-  --line-2: rgba(230,218,195,0.1);
-  --line-forte: rgba(230,218,195,0.26);
-  --accent-soft: rgba(212,162,58,0.14);
-  --on-accent: #17120a;
-  --focus: #d4a23a;
-  --accent-hover: #e0b456;
-  --accent-hl: rgba(212,162,58,0.16);
-  --accent-borda: rgba(212,162,58,0.32);
-  --glow: rgba(212,162,58,0);
-  --erro: #f2a493;
-  --card-a: #19223a;
-  --card-b: #212c45;
-  --card-marca: none;
-  --card-marca-cor: rgba(212,162,58,0.09);
-  --bar-trilha: rgba(230,218,195,0.14);
-  --serif: 'Young Serif', Georgia, 'Times New Roman', serif;
-  --sans: 'Source Sans 3', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --radius: 10px;
-}
+@font-face { font-family: 'Inter'; src: url('/static/valderez/fontes/Inter-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/static/valderez/fontes/Inter-SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Cormorant Garamond'; src: url('/static/valderez/fontes/Cormorant-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Cormorant Garamond'; src: url('/static/valderez/fontes/Cormorant-SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
 
-/* — Detalhes de impressão (almanaque) — */
-/* Young Serif só tem o peso 400 e não tem itálico: nada de negrito ou itálico
-   falsos. A ênfase é a segunda tinta (zarcão), como na impressão a duas cores. */
-html { font-synthesis: none; }
-h1, h2, h3, .marca, .fb-pergunta, .faq summary, .cardc .score { font-weight: 400; }
-h1 em, .mark, .insight, .cardc .insight, .dim .dn { font-style: normal; }
-h1 em { color: var(--blush); }
-/* Rótulos em versaletes espaçados (SITUAÇÃO, DESAFIO…). */
-.eyebrow, .cardc .who, .cardc .scorelab {
-  text-transform: none; font-variant-caps: all-small-caps; letter-spacing: .16em; font-size: 14px; }
-/* Filetes finos em vez de caixas com sombra. */
-.cardc, .auto ul { box-shadow: none; }
-.cardc { border-radius: 10px; }
-.cardc::after { content: none; }
-.rule { background: var(--line); }
+/* Nomes antigos, para as páginas ainda no base.css (tema escuro da Valderez).
+   Vêm ANTES dos temas: --on-accent, --accent-hover e --focus existem nos dois
+   conjuntos, e na mesma especificidade o tema (depois) é que vale. */
+:root {
+  --ground: #091321;
+  --ground-2: #122034;
+  --ground-3: #122034;
+  --ink: #F8F3EF;
+  --muted: #C8CCD8;
+  --faint: #A8B1C4;
+  --saffron: #D9B9D0;
+  --blush: #DCB1CF;
+  --sage: #9CD8B4;
+  --line: rgba(248,243,239,0.18);
+  --line-2: rgba(248,243,239,0.1);
+  --line-forte: rgba(248,243,239,0.26);
+  --accent-soft: rgba(217,185,208,0.14);
+  --on-accent: #142234;
+  --focus: #D9B9D0;
+  --accent-hover: #EAD3E3;
+  --accent-hl: rgba(217,185,208,0.16);
+  --accent-borda: rgba(217,185,208,0.32);
+  --glow: rgba(217,185,208,0);
+  --erro: #FFADB9;
+  --card-a: #122034;
+  --card-b: #091321;
+  --card-marca: none;
+  --card-marca-cor: rgba(217,185,208,0.09);
+  --bar-trilha: rgba(248,243,239,0.14);
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: Inter, Arial, sans-serif;
+  --radius: 12px;
+}
+:root {
+  --font-sans: Inter, Arial, sans-serif;
+  --font-editorial: 'Cormorant Garamond', Georgia, serif;
+  --radius-control: 8px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  --shadow-card: 0 12px 32px rgba(9,19,33,.10);
+  --shadow-paper: 0 20px 42px rgba(9,19,33,.18);
+  --container: 1200px;
+  --article: 720px;
+  --gutter: 24px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+  --space-4xl: 64px;
+  --space-5xl: 96px;
+  --h1-size: 42px;
+  --h1-line: 46px;
+  --h2-size: 34px;
+  --h2-line: 40px;
+  --h3-size: 28px;
+  --h3-line: 34px;
+  --h4-size: 24px;
+  --h4-line: 30px;
+  --body-size: 16px;
+  --body-line: 28px;
+  --caption-size: 14px;
+  --caption-line: 22px;
+  --button-size: 14px;
+  --button-line: 20px;
+}
+@media (min-width: 768px) { :root { --gutter: 32px; } }
+@media (min-width: 1100px) { :root { --gutter: 40px; --h1-size: 64px; --h1-line: 68px; --h2-size: 44px; --h2-line: 50px; --h3-size: 30px; --h3-line: 36px; } }
+
+/* Tema claro (página) e escuro (blocos com data-theme="dark"). */
+[data-theme="light"] {
+  --background: #F7F3F0;
+  --surface: #FFFFFF;
+  --text: #142234;
+  --text-secondary: #495365;
+  --text-muted: #656474;
+  --accent: #715078;
+  --accent-hover: #593C61;
+  --on-accent: #FFFFFF;
+  --border: #827587;
+  --error: #A12D46;
+  --success: #216342;
+  --focus: #715078;
+  --rose: #80506F;
+  --gold: #796039;
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --background: #091321;
+  --surface: #122034;
+  --text: #F8F3EF;
+  --text-secondary: #C8CCD8;
+  --text-muted: #A8B1C4;
+  --accent: #D9B9D0;
+  --accent-hover: #EAD3E3;
+  --on-accent: #142234;
+  --border: #8692A9;
+  --error: #FFADB9;
+  --success: #9CD8B4;
+  --focus: #E2BCD9;
+  --rose: #DCB1CF;
+  --gold: #D9BE8D;
+  color-scheme: dark;
+}

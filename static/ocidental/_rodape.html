@@ -1,0 +1,25 @@
+{# Rodapé da versão ocidental (pacote de design, componentes/rodape.html). Bloco
+   escuro. Links reais: minhas leituras, privacidade, termos, contato, código-fonte
+   (a publicação do código cumpre a AGPL do Swiss Ephemeris; ver CLAUDE.md) e
+   "Preferências de cookies" (consentimento.js mostra o link quando há o que
+   consentir). Quem inclui pode definir `nota_rodape` (HTML) com o aviso da página. #}
+<footer class="footer" data-theme="dark">
+  <div class="container footer-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">{{ marca.svg() }}</span>
+      <span class="brand-name">Valderez<small>Astrologia</small></span>
+    </div>
+    <nav aria-label="Rodapé">
+      <a href="/minhas-leituras">Minhas leituras</a>
+      <a href="/privacidade">Privacidade</a>
+      <a href="/termos">Termos de uso</a>
+      <a href="mailto:contato@pedrosperbmonteiro.com.br">Contato</a>
+      <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
+      <a href="#" id="preferencias-cookies" hidden>Preferências de cookies</a>
+    </nav>
+    <p class="caption">Astrologia para autoconhecimento. O conteúdo tem fins de reflexão e não substitui aconselhamento profissional.</p>
+    {%- if nota_rodape is defined and nota_rodape %}
+    <p class="caption nota-rodape">{{ nota_rodape }}</p>
+    {%- endif %}
+  </div>
+</footer>

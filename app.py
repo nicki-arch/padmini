@@ -348,23 +348,22 @@ def api_minhas_leituras(pedido: PedidoMinhasLeituras, request: Request, tarefas:
 
 @app.api_route("/estilo", methods=["GET", "HEAD"])
 def pagina_estilo(request: Request):
-    """Vitrine da identidade da versão ocidental (cores com contraste, fontes,
-    botões, campos, cartas, card do casal, e-mail) para o Nicolas aprovar. Só
+    """Vitrine da marca Valderez Astrologia (versão ocidental): cores e pares de
+    contraste, fontes e os componentes do pacote de design com os estados (botões,
+    campos, cidade, consentimento, erro, cartão, preço, cookies, menu, FAQ,
+    artigo) e os e-mails, para o Nicolas aprovar. Só
     com a chave de prévia; sem ela, 404. Sempre a ocidental, fora do buscador."""
     chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
     if not (chave and chave in (request.query_params.get("previa"), request.cookies.get("pad_previa"))):
         raise HTTPException(404, "Página não encontrada.")
-    import tarot
     t = paleta.tela("ocidental")
-    exemplo = ["a_estrela", "valete_de_copas", "as_de_ouros", "sete_de_espadas", "dez_de_paus"]
-    posicoes = ["Situação", "Desafio", "Conselho", "Espadas", "Paus"]
-    cartas = [{**next(c for c in tarot.CARTAS if c["chave"] == k), "posicao_pt": p} for k, p in zip(exemplo, posicoes)]
     email = entrega.email_completo_html("tarot", f"{entrega.SITE_URL}/tarot?t=exemplo&token=oc-exemplo", "Ana",
                                         marketing._venda_cruzada_ocidental("tarot", {}), "ocidental")
     html = _jinja.get_template("ocidental/estilo.html").render(
         cores=t, fontes=paleta.FONTES["ocidental"], marca=marca, contrastes=paleta.contrastes("ocidental"),
-        paleta_amostras=[{"token": k, "valor": t[k], "nome": n, "uso": u} for k, (n, u) in paleta.NOMES.items()],
-        cartas_exemplo=cartas, email_exemplo=email, emails_marketing=_emails_de_exemplo_ocidental())
+        temas={nome: paleta.valderez_css(nome) for nome in ("light", "dark")}, blog=blog,
+        ofertas=ofertas.do_sistema("ocidental"), tipografia=paleta.TIPOGRAFIA,
+        email_exemplo=email, emails_marketing=_emails_de_exemplo_ocidental())
     resp = Response(html, media_type="text/html; charset=utf-8", headers={"X-Robots-Tag": "noindex, nofollow"})
     if request.query_params.get("previa") == chave:
         resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
@@ -1195,20 +1194,12 @@ def enviar_sequencias(request: Request):
 # Descadastro (link em todo e-mail de marketing)
 # ---------------------------------------------------------------------------
 def _pagina_simples(titulo: str, corpo: str) -> Response:
-    """Páginas curtas (descadastro). Na védica, a de sempre; na ocidental, com o
-    tema, as fontes, o favicon e o lótus dela."""
+    """Páginas curtas (descadastro). Na védica, a de sempre; na ocidental, com a
+    marca Valderez Astrologia (static/ocidental/simples.html)."""
     import html as _html
     if sistema.ativo() == "ocidental":
-        cores, fontes = paleta.tela("ocidental"), paleta.FONTES["ocidental"]
-        pagina = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
-<meta name="theme-color" content="{cores['ground']}">
-<title>Padmini — {_html.escape(titulo)}</title><link href="{fontes['google']}" rel="stylesheet">
-<link rel="stylesheet" href="/static/base.css"><link rel="stylesheet" href="/static/ocidental/tema.css">
-<link rel="icon" href="{marca.favicon_uri()}"></head>
-<body><main style="max-width:520px;margin:12vh auto;padding:0 16px">
-<a class="marca" href="/">{marca.svg(30)} Padmini</a><h1>{_html.escape(titulo)}</h1>{corpo}
-<p><a href="/">Voltar para a Padmini</a></p></main></body></html>"""
+        pagina = _jinja.get_template("ocidental/simples.html").render(
+            titulo=_html.escape(titulo), corpo=corpo, cores=paleta.tela("ocidental"), marca=marca, blog=blog)
         return Response(pagina, media_type="text/html; charset=utf-8")
     pagina = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
@@ -1218,6 +1209,15 @@ def _pagina_simples(titulo: str, corpo: str) -> Response:
     return Response(pagina, media_type="text/html; charset=utf-8")
 
 
+def _nome_da_marca() -> str:
+    """O nome que o público vê: Valderez Astrologia na ocidental, Padmini na védica."""
+    return "Valderez Astrologia" if sistema.ativo() == "ocidental" else "Padmini"
+
+
+def _classe_botao() -> str:
+    return "button" if sistema.ativo() == "ocidental" else "btn btn-primary"
+
+
 @app.get("/descadastrar")
 def descadastrar_confirmar(e: str = Query("", max_length=160), t: str = Query("", max_length=64)):
     # GET só mostra o botão: leitores de e-mail abrem links sozinhos (antivírus,
@@ -1225,11 +1225,11 @@ def descadastrar_confirmar(e: str = Query("", max_length=160), t: str = Query(""
     import html as _html
     if not marketing.descadastro_valido(e, t):
         return _pagina_simples("Link inválido", "<p>Este link de descadastro não é válido.</p>")
-    corpo = (f'<p>Parar de receber e-mails da Padmini em <b>{_html.escape(e)}</b>?</p>'
+    corpo = (f'<p>Parar de receber e-mails da {_nome_da_marca()} em <b>{_html.escape(e)}</b>?</p>'
              f'<form method="post" action="/descadastrar">'
              f'<input type="hidden" name="e" value="{_html.escape(e, quote=True)}">'
              f'<input type="hidden" name="t" value="{_html.escape(t, quote=True)}">'
-             f'<button type="submit" class="btn btn-primary">Sim, descadastrar</button></form>'
+             f'<button type="submit" class="{_classe_botao()}">Sim, descadastrar</button></form>'
              f'<p style="font-size:13px">E-mails de compras que você fizer (o link do relatório) continuam chegando.</p>')
     return _pagina_simples("Descadastrar", corpo)
 
@@ -1243,4 +1243,4 @@ async def descadastrar(request: Request):
         return _pagina_simples("Link inválido", "<p>Este link de descadastro não é válido.</p>")
     if not db.descadastrar(e):
         return _pagina_simples("Tente de novo", "<p>Não conseguimos registrar agora. Tente em instantes.</p>")
-    return _pagina_simples("Pronto", "<p>Você não vai mais receber e-mails de novidades da Padmini.</p>")
+    return _pagina_simples("Pronto", f"<p>Você não vai mais receber e-mails de novidades da {_nome_da_marca()}.</p>")

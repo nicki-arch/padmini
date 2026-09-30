@@ -4,24 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="{{ cores.ground }}">
-<title>{% if artigo %}{{ artigo.titulo }} — Padmini{% else %}Blog — Padmini{% endif %}</title>
+<title>{% if artigo %}{{ artigo.titulo }} — Valderez Astrologia{% else %}Blog — Valderez Astrologia{% endif %}</title>
 <meta name="description" content="{% if artigo %}{{ artigo.descricao | e }}{% else %}Textos sobre sinastria, mapa natal, numerologia e tarot — astrologia para autoconhecimento.{% endif %}">
 {% if rascunho %}<meta name="robots" content="noindex, nofollow">{% else %}<link rel="canonical" href="https://padmini.com.br/blog{% if artigo %}/{{ artigo.slug }}{% endif %}">{% endif %}
 <meta property="og:type" content="{{ 'article' if artigo else 'website' }}">
-<meta property="og:site_name" content="Padmini">
-<meta property="og:title" content="{% if artigo %}{{ artigo.titulo | e }}{% else %}Blog — Padmini{% endif %}">
+<meta property="og:site_name" content="Valderez Astrologia">
+<meta property="og:title" content="{% if artigo %}{{ artigo.titulo | e }}{% else %}Blog — Valderez Astrologia{% endif %}">
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
-<link rel="stylesheet" href="/static/ocidental/tema.css">
+{% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/ocidental/componentes.css">
 <script src="/static/afiliado.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-<link rel="icon" href="{{ marca.favicon_uri() }}">
 {# Blog da versão ocidental (blog.py). Uma página para a lista e para o artigo. #}
 <style>
   .faixa-rascunho{background:var(--blush);color:var(--on-accent);text-align:center;padding:8px 16px;font-weight:600;font-size:14px}
@@ -43,14 +39,9 @@
 </head>
 <body>
 {% if rascunho %}<div class="faixa-rascunho">Prévia — {% if artigo and not artigo.revisado %}rascunho, ainda não revisado: não está no ar{% else %}lista com rascunhos{% endif %}</div>{% endif %}
-<header class="wrap">
-  <div class="topbar">
-    <a class="marca" href="/">{{ marca.svg(30) }} Padmini</a>
-    {% set atual = "/blog" %}{% include "ocidental/_menu.html" %}
-  </div>
-</header>
+{% set atual = "/blog" %}{% include "ocidental/_cabecalho.html" %}
 
-<main class="wrap">
+<main id="conteudo" class="wrap">
 {% if artigo %}
   <article class="texto">
     <p class="eyebrow"><a href="/blog" style="color:inherit;text-decoration:none">Blog</a> · <span class="quando">{{ artigo.data_br }}</span></p>
@@ -68,7 +59,7 @@
     </div>
   </article>
 {% else %}
-  <p class="eyebrow">Padmini · Blog</p>
+  <p class="eyebrow">Valderez Astrologia · Blog</p>
   <h1>Para ler com calma.</h1>
   <p class="lede">Textos sobre sinastria, mapa natal, numerologia e tarot — como as coisas funcionam, sem promessa e sem horóscopo de jornal.</p>
   <ul class="lista-blog">
@@ -80,9 +71,6 @@
 {% endif %}
 </main>
 
-<footer>
-  Padmini — astrologia para autoconhecimento.<br>
-  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
-</footer>
+{% include "ocidental/_rodape.html" %}
 </body>
 </html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="{{ cores.ground }}">
+{# Páginas curtas da ocidental (descadastro), montadas por app._pagina_simples.
+   `titulo` vem escapado; `corpo` é HTML montado no servidor (com o e-mail escapado). #}
+<title>Valderez Astrologia — {{ titulo }}</title>
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/componentes.css">
+</head>
+<body>
+{% set atual = "" %}{% include "ocidental/_cabecalho.html" %}
+<main id="conteudo" class="section container">
+  <div class="article stack">
+    <h1>{{ titulo }}</h1>
+    {{ corpo }}
+    <p><a href="/">Voltar para a Valderez Astrologia</a></p>
+  </div>
+</main>
+{% include "ocidental/_rodape.html" %}
+</body>
+</html>

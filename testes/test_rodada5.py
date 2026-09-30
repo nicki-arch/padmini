@@ -155,12 +155,14 @@ def test_todo_campo_dos_formularios_tem_name(ocidental):
 def test_menu_com_os_quatro_produtos_em_todas_as_paginas(ocidental):
     for rota in PAGINAS_OC:
         html = cliente.get(rota).text
-        menu = re.search(r'<nav class="menu-produtos".*?</nav>', html, re.S).group(0)
+        # rodada visual (Valderez): o menu fica no cabeçalho (nav-desktop; no celular, o mesmo
+        # _menu.html num details). O botão "Fazer meu mapa natal" não conta como item do menu.
+        menu = re.sub(r'<a class="button"[^>]*>.*?</a>', "", re.search(r'<nav class="nav-desktop".*?</nav>', html, re.S).group(0))
         for destino in ("/compatibilidade", "/mapa", "/numerologia", "/tarot"):
             assert f'href="{destino}"' in menu, (rota, destino)
         atual = re.findall(r'href="([^"]+)" aria-current="page"', menu)
         assert atual == ([] if rota == "/" else [rota]), rota
-        assert "/static/ocidental/componentes.css" in html
+        assert "/static/valderez/casca.css" in html
 
 
 def test_busca_de_cidade_diz_o_que_aconteceu(ocidental):

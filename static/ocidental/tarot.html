@@ -4,21 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="{{ cores.ground }}">
-<title>Padmini — Tarot</title>
+<title>Valderez Astrologia — Tarot</title>
 <meta name="description" content="Tiragem de tarot de 3 cartas — Situação, Desafio e Conselho — com o baralho de 78 cartas. Veja as suas cartas grátis.">
 <link rel="canonical" href="https://padmini.com.br/tarot">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Padmini">
-<meta property="og:title" content="Tire as suas 3 cartas — Padmini">
+<meta property="og:site_name" content="Valderez Astrologia">
+<meta property="og:title" content="Tire as suas 3 cartas — Valderez Astrologia">
 <meta property="og:description" content="Situação, Desafio e Conselho. Veja as suas cartas grátis.">
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-tarot.png">
 <meta property="og:url" content="https://padmini.com.br/tarot">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="{{ fontes.google }}" rel="stylesheet">
 <link rel="stylesheet" href="/static/base.css">
-<link rel="stylesheet" href="/static/ocidental/tema.css">
+{% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/ocidental/componentes.css">
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
@@ -28,7 +25,6 @@
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-<link rel="icon" href="{{ marca.favicon_uri() }}">
 {# Versão ocidental. Preço e checkout: conteudo/ocidental/ofertas.yaml (tarot);
    textos: conteudo/ocidental/textos/tarot.yaml; API: /api/ocidental/tarot*.
    Cartas só tipográficas (nome, número e um símbolo simples nosso): nenhuma
@@ -72,17 +68,9 @@
 </style>
 </head>
 <body>
-<header class="wrap">
-  <div class="topbar">
-    <a class="marca" href="/">
-      {{ marca.svg(30) }}
-      Padmini
-    </a>
-    {% set atual = "/tarot" %}{% include "ocidental/_menu.html" %}
-  </div>
-</header>
+{% set atual = "/tarot" %}{% include "ocidental/_cabecalho.html" %}
 
-<main class="wrap">
+<main id="conteudo" class="wrap">
   <h1>Tire as suas 3 cartas</h1>
   <p class="lede">Situação, Desafio e Conselho. Pense no que está vivendo, respire e tire as cartas — o sorteio é feito na hora, entre as 78 cartas do baralho.</p>
 
@@ -113,10 +101,7 @@
   </section>
 </main>
 
-<footer>
-  Tarot: baralho de 78 cartas (tradição Rider-Waite-Smith), cartas na posição normal. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional.<br>
-  <a href="/minhas-leituras">Minhas leituras</a> · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos de uso</a> · <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
-</footer>
+{% set nota_rodape %}Tarot: baralho de 78 cartas (tradição Rider-Waite-Smith), cartas na posição normal. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional.{% endset %}{% include "ocidental/_rodape.html" %}
 
 <script>
 const LINK_CHECKOUT = "{{ ofertas.tarot.checkout }}";

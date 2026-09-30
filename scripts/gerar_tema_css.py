@@ -1,13 +1,21 @@
 """
-Gera static/ocidental/tema.css — o tema "Almanaque" da versão ocidental — a
-partir de paleta.py (fonte única das cores e fontes):
+Gera static/ocidental/tema.css — os tokens da versão ocidental (marca Valderez
+Astrologia) — a partir de paleta.py (fonte única das cores e fontes):
 
     python scripts/gerar_tema_css.py
 
-O tema é carregado DEPOIS do static/base.css nas páginas de static/ocidental/ e
-só redefine tokens (cores, famílias) e uns poucos detalhes de impressão. Os
-componentes continuam no base.css. Há teste que confere que o arquivo gravado
-é o que este script gera (mudou a paleta? rode de novo).
+O arquivo tem três partes:
+  1. @font-face das fontes servidas pelo site (static/valderez/fontes/, WOFF2);
+  2. os tokens do pacote de design (docs/design/valderez-1.0/tokens/): tema
+     claro em [data-theme="light"] e escuro em [data-theme="dark"], sem seguir o
+     tema do sistema; mais medidas (tipografia, espaços, raios, sombras);
+  3. os nomes antigos (--ground, --ink, --saffron…) no :root, que as páginas
+     ainda no base.css usam, apontando para o tema escuro da Valderez.
+Os tokens novos ficam só dentro de [data-theme]: o base.css tem apelidos antigos
+com os mesmos nomes (--surface, --accent) que as páginas legadas ainda usam.
+
+Há teste que confere que o arquivo gravado é o que este script gera (mudou a
+paleta? rode de novo).
 """
 import sys
 from pathlib import Path
@@ -19,48 +27,65 @@ import paleta  # noqa: E402
 
 DESTINO = RAIZ / "static" / "ocidental" / "tema.css"
 
-# Tokens que vêm da paleta, na ordem em que aparecem no base.css.
+# Tokens antigos que vêm da paleta, na ordem em que aparecem no base.css.
 ORDEM = ["ground", "ground-2", "ground-3", "ink", "muted", "faint", "saffron", "blush", "sage",
          "line", "line-2", "line-forte", "accent-soft", "on-accent", "focus", "accent-hover", "accent-hl",
          "accent-borda", "glow", "erro", "card-a", "card-b", "card-marca", "card-marca-cor", "bar-trilha",
          "serif", "sans"]
 
-DETALHES = """
-/* — Detalhes de impressão (almanaque) — */
-/* Young Serif só tem o peso 400 e não tem itálico: nada de negrito ou itálico
-   falsos. A ênfase é a segunda tinta (zarcão), como na impressão a duas cores. */
-html { font-synthesis: none; }
-h1, h2, h3, .marca, .fb-pergunta, .faq summary, .cardc .score { font-weight: 400; }
-h1 em, .mark, .insight, .cardc .insight, .dim .dn { font-style: normal; }
-h1 em { color: var(--blush); }
-/* Rótulos em versaletes espaçados (SITUAÇÃO, DESAFIO…). */
-.eyebrow, .cardc .who, .cardc .scorelab {
-  text-transform: none; font-variant-caps: all-small-caps; letter-spacing: .16em; font-size: 14px; }
-/* Filetes finos em vez de caixas com sombra. */
-.cardc, .auto ul { box-shadow: none; }
-.cardc { border-radius: 10px; }
-.cardc::after { content: none; }
-.rule { background: var(--line); }
-"""
+
+def _fontes() -> str:
+    return "\n".join(
+        f"@font-face {{ font-family: '{familia}'; src: url('/static/valderez/fontes/{arquivo}') format('woff2'); "
+        f"font-weight: {peso}; font-style: normal; font-display: swap; }}"
+        for familia, peso, arquivo in paleta.FONTES["ocidental"]["arquivos"])
+
+
+def _tema(nome: str) -> str:
+    esquema = "light" if nome == "light" else "dark"
+    linhas = [f"  --{k}: {v};" for k, v in paleta.valderez_css(nome).items()]
+    return "\n".join(linhas) + f"\n  color-scheme: {esquema};"
+
+
+def _medidas() -> str:
+    f = paleta.FONTES["ocidental"]
+    linhas = [f"  --font-sans: {f['sans']};", f"  --font-editorial: {f['serif']};"]
+    linhas += [f"  --radius-{k}: {v}px;" for k, v in paleta.RAIOS.items()]
+    linhas += [f"  --shadow-{k}: {v};" for k, v in paleta.SOMBRAS.items()]
+    linhas += [f"  --container: {paleta.LAYOUT['container']}px;", f"  --article: {paleta.LAYOUT['article']}px;",
+               f"  --gutter: {paleta.LAYOUT['gutter'][0]}px;"]
+    linhas += [f"  --space-{k}: {v}px;" for k, v in paleta.ESPACOS.items()]
+    for k, (celular, _) in paleta.TIPOGRAFIA.items():
+        linhas += [f"  --{k}-size: {celular[0]}px;", f"  --{k}-line: {celular[1]}px;"]
+    desktop = " ".join(f"--{k}-size: {d[0]}px; --{k}-line: {d[1]}px;" for k, (c, d) in paleta.TIPOGRAFIA.items()
+                       if c != d)
+    return (":root {\n" + "\n".join(linhas) + "\n}\n"
+            f"@media (min-width: 768px) {{ :root {{ --gutter: {paleta.LAYOUT['gutter'][1]}px; }} }}\n"
+            f"@media (min-width: 1100px) {{ :root {{ --gutter: {paleta.LAYOUT['gutter'][2]}px; {desktop} }} }}\n")
 
 
 def gerar() -> str:
     t = paleta.tela("ocidental")
-    linhas = [f"  --{k}: {t[k]};" for k in ORDEM]
+    antigos = "\n".join(f"  --{k}: {t[k]};" for k in ORDEM)
     contrastes = "\n".join(
-        f"     {k:<7} {t[k]}  {paleta.contraste(t[k], t['ground'])}:1 no fundo · "
-        f"{paleta.contraste(t[k], t['ground-3'])}:1 na superfície elevada"
-        for k in ("ink", "muted", "faint", "saffron", "blush", "sage"))
+        f"     {c['tema']:<5} {c['texto']:<13} sobre {c['fundo']:<11} {c['razao']}:1 ({c['regra']})"
+        for c in paleta.contrastes("ocidental"))
     return (
         "/* ==========================================================================\n"
-        "   Padmini — tema \"Almanaque\" da versão OCIDENTAL.\n"
+        "   Valderez Astrologia — tokens da versão OCIDENTAL.\n"
         "   GERADO por scripts/gerar_tema_css.py a partir de paleta.py: não editar à mão.\n"
-        "   Carregado depois do base.css; só troca tokens e detalhes de impressão.\n"
-        "   Contrastes (WCAG):\n"
+        "   Pacote de design: docs/design/valderez-1.0/. Pares de contraste aprovados (WCAG):\n"
         f"{contrastes}\n"
-        f"     botão   {t['on-accent']} sobre {t['saffron']}  {paleta.contraste(t['on-accent'], t['saffron'])}:1\n"
         "   ========================================================================== */\n"
-        ":root {\n" + "\n".join(linhas) + "\n  --radius: 10px;\n}\n" + DETALHES
+        + _fontes() + "\n\n"
+        "/* Nomes antigos, para as páginas ainda no base.css (tema escuro da Valderez).\n"
+        "   Vêm ANTES dos temas: --on-accent, --accent-hover e --focus existem nos dois\n"
+        "   conjuntos, e na mesma especificidade o tema (depois) é que vale. */\n"
+        ":root {\n" + antigos + "\n  --radius: 12px;\n}\n"
+        + _medidas() + "\n"
+        "/* Tema claro (página) e escuro (blocos com data-theme=\"dark\"). */\n"
+        '[data-theme="light"] {\n' + _tema("light") + "\n}\n"
+        '[data-theme="dark"] {\n' + _tema("dark") + "\n}\n"
     )
 
 

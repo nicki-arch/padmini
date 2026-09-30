@@ -1,167 +1,222 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="{{ cores.ground }}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Estilo — Padmini (versão ocidental)</title>
-<link href="{{ fontes.google }}" rel="stylesheet">
-<link rel="stylesheet" href="/static/base.css">
-<link rel="stylesheet" href="/static/ocidental/tema.css">
-{% include "ocidental/_carta.html" %}
-<link rel="icon" href="{{ marca.favicon_uri() }}">
-{# Vitrine da identidade "Almanaque" (rodada 3), para o Nicolas aprovar. Só com a
-   chave de prévia (PADMINI_PREVIA_CHAVE), sempre na versão ocidental, fora do buscador.
-   Tudo aqui sai de paleta.py / marca.py / tema.css: é o que as páginas usam. #}
+<meta name="theme-color" content="{{ cores.ground }}">
+<title>Estilo — Valderez Astrologia (versão ocidental)</title>
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/componentes.css">
+{# Vitrine da marca Valderez Astrologia (rodada visual, 29/set/2026), para o Nicolas
+   aprovar. Só com a chave de prévia (PADMINI_PREVIA_CHAVE), sempre na versão
+   ocidental, fora do buscador. Tudo sai de paleta.py / marca.py / tema.css /
+   static/valderez/: é o que as páginas usam. Pacote de referência:
+   docs/design/valderez-1.0/ (componentes/index.html e escuro.html).
+   `.is-hover` / `.is-focus` só servem para fotografar os estados aqui. #}
 <style>
-  h1{font-size:clamp(2.2rem,5vw,3.2rem)}
-  .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
-  .amostra{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--ground-2)}
-  .amostra .cor{height:78px;border-bottom:1px solid var(--line)}
-  .amostra .info{padding:10px 12px;font-size:14px}
-  .amostra code{font-size:13px;color:var(--muted)}
-  .ok{color:var(--sage)} .ruim{color:var(--erro)}
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{color:var(--faint);font-weight:600}
-  .tipos>*{margin:0 0 14px}
-  .linha{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
-  .form{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px}
-  .tiragem{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:560px}
-  .tiragem .posicao{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
-  .rotulo-pos{font-variant-caps:all-small-caps;letter-spacing:.16em;color:var(--saffron);font-weight:600;font-size:15px}
-  .email{max-width:560px}
-  .marcas{display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap}
-  .marcas figure{margin:0;text-align:center;font-size:13px;color:var(--faint)}
-  @media(max-width:640px){.form{grid-template-columns:1fr}}
+  .amostras { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  .amostras code { font-size: 13px; }
+  .ok { color: var(--success); font-weight: 600; } .ruim { color: var(--error); font-weight: 600; }
+  .marcas { display: flex; gap: 32px; align-items: flex-end; flex-wrap: wrap; }
+  .marcas figure { margin: 0; text-align: center; }
+  .cookie.estatico { position: static; margin: 0; }
+  .nav-mobile.estatico { display: block; }
+  .nav-mobile.estatico nav { position: static; margin-top: 12px; }
+  .email { max-width: 600px; }
+  .bloco-escuro { padding: 32px; border-radius: var(--radius-card); }
 </style>
 </head>
 <body>
-<header class="wrap">
-  <div class="topbar">
-    <a class="marca" href="/">{{ marca.svg(30) }} Padmini</a>
-    <span class="nota">Vitrine de estilo · versão ocidental</span>
-  </div>
-</header>
+{% set atual = "/mapa" %}{% include "ocidental/_cabecalho.html" %}
 
-<main class="wrap">
-  <section style="padding-top:20px">
-    <p class="eyebrow">Identidade · Almanaque</p>
-    <h1>A roupa nova da <em>Padmini</em> ocidental.</h1>
-    <p class="lede">Azul de tinta de impressão, papel creme, ouro velho e zarcão — as cores dos almanaques, dos atlas celestes e do tarô impresso em litografia. Mesmas páginas, mesmos componentes: muda a roupa, não a casa.</p>
+<main id="conteudo" class="container">
+  <section class="gallery-section">
+    <p class="eyebrow">Vitrine interna · não aparece no buscador</p>
+    <h1>A marca Valderez Astrologia na versão ocidental.</h1>
+    <p class="lede">Cores, fontes e componentes do pacote de design (<code>docs/design/valderez-1.0/</code>), já com os tokens de <code>paleta.py</code> e as fontes servidas pelo próprio site. Padmini é a produtora por trás da marca.</p>
   </section>
 
-  <section>
-    <h2>A marca</h2>
-    <p class="sub">O lótus (Padmini é "a do lótus") em traço de gravura, linha única, com um astro de quatro pontas no centro. Um desenho só para o site, o favicon, o PDF e as imagens de compartilhamento (<code>marca.py</code>).</p>
+  <section class="gallery-section">
+    <h2>Marca</h2>
+    <p class="secondary">O símbolo (rosa dos ventos celeste: círculo, oito raios e a estrela de quatro pontas) é SVG de <code>marca.py</code>; o nome vai em HTML, com a Cormorant Garamond do site.</p>
     <div class="marcas">
-      <figure><img src="{{ marca.favicon_uri() }}" width="16" height="16" alt=""><figcaption>16px (favicon)</figcaption></figure>
-      <figure><img src="{{ marca.favicon_uri() }}" width="32" height="32" alt=""><figcaption>32px</figcaption></figure>
-      <figure>{{ marca.svg(64) }}<figcaption>64px</figcaption></figure>
-      <figure>{{ marca.svg(160, traco=1.2) }}<figcaption>grande</figcaption></figure>
+      <figure><img src="/static/valderez/favicon.svg" width="16" height="16" alt=""><figcaption class="caption">16px (favicon)</figcaption></figure>
+      <figure><img src="/static/valderez/favicon.svg" width="32" height="32" alt=""><figcaption class="caption">32px</figcaption></figure>
+      <figure><img src="/static/valderez/simbolo-claro.svg" width="64" height="64" alt=""><figcaption class="caption">fundo claro</figcaption></figure>
+      <figure class="bloco-escuro" data-theme="dark"><span class="brand"><span class="brand-mark" aria-hidden="true">{{ marca.svg() }}</span><span class="brand-name">Valderez<small>Astrologia</small></span></span></figure>
     </div>
   </section>
 
-  <section>
+  <section class="gallery-section">
     <h2>Paleta e contrastes</h2>
-    <p class="sub">Razão de contraste WCAG. Regra: texto de corpo entre 10:1 e 13:1; nada legível abaixo de 4,5:1.</p>
-    <div class="grade">
-      {%- for c in paleta_amostras %}
-      <div class="amostra"><div class="cor" style="background:{{ c.valor }}"></div>
-        <div class="info"><b>{{ c.nome }}</b><br><code>--{{ c.token }} · {{ c.valor }}</code><br>{{ c.uso }}</div></div>
-      {%- endfor %}
+    <p class="secondary">Tema claro para leitura e formulários; escuro para cabeçalho, rodapé e abertura (<code>data-theme</code>, sem seguir o tema do sistema). Só os pares aprovados no <code>tokens.json</code>.</p>
+    {% for nome, tema in temas.items() %}
+    <div class="bloco-escuro" data-theme="{{ nome }}" style="margin-bottom:24px;border:1px solid var(--border)">
+      <h3>{{ "Claro" if nome == "light" else "Escuro" }}</h3>
+      <div class="amostras">
+        {% for token, valor in tema.items() %}
+        <div><div class="swatch" style="background:{{ valor }}"></div><b>--{{ token }}</b><br><code>{{ valor }}</code></div>
+        {% endfor %}
+      </div>
     </div>
-    <table style="margin-top:22px">
-      <tr><th>Texto</th><th>Sobre</th><th>Contraste</th><th>Regra</th></tr>
-      {%- for c in contrastes %}
-      <tr><td>{{ c.texto }}</td><td>{{ c.fundo }}</td><td><b>{{ c.razao }}:1</b></td>
-        <td class="{{ 'ok' if c.passa else 'ruim' }}">{{ c.regra }} {{ '✓' if c.passa else '✗' }}</td></tr>
-      {%- endfor %}
-    </table>
+    {% endfor %}
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Pares de contraste aprovados">
+      <table>
+        <caption>Pares aprovados (WCAG)</caption>
+        <thead><tr><th scope="col">Tema</th><th scope="col">Primeiro plano</th><th scope="col">Fundo</th><th scope="col">Razão</th><th scope="col">Mínimo</th><th scope="col">Passa</th></tr></thead>
+        <tbody>
+        {% for c in contrastes %}
+          <tr><td>{{ c.tema }}</td><td>{{ c.texto }} <code>{{ c.cor_texto }}</code></td><td>{{ c.fundo }} <code>{{ c.cor_fundo }}</code></td><td>{{ c.razao }}:1</td><td>{{ c.regra }}</td><td class="{{ 'ok' if c.passa else 'ruim' }}">{{ "sim" if c.passa else "não" }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </section>
 
-  <section class="tipos">
+  <section class="gallery-section">
     <h2>Tipografia</h2>
-    <p class="sub">Títulos: <b>Young Serif</b> (serifa de impressão antiga; um peso só, sem itálico — a ênfase é a segunda tinta). Corpo: <b>Source Sans 3</b> (sans humanista). Rótulos em versaletes espaçados.</p>
-    <p class="eyebrow">Rótulo em versaletes · Situação · Desafio · Conselho</p>
-    <h1 style="margin:0">Título grande com <em>ênfase</em></h1>
-    <h2 style="margin:0">Título de seção</h2>
-    <h3>Título de bloco</h3>
-    <p class="lede">Texto de abertura, maior e mais suave, para a primeira frase de uma página.</p>
-    <p>Texto corrido de leitura: o Sol em Touro fala de constância e de prazer nas coisas concretas. Tendências, não sentenças — o texto fala com você, com calma, e explica o porquê de cada coisa.</p>
-    <p class="sub">Nota de rodapé, aviso pequeno, texto de apoio.</p>
+    <p class="secondary">Cormorant Garamond (títulos e marca, 500 e 600) e Inter (texto, formulário e navegação, 400 e 600), em WOFF2 com as licenças OFL em <code>static/valderez/fontes/</code>.</p>
+    <h1>Título 1 · o céu de quando você <em>nasceu</em></h1>
+    <h2>Título 2 · seções principais</h2>
+    <h3>Título 3 · subseções e cartões</h3>
+    <h4>Título 4 · quarto nível editorial</h4>
+    <p>Texto de corpo em Inter 16/28. O Sol, a Lua e o Ascendente, calculados para a data, a hora e a cidade do nascimento.</p>
+    <p class="caption">Legenda em Inter 14/22: ajuda, notas e metadados.</p>
   </section>
 
-  <section>
-    <h2>Botões e campos</h2>
-    <div class="linha" style="margin-bottom:22px">
-      <a class="btn btn-primary" href="#">Quero a leitura completa →</a>
-      <a class="btn btn-outline" href="#">Fazer meu mapa</a>
-      <a class="navlink" href="#">Mapa natal →</a>
-      <a class="navlink destaque" href="#">Destaque</a>
+  <section class="gallery-section">
+    <h2>Botões</h2>
+    <div class="row">
+      <button type="button" class="button">Primário</button>
+      <button type="button" class="button is-hover">Hover</button>
+      <button type="button" class="button is-focus">Foco</button>
+      <button type="button" class="button" disabled>Desabilitado</button>
+      <button type="button" class="button" disabled aria-busy="true"><span class="spinner" aria-hidden="true"></span>Carregando…</button>
     </div>
-    <div class="card form">
-      <div class="campo"><label for="e-nome">Nome</label><input id="e-nome" placeholder="Como você quer ser chamada"></div>
-      <div class="campo"><label for="e-data">Data de nascimento</label><input id="e-data" placeholder="dd/mm/aaaa"><span class="dica">Dica de campo, texto terciário.</span></div>
-      <p class="erro" style="grid-column:1/-1">Mensagem de erro de um campo.</p>
-      <p class="aviso" style="grid-column:1/-1;margin:0">Aviso: sem a hora de nascimento, o Ascendente e as casas ficam de fora.</p>
+    <div class="row" style="margin-top:16px">
+      <button type="button" class="button button--secondary">Secundário</button>
+      <button type="button" class="button button--secondary is-hover">Hover</button>
+      <button type="button" class="button button--secondary is-focus">Foco</button>
     </div>
   </section>
 
-  <section>
-    <h2>Card do mapa</h2>
-    <article class="card relatorio" style="max-width:620px">
-      <p class="eyebrow" style="margin-bottom:6px">Sol em Touro · casa 8</p>
-      <h3>O jeito de brilhar</h3>
-      <p style="color:var(--faint);margin:4px 0 0">24°37'</p>
-      <p>Com o Sol em Touro, você tende a construir devagar e a confiar no que dá para tocar. Numa decisão importante, costuma pedir tempo — e isso, que às vezes parece teimosia, é o seu jeito de ter certeza.</p>
-    </article>
+  <section class="gallery-section">
+    <h2>Campos</h2>
+    <div class="grid grid--2">
+      <div class="field"><label for="ex-nome">Nome <span class="opcional">(opcional)</span></label><input id="ex-nome" autocomplete="off"><p class="help">Como você quer ser chamada na leitura.</p></div>
+      <div class="field"><label for="ex-foco">Com foco</label><input id="ex-foco" class="is-focus" value="Ana"></div>
+      <div class="field"><label for="ex-erro">E-mail</label><input id="ex-erro" type="email" value="ana@" aria-invalid="true" aria-describedby="ex-erro-msg"><p class="field-error" id="ex-erro-msg">Erro: confira o e-mail.</p></div>
+      <div class="field"><label for="ex-off">Desabilitado</label><input id="ex-off" disabled value="—"></div>
+      <div class="field"><label for="ex-data">Data de nascimento</label><input id="ex-data" type="date" value="1990-05-15"></div>
+      <div class="field"><label for="ex-hora">Hora <span class="opcional">(se souber)</span></label><input id="ex-hora" type="time" value="14:30"></div>
+    </div>
   </section>
 
-  <section>
-    <h2>As cartas do tarot</h2>
-    <p class="sub">Tipográficas, com um símbolo nosso por naipe; nos arcanos maiores, o lótus. Figuras (Valete, Cavaleiro, Rainha, Rei) sem rótulo em cima.</p>
-    <div class="tiragem" id="cartas"></div>
-  </section>
-
-  <section>
-    <h2>Card compartilhável da sinastria</h2>
-    <div class="share">
-      <div class="cardc">
-        <div class="top"><span class="wm">padmini</span>{{ marca.svg(22) }}</div>
-        <div class="who">Ana &amp; Rafael</div>
-        <div class="score">78<span> / 100</span></div>
-        <div class="scorelab">Índice Padmini · método próprio</div>
-        <div class="bar"><i style="width:78%"></i></div>
-        <div class="insight">"O ponto mais forte de vocês: emoções."</div>
+  <section class="gallery-section">
+    <h2>Cidade</h2>
+    <p class="secondary">O autocomplete atual do site (busca na base do GeoNames e guarda o identificador da cidade escolhida), no visual novo.</p>
+    <div class="grid grid--2">
+      <div class="field"><label for="ex-cidade">Cidade de nascimento</label>
+        <div class="auto estatico"><input id="ex-cidade" role="combobox" aria-expanded="true" aria-controls="ex-cidades" aria-autocomplete="list" value="Porto Al">
+          <ul id="ex-cidades" role="listbox" aria-label="Cidades"><li role="option" aria-selected="true">Porto Alegre <small>RS, Brasil</small></li><li role="option">Porto Alegre do Norte <small>MT, Brasil</small></li></ul></div></div>
+      <div class="stack">
+        <div class="field"><label for="ex-cidade-busca">Buscando</label><input id="ex-cidade-busca" value="Sant" aria-busy="true"><p class="help" role="status"><span class="spinner" aria-hidden="true"></span> Procurando cidades…</p></div>
+        <div class="field"><label for="ex-cidade-vazio">Nada encontrado</label><input id="ex-cidade-vazio" value="Xyzw" aria-invalid="true" aria-describedby="ex-cidade-vazio-msg"><p class="field-error" id="ex-cidade-vazio-msg">Nenhuma cidade com esse nome. Tente sem acento ou só o começo.</p></div>
+        <div class="field"><label for="ex-cidade-ok">Selecionada</label><input id="ex-cidade-ok" value="Porto Alegre, RS, Brasil" aria-describedby="ex-cidade-ok-msg"><p class="field-success" id="ex-cidade-ok-msg">Cidade confirmada.</p></div>
       </div>
     </div>
   </section>
 
-  <section>
+  <section class="gallery-section">
+    <h2>Consentimento</h2>
+    <label class="consent"><input type="checkbox"><span>Quero receber por e-mail o aviso da abertura (desmarcado; nunca pré-marcado).</span></label>
+    <label class="consent"><input type="checkbox" checked><span>Marcado.</span></label>
+    <label class="consent"><input type="checkbox" disabled><span>Desabilitado (ex.: WhatsApp sem número).</span></label>
+    <label class="consent"><input type="checkbox" aria-invalid="true" aria-describedby="ex-consent-msg"><span>Inválido.</span></label>
+    <p class="field-error" id="ex-consent-msg">Marque a autorização para continuar.</p>
+  </section>
+
+  <section class="gallery-section">
+    <h2>Erro e confirmação</h2>
+    <div class="stack">
+      <p class="form-erro" role="alert">Não conseguimos salvar agora. Tente de novo.</p>
+      <p class="notice notice--error">O e-mail não saiu. A leitura inteira está abaixo e a equipe foi avisada.</p>
+      <p class="notice">O restante da leitura foi para o seu e-mail.</p>
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <h2>Cartão de resultado</h2>
+    <div class="grid grid--2">
+      <article class="card result-card"><p class="eyebrow">Sol</p><h3>Sol em Touro</h3><p class="value">Touro</p><p class="secondary">Exemplo de cartão: o conteúdo real vem do cálculo do mapa.</p></article>
+      <article class="card result-card" aria-busy="true"><p role="status"><span class="spinner" aria-hidden="true"></span> Calculando o seu mapa…</p></article>
+      <article class="card result-card"><h3>Sem a hora de nascimento</h3><p>O Ascendente precisa da hora. Sem ela, mostramos o Sol e a Lua.</p></article>
+      <article class="card result-card"><p class="field-error" role="alert">Erro: não foi possível calcular agora.</p><button type="button" class="button button--secondary">Tentar de novo</button></article>
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <h2>Preço</h2>
+    <p class="secondary">Valor sempre de <code>conteudo/ocidental/ofertas.yaml</code>; o botão leva ao checkout atual (com <code>sck</code> e cupom). A linha da taxa da plataforma entra na fase B, também vinda do YAML.</p>
+    <div class="grid grid--2">
+      <aside class="card price-card"><p class="eyebrow">Leitura completa</p><h3>{{ ofertas.mapa.nome }}</h3><p class="price">R${{ ofertas.mapa.preco | moeda }}</p><p class="help">Pagamento único, pela Cakto.</p><button type="button" class="button">Quero a leitura completa</button></aside>
+      <aside class="card price-card"><p class="eyebrow">Carregando</p><h3>{{ ofertas.compat.nome }}</h3><p class="price">R${{ ofertas.compat.preco | moeda }}</p><p class="help">Estado enquanto o link do checkout é montado.</p><button type="button" class="button" disabled aria-busy="true"><span class="spinner" aria-hidden="true"></span>Abrindo o pagamento…</button></aside>
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <h2>Aviso de cookies</h2>
+    <p class="secondary">O mesmo do <code>consentimento.js</code>: "Aceitar" e "Recusar" do mesmo tamanho e com o mesmo destaque.</p>
+    <aside class="cookie estatico" data-theme="light" aria-label="Exemplo do aviso de cookies"><h2>Cookies</h2><p>Com a sua permissão, usamos cookies para medir as visitas e o resultado dos nossos anúncios (Meta, TikTok e Google). Sem ela, nada disso é ativado e o site funciona igual. <a href="/privacidade#cookies">Saiba mais</a>.</p><div class="cookie-actions"><button type="button" class="button">Aceitar</button><button type="button" class="button">Recusar</button></div></aside>
+  </section>
+
+  <section class="gallery-section">
+    <h2>Menu</h2>
+    <p class="secondary">No desktop, os links em linha (o cabeçalho desta página). No celular, <code>details/summary</code>: painel flutuante, sem prender o foco.</p>
+    <div class="bloco-escuro" data-theme="dark">
+      <details class="nav-mobile estatico" open><summary>Menu</summary><nav aria-label="Exemplo do menu no celular">{% include "ocidental/_menu.html" %}</nav></details>
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <h2>Perguntas frequentes</h2>
+    <details class="faq"><summary>Preciso saber a hora do nascimento?</summary><p>Ajuda muito: o Ascendente e as casas dependem dela. Sem a hora, mostramos o que dá para calcular com segurança.</p></details>
+    <details class="faq" open><summary>A amostra é grátis mesmo?</summary><p>Sim. Você vê o seu Sol, a sua Lua e o seu Ascendente antes de decidir qualquer coisa.</p></details>
+  </section>
+
+  <section class="gallery-section">
+    <h2>Artigo</h2>
+    <article class="article">
+      <p class="eyebrow">Blog</p>
+      <h2>O que é o Ascendente</h2>
+      <p class="caption">Exemplo de tipografia de artigo (o texto real vem do blog revisado).</p>
+      <p>O Ascendente é o signo que subia no horizonte leste na hora e no lugar do seu nascimento. Por isso ele depende da hora exata.</p>
+      <h3>Por que a hora importa</h3>
+      <p>A cada duas horas, mais ou menos, o signo no horizonte muda. <strong>Uma diferença de minutos</strong> pode trocar o Ascendente.</p>
+      <blockquote>Trecho em destaque do próprio conteúdo. Não é depoimento.</blockquote>
+      <ul><li>Primeiro item da explicação.</li><li>Segundo item da explicação.</li></ul>
+    </article>
+  </section>
+
+  <section class="gallery-section">
     <h2>E-mail de entrega</h2>
-    <p class="sub">Como chega na caixa de entrada (cores de <code>paleta.email("ocidental")</code>; o e-mail não baixa fonte: onde a Young Serif não existir, cai no Georgia).</p>
+    <p class="secondary">Ainda nas cores da rodada 3 (<code>paleta.email("ocidental")</code>): a marca nova entra nos e-mails na fase B.</p>
     <div class="email">{{ email_exemplo }}</div>
   </section>
 
-  <section>
+  <section class="gallery-section">
     <h2>E-mails de marketing</h2>
-    <p class="sub">Amostra por e-mail, o lembrete (quem marcou a caixa antes da rodada 6), o de carrinho abandonado e, desde a rodada 6, as sequências: boas-vindas (3 e-mails, só com a caixa marcada) e pós-compra (3 e-mails). Montados com dados de exemplo pelas mesmas funções do envio de verdade. Clique para abrir.</p>
+    <p class="secondary">Amostra por e-mail, lembrete, carrinho abandonado e as sequências (boas-vindas e pós-compra), montados com dados de exemplo pelas mesmas funções do envio de verdade. Clique para abrir.</p>
     {%- for m in emails_marketing %}
-    <details class="card" style="margin:0 0 12px;max-width:600px">
-      <summary><b>{{ m.titulo }}</b> — <span class="nota">Assunto: {{ m.assunto }}</span></summary>
-      <div class="email" style="margin-top:14px">{{ m.html }}</div>
+    <details class="faq">
+      <summary>{{ m.titulo }} — Assunto: {{ m.assunto }}</summary>
+      <div class="email" style="margin-top:16px">{{ m.html }}</div>
     </details>
     {%- endfor %}
   </section>
 </main>
 
-<footer>Padmini — vitrine de estilo da versão ocidental. Não aparece no buscador.</footer>
-<script>
-const CARTAS = {{ cartas_exemplo | tojson }};
-document.getElementById("cartas").innerHTML = CARTAS.map((c) =>
-  `<div class="posicao">${carta(c)}<span class="rotulo-pos">${c.posicao_pt}</span></div>`).join("");
-</script>
+{% include "ocidental/_rodape.html" %}
 </body>
 </html>

@@ -7,11 +7,11 @@
 # Preço NÃO fica aqui: conteudo/ocidental/ofertas.yaml.
 
 seo:
-  titulo: Padmini — Astrologia para autoconhecimento
+  titulo: Valderez Astrologia — Astrologia para autoconhecimento
   descricao: >-
     Mapa natal, sinastria do casal, numerologia e tarot. Astrologia para
     autoconhecimento, com amostra grátis em todos.
-  og_titulo: O seu mapa natal — Padmini
+  og_titulo: O seu mapa natal — Valderez Astrologia
   og_descricao: O Sol, a Lua e o Ascendente de quando você nasceu. Amostra grátis.
 
 menu:
@@ -21,7 +21,7 @@ menu:
   tarot: Tarot
 
 hero:
-  eyebrow: Padmini · Astrologia para autoconhecimento
+  eyebrow: Valderez Astrologia · Astrologia para autoconhecimento
   titulo: O céu de quando você <em>nasceu</em>, lido com cuidado.
   lede: >-
     Não é horóscopo de signo. O mapa natal parte da data, da hora e da cidade
@@ -181,6 +181,6 @@ fechamento:
   botao: Ver meu mapa natal →
 
 rodape:
-  linha1: Padmini — astrologia para autoconhecimento.
+  linha1: Valderez Astrologia — astrologia para autoconhecimento.
   linha2: >-
     O conteúdo tem fins de reflexão e não substitui aconselhamento profissional.

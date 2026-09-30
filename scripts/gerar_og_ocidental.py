@@ -3,8 +3,9 @@ Gera as imagens de compartilhamento (og:image, 1200×630) da versão ocidental:
 
     python scripts/gerar_og_ocidental.py
 
-Grava static/og-oc-<página>.png. Identidade "Almanaque" (rodada 3): cores e
-fontes de paleta.py, o lótus em traço de marca.py, filete duplo de almanaque.
+Grava static/og-oc-<página>.png. Marca Valderez Astrologia (29/set/2026): o
+desenho de docs/design/valderez-1.0/marca/compartilhamento-1200x630.svg, com as
+cores do tema escuro e as fontes de paleta.py e o símbolo de marca.py.
 Nenhuma imagem de terceiros, nenhum devanágari. Precisa do Playwright com o
 Chromium; as fontes são os TTF de fontes/ (sem rede).
 
@@ -35,11 +36,11 @@ IMAGENS = {
 }
 
 def _fontes_locais() -> str:
-    """@font-face com os TTF de fontes/ embutidos (os mesmos do PDF): a imagem não
-    depende de rede e sai igual toda vez."""
+    """@font-face com os TTF de fontes/ embutidos (os mesmos do PDF e, em WOFF2, do
+    site): a imagem não depende de rede e sai igual toda vez."""
     import base64
-    faces = [("Young Serif", 400, "YoungSerif-Regular.ttf"), ("Source Sans 3", 400, "SourceSans3-Regular.ttf"),
-             ("Source Sans 3", 600, "SourceSans3-SemiBold.ttf")]
+    faces = [("Cormorant Garamond", 500, "Cormorant-Medium.ttf"), ("Cormorant Garamond", 600, "Cormorant-SemiBold.ttf"),
+             ("Inter", 400, "Inter-Regular.ttf"), ("Inter", 600, "Inter-SemiBold.ttf")]
     return "\n".join(
         f"@font-face{{font-family:'{nome}';font-weight:{peso};src:url(data:font/ttf;base64,"
         f"{base64.b64encode((RAIZ / 'fontes' / arq).read_bytes()).decode()}) format('truetype')}}"
@@ -47,33 +48,38 @@ def _fontes_locais() -> str:
 
 
 def modelo() -> str:
-    """HTML da imagem: cores e fontes de paleta.py, o lótus de marca.py."""
+    """HTML da imagem, no desenho de docs/design/valderez-1.0/marca/compartilhamento-1200x630.svg:
+    cores do tema escuro (paleta.VALDEREZ), fontes de paleta.py, símbolo de marca.py."""
     import marca
     import paleta
-    t, f = paleta.tela("ocidental"), paleta.FONTES["ocidental"]
+    v, f = paleta.VALDEREZ["dark"], paleta.FONTES["ocidental"]
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <style>
 {_fontes_locais()}
   html,body{{margin:0;width:1200px;height:630px;overflow:hidden}}
-  body{{background:{t['ground']};color:{t['ink']};font-family:{f['sans']};position:relative}}
-  /* filete duplo de almanaque, em vez de brilho */
-  .moldura{{position:absolute;inset:26px;border:2px solid {t['saffron']}}}
-  .moldura::after{{content:"";position:absolute;inset:8px;border:1px solid {paleta.rgba(t['saffron'], .5)}}}
-  .marca{{position:absolute;left:80px;top:74px;display:flex;align-items:center;gap:16px;
-         font:400 36px {f['serif']};color:{t['saffron']}}}
-  .eyebrow{{position:absolute;left:80px;top:176px;font-size:28px;letter-spacing:.2em;font-variant-caps:all-small-caps;
-           color:{t['saffron']};font-weight:600}}
-  h1{{position:absolute;left:80px;top:218px;margin:0;width:880px;font:400 68px/1.1 {f['serif']}}}
-  h1 em{{font-style:normal;color:{t['blush']}}}
-  .rodape{{position:absolute;left:80px;bottom:72px;font-size:22px;color:{t['muted']}}}
-  .lotus{{position:absolute;right:80px;bottom:56px;opacity:.9}}
+  body{{background:{v['background']};color:{v['text']};font-family:{f['sans']};position:relative}}
+  .marca{{position:absolute;left:80px;top:92px;font:500 46px/1 {f['serif']};color:{v['text']}}}
+  .marca small{{display:block;margin-top:18px;font:400 16px/1 {f['sans']};letter-spacing:.3em;color:{v['rose']}}}
+  .eyebrow{{position:absolute;left:80px;top:222px;font:600 16px/1 {f['sans']};letter-spacing:.2em;text-transform:uppercase;color:{v['rose']}}}
+  h1{{position:absolute;left:80px;top:254px;margin:0;width:640px;font:600 54px/1.08 {f['serif']};color:{v['text']}}}
+  h1 em{{font-style:normal;color:{v['rose']}}}
+  .desc{{position:absolute;left:80px;top:440px;width:690px;font:400 21px/1.4 {f['sans']};color:{v['textSecondary']}}}
+  .filete{{position:absolute;left:80px;top:532px;width:520px;height:1px;background:{v['textMuted']}}}
+  .site{{position:absolute;left:80px;top:556px;font:400 20px/1 {f['sans']};color:{v['rose']}}}
+  .ceu{{position:absolute;left:790px;top:70px}}
 </style></head><body>
-<div class="moldura"></div>
-<div class="marca">{marca.svg(40, cor=t['saffron'], astro=t['blush'], traco=1.8)}Padmini</div>
+<div class="marca">Valderez<small>ASTROLOGIA</small></div>
 <div class="eyebrow">{{eyebrow}}</div>
 <h1>{{titulo}}</h1>
-<div class="rodape">{{rodape}}</div>
-{marca.svg(210, cor=t['saffron'], astro=t['blush'], traco=1.1, classe='lotus')}
+<div class="desc">{{rodape}}</div>
+<div class="filete"></div>
+<div class="site">padmini.com.br</div>
+<svg class="ceu" width="460" height="460" viewBox="0 0 460 460" aria-hidden="true">
+  <circle cx="230" cy="230" r="230" fill="{v['surface']}"/>
+  <g fill="none" stroke="{v['border']}" stroke-width="1"><circle cx="230" cy="230" r="195"/><circle cx="230" cy="230" r="150"/>
+  <path d="M230 -5V465M10 230H450"/></g>
+  <g transform="translate(134 134) scale(3)" style="color:{v['rose']}">{marca.svg(64, traco=1.7)}</g>
+</svg>
 </body></html>"""
 
 
@@ -88,8 +94,8 @@ def main() -> int:
             html = modelo().replace("{eyebrow}", eyebrow).replace("{titulo}", titulo).replace("{rodape}", rodape)
             pagina.set_content(html, wait_until="networkidle")
             pagina.evaluate("document.fonts.ready")
-            if not pagina.evaluate("document.fonts.check('400 68px \"Young Serif\"') && "
-                                   "document.fonts.check('400 22px \"Source Sans 3\"')"):
+            if not pagina.evaluate("document.fonts.check('600 54px \"Cormorant Garamond\"') && "
+                                   "document.fonts.check('400 22px \"Inter\"')"):
                 raise RuntimeError("as fontes não carregaram; a imagem sairia com a fonte errada")
             destino = RAIZ / "static" / f"og-oc-{nome}.png"
             pagina.screenshot(path=str(destino))
