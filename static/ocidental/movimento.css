@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Padmini (ocidental) — movimento. Round 5.
+   Valderez Astrologia (ocidental) — movimento. Round 5; seletores da rodada visual.
    Pouco e devagar: seções entram com um fade curto, a barra do índice e as
    pétalas da rosa crescem uma vez, botões e cards respondem ao toque.
    Tudo só com prefers-reduced-motion: no-preference; e o "esconder antes de
@@ -7,9 +7,9 @@
    JavaScript (ou se ele falhar), a página aparece inteira, parada.
    ========================================================================== */
 @media (prefers-reduced-motion: no-preference) {
-  .btn, .navlink, .prod, .passo, .dim { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background-color .25s ease; }
-  .btn:hover, .navlink:hover { transform: translateY(-1px); }
-  .prod:hover, .passo:hover { transform: translateY(-2px); border-color: var(--accent-borda); }
+  .button, .prod, .dim { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background-color .25s ease; }
+  .button:hover { transform: translateY(-1px); }
+  .prod:hover { transform: translateY(-2px); border-color: var(--accent); }
 
   .mov [data-revelar] { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
   .mov [data-revelar].revelado { opacity: 1; transform: none; }

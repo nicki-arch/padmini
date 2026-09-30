@@ -294,7 +294,7 @@ def _calcular_pessoa(x: PessoaOcidental):
 
 @rotas.post("/api/ocidental/sinastria")
 def sinastria_ocidental(p: PedidoSinastria, request: Request):
-    """Amostra: Índice Padmini + ponto forte e de atenção (o card). Completo:
+    """Amostra: o índice (textos.NOME_INDICE) + ponto forte e de atenção (o card). Completo:
     as 8 dimensões, aspectos cruzados e casas — com token."""
     import sinastria as si
     limites.exigir(limites.CALCULO, request)

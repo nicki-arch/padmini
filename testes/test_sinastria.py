@@ -178,7 +178,7 @@ def test_pagina_do_casal_ocidental(ocidental):
     html = cliente.get("/compatibilidade").text
     assert "/api/ocidental/sinastria" in html and "Índice Padmini" in html and "método próprio" in html
     assert "védic" not in html.lower() and "Guna" not in html and "पद्मिनी" not in html
-    assert ".cardc::after{content:none}" in html  # base.css desenha "पद्मिनी" no card
+    assert "/static/base.css" not in html  # rodada visual: sem o base.css (que desenhava "पद्मिनी" no card)
     # R$127 por padrão; o preço com cupom (R$96,52) só para quem chega com cupom válido
     assert f"relatório completo por <b id=\"preco-nota\">R${ofertas.preco('compat', 'ocidental')}</b>" in html
     assert 'const PRECO_CUPOM = "96,52";' in html and 'const CUPONS = ["pedro"];' in html

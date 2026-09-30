@@ -35,10 +35,10 @@ TELA = {
         "card-a": "#301d2d", "card-b": "#3f2740", "bar-base": "#f4e9dc",
         "card-marca": '"पद्मिनी"', "glow-alfa": .10,
     },
-    # Ocidental: as páginas ainda no base.css (as que as fases B e C da rodada
-    # visual vão vestir de novo) usam os nomes antigos. Eles apontam para o tema
-    # ESCURO da Valderez (VALDEREZ["dark"], abaixo): mesma estrutura de antes
-    # (fundo escuro, texto claro, um acento), só com as cores e os pares aprovados.
+    # Ocidental: os nomes antigos apontam para o tema ESCURO da Valderez
+    # (VALDEREZ["dark"], abaixo). Desde a fase C da rodada visual nenhuma página
+    # usa o base.css; estes nomes ainda desenham a rosa das 8 dimensões, as cartas
+    # do tarot e o card do casal (sempre em blocos escuros), e a og:image.
     "ocidental": {
         "ground": "#091321",    # dark.background
         "ground-2": "#122034",  # dark.surface

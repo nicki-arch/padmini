@@ -1,8 +1,8 @@
 {# O que toda página da versão ocidental põe no <head> (marca Valderez): favicon,
    fontes do próprio site (pré-carregadas), tokens (tema.css, gerado de paleta.py)
-   e a casca (cabeçalho, rodapé, cookies). Nenhuma fonte ou recurso de fora. As
-   páginas já vestidas com o pacote carregam ainda o /static/valderez/componentes.css;
-   as outras continuam no /static/base.css (carregado ANTES deste include). #}
+   e a casca (cabeçalho, rodapé, cookies). Nenhuma fonte ou recurso de fora. Depois
+   deste include, cada página carrega o /static/valderez/componentes.css (desde a
+   fase C da rodada visual, nenhuma página ocidental usa o base.css). #}
 <link rel="icon" href="/static/valderez/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/static/valderez/fontes/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/static/valderez/fontes/Cormorant-SemiBold.woff2" as="font" type="font/woff2" crossorigin>

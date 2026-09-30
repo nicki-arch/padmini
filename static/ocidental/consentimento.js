@@ -138,7 +138,7 @@
 
   // O visual é o do pacote de design da Valderez (.cookie, em /static/valderez/casca.css):
   // "Aceitar" e "Recusar" com o mesmo tamanho e o mesmo destaque. O bloco herda
-  // o tema da página (claro nas páginas novas; escuro nas que ainda usam o base.css).
+  // o tema da página (claro no site; escuro no /live).
   function tema() {
     var t = document.documentElement.getAttribute("data-theme") || (document.body && document.body.getAttribute("data-theme"));
     return t === "light" ? "light" : "dark";

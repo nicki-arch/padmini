@@ -1,0 +1,10 @@
+# Valderez Astrologia (versão OCIDENTAL) — nomes de produto que podem mudar.
+#
+# O nome do índice da sinastria mora SÓ aqui. Nos textos (conteudo/ocidental/*.yaml,
+# textos/, blog/) ele aparece como {indice}; o código, os templates, os e-mails, o
+# PDF e as imagens de compartilhamento leem daqui (textos.NOME_INDICE). Para
+# renomear: troque a linha abaixo, rode `python scripts/gerar_og_ocidental.py`
+# (a imagem da sinastria tem o nome escrito) e faça o deploy.
+# O endereço do artigo do blog (/blog/como-ler-o-indice-padmini) NÃO muda com o
+# nome: link já compartilhado não quebra.
+indice: Índice Padmini

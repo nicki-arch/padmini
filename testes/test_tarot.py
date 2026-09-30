@@ -265,7 +265,7 @@ def test_live_tarot_exige_sessao():
 def test_live_tem_a_aba_de_tarot(versao):
     versao("ocidental")
     html = cliente.get("/live").text
-    assert 'id="aba-tarot"' in html and "/api/live/ocidental/token/tarot" in html and "linha laranja" in html
+    assert 'id="aba-tarot"' in html and "/api/live/ocidental/token/tarot" in html and "linha dourada" in html  # rodada visual: a faixa do pago é dourada (gold do pacote)
 
 
 @pytest.mark.skipif(__import__("shutil").which("node") is None, reason="node não instalado")

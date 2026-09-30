@@ -17,6 +17,8 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
+import textos  # noqa: E402  (o nome do índice: conteudo/ocidental/marca.yaml)
+
 IMAGENS = {
     "home": ("Astrologia para autoconhecimento",
              "O céu de quando você <em>nasceu</em>, lido com cuidado.",
@@ -26,7 +28,7 @@ IMAGENS = {
              "Astrologia ocidental (tropical) · amostra grátis"),
     "compatibilidade": ("Sinastria do casal",
                         "Onde o mapa de um toca o mapa do <em>outro</em>.",
-                        "8 dimensões · Índice Padmini (método próprio) · amostra grátis"),
+                        f"8 dimensões · {textos.NOME_INDICE} (método próprio) · amostra grátis"),
     "numerologia": ("Numerologia",
                     "Os <em>números</em> do seu nome e da sua data.",
                     "Numerologia pitagórica · Caminho de Vida grátis"),

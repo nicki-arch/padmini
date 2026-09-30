@@ -313,3 +313,69 @@ abbr[title] { text-decoration: none; cursor: help; }
   font: 600 var(--button-size)/var(--button-line) var(--font-sans); cursor: pointer; text-decoration: none; }
 .btn.btn-outline:hover { background: var(--surface); color: var(--text); border-color: var(--accent); }
 .btn.btn-outline:disabled { cursor: not-allowed; color: var(--text-muted); border-style: dashed; }
+
+/* ==========================================================================
+   Fase C — sinastria, numerologia, tarot, blog, /live. Mesmos tokens.
+   ========================================================================== */
+.pessoa { border: 1px solid var(--border); border-radius: var(--radius-card); padding: 20px; margin: 0; min-width: 0; display: grid; gap: 16px; background: var(--background); }
+.pessoa legend { padding: 0 8px; font-size: 14px; line-height: 22px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--rose); }
+.moldura { font: 500 24px/32px var(--font-editorial); max-width: 52ch; }
+.pontos { display: grid; gap: 24px; }
+@media (min-width: 768px) { .pontos--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ponto { border: 1px solid var(--border); border-radius: var(--radius-card); padding: 24px; background: var(--surface); }
+.ponto .rot { font-size: 14px; line-height: 22px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--rose); margin-bottom: 8px; }
+.ponto.forte { border-top: 3px solid var(--success); } .ponto.forte .rot { color: var(--success); }
+.ponto.atencao { border-top: 3px solid var(--gold); } .ponto.atencao .rot { color: var(--gold); }
+.ponto h3 { margin: 0 0 8px; }
+.ponto p { margin: 0 0 8px; color: var(--text-secondary); }
+.ponto p:last-child { margin-bottom: 0; }
+.esmaecido { position: relative; max-height: 9.5em; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, currentColor 35%, transparent); mask-image: linear-gradient(180deg, currentColor 35%, transparent); }
+.como-fica { display: grid; gap: 32px; align-items: center; }
+@media (min-width: 900px) { .como-fica { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); } }
+/* a rosa das 8 dimensões desenha com os nomes antigos (tema escuro): num bloco escuro */
+.rosa-bloco { margin: 0; padding: 24px; border-radius: var(--radius-card); background: var(--background); color: var(--text); }
+.rosa-bloco figcaption { margin-top: 8px; text-align: center; font-size: 14px; color: var(--text-muted); }
+.rosa-bloco svg { width: 100%; height: auto; display: block; max-width: 460px; margin-inline: auto; }
+.comparacao .marca-c { text-align: center; width: 24%; }
+.share { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.share .cardc { width: min(100%, 340px); }
+.honesty { font-size: 14px; line-height: 22px; color: var(--text-muted); max-width: 60ch; }
+.faq-card summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+
+/* Numerologia */
+.numeros { display: grid; gap: 24px; }
+@media (min-width: 768px) { .numeros { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Tarot: as cartas (static/ocidental/_carta.html) desenham com os nomes antigos (tema
+   escuro): a mesa é um bloco escuro. */
+.mesa { padding: 32px 24px; border-radius: var(--radius-card); }
+.tiragem { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; max-width: 600px; margin-inline: auto; }
+.tiragem .posicao { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.rotulo-pos { font-size: 14px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--rose); }
+.contador { font-size: 14px; color: var(--text-muted); }
+.field textarea { width: 100%; min-height: 96px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-control);
+  background: var(--surface); color: var(--text); font: inherit; resize: vertical; }
+
+/* Blog */
+.artigos { display: grid; gap: 24px; }
+@media (min-width: 768px) { .artigos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.artigo-card h2 { font-size: var(--h3-size); line-height: var(--h3-line); margin-bottom: 8px; }
+.artigo-card h2 a { color: var(--text); text-decoration: none; }
+.artigo-card h2 a:hover { text-decoration: underline; }
+.chamada { margin-top: 48px; }
+/* Números em destaque com algarismos alinhados (a Cormorant usa os "antigos", que
+   descem abaixo da linha): preço, índice, notas. */
+.price, .prod .pprice, .cardc .score, .result-card .value, .resumo strong, .num-destaque { font-variant-numeric: lining-nums; }
+.tiragem .posicao:nth-child(2) .carta { animation-delay: .15s; }
+.tiragem .posicao:nth-child(3) .carta { animation-delay: .3s; }
+.posicao .frase { color: var(--text-secondary); font-size: 15px; line-height: 24px; margin: 0; max-width: 26ch; }
+.pergunta-vista { font: 500 22px/30px var(--font-editorial); color: var(--rose); margin: 0 0 24px; }
+@media (max-width: 640px) {
+  .tiragem { grid-template-columns: 1fr; gap: 20px; }
+  .tiragem .posicao { flex-direction: row; text-align: left; align-items: center; gap: 16px; }
+  .tiragem .posicao .carta { width: 96px; flex: none; padding: 10px 6px; }
+  .tiragem .carta .nome { font-size: 15px; } .tiragem .carta .num { font-size: 17px; }
+  .posicao .texto-pos { display: flex; flex-direction: column; gap: 4px; }
+}
+.field .consent { font-weight: 400; }

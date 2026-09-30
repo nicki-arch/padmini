@@ -27,6 +27,22 @@ PASTA = Path(__file__).parent / "conteudo"
 
 _lidos: dict[tuple[str, str], dict] = {}
 
+# Nome do índice da sinastria (ocidental): FONTE ÚNICA em conteudo/ocidental/marca.yaml.
+# Nos textos ele é escrito {indice}; com_indice() troca pelo nome na hora de mostrar.
+NOME_INDICE = str((yaml.safe_load((PASTA / "ocidental" / "marca.yaml").read_text(encoding="utf-8")) or {})
+                  .get("indice") or "Índice")
+
+
+def com_indice(valor):
+    """Troca {indice} pelo nome do índice em textos (str, listas e dicionários)."""
+    if isinstance(valor, str):
+        return valor.replace("{indice}", NOME_INDICE)
+    if isinstance(valor, list):
+        return [com_indice(v) for v in valor]
+    if isinstance(valor, dict):
+        return {k: com_indice(v) for k, v in valor.items()}
+    return valor
+
 
 def da_pagina(pagina: str, sistema: str | None = None) -> dict:
     """`da_pagina("home", "vedica")` → conteúdo de conteudo/vedica/home.yaml.
@@ -35,6 +51,6 @@ def da_pagina(pagina: str, sistema: str | None = None) -> dict:
     sistema = sistema or _sistema.ativo()
     if (sistema, pagina) not in _lidos:
         arquivo = PASTA / sistema / f"{pagina}.yaml"
-        _lidos[(sistema, pagina)] = (yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}
-                                     if arquivo.exists() else {})
+        _lidos[(sistema, pagina)] = com_indice(yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}
+                                               if arquivo.exists() else {})
     return _lidos[(sistema, pagina)]

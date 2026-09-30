@@ -9,10 +9,11 @@ O arquivo tem três partes:
   2. os tokens do pacote de design (docs/design/valderez-1.0/tokens/): tema
      claro em [data-theme="light"] e escuro em [data-theme="dark"], sem seguir o
      tema do sistema; mais medidas (tipografia, espaços, raios, sombras);
-  3. os nomes antigos (--ground, --ink, --saffron…) no :root, que as páginas
-     ainda no base.css usam, apontando para o tema escuro da Valderez.
-Os tokens novos ficam só dentro de [data-theme]: o base.css tem apelidos antigos
-com os mesmos nomes (--surface, --accent) que as páginas legadas ainda usam.
+  3. os nomes antigos (--ground, --ink, --saffron…) no :root, apontando para o
+     tema escuro da Valderez: ainda desenham a rosa das 8 dimensões
+     (exemplos_ocidental.py), as cartas do tarot (_carta.html) e o card do casal
+     (canvas); por isso aparecem dentro de blocos data-theme="dark".
+Os tokens novos ficam só dentro de [data-theme] (a página inteira tem um).
 
 Há teste que confere que o arquivo gravado é o que este script gera (mudou a
 paleta? rode de novo).
