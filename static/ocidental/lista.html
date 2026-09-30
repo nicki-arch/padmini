@@ -100,7 +100,9 @@
 <script>
 const $ = (s) => document.querySelector(s);
 
-// data de abertura (configurada na Render: PADMINI_DATA_ABERTURA, ex.: "10 de outubro")
+{# data de abertura: variável PADMINI_DATA_ABERTURA na Render (ex.: "10 de outubro"), lida por /api/config.
+   Comentário do template (não vai para o HTML servido). #}
+// data de abertura, se estiver configurada
 fetch("/api/config").then((r) => r.json()).then((c) => {
   if (c.data_abertura) { const el = $("#data-abertura"); el.textContent = "Abre em " + c.data_abertura; el.hidden = false; }
 }).catch(() => {});

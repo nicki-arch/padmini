@@ -60,7 +60,12 @@ def arquivo(sistema: str) -> Path:
 
 def _carregar(sistema: str) -> dict:
     dados = yaml.safe_load(arquivo(sistema).read_text(encoding="utf-8")) or {}
+    # Taxa que a plataforma de pagamento soma no checkout (ex.: R$0,99 da Cakto).
+    # Não é uma oferta: sai da lista e vai para cada oferta como `taxa_plataforma`,
+    # para a página mostrar "+ R$0,99 de taxa da plataforma" sem escrever à mão.
+    taxa = dados.pop("taxa_plataforma", None)
     for chave, oferta in dados.items():
+        oferta["taxa_plataforma"] = taxa
         oferta["checkout"] = str(oferta.get("checkout") or "")
         oferta["codigo"] = _codigo_da_oferta(oferta["checkout"])
         # sempre definido (None = sem desconto): os templates usam StrictUndefined,

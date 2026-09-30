@@ -9,6 +9,12 @@
 # e fazer o deploy (é um PR comum). Só depois trocar PADMINI_SISTEMA.
 # Links colados em 26/set/2026 (rodada 3).
 
+# Taxa que a Cakto soma no checkout, por compra. Não é oferta: o ofertas.py a
+# põe em cada oferta (`taxa_plataforma`) e o bloco de preço mostra "+ R$0,99 de
+# taxa da plataforma" ao lado do preço (rodada visual, fase B). Mudou na Cakto?
+# Só aqui.
+taxa_plataforma: 0.99
+
 # Preços decididos pelo Nicolas em 26/set/2026 (rodada 2).
 mapa:
   nome: Mapa Natal completo

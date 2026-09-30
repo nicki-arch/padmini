@@ -1,5 +1,5 @@
 """
-Padmini (versão ocidental) — mapa natal completo em PDF.
+Valderez Astrologia (versão ocidental da Padmini) — mapa natal completo em PDF.
 
   1. Capa: dados de nascimento, Sol/Lua/Ascendente e a roda do mapa
   2. Posições: planetas, Ascendente, Meio do Céu e Nodo, com signo, grau e casa
@@ -25,6 +25,7 @@ import gerar_pdf
 import mapa_ocidental as mo
 import marca
 import paleta
+import sistema as _sistema
 from gerar_pdf import ALTURA_PAGINA, LARGURA_PAGINA, LARGURA_UTIL, MARGEM
 from reportlab.lib.styles import ParagraphStyle  # noqa: E402
 from reportlab.pdfbase import pdfmetrics  # noqa: E402
@@ -32,39 +33,42 @@ from reportlab.pdfbase.ttfonts import TTFont  # noqa: E402
 from reportlab.platypus import Paragraph  # noqa: E402
 
 # ---------------------------------------------------------------- aparência
-# Identidade "Almanaque" (rodada 3): cores do papel e fontes de paleta.py; o
-# lótus em traço de marca.py. A estrutura (capa, tabelas, roda) é a de antes.
+# Marca Valderez Astrologia (rodada visual, fase B): cores do papel e fontes de
+# paleta.py (Cormorant Garamond + Inter, os TTF de fontes/, os mesmos do site em
+# WOFF2); o símbolo de marca.py. A estrutura (capa, tabelas, roda) é a de antes.
 _PAPEL = paleta.papel("ocidental")
-for _chave in ("fonte_titulo", "fonte_corpo", "fonte_corpo_forte"):
+for _chave in ("fonte_titulo", "fonte_titulo_forte", "fonte_corpo", "fonte_corpo_forte"):
     _nome, _arquivo = _PAPEL[_chave]
     if _nome not in pdfmetrics.getRegisteredFontNames():
         pdfmetrics.registerFont(TTFont(_nome, str(gerar_pdf.FONTES / _arquivo)))
-TITULO = _PAPEL["fonte_titulo"][0]          # Young Serif (um peso só, sem itálico)
-CORPO = _PAPEL["fonte_corpo"][0]            # Source Sans 3
+TITULO = _PAPEL["fonte_titulo"][0]          # Cormorant Garamond 500
+TITULO_FORTE = _PAPEL["fonte_titulo_forte"][0]  # Cormorant Garamond 600
+CORPO = _PAPEL["fonte_corpo"][0]            # Inter
 CORPO_FORTE = _PAPEL["fonte_corpo_forte"][0]
 pdfmetrics.registerFontFamily(CORPO, normal=CORPO, bold=CORPO_FORTE, italic=CORPO, boldItalic=CORPO_FORTE)
-pdfmetrics.registerFontFamily(TITULO, normal=TITULO, bold=TITULO, italic=TITULO, boldItalic=TITULO)
+pdfmetrics.registerFontFamily(TITULO, normal=TITULO, bold=TITULO_FORTE, italic=TITULO, boldItalic=TITULO_FORTE)
 
 TINTA = colors.HexColor(_PAPEL["tinta"])
 TINTA_SUAVE = colors.HexColor(_PAPEL["tinta_suave"])
 NOITE = colors.HexColor(_PAPEL["noite"])
-ACENTO = colors.HexColor(_PAPEL["acento"])        # zarcão
+ACENTO = colors.HexColor(_PAPEL["acento"])        # accent (ameixa)
 ACENTO_SUAVE = colors.HexColor(_PAPEL["acento_suave"])
 SUPERFICIE = colors.HexColor(_PAPEL["superficie"])
 LINHA = colors.HexColor(_PAPEL["linha"])
-OURO = colors.HexColor(_PAPEL["lotus"])           # ouro velho, só em desenho (não em texto)
+OURO = colors.HexColor(_PAPEL["lotus"])           # rose: o traço do símbolo
 HARMONICO = colors.HexColor(_PAPEL["harmonico"])
+MARCA = _sistema.MARCA["ocidental"]  # Valderez Astrologia
 
 # Mesmos estilos da védica (gerar_pdf.E), com as fontes e as tintas daqui.
-# Young Serif é mais larga e mais "cheia" que a Cormorant: títulos um pouco menores.
-_FONTE = {"Cormorant-SemiBold": TITULO, "Cormorant-Italic": TITULO, "Cormorant": TITULO,
+# As mesmas famílias da védica; sem itálico (o pacote da Valderez não tem).
+_FONTE = {"Cormorant-SemiBold": TITULO_FORTE, "Cormorant-Italic": TITULO, "Cormorant": TITULO,
           "Inter": CORPO, "Inter-SemiBold": CORPO_FORTE}
 _COR = {id(gerar_pdf.TINTA): TINTA, id(gerar_pdf.TINTA_SUAVE): TINTA_SUAVE, id(gerar_pdf.NOITE): NOITE,
         id(gerar_pdf.ACENTO): ACENTO}
-_TAMANHO = {"capa_marca": .9, "capa_titulo": .86, "capa_nome": .9, "h1": .86, "h2": .9, "centro": .9}
+_TAMANHO: dict = {}  # mesmas famílias da védica: mesmos tamanhos
 E = {}
 for _k, _e in gerar_pdf.E.items():
-    _f = _TAMANHO.get(_k, 1.04)  # Source Sans tem o olho menor que a Inter: corpo um tico maior
+    _f = _TAMANHO.get(_k, 1.0)
     E[_k] = ParagraphStyle(f"oc_{_k}", parent=_e, fontName=_FONTE[_e.fontName],
                            fontSize=round(_e.fontSize * _f, 1), leading=round(_e.leading * _f, 1),
                            textColor=_COR.get(id(_e.textColor), _e.textColor))
@@ -234,7 +238,7 @@ def _rodape(titulo_curto: str):
         if doc.page > 1:
             canvas.setFont(TITULO, 10)
             canvas.setFillColor(NOITE)
-            canvas.drawString(MARGEM, ALTURA_PAGINA - 12 * mm, "Padmini")
+            canvas.drawString(MARGEM, ALTURA_PAGINA - 12 * mm, MARCA)
             canvas.setFont(CORPO, 7.8)
             canvas.setFillColor(TINTA_SUAVE)
             canvas.drawRightString(LARGURA_PAGINA - MARGEM, ALTURA_PAGINA - 12 * mm, titulo_curto)
@@ -268,11 +272,11 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=MARGEM, rightMargin=MARGEM,
                             topMargin=20 * mm, bottomMargin=18 * mm,
-                            title=titulo_curto, author="Padmini", subject="Mapa natal (astrologia ocidental)")
+                            title=titulo_curto, author=MARCA, subject="Mapa natal (astrologia ocidental)")
     h = []
 
     # ---- 1. capa
-    marca = Table([[Lotus(26), _p("Padmini", "capa_marca")]], colWidths=[34, 200], hAlign="LEFT")
+    marca = Table([[Lotus(26), _p(MARCA, "capa_marca")]], colWidths=[34, 200], hAlign="LEFT")
     marca.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
     h += [marca, Spacer(1, 8 * mm), _p("Mapa Natal", "capa_titulo")]
     if nome_exibido:
@@ -296,9 +300,9 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
     roda.setStyle(TableStyle([("ALIGN", (0, 0), (-1, -1), "CENTER")]))
     h.append(roda)
     h.append(Spacer(1, 3 * mm))
-    h.append(_p("Zodíaco tropical. " + ("Ascendente à esquerda; linhas vermelhas são os eixos das casas 1–7 e 4–10. "
+    h.append(_p("Zodíaco tropical. " + ("Ascendente à esquerda; linhas em cor são os eixos das casas 1–7 e 4–10. "
                                         if mapa["tem_hora"] else "Áries à esquerda (sem hora não há casas). ")
-                + "Linhas no miolo: aspectos (vermelho = tensos, verde = harmônicos). R = retrógrado.", "nota"))
+                + "Linhas no miolo: aspectos (roxo = tensos, verde = harmônicos). R = retrógrado.", "nota"))
     h.append(PageBreak())
 
     # ---- 2. posições
@@ -361,7 +365,7 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
         "com o histórico oficial de cada lugar.",
         "O Ascendente muda de signo a cada duas horas, em média. Se a hora não for exata, confira a certidão: "
         "poucos minutos podem mudar o Ascendente e as casas.",
-        "Dados de cidades: GeoNames (CC BY 4.0). Fontes tipográficas: Young Serif e Source Sans 3 "
+        "Dados de cidades: GeoNames (CC BY 4.0). Fontes tipográficas: Cormorant Garamond e Inter "
         "(SIL Open Font License).",
     ]:
         h.append(_p(escape(texto)))
@@ -396,8 +400,8 @@ def _capa(titulo: str, nome: str, linha: str, caixas: list, subject: str):
     titulo_curto = f"{titulo} de {nome}" if nome else titulo
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=MARGEM, rightMargin=MARGEM,
                             topMargin=20 * mm, bottomMargin=18 * mm,
-                            title=titulo_curto, author="Padmini", subject=subject)
-    marca = Table([[Lotus(26), _p("Padmini", "capa_marca")]], colWidths=[34, 200], hAlign="LEFT")
+                            title=titulo_curto, author=MARCA, subject=subject)
+    marca = Table([[Lotus(26), _p(MARCA, "capa_marca")]], colWidths=[34, 200], hAlign="LEFT")
     marca.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
     h = [marca, Spacer(1, 8 * mm), _p(escape(titulo), "capa_titulo")]
     if nome:

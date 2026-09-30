@@ -3,7 +3,7 @@ Padmini — cabeçalhos HTTP de segurança, aplicados a toda resposta.
 
 Por que existe: o site não mandava nenhum. O que cada um faz aqui:
   - Content-Security-Policy: só roda script/estilo/fonte das origens que o site
-    usa de verdade (o próprio site, Google Fonts e o PostHog). Se um dia entrar
+    usa de verdade (o próprio site, o PostHog e, só na védica, o Google Fonts). Se um dia entrar
     uma falha de XSS, o script injetado não consegue carregar código de fora nem
     mandar dados para outro domínio. `frame-ancestors 'none'` impede o site de
     ser embutido num iframe (clickjacking).
@@ -87,14 +87,31 @@ def _origens_pixels(tipo: str) -> str:
     return " ".join(o for chave, dirs in CSP_PIXELS.items() if ids.get(chave) for o in dirs.get(tipo, []))
 
 
-def politica_csp() -> str:
+# Google Fonts: só a védica usa (as páginas dela carregam as fontes de lá). A
+# ocidental (Valderez) serve as próprias fontes, então a CSP dela não libera
+# fonts.googleapis.com nem fonts.gstatic.com — a não ser num link de entrega da
+# védica (token sem prefixo), que abre a página védica mesmo com a ocidental no ar.
+GOOGLE_FONTS = {"style": "https://fonts.googleapis.com", "font": "https://fonts.gstatic.com"}
+
+
+def precisa_google_fonts(request=None) -> bool:
+    import acesso
+    import sistema
+    if sistema.ativo() == "vedica":
+        return True
+    token = request.query_params.get("token") if request is not None else None
+    return bool(token) and acesso.sistema_do_token(token) == "vedica"
+
+
+def politica_csp(fontes_google: bool = True) -> str:
     ph = " ".join(origens_posthog())
+    gf = GOOGLE_FONTS if fontes_google else {"style": "", "font": ""}
     frames = _origens_pixels("frame")
     diretivas = [
         "default-src 'self'",
         f"script-src 'self' 'unsafe-inline' {ph} {_origens_pixels('script')}",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com",
+        f"style-src 'self' 'unsafe-inline' {gf['style']}",
+        f"font-src 'self' {gf['font']}",
         f"img-src 'self' data: blob: {_origens_pixels('img')}",
         f"connect-src 'self' {ph} {_origens_pixels('connect')}",
         "worker-src 'self' blob:",
@@ -107,9 +124,9 @@ def politica_csp() -> str:
     return "; ".join(" ".join(d.split()) for d in diretivas)
 
 
-def cabecalhos() -> dict[str, str]:
+def cabecalhos(request=None) -> dict[str, str]:
     return {
-        "Content-Security-Policy": politica_csp(),
+        "Content-Security-Policy": politica_csp(precisa_google_fonts(request)),
         "Strict-Transport-Security": "max-age=31536000",
         "Referrer-Policy": "strict-origin-when-cross-origin",
         "X-Content-Type-Options": "nosniff",
@@ -120,6 +137,6 @@ def cabecalhos() -> dict[str, str]:
 
 async def cabecalhos_de_seguranca(request, call_next):
     resposta = await call_next(request)
-    for nome, valor in cabecalhos().items():
+    for nome, valor in cabecalhos(request).items():
         resposta.headers.setdefault(nome, valor)
     return resposta

@@ -1,4 +1,4 @@
-# Padmini (versão OCIDENTAL) — texto da home. FONTE ÚNICA da copy desta página,
+# Valderez Astrologia (versão OCIDENTAL) — texto da home. FONTE ÚNICA da copy desta página,
 # inclusive o <head> (título e descrição para buscador e redes).
 # Mesma estrutura do conteudo/vedica/home.yaml; o desenho está em
 # static/ocidental/home.html. Quatro produtos, nesta ordem (rodada 6, decisão
@@ -30,6 +30,12 @@ hero:
     Sol, a sua Lua e o seu Ascendente agora, de graça.
   botao_principal: Ver meu mapa natal →
   botao_secundario: Fazer a sinastria do casal
+  # Selos embaixo dos botões (rodada visual, fase B). Só fatos do produto, já ditos
+  # no "Como funciona" e nas perguntas: nada de número ou promessa nova.
+  confianca:
+    - Amostra grátis, na hora
+    - Sem cadastro nem senha
+    - O completo chega no seu e-mail
 
 como_funciona:
   titulo: Como funciona

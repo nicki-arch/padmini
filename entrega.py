@@ -10,6 +10,7 @@ não envia e devolve False (o chamador registra o link para envio manual).
 
 import html
 import json
+import re
 import os
 import urllib.parse
 import urllib.request
@@ -66,17 +67,27 @@ TITULO_EMAIL = {
 }
 
 
+def marca_do_email(c: dict, sistema: str) -> str:
+    """O topo de todo e-mail: o nome da marca da versão (sistema.MARCA) e a marca
+    `<!-- versao:… -->`, que o enviar_email lê para pôr o mesmo nome no remetente."""
+    # a védica sai byte a byte como antes (foto em testes/dados/vedica_html): sem a marca
+    versao = "" if sistema == "vedica" else f"<!-- versao:{sistema} -->"
+    return (f'{versao}<p style="font-family:{c["fonte_marca"]};font-size:24px;'
+            f'color:{c["acento"]};margin:0 0 18px">{_sistema.MARCA[sistema]}</p>')
+
+
 def email_completo_html(produto: str, link: str, nome: str = "", extra: str = "",
                         sistema: str = "vedica") -> str:
     """`extra`: HTML já pronto (e escapado) a acrescentar, ex.: a venda cruzada.
     Cores e fontes: paleta.email(sistema)."""
     c = paleta.email(sistema)
+    marca = marca_do_email(c, sistema)
     titulo = TITULO_EMAIL[sistema].get(produto) or TITULO_EMAIL[sistema]["mapa"]
     assinatura = _sistema.ASSINATURA_EMAIL[sistema]
     ola = _ola(nome)
     link = html.escape(link, quote=True)
     return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
-  <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
+  {marca}
   <p style="margin:0 0 12px">{ola}</p>
   <p style="margin:0 0 8px">Seu pagamento foi confirmado — {titulo} está pronto.</p>
   <p style="margin:26px 0"><a href="{link}" style="{estilo_botao(c)}">Ver meu relatório completo →</a></p>
@@ -105,6 +116,7 @@ def estilo_botao(c: dict) -> str:
 def email_mapas_do_casal_html(links: list, nome: str = "", sistema: str = "vedica") -> str:
     """links: [(nome da pessoa, link do mapa completo), ...]"""
     c = paleta.email(sistema)
+    marca = marca_do_email(c, sistema)
     assinatura = _sistema.ASSINATURA_EMAIL[sistema]
     ola = _ola(nome)
     links = [(html.escape(str(pessoa)[:40]), html.escape(l, quote=True)) for pessoa, l in links]
@@ -113,7 +125,7 @@ def email_mapas_do_casal_html(links: list, nome: str = "", sistema: str = "vedic
         f'<p style="color:{c["suave"]};font-size:12px;word-break:break-all;margin:0 0 8px">{l}</p>'
         for pessoa, l in links)
     return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
-  <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
+  {marca}
   <p style="margin:0 0 12px">{ola}</p>
   <p style="margin:0 0 8px">Os mapas individuais de vocês dois estão prontos — um para cada pessoa.</p>
   {botoes}{_linha_minhas_leituras(sistema, c)}
@@ -132,13 +144,14 @@ NOME_LEITURA = {
 
 def nome_da_leitura(produto: str) -> str:
     versao, _, nome = produto.partition(":") if ":" in produto else ("vedica", "", produto)
-    return NOME_LEITURA.get(versao, {}).get(nome, "Leitura Padmini")
+    return NOME_LEITURA.get(versao, {}).get(nome, f"Leitura {_sistema.MARCA.get(versao, 'Padmini')}")
 
 
 def email_minhas_leituras_html(leituras: list[dict]) -> str:
     """Todas as leituras compradas por um e-mail, cada uma com o seu link (que
     abre na versão em que foi comprada). leituras: [{produto, criado_em, link}]."""
     c = paleta.email("ocidental")
+    marca = marca_do_email(c, "ocidental")
     blocos = []
     for item in leituras:
         links = [l for l in str(item["link"]).split("\n") if l.strip()]
@@ -152,7 +165,7 @@ def email_minhas_leituras_html(leituras: list[dict]) -> str:
                       f'<p style="margin:0;font-family:{c["fonte_marca"]};font-size:19px">{titulo}</p>'
                       f'<p style="margin:2px 0 6px;color:{c["suave"]};font-size:13px">Comprada em {quando}</p>{botoes}</div>')
     return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
-  <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
+  {marca}
   <p style="margin:0 0 12px">Olá,</p>
   <p style="margin:0 0 18px">Você pediu os links das suas leituras. Aqui estão todas as que foram compradas com este e-mail:</p>
   {"".join(blocos)}
@@ -161,12 +174,26 @@ def email_minhas_leituras_html(leituras: list[dict]) -> str:
 </div>"""
 
 
+def remetente_do_email(html_do_email: str = "") -> str:
+    """O "De:" do e-mail. O endereço é sempre o de PADMINI_EMAIL_FROM (domínio
+    atual, já verificado no Resend: não mexe em DNS); só o NOME que aparece para
+    quem recebe segue a versão do e-mail (a marca `<!-- versao:… -->` do topo):
+    "Valderez Astrologia <…>" na ocidental, o de sempre na védica."""
+    padrao = os.environ.get("PADMINI_EMAIL_FROM", "Padmini <nao-responda@padmini.com.br>")
+    m = re.search(r"<!-- versao:(\w+) -->", html_do_email or "")
+    if not m or m.group(1) == "vedica" or m.group(1) not in _sistema.MARCA:
+        return padrao
+    endereco = re.search(r"<([^<>@\s]+@[^<>\s]+)>", padrao)
+    endereco = endereco.group(1) if endereco else padrao.strip()
+    return f"{_sistema.MARCA[m.group(1)]} <{endereco}>"
+
+
 def enviar_email(destino: str, assunto: str, html: str, responder_para: str | None = None) -> bool:
     """Envia via Resend (RESEND_API_KEY). Retorna True se enviou; False se não configurado/falhou.
     `responder_para`: o Reply-To (campo `reply_to` da API do Resend), para e-mails que
     convidam a responder — o remetente padrão é nao-responda@."""
     chave = os.environ.get("RESEND_API_KEY")
-    remetente = os.environ.get("PADMINI_EMAIL_FROM", "Padmini <nao-responda@padmini.com.br>")
+    remetente = remetente_do_email(html)
     if not chave or not destino:
         return False
     corpo = {"from": remetente, "to": [destino], "subject": assunto, "html": html}

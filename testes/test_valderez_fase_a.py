@@ -4,7 +4,8 @@ Rodada visual (29/set/2026), Fase A: a marca Valderez Astrologia na versão ocid
 - Nenhuma página pública da ocidental carrega fonte ou recurso de fora do site.
 - Os tokens e os pares de cor da ocidental batem com o tokens.json do pacote.
 - "Padmini" não aparece como marca nas páginas públicas da ocidental (exceções:
-  o Índice Padmini, que o Nicolas ainda vai renomear, os textos legais e o domínio).
+  o Índice Padmini, que o Nicolas ainda vai renomear, e o domínio). Desde a fase B,
+  também nos textos legais.
 - Nada do pacote de referência (barra "REFERÊNCIA", noindex, colchetes) vai ao ar.
 - Fontes WOFF2 com as licenças OFL; SVGs servidos leves e sem texto embutido.
 - Com a captura ligada, a /lista é a porta: sem menu para páginas trancadas.
@@ -27,7 +28,7 @@ VALDEREZ = RAIZ / "static" / "valderez"
 # Páginas públicas da ocidental (as do buscador e as do rodapé).
 PUBLICAS = (list(sistema.PAGINAS["ocidental"]) + list(sistema.LEGAIS["ocidental"])
             + ["/minhas-leituras", "/blog"])
-# Textos legais: quem é o responsável pelos dados é decisão do Nicolas (fica "Padmini" até lá).
+# Textos legais: a marca troca; o responsável pelos dados e o CNPJ, não.
 LEGAIS = set(sistema.LEGAIS["ocidental"])
 
 
@@ -159,21 +160,20 @@ def _sem_excecoes(html):
 
 @pytest.mark.parametrize("rota", PUBLICAS)
 def test_padmini_nao_aparece_como_marca(rota, ocidental):
-    if rota in LEGAIS:
-        pytest.skip("texto legal: o responsável pelos dados é decisão do Nicolas (ver relatório da fase A)")
     html = _pagina(rota)
     assert "Valderez Astrologia" in html, rota
     achados = re.findall(r".{0,40}\bPadmini\b.{0,40}", _sem_excecoes(html))
     assert achados == [], (rota, achados)
 
 
-def test_textos_legais_mudam_so_a_marca_do_cabecalho(ocidental):
-    """Termos e privacidade: cabeçalho, título e rodapé com a Valderez; o texto legal
-    (quem é o responsável) fica como está até o Nicolas decidir."""
+def test_textos_legais_trocam_a_marca_mas_nao_o_responsavel(ocidental):
+    """Termos e privacidade (decisão do Nicolas, fase B): onde "Padmini" era nome de
+    marca, agora é Valderez Astrologia; o responsável pelos dados e o CNPJ não mudam."""
     for rota in LEGAIS:
         html = _pagina(rota)
         assert "<title>Valderez Astrologia — " in html and 'class="brand"' in html, rota
-        assert "Pedro Sperb Monteiro LTDA" in html, rota
+        assert "Pedro Sperb Monteiro LTDA" in html and "55.428.936/0001-00" in html, rota
+        assert "Valderez Astrologia (padmini.com.br)" in html, rota
 
 
 # ------------------------------------------------------------------ nada do pacote vai ao ar

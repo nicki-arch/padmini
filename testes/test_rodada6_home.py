@@ -26,18 +26,18 @@ def test_hero_e_do_mapa_natal(ocidental):
     html = cliente.get("/").text
     hero = html[html.index('<section class="hero'):html.index("</section>")]
     assert "nasceu" in hero and "Ver meu mapa natal" in hero
-    assert re.search(r'class="btn btn-primary" href="/mapa"', hero)
+    assert re.search(r'class="button" href="/mapa"', hero)  # rodada visual: botão principal do pacote
     assert 'href="/compatibilidade"' in hero  # a sinastria continua a um clique
     fim = html[html.rindex("<h2>"):]
-    assert 'class="btn btn-primary" href="/mapa"' in fim
+    assert 'class="button" href="/mapa"' in fim
 
 
 def test_ordem_dos_cards_e_do_menu(ocidental):
     html = cliente.get("/").text
     cards = html[html.index('class="produtos"'):]
     cards = cards[:cards.index("</section>")]
-    assert re.findall(r'<a class="btn[^"]*" href="(/[a-z]+)"', cards) == ORDEM
-    assert 'class="prod anchor"' in cards[:cards.index("/compatibilidade")]  # o destaque é do mapa
+    assert re.findall(r'<a class="button[^"]*" href="(/[a-z]+)"', cards) == ORDEM
+    assert 'prod anchor"' in cards[:cards.index("/compatibilidade")]  # o destaque é do mapa
     for rota in ("/", "/mapa", "/tarot"):
         menu = re.search(r'<nav class="nav-desktop".*?</nav>', cliente.get(rota).text, re.S).group(0)
         menu = re.sub(r'<a class="button"[^>]*>.*?</a>', "", menu)  # o botão do cabeçalho não é item do menu

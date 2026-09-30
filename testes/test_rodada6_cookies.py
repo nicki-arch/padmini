@@ -82,6 +82,8 @@ def test_variaveis_vazias_deixam_config_e_csp_como_antes(no_ar, sem_pixels):
         c = cliente.get("/api/config").json()
         assert all(c[k] == "" for k in seguranca.PIXELS)
         esperado = CSP_DE_HOJE.format(ph=" ".join(seguranca.origens_posthog()))
+        if versao == "ocidental":  # rodada visual (fase B): a ocidental serve as próprias fontes
+            esperado = esperado.replace(" https://fonts.googleapis.com", "").replace(" https://fonts.gstatic.com", "")
         assert cliente.get("/").headers["content-security-policy"] == esperado
 
 

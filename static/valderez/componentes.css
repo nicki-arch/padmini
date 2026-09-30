@@ -175,3 +175,141 @@ h1 em, h2 em { font-style: normal; color: var(--rose); }
 .auto li[aria-selected=true], .auto li:hover { background: var(--background); outline: 2px solid var(--accent); outline-offset: -2px; }
 .auto li small { color: var(--text-muted); }
 .auto.estatico ul { position: static; margin-top: 4px; }
+
+/* ==========================================================================
+   Fase B — home, /mapa (formulário, carregando, amostra, completo), 404,
+   páginas de texto. Mesmos tokens; nada de cor escrita.
+   ========================================================================== */
+.section--escura { padding-block: 64px; }
+@media (min-width: 768px) { .section--escura { padding-block: 80px; } }
+.row .button { flex: 0 1 auto; }
+.lista-check { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 12px; }
+.lista-check li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; color: var(--text-secondary); }
+.lista-check li::before { content: "✓"; color: var(--rose); font-weight: 600; }
+
+/* Como funciona: três passos numerados (01 · …). */
+.passos { display: grid; gap: 32px; counter-reset: passo; }
+.passo h3::before { counter-increment: passo; content: "0" counter(passo) " · "; color: var(--rose); }
+@media (min-width: 768px) { .passos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Os quatro produtos (home). */
+.produtos { display: grid; gap: 24px; align-items: stretch; }
+@media (min-width: 768px) { .produtos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.prod { display: flex; flex-direction: column; gap: 8px; }
+.prod.anchor { border-top: 3px solid var(--rose); }
+.prod h3 { margin: 0; }
+.prod p { margin: 0; color: var(--text-secondary); }
+.prod .plab { font-size: 14px; line-height: 22px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--rose); }
+.prod .pprice { font: 600 40px/46px var(--font-editorial); }
+.prod .pprice small { font: 400 16px/1 var(--font-sans); color: var(--text-muted); text-decoration: line-through; margin-left: 8px; }
+.prod .poff { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: var(--radius-pill); background: var(--accent);
+  color: var(--on-accent); font: 600 12px/20px var(--font-sans); vertical-align: middle; }
+.prod .peco { color: var(--success); font-size: 14px; font-weight: 600; }
+.prod .pcombo, .prod .ptaxa { font-size: 14px; line-height: 22px; color: var(--text-muted); }
+.prod .button { margin-top: auto; align-self: flex-start; }
+.prod .pprice + .ptaxa { margin-top: -6px; }
+
+/* As 8 dimensões do casal. */
+.dims { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--border);
+  border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; }
+@media (min-width: 900px) { .dims { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.dim { background: var(--surface); padding: 20px 16px; }
+.dim .dico { color: var(--rose); display: block; margin-bottom: 8px; }
+.dim .dn { font: 600 18px/24px var(--font-editorial); color: var(--rose); }
+.dim .dt { font-weight: 600; margin: 4px 0 2px; }
+.dim .dd { font-size: 14px; line-height: 22px; color: var(--text-secondary); }
+
+/* Card do casal (bloco escuro: data-theme="dark"). A rosa das 8 dimensões usa os
+   nomes antigos (--saffron, --blush…), que no :root são as cores do tema escuro. */
+.galeria { display: grid; gap: 24px; align-items: start; }
+@media (min-width: 900px) { .galeria { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 899px) { .galeria { max-width: 360px; margin-inline: auto; } }
+.cardc { border: 1px solid var(--border); border-radius: var(--radius-card); padding: 28px 24px; background: var(--surface); color: var(--text); }
+.cardc .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; color: var(--rose); }
+.cardc .wm { font: 500 18px/1 var(--font-editorial); color: var(--text); }
+.cardc .who { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; }
+.cardc .score { font: 600 56px/1 var(--font-editorial); }
+.cardc .score span { font-size: 22px; color: var(--text-muted); }
+.cardc .scorelab { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--rose); margin-top: 6px; font-weight: 600; }
+.cardc .bar { height: 5px; border-radius: 3px; background: var(--background); margin: 18px 0; overflow: hidden; }
+.cardc .bar i { display: block; height: 100%; border-radius: 3px; background: var(--rose); }
+.cardc .insight { font: 500 19px/26px var(--font-editorial); }
+.rosa-mini { margin: 14px auto 4px; max-width: 170px; }
+.rosa-mini svg, .rosa svg { width: 100%; height: auto; display: block; }
+
+.depoimentos { display: grid; gap: 24px; }
+@media (min-width: 768px) { .depoimentos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.depo { margin: 0; border-left: 3px solid var(--rose); padding: 4px 0 4px 20px; }
+.depo blockquote { margin: 0; font: 500 20px/28px var(--font-editorial); }
+.depo figcaption { margin-top: 10px; font-size: 14px; color: var(--text-muted); }
+
+/* Faixa "é um casal?" entre produtos. */
+.cross { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.cross h3, .cross p { margin: 0; }
+
+/* /mapa: formulário. */
+.campos-2 { display: grid; gap: 24px; }
+@media (min-width: 600px) { .campos-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.field .consent { min-height: 44px; padding-block: 6px; }
+.cidade-status { margin: 0; font-size: 14px; line-height: 22px; color: var(--text-muted); }
+.cidade-status.ok { color: var(--success); }
+.field input.escolhida { border-color: var(--success); }
+.estado[hidden] { display: none !important; }
+.estado:focus { outline: none; }
+.estado h1:focus, .estado h2:focus { outline: none; }
+/* No celular o formulário vem antes da ilustração e dos selos. */
+.mapa-grade { display: grid; gap: 48px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "form" "arte"; }
+.mapa-grade > * { min-width: 0; }
+.mapa-intro { grid-area: intro; } .mapa-form { grid-area: form; } .mapa-arte { grid-area: arte; }
+.mapa-arte img { display: block; width: min(100%, 420px); margin-inline: auto; }
+@media (max-width: 1099px) { .mapa-intro .trust { display: none; } }  /* no celular, os campos sobem para a primeira tela */
+@media (min-width: 1100px) {
+  .mapa-grade { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 64px; row-gap: 32px;
+    grid-template-areas: "intro form" "arte form"; align-items: start; }
+}
+
+/* /mapa: amostra e completo. */
+.aviso { margin: 0 0 24px; padding: 16px 20px; border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  border-radius: var(--radius-control); background: var(--surface); color: var(--text-secondary); font-size: 14px; line-height: 22px; }
+.nota { font-size: 14px; line-height: 22px; color: var(--text-muted); }
+.resultado-topo { margin-bottom: 32px; }
+.resultado-topo h2, .resultado-topo h1 { margin-bottom: 8px; }
+.grau { margin: 0 0 12px; font-size: 14px; color: var(--text-muted); }
+.result-card h3 { margin-bottom: 4px; }
+.aviso-email { margin: 0 0 24px; }
+.aviso-email p { margin: 0; }
+.aviso-email .row { margin-top: 16px; }
+.price-card .ptaxa { margin: 0 0 4px; }
+.resumo { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 32px; }
+.resumo div { padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--surface); }
+.resumo small { display: block; color: var(--text-muted); font-size: 14px; }
+.resumo strong { font: 600 22px/28px var(--font-editorial); }
+@media (max-width: 599px) { .resumo { grid-template-columns: 1fr; } }
+.roda-e-tabela { display: grid; gap: 32px; align-items: start; }
+@media (min-width: 900px) { .roda-e-tabela { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.roda svg { width: 100%; height: auto; display: block; }
+td.num, .num { font-variant-numeric: tabular-nums; }
+abbr[title] { text-decoration: none; cursor: help; }
+.aspectos { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.aspectos li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: var(--radius-control);
+  border: 1px solid var(--border); background: var(--surface); }
+.barras { display: grid; grid-template-columns: auto 1fr auto; gap: 8px 12px; align-items: center; font-size: 14px; }
+.barras i { display: block; height: 8px; border-radius: 4px; background: var(--rose); }
+.bloco { margin-top: 48px; scroll-margin-top: 24px; }
+.acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin: 0 0 32px; }
+.ia-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 0 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+.feedback { text-align: left; }
+.feedback .fb-botoes { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* 404 */
+.nao-achei img { display: block; width: min(100%, 360px); margin: 48px auto 0; }
+/* Peças montadas por JavaScript compartilhado com a védica (analytics.js: "isso fez
+   sentido?"; amostra-email.js): usam .btn/.btn-outline, que aqui viram o botão
+   secundário do pacote. */
+.fb-pergunta { font: 600 var(--h4-size)/var(--h4-line) var(--font-editorial); margin: 0 0 16px; }
+.fb-botoes { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn.btn-outline { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 13px 24px;
+  border: 1px solid var(--border); border-radius: var(--radius-pill); background: transparent; color: var(--accent);
+  font: 600 var(--button-size)/var(--button-line) var(--font-sans); cursor: pointer; text-decoration: none; }
+.btn.btn-outline:hover { background: var(--surface); color: var(--text); border-color: var(--accent); }
+.btn.btn-outline:disabled { cursor: not-allowed; color: var(--text-muted); border-style: dashed; }
