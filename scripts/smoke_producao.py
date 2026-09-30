@@ -310,6 +310,8 @@ def conferir_precos_na_cakto(ofertas: dict, baixar=None) -> list:
     baixar = baixar or _baixar
     op = _ofertas_py()
     falhas = []
+    # só as ofertas: o YAML também tem valores soltos (ex.: taxa_plataforma: 0.99)
+    ofertas = {k: v for k, v in ofertas.items() if isinstance(v, dict)}
     for chave, oferta in ofertas.items():
         mae = ofertas.get(oferta.get("bump_de") or "") or {}
         url = str((mae if mae else oferta).get("checkout") or "")

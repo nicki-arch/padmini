@@ -219,3 +219,17 @@ def test_sem_captura_nao_avisa(monkeypatch):
     _local(monkeypatch)
     smoke.AVISOS.clear()
     assert smoke._captura_no_ar() is False and smoke.AVISOS == []
+
+
+def test_valor_solto_no_yaml_nao_derruba_a_conferencia():
+    """30/set/2026: `taxa_plataforma: 0.99` entrou no topo do ofertas.yaml da
+    ocidental e a checagem caía com "'float' object has no attribute 'get'"."""
+    ofertas = {"taxa_plataforma": 0.99,
+               "compat": {"preco": 127, "checkout": "https://pay.cakto.com.br/x_1"}}
+    assert smoke.conferir_precos_na_cakto(ofertas, baixar=lambda url: CHECKOUT_127) == []
+
+
+@pytest.mark.parametrize("versao", ["vedica", "ocidental"])
+def test_conferencia_roda_com_o_yaml_de_verdade(versao):
+    smoke.AVISOS.clear()
+    smoke.conferir_precos_na_cakto(smoke._ofertas_do_yaml(versao), baixar=lambda url: "")
