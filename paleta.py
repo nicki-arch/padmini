@@ -125,10 +125,14 @@ EMAIL = {
     "vedica": {"fundo": "#241522", "texto": "#f4e9dc", "acento": "#e7a24a", "sobre_acento": "#2a1608",
                "suave": "#c9b1a6", "fraco": "#8f7a76", "linha": "#4a3346", "acento2": "#e2a89d",
                "fonte": "Arial,Helvetica,sans-serif", "fonte_marca": "Georgia,serif", "raio_botao": "999px"},
-    "ocidental": {"fundo": "#121a2b", "texto": "#e6dac3", "acento": "#d4a23a", "sobre_acento": "#17120a",
-                  "suave": "#c6b99e", "fraco": "#a59a82", "linha": "#2c3957", "acento2": "#e2744f",
-                  "fonte": "'Source Sans 3','Segoe UI',Arial,Helvetica,sans-serif",
-                  "fonte_marca": "'Young Serif',Georgia,serif", "raio_botao": "6px"},
+    # Valderez (fase B da rodada visual): o tema CLARO do pacote, o de leitura.
+    # Fundo "background", texto "text", botão "accent" com "onAccent"; os textos
+    # de apoio são textSecondary/textMuted, todos em pares aprovados no fundo claro.
+    # O e-mail não baixa fonte: onde a Cormorant/Inter não existir, cai no Georgia/Arial.
+    "ocidental": {"fundo": "#F7F3F0", "texto": "#142234", "acento": "#715078", "sobre_acento": "#FFFFFF",
+                  "suave": "#495365", "fraco": "#656474", "linha": "#827587", "acento2": "#80506F",
+                  "fonte": "Inter,Arial,Helvetica,sans-serif",
+                  "fonte_marca": "'Cormorant Garamond',Georgia,serif", "raio_botao": "999px"},
 }
 
 # ---------------------------------------------------------------------------
@@ -144,14 +148,18 @@ PAPEL = {
                "fonte_titulo_italico": ("Cormorant-Italic", "Cormorant-Italic.ttf"),
                "fonte_corpo": ("Inter", "Inter-Regular.ttf"),
                "fonte_corpo_forte": ("Inter-SemiBold", "Inter-SemiBold.ttf")},
-    "ocidental": {"tinta": "#121a2b", "tinta_suave": "#4a5468", "noite": "#121a2b", "acento": "#a8401f",
-                  "acento_suave": "#f4e2d6", "superficie": "#efe7d4", "fundo": "#faf6ec", "linha": "#ddd2bb",
-                  "lotus": "#9a7314", "harmonico": "#4f6b45",
-                  "fonte_titulo": ("YoungSerif", "YoungSerif-Regular.ttf"),
-                  "fonte_titulo_forte": ("YoungSerif", "YoungSerif-Regular.ttf"),
-                  "fonte_titulo_italico": ("YoungSerif", "YoungSerif-Regular.ttf"),
-                  "fonte_corpo": ("SourceSans3", "SourceSans3-Regular.ttf"),
-                  "fonte_corpo_forte": ("SourceSans3-SemiBold", "SourceSans3-SemiBold.ttf")},
+    # Valderez: tinta = text, acento = accent (títulos e filetes), noite = o azul
+    # do tema escuro (capa); fontes = os TTF de fontes/ (os mesmos WOFF2 do site).
+    "ocidental": {"tinta": "#142234", "tinta_suave": "#495365", "noite": "#091321", "acento": "#715078",
+                  "acento_suave": "#F7F3F0", "superficie": "#F7F3F0", "fundo": "#FFFFFF", "linha": "#827587",
+                  "lotus": "#80506F", "harmonico": "#216342",
+                  # os mesmos nomes (e arquivos) que o gerar_pdf.py registra; sem itálico,
+                  # como no pacote (Cormorant 500/600, Inter 400/600)
+                  "fonte_titulo": ("Cormorant", "Cormorant-Medium.ttf"),
+                  "fonte_titulo_forte": ("Cormorant-SemiBold", "Cormorant-SemiBold.ttf"),
+                  "fonte_titulo_italico": ("Cormorant", "Cormorant-Medium.ttf"),
+                  "fonte_corpo": ("Inter", "Inter-Regular.ttf"),
+                  "fonte_corpo_forte": ("Inter-SemiBold", "Inter-SemiBold.ttf")},
 }
 
 # Cores que eram da marca védica e não podem aparecer na ocidental (o teste

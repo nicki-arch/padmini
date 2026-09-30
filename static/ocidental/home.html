@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -15,201 +15,169 @@
 <meta property="og:url" content="https://padmini.com.br/">
 <meta name="twitter:card" content="summary_large_image">
 {{ ld.home(t) }}
-<link rel="stylesheet" href="/static/base.css">
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/ocidental/componentes.css">
+<link rel="stylesheet" href="/static/valderez/componentes.css">
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-<style>
-  /* específico da home (landing) — o resto vem de base.css */
-  .hero{padding-block:64px 40px}
-  h1{font-size:clamp(2.6rem,6.5vw,4.4rem);line-height:1.03}
-  h2{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.1}
-  .passos{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:p}
-  .passo{background:var(--ground-2);border:1px solid var(--line);border-radius:14px;padding:22px}
-  .passo::before{counter-increment:p;content:counter(p, upper-roman);font-family:var(--serif);font-size:1.6rem;color:var(--saffron);display:block;margin-bottom:8px}
-  .passo p{margin:6px 0 0;color:var(--muted);font-size:14.5px}
-  .produtos{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
-  .prod{border:1px solid var(--line);border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:8px;background:var(--ground-2)}
-  .prod.anchor{background:linear-gradient(180deg,var(--ground-3),var(--ground-2));border-color:var(--accent-borda)}
-  .prod .plab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--saffron)}
-  .prod .pprice{font-family:var(--serif);font-size:2.2rem;line-height:1;font-weight:500;margin:2px 0 2px}
-  .prod .pprice small{font-size:1rem;color:var(--muted);text-decoration:line-through;text-decoration-thickness:1.5px;margin-left:8px;font-family:var(--sans)}
-  .prod .poff{display:inline-block;margin-left:8px;padding:3px 8px;border-radius:999px;font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.03em;background:var(--saffron);color:var(--on-accent);vertical-align:middle}
-  .prod .peco{font-family:var(--sans);font-size:12.5px;color:var(--sage);margin:2px 0 0;font-weight:600}
-  .prod p{color:var(--muted);font-size:14.5px;margin:0}
-  .prod .btn{margin-top:auto}
-  .anchor2{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;background:var(--ground-2);border:1px solid var(--line);border-radius:16px;padding:26px}
-  .badge{flex:none;width:54px;height:54px;border-radius:50%;background:var(--ground-3);display:grid;place-items:center}
-  .prod .pcombo{font-size:13px;color:var(--muted);margin:0}
-  nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
-  @media(max-width:640px){.passos,.produtos{grid-template-columns:1fr}section{padding-block:44px}.so-largo{display:none}}
-  .galeria{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start}
-  .galeria .cardc{width:auto;max-width:none}
-  .rosa-mini{margin:14px auto 4px;max-width:170px}
-  .rosa-mini svg{width:100%;height:auto;display:block}
-  @media(max-width:900px){.galeria{grid-template-columns:1fr;max-width:360px;margin-inline:auto}}
-  .depoimentos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
-  .depo{margin:0;border-left:2px solid var(--saffron);padding:4px 0 4px 18px}
-  .depo blockquote{margin:0;font-family:var(--serif);font-size:1.15rem;line-height:1.45}
-  .depo figcaption{margin-top:10px;font-size:13px;color:var(--faint)}
-  .cardc::after{content:none} /* o base.css desenha a marca em sânscrito no card */
-</style>
+{# Home da versão OCIDENTAL (marca Valderez Astrologia; desenho de
+   docs/design/valderez-1.0/telas/home.html). Texto: conteudo/ocidental/home.yaml
+   (variável `t`), inclusive o <head>. Preço: conteudo/ocidental/ofertas.yaml.
+   Quatro produtos, nesta ordem (rodada 6): mapa natal (a porta de entrada),
+   sinastria, numerologia e tarot. As seções que o pacote não desenhou (produtos,
+   8 dimensões, card do casal, depoimentos) estão vestidas com os mesmos componentes. #}
 </head>
 <body>
-{# Home da versão OCIDENTAL. Texto: conteudo/ocidental/home.yaml (variável `t`), inclusive o <head>.
-   Preço: conteudo/ocidental/ofertas.yaml. Quatro produtos, nesta ordem (rodada 6): mapa natal (a porta
-   de entrada), sinastria, numerologia e tarot. #}
 {% set atual = "/" %}{% include "ocidental/_cabecalho.html" %}
 
 <main id="conteudo">
-  <section class="hero wrap">
-    <p class="eyebrow">{{ t.hero.eyebrow }}</p>
-    <h1>{{ t.hero.titulo }}</h1>
-    <p class="lede">{{ t.hero.lede }}</p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="/mapa">{{ t.hero.botao_principal }}</a>
-      <a class="btn btn-outline" href="/compatibilidade">{{ t.hero.botao_secundario }}</a>
+  <section class="hero" data-theme="dark">
+    <div class="container split">
+      <div>
+        <p class="eyebrow">{{ t.hero.eyebrow }}</p>
+        <h1>{{ t.hero.titulo }}</h1>
+        <p class="lede secondary">{{ t.hero.lede }}</p>
+        <div class="row">
+          <a class="button" href="/mapa">{{ t.hero.botao_principal }}</a>
+          <a class="button button--secondary" href="/compatibilidade">{{ t.hero.botao_secundario }}</a>
+        </div>
+        <div class="trust">{% for item in t.hero.confianca %}<span>{{ item }}</span>{% endfor %}</div>
+      </div>
+      <img class="hero-art" src="/static/valderez/celeste.svg" alt="" width="540" height="520">
     </div>
   </section>
 
-  <hr class="rule">
-
-  <section class="wrap" data-revelar>
-    <h2>{{ t.como_funciona.titulo }}</h2>
-    <p class="sub">{{ t.como_funciona.sub }}</p>
-    <div class="passos">
-      {%- for passo in t.como_funciona.passos %}
-      <div class="passo"><h3>{{ passo.titulo }}</h3><p>{{ passo.texto }}</p></div>
-      {%- endfor %}
-    </div>
-  </section>
-
-  <hr class="rule">
-
-  <section class="wrap" data-revelar>
-    <h2>{{ t.produtos.titulo }}</h2>
-    <p class="sub">{{ t.produtos.sub }}</p>
-    <div class="produtos">
-      <div class="prod anchor">
-        <span class="plab">{{ t.produtos.mapa.etiqueta }}</span>
-        <h3>{{ t.produtos.mapa.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.mapa.preco | moeda }}</div>
-        <p>{{ t.produtos.mapa.texto }}</p>
-        <a class="btn btn-primary" href="/mapa">{{ t.produtos.mapa.botao }}</a>
-      </div>
-      <div class="prod">
-        <span class="plab">{{ t.produtos.compat.etiqueta }}</span>
-        <h3>{{ t.produtos.compat.titulo }}</h3>
-        {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco | moeda }} <small>R${{ ofertas.compat.preco_de | moeda }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
-        <p class="peco">Você economiza R${{ ofertas.compat.economia | moeda }}</p>
-        {% else %}<div class="pprice">R${{ ofertas.compat.preco | moeda }}</div>
-        {% endif %}        <p>{{ t.produtos.compat.texto }}</p>
-        {% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco | moeda }}</p>{% endif %}
-        <a class="btn btn-outline" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
-      </div>
-      <div class="prod">
-        <span class="plab">{{ t.produtos.numerologia.etiqueta }}</span>
-        <h3>{{ t.produtos.numerologia.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.numerologia.preco | moeda }}</div>
-        <p>{{ t.produtos.numerologia.texto }}</p>
-        <a class="btn btn-outline" href="/numerologia">{{ t.produtos.numerologia.botao }}</a>
-      </div>
-      <div class="prod">
-        <span class="plab">{{ t.produtos.tarot.etiqueta }}</span>
-        <h3>{{ t.produtos.tarot.titulo }}</h3>
-        <div class="pprice">R${{ ofertas.tarot.preco | moeda }}</div>
-        <p>{{ t.produtos.tarot.texto }}</p>
-        <a class="btn btn-outline" href="/tarot">{{ t.produtos.tarot.botao }}</a>
+  <section class="section surface" data-revelar>
+    <div class="container">
+      <p class="eyebrow">{{ t.como_funciona.sub }}</p>
+      <h2>{{ t.como_funciona.titulo }}</h2>
+      <div class="passos">
+        {%- for passo in t.como_funciona.passos %}
+        <div class="passo"><h3>{{ passo.titulo }}</h3><p class="secondary">{{ passo.texto }}</p></div>
+        {%- endfor %}
       </div>
     </div>
   </section>
 
-  <hr class="rule">
-
-  <section class="wrap" data-revelar>
-    <p class="eyebrow">{{ t.dimensoes.eyebrow }}</p>
-    <h2>{{ t.dimensoes.titulo }}</h2>
-    <p class="sub">{{ t.dimensoes.sub }}</p>
-    <div class="dims">
-      {%- for d in t.dimensoes.itens %}
-      <div class="dim"><svg class="dico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ d.icone }}</svg><div class="dn">{{ d.nome }}</div><div class="dt">{{ d.titulo }}</div><div class="dd">{{ d.texto }}</div></div>
-      {%- endfor %}
-    </div>
-  </section>
-
-  <hr class="rule">
-
-  <section class="wrap" data-revelar>
-    <h2>{{ t.card_exemplo.titulo }}</h2>
-    <p class="sub">{{ t.card_exemplo.sub }}</p>
-    <div class="galeria">
-      {%- for c in exemplos.casais() %}
-      <div class="cardc exemplo">
-        <div class="top"><span class="wm">padmini</span>{{ marca.svg(22) }}</div>
-        <div class="who">{{ c.nomes.a }} &amp; {{ c.nomes.b }}</div>
-        <div class="score">{{ c.indice }}<span> / 100</span></div>
-        <div class="scorelab">{{ t.card_exemplo.rotulo }}</div>
-        <div class="bar"><i style="width:{{ c.indice }}%"></i></div>
-        <div class="rosa-mini">{{ c.rosa }}</div>
-        <div class="insight">"{{ t.card_exemplo.frase }} {{ c.ponto_forte | lower }}."</div>
+  <section class="section" data-revelar>
+    <div class="container">
+      <h2>{{ t.produtos.titulo }}</h2>
+      <p class="secondary">{{ t.produtos.sub }}</p>
+      <div class="produtos">
+        <div class="card prod anchor">
+          <span class="plab">{{ t.produtos.mapa.etiqueta }}</span>
+          <h3>{{ t.produtos.mapa.titulo }}</h3>
+          <div class="pprice">R${{ ofertas.mapa.preco | moeda }}</div>
+          <p>{{ t.produtos.mapa.texto }}</p>
+          <a class="button" href="/mapa">{{ t.produtos.mapa.botao }}</a>
+        </div>
+        <div class="card prod">
+          <span class="plab">{{ t.produtos.compat.etiqueta }}</span>
+          <h3>{{ t.produtos.compat.titulo }}</h3>
+          {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco | moeda }} <small>R${{ ofertas.compat.preco_de | moeda }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
+          <p class="peco">Você economiza R${{ ofertas.compat.economia | moeda }}</p>
+          {% else %}<div class="pprice">R${{ ofertas.compat.preco | moeda }}</div>
+          {% endif %}          <p>{{ t.produtos.compat.texto }}</p>
+          {% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco | moeda }}</p>{% endif %}
+          <a class="button button--secondary" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
+        </div>
+        <div class="card prod">
+          <span class="plab">{{ t.produtos.numerologia.etiqueta }}</span>
+          <h3>{{ t.produtos.numerologia.titulo }}</h3>
+          <div class="pprice">R${{ ofertas.numerologia.preco | moeda }}</div>
+          <p>{{ t.produtos.numerologia.texto }}</p>
+          <a class="button button--secondary" href="/numerologia">{{ t.produtos.numerologia.botao }}</a>
+        </div>
+        <div class="card prod">
+          <span class="plab">{{ t.produtos.tarot.etiqueta }}</span>
+          <h3>{{ t.produtos.tarot.titulo }}</h3>
+          <div class="pprice">R${{ ofertas.tarot.preco | moeda }}</div>
+          <p>{{ t.produtos.tarot.texto }}</p>
+          <a class="button button--secondary" href="/tarot">{{ t.produtos.tarot.botao }}</a>
+        </div>
       </div>
-      {%- endfor %}
     </div>
-    <p class="sub" style="text-align:center;margin:22px auto 0;max-width:52ch">{{ t.card_exemplo.legenda }}</p>
-    <p style="display:flex;justify-content:center;margin:14px 0 0"><a class="navlink" href="/compatibilidade#como-fica">{{ t.card_exemplo.link }}</a></p>
   </section>
 
-  <hr class="rule">
+  <section class="section" data-revelar>
+    <div class="container split">
+      <img src="/static/valderez/papeis.svg" alt="" width="500" height="500">
+      <div>
+        <p class="eyebrow">Valderez Astrologia</p>
+        <h2>{{ t.tradicao.titulo }}</h2>
+        <p class="secondary">{{ t.tradicao.texto }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-revelar>
+    <div class="container">
+      <p class="eyebrow">{{ t.dimensoes.eyebrow }}</p>
+      <h2>{{ t.dimensoes.titulo }}</h2>
+      <p class="secondary">{{ t.dimensoes.sub }}</p>
+      <div class="dims">
+        {%- for d in t.dimensoes.itens %}
+        <div class="dim"><svg class="dico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ d.icone }}</svg><div class="dn">{{ d.nome }}</div><div class="dt">{{ d.titulo }}</div><div class="dd">{{ d.texto }}</div></div>
+        {%- endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="section--escura" data-theme="dark" data-revelar>
+    <div class="container">
+      <h2>{{ t.card_exemplo.titulo }}</h2>
+      <p class="secondary">{{ t.card_exemplo.sub }}</p>
+      <div class="galeria">
+        {%- for c in exemplos.casais() %}
+        <div class="cardc exemplo">
+          <div class="top"><span class="wm">Valderez</span>{{ marca.svg(22) }}</div>
+          <div class="who">{{ c.nomes.a }} &amp; {{ c.nomes.b }}</div>
+          <div class="score">{{ c.indice }}<span> / 100</span></div>
+          <div class="scorelab">{{ t.card_exemplo.rotulo }}</div>
+          <div class="bar"><i style="width:{{ c.indice }}%"></i></div>
+          <div class="rosa-mini">{{ c.rosa }}</div>
+          <div class="insight">"{{ t.card_exemplo.frase }} {{ c.ponto_forte | lower }}."</div>
+        </div>
+        {%- endfor %}
+      </div>
+      <p class="caption" style="margin:24px 0 0;max-width:60ch">{{ t.card_exemplo.legenda }}</p>
+      <p style="margin:16px 0 0"><a href="/compatibilidade#como-fica">{{ t.card_exemplo.link }}</a></p>
+    </div>
+  </section>
 
   {%- set deps = depoimentos.publicaveis() %}
   {%- if deps %}
-  <section class="wrap" data-revelar>
-    <h2>{{ t.depoimentos.titulo }}</h2>
-    <div class="depoimentos">
-      {%- for d in deps[:3] %}
-      <figure class="depo"><blockquote>“{{ d.texto }}”</blockquote><figcaption>{{ d.nome }} · {{ d.produto_nome }}</figcaption></figure>
-      {%- endfor %}
+  <section class="section" data-revelar>
+    <div class="container">
+      <h2>{{ t.depoimentos.titulo }}</h2>
+      <div class="depoimentos">
+        {%- for d in deps[:3] %}
+        <figure class="depo"><blockquote>“{{ d.texto }}”</blockquote><figcaption>{{ d.nome }} · {{ d.produto_nome }}</figcaption></figure>
+        {%- endfor %}
+      </div>
     </div>
   </section>
-
-  <hr class="rule">
   {%- endif %}
 
-  <section class="wrap" data-revelar>
-    <div class="anchor2">
-      <div class="badge">
-        {{ marca.svg(26) }}
-      </div>
-      <div style="flex:1 1 260px">
-        <h3>{{ t.tradicao.titulo }}</h3>
-        <p style="color:var(--muted);margin-top:6px">{{ t.tradicao.texto }}</p>
-      </div>
-    </div>
-  </section>
-
-  <hr class="rule">
-
-  <section class="wrap">
+  <section class="section container narrow">
     <h2>{{ t.faq.titulo }}</h2>
-    <div class="faq">
-      {%- for item in t.faq.itens %}
-      <details{% if loop.first %} open{% endif %}><summary>{{ item.pergunta }}</summary><p>{{ item.resposta }}</p></details>
-      {%- endfor %}
-    </div>
+    {%- for item in t.faq.itens %}
+    <details class="faq"{% if loop.first %} open{% endif %}><summary>{{ item.pergunta }}</summary><p>{{ item.resposta }}</p></details>
+    {%- endfor %}
   </section>
 
-  <section class="wrap" style="text-align:center;padding-top:10px">
-    <h2>{{ t.fechamento.titulo }}</h2>
-    <p style="margin:0 auto 26px;color:var(--muted)">{{ t.fechamento.sub }}</p>
-    <a class="btn btn-primary" href="/mapa">{{ t.fechamento.botao }}</a>
+  <section class="section--escura" data-theme="dark">
+    <div class="container narrow">
+      <h2>{{ t.fechamento.titulo }}</h2>
+      <p class="secondary">{{ t.fechamento.sub }}</p>
+      <a class="button" href="/mapa">{{ t.fechamento.botao }}</a>
+    </div>
   </section>
 </main>
 
-{% set nota_rodape %}{{ t.rodape.linha1 }} {{ t.rodape.linha2 }}{% endset %}{% include "ocidental/_rodape.html" %}
+{# o rodapé comum já traz a linha do aviso (t.rodape.linha2) #}{% include "ocidental/_rodape.html" %}
 </body>
 </html>

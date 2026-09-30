@@ -158,10 +158,10 @@
 
   <section class="gallery-section">
     <h2>Preço</h2>
-    <p class="secondary">Valor sempre de <code>conteudo/ocidental/ofertas.yaml</code>; o botão leva ao checkout atual (com <code>sck</code> e cupom). A linha da taxa da plataforma entra na fase B, também vinda do YAML.</p>
+    <p class="secondary">Valor e taxa sempre de <code>conteudo/ocidental/ofertas.yaml</code> (<code>preco</code> e <code>taxa_plataforma</code>); o botão leva ao checkout atual (com <code>sck</code> e cupom).</p>
     <div class="grid grid--2">
-      <aside class="card price-card"><p class="eyebrow">Leitura completa</p><h3>{{ ofertas.mapa.nome }}</h3><p class="price">R${{ ofertas.mapa.preco | moeda }}</p><p class="help">Pagamento único, pela Cakto.</p><button type="button" class="button">Quero a leitura completa</button></aside>
-      <aside class="card price-card"><p class="eyebrow">Carregando</p><h3>{{ ofertas.compat.nome }}</h3><p class="price">R${{ ofertas.compat.preco | moeda }}</p><p class="help">Estado enquanto o link do checkout é montado.</p><button type="button" class="button" disabled aria-busy="true"><span class="spinner" aria-hidden="true"></span>Abrindo o pagamento…</button></aside>
+      <aside class="card price-card"><p class="eyebrow">Leitura completa</p><h3>{{ ofertas.mapa.nome }}</h3><p class="price">R${{ ofertas.mapa.preco | moeda }}</p>{% if ofertas.mapa.taxa_plataforma %}<p class="caption ptaxa">+ R${{ ofertas.mapa.taxa_plataforma | moeda }} de taxa da plataforma</p>{% endif %}<p class="help">Pagamento único. Garantia de 7 dias.</p><button type="button" class="button">Quero a leitura completa</button></aside>
+      <aside class="card price-card"><p class="eyebrow">Carregando</p><h3>{{ ofertas.compat.nome }}</h3><p class="price">R${{ ofertas.compat.preco | moeda }}</p>{% if ofertas.compat.taxa_plataforma %}<p class="caption ptaxa">+ R${{ ofertas.compat.taxa_plataforma | moeda }} de taxa da plataforma</p>{% endif %}<p class="help">Estado enquanto o link do checkout é montado.</p><button type="button" class="button" disabled aria-busy="true"><span class="spinner" aria-hidden="true"></span>Abrindo o pagamento…</button></aside>
     </div>
   </section>
 
@@ -201,7 +201,7 @@
 
   <section class="gallery-section">
     <h2>E-mail de entrega</h2>
-    <p class="secondary">Ainda nas cores da rodada 3 (<code>paleta.email("ocidental")</code>): a marca nova entra nos e-mails na fase B.</p>
+    <p class="secondary">Tema claro do pacote (<code>paleta.email("ocidental")</code>), com o nome Valderez Astrologia no topo e no remetente. O e-mail não baixa fonte: onde a Cormorant/Inter não existir, cai no Georgia/Arial.</p>
     <div class="email">{{ email_exemplo }}</div>
   </section>
 

@@ -25,6 +25,8 @@ from fastapi import BackgroundTasks, Body, FastAPI, HTTPException, Query, Reques
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
+from fastapi.exception_handlers import http_exception_handler
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel, Field, ValidationError
 
 from base_significacoes import NOME_PT, SIGNO_PT
@@ -96,6 +98,24 @@ async def _avisar_erro_500(request: Request, call_next):
                         chave="erro500", intervalo=15 * 60)
         raise
 app.mount("/static", StaticFiles(directory=RAIZ / "static"), name="static")
+
+
+# Página não encontrada (404) da ocidental: a tela do pacote da Valderez, sempre
+# com status 404. A API, o webhook, os arquivos estáticos e a védica continuam
+# com a resposta de sempre (JSON {"detail": ...}).
+_SEM_PAGINA_404 = ("/api/", "/static/", "/webhook/")
+
+
+@app.exception_handler(StarletteHTTPException)
+async def _nao_encontrada(request: Request, exc: StarletteHTTPException):
+    if (exc.status_code == 404 and sistema.ativo() == "ocidental"
+            and not request.url.path.startswith(_SEM_PAGINA_404)
+            and "text/html" in request.headers.get("accept", "")):
+        # com a captura ligada, as outras páginas voltam para a lista: nada de menu
+        html = _jinja.get_template("ocidental/404.html").render(
+            cores=paleta.tela("ocidental"), marca=marca, blog=blog, sem_menu=_captura_ligada())
+        return Response(html, status_code=404, media_type="text/html; charset=utf-8")
+    return await http_exception_handler(request, exc)
 # Rotas da versão ocidental (/api/ocidental/*): existem sempre, qualquer que seja
 # a versão no ar — um link já entregue precisa abrir depois de uma troca.
 app.include_router(rotas_ocidental.rotas)
@@ -326,7 +346,7 @@ def _mandar_minhas_leituras(email: str) -> None:
     leituras = db.leituras_do_email(email)
     if not leituras:
         return
-    if not entrega.enviar_email(email, "Os links das suas leituras na Padmini",
+    if not entrega.enviar_email(email, "Os links das suas leituras na Valderez Astrologia",
                                 entrega.email_minhas_leituras_html(leituras)):
         alertas.alertar("\"Minhas leituras\" não saiu por e-mail",
                         f"{len(leituras)} leitura(s) de um cliente não foram reenviadas. Conferir o Resend.",
@@ -899,7 +919,7 @@ def _processar_pedido(evento: dict) -> dict:
         log.exception("venda cruzada: falha ao montar o bloco")
         extra = ""
     enviado = entrega.enviar_email(
-        email, "Seu relatório Padmini está pronto",
+        email, ASSUNTO_ENTREGA[versao],
         entrega.email_completo_html(produto, link, dados.get("nome", ""), extra, versao))
     db.registrar_pedido(evento, _rotulo_produto(produto, versao), dados, email, link, enviado)
     if not enviado:
@@ -909,6 +929,11 @@ def _processar_pedido(evento: dict) -> dict:
     # se não enviou (Resend não configurado), devolve o link para envio manual
     return {"ok": True, "produto": produto, "email": email or None,
             "email_enviado": enviado, "link": None if enviado else link}
+
+
+# Assunto do e-mail de entrega do completo, na versão da oferta paga.
+ASSUNTO_ENTREGA = {"vedica": "Seu relatório Padmini está pronto",
+                   "ocidental": "Sua leitura da Valderez Astrologia está pronta"}
 
 
 def _entregar_mapas_do_casal(evento: dict, versao: str = "vedica") -> dict:

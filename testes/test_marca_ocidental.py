@@ -122,7 +122,7 @@ def test_emails_da_ocidental(monkeypatch):
                                               "ocidental")
         html = entrega.email_completo_html(produto, "https://padmini.com.br/x", "Ana", extra, "ocidental")
         _sem_nada_antigo(html, f"e-mail {produto}")
-        assert paleta.EMAIL["ocidental"]["fundo"] in html and "Young Serif" in html
+        assert paleta.EMAIL["ocidental"]["fundo"] in html and "Cormorant Garamond" in html
     _sem_nada_antigo(entrega.email_mapas_do_casal_html([("Ana", "https://x")], "Ana", "ocidental"), "mapas do casal")
 
 
@@ -140,7 +140,7 @@ def test_emails_de_marketing_da_ocidental():
                 ("lembrete", marketing.email_lembrete_html(produto, amostra, dados, "a@b.c", "ocidental")),
                 ("abandono", marketing.email_abandono_html(produto, "Ana", "https://x", "a@b.c", "ocidental"))):
             _sem_nada_antigo(html, f"{nome} {produto}")
-            assert paleta.EMAIL["ocidental"]["fundo"] in html and "Young Serif" in html, f"{nome} {produto}"
+            assert paleta.EMAIL["ocidental"]["fundo"] in html and "Cormorant Garamond" in html, f"{nome} {produto}"
 
 
 def test_emails_da_vedica_continuam_com_as_cores_de_sempre():
@@ -179,8 +179,10 @@ def test_pdfs_da_ocidental(monkeypatch):
     novas = {_cor_pdf(paleta.PAPEL["ocidental"][k]) for k in ("tinta", "acento")}
     for nome, gerar in pdfs.items():
         conteudo = _pdf_sem_compressao(monkeypatch, gerar)
-        assert "Cormorant" not in conteudo and "Inter" not in conteudo, nome
-        assert "YoungSerif" in conteudo and "SourceSans3" in conteudo, nome
+        # Valderez (fase B): Cormorant Garamond + Inter, como o site; nada da rodada 3
+        assert "Cormorant" in conteudo and "Inter" in conteudo, nome
+        assert "YoungSerif" not in conteudo and "SourceSans3" not in conteudo, nome
+        assert "Valderez Astrologia" in conteudo or "Valderez" in conteudo, nome
         usadas = {tuple(round(float(x), 3) for x in trio.split())
                   for trio in re.findall(r"(\d*\.?\d+ \d*\.?\d+ \d*\.?\d+) (?:rg|RG)", conteudo)}
         assert not (usadas & antigas), f"{nome}: cor antiga {usadas & antigas}"

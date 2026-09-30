@@ -1,4 +1,4 @@
-// Padmini (ocidental) — e-mail antes da amostra (rodada 6). O campo e a caixa
+// Versão ocidental (Valderez Astrologia) — e-mail antes da amostra (rodada 6). O campo e a caixa
 // estão em ocidental/_campo_email.html; quem decide o que vai para a tela e o
 // que vai por e-mail é o servidor (rotas_ocidental.entregar_amostra).
 (function () {
@@ -18,8 +18,9 @@
   // o aviso no lugar do que foi para o e-mail (nada, se o e-mail não saiu: aí a tela já tem tudo)
   function aviso(d) {
     if (!d.email || !d.email.enviado) return "";
-    return `<div class="card aviso-email" id="aviso-email">
-      <p style="margin:0"><b>O resto da sua leitura chegou em ${esc(d.email.para)}.</b></p>
+    // Só com o envio confirmado pelo servidor (d.email.enviado): o aviso nunca sai no clique.
+    return `<div class="card aviso-email" id="aviso-email" role="status">
+      <p style="margin:0"><b>O resto da sua leitura foi para o seu e-mail: ${esc(d.email.para)}.</b></p>
       <p class="nota" style="margin:6px 0 12px">Não chegou? Confira o spam e a aba Promoções — ou peça de novo.</p>
       <button type="button" class="btn btn-outline" id="reenviar-amostra">Reenviar o e-mail</button>
       <span class="nota" id="reenvio-status" aria-live="polite" style="margin-left:10px"></span>

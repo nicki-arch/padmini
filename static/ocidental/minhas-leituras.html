@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -9,35 +9,29 @@
 <title>Valderez Astrologia — Minhas leituras</title>
 <meta name="description" content="Receba de novo, no seu e-mail, os links de todas as leituras que você comprou na Valderez Astrologia.">
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="/static/base.css">
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/ocidental/componentes.css">
-<style>
-  .caixa{max-width:520px}
-  form{display:grid;gap:14px}
-  .resposta{margin-top:16px}
-</style>
+<link rel="stylesheet" href="/static/valderez/componentes.css">
 </head>
 <body>
 {% set atual = "/minhas-leituras" %}{% include "ocidental/_cabecalho.html" %}
 
-<main id="conteudo" class="wrap">
+<main id="conteudo" class="section container narrow">
   <p class="eyebrow">Suas leituras</p>
   <h1>Recuperar minhas leituras</h1>
   <p class="lede">Perdeu o e-mail com o link? Digite o e-mail que você usou na compra e mandamos de novo os links de todas as suas leituras — sem senha, sem cadastro.</p>
 
-  <div class="card caixa">
-    <form id="form" novalidate>
-      <div class="campo">
+  <div class="card" style="margin-top:32px">
+    <form id="form" class="stack" novalidate>
+      <div class="field">
         <label for="email">Seu e-mail</label>
-        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required placeholder="voce@exemplo.com">
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required placeholder="voce@exemplo.com" aria-describedby="erro">
       </div>
-      <p class="erro" id="erro" role="alert" hidden></p>
-      <button id="enviar" type="submit">Mandar os meus links</button>
+      <p class="form-erro" id="erro" role="alert" hidden></p>
+      <button class="button" id="enviar" type="submit">Mandar os meus links</button>
     </form>
-    <p class="aviso resposta" id="resposta" aria-live="polite" hidden></p>
+    <p class="notice" id="resposta" role="status" aria-live="polite" hidden style="margin-top:24px"></p>
   </div>
-  <p class="nota" style="margin-top:18px">Os links chegam só no e-mail da compra. Não achou nada? Confira o spam e se é o mesmo e-mail que você usou no pagamento — ou escreva para <a href="mailto:contato@pedrosperbmonteiro.com.br">contato@pedrosperbmonteiro.com.br</a>.</p>
+  <p class="caption" style="margin-top:24px">Os links chegam só no e-mail da compra. Não achou nada? Confira o spam e se é o mesmo e-mail que você usou no pagamento — ou escreva para <a href="mailto:contato@pedrosperbmonteiro.com.br">contato@pedrosperbmonteiro.com.br</a>.</p>
 </main>
 
 {% include "ocidental/_rodape.html" %}
@@ -48,15 +42,16 @@ $("#form").addEventListener("submit", async (e) => {
   const erro = $("#erro"), resp = $("#resposta"), botao = $("#enviar");
   erro.hidden = true; resp.hidden = true;
   const email = $("#email").value.trim();
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { erro.textContent = "Confira o e-mail."; erro.hidden = false; return; }
-  botao.disabled = true; botao.textContent = "Enviando…";
+  $("#email").removeAttribute("aria-invalid");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { erro.textContent = "Confira o e-mail."; erro.hidden = false; $("#email").setAttribute("aria-invalid", "true"); $("#email").focus(); return; }
+  botao.disabled = true; botao.setAttribute("aria-busy", "true"); botao.textContent = "Enviando…";
   try {
     const r = await fetch("/api/minhas-leituras", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
     const c = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Não deu agora. Tente de novo em instantes.");
     resp.textContent = c.mensagem; resp.hidden = false;
   } catch (err) { erro.textContent = err.message; erro.hidden = false; }
-  finally { botao.disabled = false; botao.textContent = "Mandar os meus links"; }
+  finally { botao.disabled = false; botao.removeAttribute("aria-busy"); botao.textContent = "Mandar os meus links"; }
 });
 </script>
 </body>

@@ -1,8 +1,8 @@
 /* ==========================================================================
    Padmini — métricas de funil (PostHog), simples e opcional.
 
-   - Só carrega o PostHog se /api/config devolver uma posthog_key (env
-     PADMINI_POSTHOG_KEY). Em branco, o site funciona igual e nada é carregado.
+   - Só carrega o PostHog se /api/config devolver uma posthog_key (variável
+     de ambiente no servidor). Em branco, o site funciona igual e nada é carregado.
    - window.padTrack(evento, props) pode ser chamado a qualquer momento: os
      eventos ficam numa fila até o PostHog estar pronto e então são enviados.
      Se as métricas estiverem desligadas, vira um no-op silencioso.

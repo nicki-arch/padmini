@@ -120,7 +120,7 @@ def _botao(link: str, texto: str, sistema: str = "vedica") -> str:
 def _moldura(corpo: str, rodape: str = "", sistema: str = "vedica") -> str:
     c = _cor(sistema)
     return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
-  <p style="font-family:{c['fonte_marca']};font-size:24px;color:{c['acento']};margin:0 0 18px">Padmini</p>
+  {entrega.marca_do_email(c, sistema)}
   {corpo}
   <p style="color:{c['fraco']};font-size:12px;margin-top:26px">{_sistema.ASSINATURA_EMAIL[sistema]}{rodape}</p>
 </div>"""
@@ -161,7 +161,7 @@ TEXTOS = {
                             "numerologia": "O seu Caminho de Vida", "tarot": "As suas 3 cartas"},
         "assunto_lembrete": {"mapa": "O resto do seu mapa natal", "compat": "O resto da sinastria de vocês",
                              "numerologia": "Os outros números do seu nome", "tarot": "O que as suas cartas dizem juntas"},
-        "assunto_abandono": "Seu pedido na Padmini ficou pela metade",
+        "assunto_abandono": "Seu pedido na Valderez Astrologia ficou pela metade",
         "completo_abre": {
             "mapa": ("a roda do seu mapa, todos os planetas signo a signo (e casa a casa, com a hora de "
                      "nascimento), os aspectos principais, os elementos e o PDF para guardar"),
@@ -181,7 +181,7 @@ TEXTOS = {
 def assunto(tipo: str, produto: str = "", sistema: str = "vedica") -> str:
     """Assunto do e-mail: tipo = 'amostra' | 'lembrete' | 'abandono'."""
     a = TEXTOS[sistema][f"assunto_{tipo}"]
-    return a if isinstance(a, str) else a.get(produto, "Padmini")
+    return a if isinstance(a, str) else a.get(produto, _sistema.MARCA[sistema])
 
 
 def _nome_do_registro(produto: str, dados: dict) -> str:
@@ -283,7 +283,7 @@ def email_amostra_html(produto: str, amostra: dict, dados: dict, email: str, nom
     preco = ofertas.moeda(ofertas.oferta(produto, sistema).get("preco"))
     oque = TEXTOS[sistema]["completo_abre"][produto]
     corpo = (_ola(nome)
-             + _p("Aqui está a amostra que você gerou na Padmini:")
+             + _p(f"Aqui está a amostra que você gerou na {_sistema.MARCA[sistema]}:")
              + _resumo_amostra(produto, amostra, sistema)
              + _p(f"O relatório completo abre {oque}.", "margin:18px 0 0")
              + _botao(link_checkout(produto, dados, "amostra", sistema),
@@ -331,7 +331,7 @@ def email_abandono_html(produto: str, nome: str, link: str, email: str, sistema:
     c = _cor(sistema)
     titulo = TEXTOS[sistema]["abandono_titulo"][produto]
     corpo = (_ola(nome)
-             + _p(f"Vimos que você começou a pedir {titulo} na Padmini, mas o pagamento não foi "
+             + _p(f"Vimos que você começou a pedir {titulo} na {_sistema.MARCA[sistema]}, mas o pagamento não foi "
                   "concluído. Se algo deu errado no checkout, é só continuar de onde parou:")
              + _botao(link, "Continuar →", sistema)
              + _p(f'<span style="color:{c["suave"]};font-size:13px">Ficou alguma dúvida? Responda este e-mail. '
@@ -424,7 +424,7 @@ def _venda_cruzada_ocidental(produto_comprado: str, dados: dict) -> str:
     outros = [(k, ofertas.oferta(k, sistema)) for k in VENDA_CRUZADA_OCIDENTAL.get(produto_comprado, ())]
     outros = [(k, o) for k, o in outros if o.get("checkout")]
     if outros:
-        linhas.append(_p("Outras leituras da Padmini, todas com amostra grátis:", f"margin:14px 0 6px;color:{_O['suave']}"))
+        linhas.append(_p("Outras leituras da Valderez Astrologia, todas com amostra grátis:", f"margin:14px 0 6px;color:{_O['suave']}"))
         for k, o in outros:
             titulo, texto = TEXTO_OUTRO_PRODUTO[k]
             linhas.append(f'<p style="margin:10px 0"><a href="{_e(link_site(k, "pos_compra"))}" '

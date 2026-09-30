@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="{{ cores.ground }}">
+{# Página não encontrada da versão ocidental (docs/design/valderez-1.0/telas/404.html).
+   Servida por app._nao_encontrada com HTTP 404: a estética não muda o status. #}
+<title>Página não encontrada — Valderez Astrologia</title>
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/componentes.css">
+</head>
+<body>
+{% set atual = "" %}{% include "ocidental/_cabecalho.html" %}
+<main id="conteudo" class="section container narrow nao-achei">
+  <p class="eyebrow">404</p>
+  <h1>Esta página não foi encontrada</h1>
+  <p class="secondary">Confira o endereço ou volte ao início. Se você chegou por um link de leitura comprada, <a href="/minhas-leituras">peça os seus links de novo</a>.</p>
+  <div class="row">
+    {%- if sem_menu %}
+    <a class="button" href="/lista">Ir para a lista de espera</a>
+    {%- else %}
+    <a class="button" href="/">Voltar ao início</a>
+    <a class="button button--secondary" href="/mapa">Ver mapa natal</a>
+    {%- endif %}
+  </div>
+  <img src="/static/valderez/celeste.svg" alt="" width="540" height="520">
+</main>
+{% include "ocidental/_rodape.html" %}
+</body>
+</html>

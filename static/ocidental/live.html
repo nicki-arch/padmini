@@ -189,7 +189,7 @@ async function verSessao() {
   try {
     const s = await (await fetch("/api/live/sessao")).json();
     mostrarLive(s.ativa);
-    if (!s.configurado) erro("#erro-senha", "Falta definir PADMINI_LIVE_SENHA no servidor.");
+    if (!s.configurado) erro("#erro-senha", "A senha do modo live ainda não foi configurada no servidor.");
   } catch { mostrarLive(false); }
 }
 function mostrarLive(ativa) {

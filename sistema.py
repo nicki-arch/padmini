@@ -80,10 +80,15 @@ LEGAIS = {
 # sempre foi; as outras são templates.
 LIVE = {"vedica": "live.html", "ocidental": "ocidental/live.html"}
 
+# O nome que o público vê em cada versão (e-mails, remetente, páginas). Desde
+# 29/set/2026 a marca pública da ocidental é Valderez Astrologia; a Padmini é a
+# produtora por trás (tecnologia, site, checkout).
+MARCA = {"vedica": "Padmini", "ocidental": "Valderez Astrologia"}
+
 # Linha de assinatura dos e-mails (entrega e marketing).
 ASSINATURA_EMAIL = {
     "vedica": "Padmini — astrologia védica para autoconhecimento.",
-    "ocidental": "Padmini — astrologia para autoconhecimento.",
+    "ocidental": "Valderez Astrologia — astrologia para autoconhecimento.",
 }
 
 # Prefixo dos tokens do completo (ver acesso.py). A védica não tem prefixo:
