@@ -182,9 +182,9 @@ def test_pdf_tem_capa_roda_e_fontes_novas(ocidental):
 
 
 def test_fontes_de_glifos_cobrem_a_roda():
-    from fontTools.ttLib import TTFont
-    sym = TTFont(RAIZ / "fontes" / "NotoSansSymbols-astro.ttf").getBestCmap()
-    sym2 = TTFont(RAIZ / "fontes" / "NotoSansSymbols2-astro.ttf").getBestCmap()
+    from reportlab.pdfbase.ttfonts import TTFontFile  # o reportlab já é dependência
+    sym = TTFontFile(str(RAIZ / "fontes" / "NotoSansSymbols-astro.ttf")).charToGlyph
+    sym2 = TTFontFile(str(RAIZ / "fontes" / "NotoSansSymbols2-astro.ttf")).charToGlyph
     glifos = set("".join(roda_mapa.GLIFO_SIGNO.values()) + "".join(roda_mapa.GLIFO_PONTO.values()))
     for g in glifos:
         fonte = sym2 if g in roda_mapa.SO_NA_SYMBOLS_2 else sym
