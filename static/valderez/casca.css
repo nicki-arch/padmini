@@ -83,6 +83,8 @@
 .cookie p { margin: 0 0 14px; color: var(--vz-tinta-2); }
 .cookie p a { color: var(--vz-vinho); }
 .cookie-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cookie-actions-um { grid-template-columns: 1fr; }
+.cookie button.button[data-cookies-fechar] { background: var(--vz-vinho); color: var(--vz-branco); border: 0; }
 .cookie button.button { min-height: 46px; padding: 0 12px; border-radius: 999px; font: 600 15px/1 var(--vz-f-texto); cursor: pointer;
   border: 1.5px solid var(--vz-vinho); background: var(--vz-branco); color: var(--vz-vinho); width: 100%; }
 .cookie button.button[data-cookies=aceito] { background: var(--vz-vinho); color: var(--vz-branco); }

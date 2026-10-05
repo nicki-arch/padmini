@@ -224,6 +224,9 @@ _jinja.globals["ilustracao_url"] = ilustracoes.url
 import produtos_ocidental  # noqa: E402
 _jinja.globals["trecho_real"] = produtos_ocidental.trecho_real
 _jinja.globals["cursos"] = produtos_ocidental.cursos
+# Ícones de traço (rodada 9.1): o YAML diz `icone: sol`; a roda é só a marca (icones.py).
+import icones  # noqa: E402
+_jinja.globals["icone"] = icones.svg
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:

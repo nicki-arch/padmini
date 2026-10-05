@@ -23,11 +23,12 @@ compat:
     cuidado e onde está o ponto mais forte do casal.
   selos: [Entrega imediata, Leitura no site e PDF, Dados dos dois]
   recebe_titulo: Tudo o que vem na <em>sinastria do casal</em>
+  # cada item: `icone` = um arquivo de static/valderez/icones/ (nunca a roda da marca)
   recebe:
-    - {titulo: "8 dimensões do casal", texto: "Atração, emoções, comunicação, afeto, identidade, crescimento, compromisso e dia a dia."}
-    - {titulo: "Aspectos entre vocês", texto: "Como os planetas de um tocam os do outro, em linguagem clara."}
-    - {titulo: "Um nas casas do outro", texto: "Em que área da vida cada um mexe com o outro (pede a hora de nascimento)."}
-    - {titulo: "O ponto mais forte", texto: "Um cartão do casal para guardar e compartilhar."}
+    - {icone: venus, titulo: "8 dimensões do casal", texto: "Atração, emoções, comunicação, afeto, identidade, crescimento, compromisso e dia a dia."}
+    - {icone: mais, titulo: "Aspectos entre vocês", texto: "Como os planetas de um tocam os do outro, em linguagem clara."}
+    - {icone: casa, titulo: "Um nas casas do outro", texto: "Em que área da vida cada um mexe com o outro (pede a hora de nascimento)."}
+    - {icone: estrela, titulo: "O ponto mais forte", texto: "Um cartão do casal para guardar e compartilhar."}
   passos:
     - {titulo: "Os dois nascimentos", texto: "Data, hora e cidade de cada um. Sem a hora também dá."}
     - {titulo: "A amostra grátis", texto: "O começo de cada dimensão do casal, na hora."}
@@ -47,12 +48,12 @@ numerologia:
   selos: [Entrega imediata, Leitura no site e PDF, Só nome e data]
   recebe_titulo: Tudo o que vem na <em>numerologia</em>
   recebe:
-    - {titulo: "Caminho de Vida", texto: "O tema que acompanha você a vida inteira."}
-    - {titulo: "Expressão", texto: "Seus talentos e o jeito de agir."}
-    - {titulo: "Alma", texto: "O que te move por dentro."}
-    - {titulo: "Personalidade", texto: "Como os outros te veem primeiro."}
-    - {titulo: "Dia de nascimento", texto: "O talento que vem do dia em que você nasceu."}
-    - {titulo: "Ano Pessoal", texto: "O clima do seu ano, de aniversário a aniversário."}
+    - {icone: sol, titulo: "Caminho de Vida", texto: "O tema que acompanha você a vida inteira."}
+    - {icone: mercurio, titulo: "Expressão", texto: "Seus talentos e o jeito de agir."}
+    - {icone: lua, titulo: "Alma", texto: "O que te move por dentro."}
+    - {icone: horizonte, titulo: "Personalidade", texto: "Como os outros te veem primeiro."}
+    - {icone: raio, titulo: "Dia de nascimento", texto: "O talento que vem do dia em que você nasceu."}
+    - {icone: montanha, titulo: "Ano Pessoal", texto: "O clima do seu ano, de aniversário a aniversário."}
   passos:
     - {titulo: "Nome e data", texto: "O nome completo de registro e a data de nascimento."}
     - {titulo: "A amostra grátis", texto: "O seu Caminho de Vida, na hora."}
@@ -71,10 +72,10 @@ tarot:
   selos: [Na hora, 3 cartas, Pergunta opcional]
   recebe_titulo: Tudo o que vem no <em>tarot</em>
   recebe:
-    - {titulo: "Situação", texto: "O cenário de agora e as forças em jogo."}
-    - {titulo: "Desafio", texto: "O que pede mais atenção."}
-    - {titulo: "Conselho", texto: "Um caminho para seguir."}
-    - {titulo: "Leitura de cada carta", texto: "O sentido da carta naquela posição."}
+    - {icone: sol, titulo: "Situação", texto: "O cenário de agora e as forças em jogo."}
+    - {icone: marte, titulo: "Desafio", texto: "O que pede mais atenção."}
+    - {icone: estrela, titulo: "Conselho", texto: "Um caminho para seguir."}
+    - {icone: pagina, titulo: "Leitura de cada carta", texto: "O sentido da carta naquela posição."}
   passos:
     - {titulo: "Sua pergunta", texto: "Escreva o que quer pensar, ou deixe em branco."}
     - {titulo: "As três cartas", texto: "A tiragem sai na hora."}
@@ -96,10 +97,10 @@ comunidade:
   selos: [Grupo do seu signo, Cancela quando quiser, Pix ou cartão]
   recebe_titulo: Tudo o que vem na <em>comunidade</em>
   recebe:
-    - {titulo: "Grupo geral", texto: "Conversas e avisos com a Dona Valderez e o Pedro."}
-    - {titulo: "Grupo do seu signo", texto: "Só com quem tem o mesmo signo solar."}
-    - {titulo: "Antes de todo mundo", texto: "Lançamentos e condições primeiro para quem assina."}
-    - {titulo: "Sem fidelidade", texto: "Cancela com um clique; o acesso sai no fim do mês pago."}
+    - {icone: sol, titulo: "Grupo geral", texto: "Conversas e avisos com a Dona Valderez e o Pedro."}
+    - {icone: lua, titulo: "Grupo do seu signo", texto: "Só com quem tem o mesmo signo solar."}
+    - {icone: raio, titulo: "Antes de todo mundo", texto: "Lançamentos e condições primeiro para quem assina."}
+    - {icone: ok, titulo: "Sem fidelidade", texto: "Cancela com um clique; o acesso sai no fim do mês pago."}
   passos:
     - {titulo: "Assine", texto: "Pix ou cartão, todo mês."}
     - {titulo: "Receba o convite", texto: "O link dos grupos chega no seu e-mail."}
@@ -127,10 +128,10 @@ astrologia-do-zero:
   selos: [Aulas gravadas, No seu ritmo, Com o seu mapa]
   recebe_titulo: Tudo o que vem na <em>astrologia do zero</em>
   recebe:
-    - {titulo: "Os 12 signos", texto: "O que cada um traz, com exemplos do dia a dia."}
-    - {titulo: "Os planetas", texto: "O que cada planeta mostra no mapa."}
-    - {titulo: "As 12 casas", texto: "As áreas da vida, uma por uma."}
-    - {titulo: "Lendo o seu mapa", texto: "Juntar tudo no seu próprio mapa."}
+    - {icone: sol, titulo: "Os 12 signos", texto: "O que cada um traz, com exemplos do dia a dia."}
+    - {icone: mercurio, titulo: "Os planetas", texto: "O que cada planeta mostra no mapa."}
+    - {icone: casa, titulo: "As 12 casas", texto: "As áreas da vida, uma por uma."}
+    - {icone: estrela, titulo: "Lendo o seu mapa", texto: "Juntar tudo no seu próprio mapa."}
   passos:
     - {titulo: "Inscreva-se", texto: "Pix ou cartão."}
     - {titulo: "Assista quando quiser", texto: "As aulas ficam na área do aluno."}
@@ -157,10 +158,10 @@ consulta:
   selos: [Por vídeo, Mapa completo incluído, Vagas por mês]
   recebe_titulo: Tudo o que vem na <em>consulta</em>
   recebe:
-    - {titulo: "O seu mapa completo", texto: "Antes da conversa, para você chegar já tendo lido."}
-    - {titulo: "A conversa por vídeo", texto: "Com a Dona Valderez, sobre as suas perguntas."}
-    - {titulo: "A gravação", texto: "Para você ouvir de novo depois."}
-    - {titulo: "Versão para casal", texto: "Os dois mapas e a sinastria na mesma conversa."}
+    - {icone: sol, titulo: "O seu mapa completo", texto: "Antes da conversa, para você chegar já tendo lido."}
+    - {icone: mercurio, titulo: "A conversa por vídeo", texto: "Com a Dona Valderez, sobre as suas perguntas."}
+    - {icone: pagina, titulo: "A gravação", texto: "Para você ouvir de novo depois."}
+    - {icone: aneis, titulo: "Versão para casal", texto: "Os dois mapas e a sinastria na mesma conversa."}
   passos:
     - {titulo: "Entre na lista", texto: "Avisamos quando abrirem as vagas do mês."}
     - {titulo: "Escolha o horário", texto: "Paga e marca no mesmo passo."}

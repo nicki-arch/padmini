@@ -119,6 +119,19 @@ def vende(chave: str, sistema: str = "ocidental") -> bool:
     return vendas_abertas() and ativo(chave)
 
 
+def colunas(quantos: int, maximo: int = 4) -> int:
+    """Colunas da grade de capas no computador (rodada 9.1): o número de colunas
+    acompanha o número de cartões, para nenhum ficar sozinho na última linha.
+    Até `maximo` cartões, uma linha só; depois, o maior número de colunas que não
+    deixa sobrar 1 (5 → 3+2, 7 → 4+3, 9 → 3+3+3). No celular a grade é de uma coluna (CSS)."""
+    if quantos <= maximo:
+        return max(quantos, 1)
+    for c in range(maximo, 1, -1):
+        if quantos % c != 1:
+            return c
+    return 2
+
+
 def dimensoes_mapa() -> list[dict]:
     return list(_dados.get("dimensoes_mapa") or [])
 

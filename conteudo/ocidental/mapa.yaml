@@ -21,9 +21,9 @@ form:
     Com a data, a hora e a cidade do seu nascimento, calculamos onde estava
     cada planeta. Você vê na hora o começo de cada dimensão, de graça.
   itens:
-    - {titulo: "Essência, Emoções e Como você chega", sub: "Sol, Lua e Ascendente"}
-    - {titulo: "Mente, Amor e Ação", sub: "Mercúrio, Vênus e Marte"}
-    - {titulo: O resto do texto fica guardado, sub_venda: Você desbloqueia se quiser ir fundo,
+    - {icone: sol, titulo: "Essência, Emoções e Como você chega", sub: "Sol, Lua e Ascendente"}
+    - {icone: mercurio, titulo: "Mente, Amor e Ação", sub: "Mercúrio, Vênus e Marte"}
+    - {icone: cadeado, titulo: O resto do texto fica guardado, sub_venda: Você desbloqueia se quiser ir fundo,
        sub_fechada: A leitura completa abre em breve}
   titulo_cartao: Seus dados de nascimento
   nome: Seu nome

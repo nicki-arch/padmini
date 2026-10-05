@@ -2,8 +2,9 @@
    com a roda clara (static/valderez/roda-claro.svg). Os produtos vêm do catálogo
    (oculto não aparece). Links: minhas leituras, lista, privacidade, termos,
    contato, código-fonte (a publicação do código cumpre a AGPL do Swiss Ephemeris;
-   ver CLAUDE.md) e "Preferências de cookies" (consentimento.js mostra o link
-   quando há o que consentir). A frase sobre a revisão é a que é verdade hoje
+   ver CLAUDE.md) e "Preferências de cookies" (sempre visível, rodada 9.1: o
+   consentimento.js abre as preferências; sem pixel configurado, elas dizem que
+   só há cookies necessários; sem JavaScript, o link leva à seção de cookies). A frase sobre a revisão é a que é verdade hoje
    (revisao.yaml). Quem inclui pode definir `nota_rodape` (HTML). #}
 <footer class="rod">
   <div class="rod-in">
@@ -26,7 +27,7 @@
       <nav aria-label="Rodapé">
         <a href="/termos">Termos</a>
         <a href="/privacidade">Privacidade</a>
-        <a href="#" id="preferencias-cookies" hidden>Preferências de cookies</a>
+        <a href="/privacidade#cookies" id="preferencias-cookies">Preferências de cookies</a>
         <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
       </nav>
     </div>
