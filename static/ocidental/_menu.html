@@ -1,9 +1,12 @@
-{# Os links do menu da versão ocidental (os quatro produtos e o blog), usados
-   pelo cabeçalho (_cabecalho.html) no desktop e no painel do celular. Quem
-   inclui define `atual` ("/", "/compatibilidade", "/mapa"…). #}
-{%- for href, rotulo in (("/mapa", "Mapa natal"), ("/compatibilidade", "Sinastria do casal"), ("/numerologia", "Numerologia"), ("/tarot", "Tarot")) %}
-<a href="{{ href }}"{% if href == atual %} aria-current="page"{% endif %}>{{ rotulo }}</a>
+{# Os links do menu da versão ocidental, MONTADOS DO CATÁLOGO (rodada 9,
+   conteudo/ocidental/catalogo.yaml): os produtos ativos e em breve, na ordem do
+   YAML (oculto não aparece), "Todas as leituras" e o blog. Usado pelo cabeçalho
+   (_cabecalho.html) no desktop e no painel do celular. Quem inclui define
+   `atual` ("/", "/compatibilidade", "/mapa"…). #}
+{%- for p in catalogo.visiveis() %}
+<a href="{{ p.rota }}"{% if p.rota == atual %} aria-current="page"{% endif %}>{{ p.nome }}{% if p.estado == "em_breve" %} <small class="menu-breve">em breve</small>{% endif %}</a>
 {%- endfor %}
+<a href="/leituras"{% if atual == "/leituras" %} aria-current="page"{% endif %}>Todas as leituras</a>
 {%- if blog.publicados() %}
 <a href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>
 {%- endif %}

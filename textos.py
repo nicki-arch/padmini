@@ -54,3 +54,24 @@ def da_pagina(pagina: str, sistema: str | None = None) -> dict:
         _lidos[(sistema, pagina)] = com_indice(yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}
                                                if arquivo.exists() else {})
     return _lidos[(sistema, pagina)]
+
+
+# --------------------------------------------------------------------------
+# REGRA DE HONESTIDADE (rodada 9): frases gerais sobre a revisão da Dona Valderez
+# (conteudo/ocidental/revisao.yaml). "quando_revisado" só vale com TODOS os textos
+# do mapa natal (conteudo/ocidental/textos/) com `revisado: true`; até lá,
+# "enquanto_isso". Nada de "revisado pela Dona Valderez" que não seja verdade.
+# --------------------------------------------------------------------------
+_REVISAO = yaml.safe_load((PASTA / "ocidental" / "revisao.yaml").read_text(encoding="utf-8")) or {}
+
+
+def tudo_revisado() -> bool:
+    import montar_texto_ocidental as mt  # aqui dentro: montar_texto_ocidental importa este módulo
+    revisados, total = mt.contagem_de_revisao()["_total"]
+    return total > 0 and revisados == total
+
+
+def frase_revisao(chave: str) -> str:
+    """A frase `chave` de revisao.yaml na versão que é verdade hoje."""
+    frase = _REVISAO[chave]
+    return frase["quando_revisado" if tudo_revisado() else "enquanto_isso"]

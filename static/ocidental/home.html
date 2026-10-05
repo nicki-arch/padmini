@@ -26,8 +26,8 @@
 {# Home da versão OCIDENTAL (marca Valderez Astrologia; desenho de
    docs/design/valderez-1.0/telas/home.html). Texto: conteudo/ocidental/home.yaml
    (variável `t`), inclusive o <head>. Preço: conteudo/ocidental/ofertas.yaml.
-   Quatro produtos, nesta ordem (rodada 6): mapa natal (a porta de entrada),
-   sinastria, numerologia e tarot. As seções que o pacote não desenhou (produtos,
+   Produtos: montados do catálogo (rodada 9, conteudo/ocidental/catalogo.yaml) —
+   estado, ordem e o interruptor de venda; as seções do casal só com a sinastria ativa. As seções que o pacote não desenhou (produtos,
    8 dimensões, card do casal, depoimentos) estão vestidas com os mesmos componentes. #}
 </head>
 <body>
@@ -42,7 +42,11 @@
         <p class="lede secondary">{{ t.hero.lede }}</p>
         <div class="row">
           <a class="button" href="/mapa">{{ t.hero.botao_principal }}</a>
+          {%- if catalogo.ativo("compat") %}
           <a class="button button--secondary" href="/compatibilidade">{{ t.hero.botao_secundario }}</a>
+          {%- else %}
+          <a class="button button--secondary" href="/leituras">{{ t.hero.botao_leituras }}</a>
+          {%- endif %}
         </div>
         <div class="trust">{% for item in t.hero.confianca %}<span>{{ item }}</span>{% endfor %}</div>
       </div>
@@ -65,40 +69,32 @@
   <section class="section" data-revelar>
     <div class="container">
       <h2>{{ t.produtos.titulo }}</h2>
-      <p class="secondary">{{ t.produtos.sub }}</p>
+      <p class="secondary">{{ t.produtos.sub if vendas else t.produtos.sub_venda_fechada }}</p>
+      {# montado do catálogo (rodada 9): produtos ativos e em breve, na ordem do YAML;
+         preço só com a venda aberta e o produto ativo (catalogo.vende) #}
       <div class="produtos">
-        <div class="card prod anchor">
-          <span class="plab">{{ t.produtos.mapa.etiqueta }}</span>
-          <h3>{{ t.produtos.mapa.titulo }}</h3>
-          <div class="pprice">R${{ ofertas.mapa.preco | moeda }}</div>
-          <p>{{ t.produtos.mapa.texto }}</p>
-          <a class="button" href="/mapa">{{ t.produtos.mapa.botao }}</a>
+        {%- for p in catalogo.visiveis() %}
+        {%- set tp = t.produtos[p.chave] if p.chave in t.produtos else {} %}
+        {%- set o = ofertas[p.oferta] if p.oferta and p.oferta in ofertas else {} %}
+        <div class="card prod{% if loop.first %} anchor{% endif %}">
+          <span class="plab">{{ tp.get('etiqueta') if p.estado == "ativo" and tp.get('etiqueta') else catalogo.textos().leituras.rotulo_em_breve if p.estado == "em_breve" else catalogo.textos().leituras.rotulo_ativo }}</span>
+          <h3>{{ tp.get('titulo') or p.nome }}</h3>
+          {%- if catalogo.vende(p.chave) and o.get('preco') %}
+          {%- if o.get('preco_de') %}<div class="pprice">R${{ o.get('preco') | moeda }} <small>R${{ o.get('preco_de') | moeda }}</small><span class="poff">−{{ o.get('desconto') }}%</span></div>
+          <p class="peco">Você economiza R${{ o.get('economia') | moeda }}</p>
+          {%- else %}<div class="pprice">R${{ o.get('preco') | moeda }}</div>{% endif %}
+          {%- endif %}
+          <p>{{ tp.get('texto') or p.resumo }}</p>
+          {%- if p.chave == "compat" and catalogo.vende("compat") and ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco | moeda }}</p>{% endif %}
+          {%- if p.estado == "ativo" %}
+          <a class="button{% if not loop.first %} button--secondary{% endif %}" href="{{ p.rota }}">{{ tp.get('botao') or p.botao or catalogo.textos().leituras.botao_ativo }}</a>
+          {%- else %}
+          <a class="button button--secondary" href="{{ p.rota }}#me-avise">{{ catalogo.textos().leituras.botao_em_breve }}</a>
+          {%- endif %}
         </div>
-        <div class="card prod">
-          <span class="plab">{{ t.produtos.compat.etiqueta }}</span>
-          <h3>{{ t.produtos.compat.titulo }}</h3>
-          {% if ofertas.compat.preco_de %}<div class="pprice">R${{ ofertas.compat.preco | moeda }} <small>R${{ ofertas.compat.preco_de | moeda }}</small><span class="poff">−{{ ofertas.compat.desconto }}%</span></div>
-          <p class="peco">Você economiza R${{ ofertas.compat.economia | moeda }}</p>
-          {% else %}<div class="pprice">R${{ ofertas.compat.preco | moeda }}</div>
-          {% endif %}          <p>{{ t.produtos.compat.texto }}</p>
-          {% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.preco %}<p class="pcombo">{{ t.produtos.combo }} R${{ ofertas.bump_mapas_casal.preco | moeda }}</p>{% endif %}
-          <a class="button button--secondary" href="/compatibilidade">{{ t.produtos.compat.botao }}</a>
-        </div>
-        <div class="card prod">
-          <span class="plab">{{ t.produtos.numerologia.etiqueta }}</span>
-          <h3>{{ t.produtos.numerologia.titulo }}</h3>
-          <div class="pprice">R${{ ofertas.numerologia.preco | moeda }}</div>
-          <p>{{ t.produtos.numerologia.texto }}</p>
-          <a class="button button--secondary" href="/numerologia">{{ t.produtos.numerologia.botao }}</a>
-        </div>
-        <div class="card prod">
-          <span class="plab">{{ t.produtos.tarot.etiqueta }}</span>
-          <h3>{{ t.produtos.tarot.titulo }}</h3>
-          <div class="pprice">R${{ ofertas.tarot.preco | moeda }}</div>
-          <p>{{ t.produtos.tarot.texto }}</p>
-          <a class="button button--secondary" href="/tarot">{{ t.produtos.tarot.botao }}</a>
-        </div>
+        {%- endfor %}
       </div>
+      <p style="margin:24px 0 0"><a href="/leituras">Todas as leituras →</a></p>
     </div>
   </section>
 
@@ -113,6 +109,7 @@
     </div>
   </section>
 
+  {%- if catalogo.ativo("compat") %}
   <section class="section" data-revelar>
     <div class="container">
       <p class="eyebrow">{{ t.dimensoes.eyebrow }}</p>
@@ -147,6 +144,7 @@
       <p style="margin:16px 0 0"><a href="/compatibilidade#como-fica">{{ t.card_exemplo.link }}</a></p>
     </div>
   </section>
+  {%- endif %}
 
   {%- set deps = depoimentos.publicaveis() %}
   {%- if deps %}

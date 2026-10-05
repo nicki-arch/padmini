@@ -20,6 +20,7 @@
 <script src="/static/ocidental/movimento.js" defer></script>
 {% include "ocidental/_carta.html" %}
 <script src="/static/afiliado.js" defer></script>
+<script src="/static/ocidental/me-avise.js" defer></script>
 <script src="/static/ocidental/amostra-email.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
@@ -62,7 +63,7 @@
 
   <section class="section container narrow" id="sobre">
     <h2>O que vem na leitura completa</h2>
-    <p class="secondary">As cartas e uma frase de cada são grátis. A leitura completa (R${{ ofertas.tarot.preco | moeda }}) abre o resto.</p>
+    <p class="secondary">As cartas e uma frase de cada são grátis. {% if catalogo.vende("tarot") %}A leitura completa (R${{ ofertas.tarot.preco | moeda }}) abre o resto.{% else %}A leitura completa abre em breve.{% endif %}</p>
     <ul class="lista-check">
       <li>A leitura de cada carta na sua posição: Situação, Desafio e Conselho</li>
       <li>A leitura de conjunto: o que as três cartas dizem juntas</li>
@@ -75,10 +76,12 @@
 {% set nota_rodape %}Tarot: baralho de 78 cartas (tradição Rider-Waite-Smith), cartas na posição normal. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional.{% endset %}{% include "ocidental/_rodape.html" %}
 
 <script>
-const LINK_CHECKOUT = "{{ ofertas.tarot.checkout }}";
-const PRECO = "{{ ofertas.tarot.preco | moeda }}";
+{#- venda fechada (catalogo.yaml) ou produto fora do ar: nada de preço nem link de compra #}
+{%- set vende = catalogo.vende("tarot") %}
+const LINK_CHECKOUT = "{{ ofertas.tarot.checkout if vende else '' }}";
+const PRECO = "{{ ofertas.tarot.preco | moeda if vende else '' }}";
 const NOME_OFERTA = {{ ofertas.tarot.nome | tojson }};
-const TAXA = "{{ ofertas.tarot.taxa_plataforma | moeda }}";  // ofertas.yaml → taxa_plataforma
+const TAXA = "{{ ofertas.tarot.taxa_plataforma | moeda if vende else '' }}";  // ofertas.yaml → taxa_plataforma
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const CHAVE_PERGUNTA = "pad_tarot_pergunta";
@@ -146,6 +149,7 @@ function desenharAmostra(d) {
           <li>O relatório em PDF</li>
         </ul>
       </div>
+      {%- if catalogo.vende("tarot") %}
       <aside class="card price-card" aria-labelledby="oferta-titulo">
         <p class="eyebrow">Leitura completa</p>
         <h3 id="oferta-titulo">${esc(NOME_OFERTA)}</h3>
@@ -154,6 +158,9 @@ function desenharAmostra(d) {
         ${cta ? `<p class="help">Pagamento único. Garantia de 7 dias.</p><a class="button" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'tarot',sistema:'ocidental'})">Quero a leitura completa →</a>`
               : `<p class="help">O pagamento desta versão ainda está sendo configurado.</p><button type="button" class="button" disabled>Em breve</button>`}
       </aside>
+      {%- else %}
+      <div>{% set aviso_produto = catalogo.produto("tarot") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}</div>
+      {%- endif %}
     </div>`;
   res.hidden = false; $("#sobre").hidden = true;
   // reenviar = as MESMAS cartas de novo, nunca um sorteio novo

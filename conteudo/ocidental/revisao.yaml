@@ -1,0 +1,60 @@
+# Valderez Astrologia (versão OCIDENTAL) — frases gerais sobre a revisão dos textos.
+#
+# REGRA DE HONESTIDADE (rodada 9, 5/out/2026). Dizer que os textos foram
+# "revisados pela Dona Valderez" só quando for verdade. Cada frase tem duas versões:
+#   quando_revisado  vale quando TODOS os textos de conteudo/ocidental/textos/
+#                    estiverem com `revisado: true`
+#   enquanto_isso    vale até lá (é a de hoje)
+# Quem escolhe é textos.frase_revisao(); os templates e os e-mails pedem a frase
+# pela chave, nunca escrevem a frase à mão. O selo num texto específico só aparece
+# se aquele texto tiver `revisado: true`.
+# Há teste: com algum texto `revisado: false`, nenhuma página pública nem e-mail
+# contém "revisad". O Nicolas ajusta o texto final.
+
+rodape:
+  quando_revisado: >-
+    Astrologia para autoconhecimento. Textos revisados pela Dona Valderez. Não é
+    previsão nem substitui orientação profissional.
+  enquanto_isso: >-
+    Astrologia para autoconhecimento, com a Dona Valderez. Não é previsão nem
+    substitui orientação profissional.
+
+# o "quem revisa" da home e das páginas de produto
+quem_revisa:
+  quando_revisado: >-
+    A Dona Valderez estuda astrologia há mais de 40 anos. Cada texto do mapa
+    natal passou pela revisão dela.
+  enquanto_isso: >-
+    A Dona Valderez estuda astrologia há mais de 40 anos. Cada texto do mapa
+    natal passa pela revisão dela; os que ela já aprovou levam o selo.
+
+# o cabeçalho do mapa (amostra e leitura completa)
+mapa:
+  quando_revisado: Textos revisados pela Dona Valderez.
+  enquanto_isso: Textos escritos com a Dona Valderez, que estuda astrologia há mais de 40 anos.
+
+# a linha dos e-mails
+email:
+  quando_revisado: Textos revisados pela Dona Valderez.
+  enquanto_isso: Astrologia para autoconhecimento, com a Dona Valderez.
+
+# /lista: o destaque e a descrição para buscador
+lista_titulo:
+  quando_revisado: Textos revisados pela Dona Valderez
+  enquanto_isso: Com a Dona Valderez
+lista_texto:
+  quando_revisado: >-
+    Cada texto das leituras passou pela revisão da Dona Valderez, que estuda
+    astrologia há mais de 40 anos. É ela quem aparece nos vídeos explicando
+    signo por signo.
+  enquanto_isso: >-
+    Os textos das leituras estão passando pelas mãos da Dona Valderez, que
+    estuda astrologia há mais de 40 anos. É ela quem aparece nos vídeos
+    explicando signo por signo.
+lista_seo:
+  quando_revisado: >-
+    O seu mapa natal, com textos revisados por quem estuda astrologia há mais
+    de 40 anos. Entre na lista de espera e receba o aviso da abertura.
+  enquanto_isso: >-
+    O seu mapa natal, com a Dona Valderez, que estuda astrologia há mais de 40
+    anos. Entre na lista de espera e receba o aviso da abertura.

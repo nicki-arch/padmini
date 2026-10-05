@@ -1,0 +1,43 @@
+{# "Me avise quando abrir" (rodada 9). Um formulário só para o mapa natal com a
+   venda fechada e para os produtos `em_breve` do catálogo. Grava em `leads` pela
+   /api/lista (interesse = chave do produto). Nome, e-mail e WhatsApp são
+   obrigatórios (validados também no servidor); a caixa do WhatsApp é separada e
+   desmarcada: o número é obrigatório, mandar mensagem depende dela.
+   Quem inclui define `aviso_produto` (produto do catálogo) e, opcional,
+   `aviso_titulo`. Este HTML também entra dentro de template string de JavaScript
+   (amostra do /mapa): nada de crase nem cifrão-chave aqui.
+   Comportamento: static/ocidental/me-avise.js. #}
+{%- set _ma = catalogo.textos().me_avise %}
+{%- set _k = aviso_produto.chave %}
+<section class="card me-avise" id="me-avise" aria-labelledby="me-avise-titulo-{{ _k }}">
+  <p class="eyebrow">{{ _ma.eyebrow }}</p>
+  <h2 id="me-avise-titulo-{{ _k }}" tabindex="-1">{{ aviso_titulo if aviso_titulo is defined and aviso_titulo else _ma.titulo }}</h2>
+  <p class="secondary">{{ _ma.texto }}</p>
+  <form class="stack" data-me-avise="{{ _k }}" novalidate>
+    <div class="field">
+      <label for="ma-nome-{{ _k }}">Seu nome</label>
+      <input id="ma-nome-{{ _k }}" name="nome" autocomplete="name" maxlength="80" required>
+    </div>
+    <div class="field">
+      <label for="ma-email-{{ _k }}">Seu e-mail</label>
+      <input id="ma-email-{{ _k }}" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required>
+    </div>
+    <div class="field">
+      <label for="ma-zap-{{ _k }}">WhatsApp</label>
+      <input id="ma-zap-{{ _k }}" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20" required aria-describedby="ma-zap-ajuda-{{ _k }}">
+      <span class="help" id="ma-zap-ajuda-{{ _k }}">{{ _ma.ajuda_whatsapp }}</span>
+    </div>
+    <div>
+      <label class="consent"><input type="checkbox" name="aceita_email" required><span>{{ _ma.aceita_email | replace("{produto}", aviso_produto.nome | lower) }}</span></label>
+      <label class="consent"><input type="checkbox" name="aceita_whatsapp"><span>{{ _ma.aceita_whatsapp }}</span></label>
+    </div>
+    <div class="honeypot" aria-hidden="true"><label for="ma-site-{{ _k }}">Não preencha</label><input id="ma-site-{{ _k }}" name="site" tabindex="-1" autocomplete="off"></div>
+    <p class="form-erro" role="alert" hidden></p>
+    <button class="button" type="submit">{{ _ma.botao }}</button>
+    <p class="caption">{{ _ma.miudo }} <a href="/privacidade">Política de Privacidade</a>.</p>
+  </form>
+  <div class="me-avise-pronto" role="status" hidden>
+    <h3 tabindex="-1">{{ _ma.pronto_titulo }}</h3>
+    <p class="secondary">{{ _ma.pronto_texto }}</p>
+  </div>
+</section>

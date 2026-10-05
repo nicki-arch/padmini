@@ -317,7 +317,13 @@ def registrar_lead(nome: str, email: str, whatsapp: str, aceita_email: bool,
                     whatsapp = COALESCE(EXCLUDED.whatsapp, leads.whatsapp),
                     aceita_email = EXCLUDED.aceita_email,
                     aceita_whatsapp = EXCLUDED.aceita_whatsapp,
-                    interesse = COALESCE(EXCLUDED.interesse, leads.interesse),
+                    -- vários "me avise" do mesmo e-mail somam os interesses ("mapa,tarot")
+                    interesse = CASE
+                        WHEN leads.interesse IS NULL THEN EXCLUDED.interesse
+                        WHEN EXCLUDED.interesse IS NULL
+                             OR ',' || leads.interesse || ',' LIKE '%%,' || EXCLUDED.interesse || ',%%'
+                            THEN leads.interesse
+                        ELSE leads.interesse || ',' || EXCLUDED.interesse END,
                     atualizado_em = now()
                 """,
                 (nome or None, email, whatsapp or None, aceita_email, aceita_whatsapp,

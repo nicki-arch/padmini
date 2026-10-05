@@ -199,6 +199,10 @@ def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
     limites.exigir(limites.CALCULO, request)
     if p.texto_ia and p.nivel != "completo":
         raise HTTPException(402, "O texto por IA faz parte do mapa completo.")
+    if p.nivel == "amostra" and len(p.nome.strip()) < 2:
+        # rodada 9: nome sempre obrigatório no formulário do mapa (o completo com
+        # token e o /live continuam aceitando sem nome: links já entregues)
+        raise HTTPException(422, "Preencha o seu nome.")
     email = exigir_email(p) if p.nivel == "amostra" else None
     mapa, aviso = calcular(p)
 

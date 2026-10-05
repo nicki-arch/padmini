@@ -15,7 +15,7 @@
     {%- if not (sem_menu is defined and sem_menu) %}
     <nav class="nav-desktop" aria-label="Principal">
       {% include "ocidental/_menu.html" %}
-      {%- if atual != "/mapa" %}
+      {%- if atual != "/mapa" and catalogo.ativo("mapa") %}
       <a class="button" href="/mapa">Fazer meu mapa natal</a>
       {%- endif %}
     </nav>

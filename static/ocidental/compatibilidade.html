@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
+<script src="/static/ocidental/me-avise.js" defer></script>
 <script src="/static/ocidental/amostra-email.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
@@ -93,7 +94,11 @@
       <p class="form-erro" id="erro" role="alert" hidden></p>
       <div class="row">
         <button id="enviar" type="submit" class="button">Ver nossa sinastria →</button>
+        {%- if catalogo.vende("compat") %}
         <span class="caption">Amostra <b>grátis</b> · relatório completo por <b id="preco-nota">R${{ ofertas.compat.preco | moeda }}</b></span>
+        {%- else %}
+        <span class="caption">Amostra <b>grátis</b> · leitura completa em breve</span>
+        {%- endif %}
       </div>
     </form>
   </div>
@@ -112,7 +117,7 @@
       </figure>
       <div class="table-wrap" tabindex="0" role="region" aria-label="Amostra grátis e completo">
       <table class="comparacao">
-        <thead><tr><th scope="col"><span class="sr-only">O que vem</span></th><th scope="col">Amostra grátis</th><th scope="col">Completo · R${{ ofertas.compat.preco | moeda }}</th></tr></thead>
+        <thead><tr><th scope="col"><span class="sr-only">O que vem</span></th><th scope="col">Amostra grátis</th><th scope="col">Completo{% if catalogo.vende("compat") %} · R${{ ofertas.compat.preco | moeda }}{% endif %}</th></tr></thead>
         <tbody>
         {%- for linha in t.como_fica.comparacao %}
           <tr><td>{{ linha.item }}</td><td class="marca-c">{{ "✓" if linha.amostra else "—" }}<span class="sr-only">{{ " incluído" if linha.amostra else " não incluído" }}</span></td><td class="marca-c">✓<span class="sr-only"> incluído</span></td></tr>
@@ -150,11 +155,13 @@
 // "checkout pré-preenchido"). O preço com cupom é calculado do percentual no servidor.
 const CORES = {{ cores | tojson }};
 const SIMBOLO_TRACOS = "{{ marca.tracos_d() }}", SIMBOLO_ASTRO = "{{ marca.astro_d() }}";
-const LINK_CHECKOUT = "{{ ofertas.compat.checkout }}";
-const PRECO = "{{ ofertas.compat.preco | moeda }}";
-const PRECO_CUPOM = "{{ ofertas.compat.preco_cupom | moeda }}";
+{#- venda fechada (catalogo.yaml) ou sinastria fora do ar: nada de preço nem link de compra #}
+{%- set vende = catalogo.vende("compat") %}
+const LINK_CHECKOUT = "{{ ofertas.compat.checkout if vende else '' }}";
+const PRECO = "{{ ofertas.compat.preco | moeda if vende else '' }}";
+const PRECO_CUPOM = "{{ ofertas.compat.preco_cupom | moeda if vende else '' }}";
 // taxa que a Cakto soma no checkout (ofertas.yaml → taxa_plataforma); vazio = não mostra a linha
-const TAXA = "{{ ofertas.compat.taxa_plataforma | moeda }}";
+const TAXA = "{{ ofertas.compat.taxa_plataforma | moeda if vende else '' }}";
 // nome do índice: conteudo/ocidental/marca.yaml (fonte única)
 const NOME_INDICE = "{{ indice | replace('"', '') }}";
 const CUPOM_PERCENTUAL = "{{ ofertas.compat.cupom_percentual or '' }}";
@@ -163,7 +170,7 @@ const CUPONS = {{ ofertas.compat.cupom_codigos | tojson }};
 // combo e o preço de TABELA da sinastria. O cupom de afiliado desconta só a
 // sinastria, então o acréscimo do combo é o mesmo com ou sem cupom.
 // Vazio enquanto o bump não tiver `checkout` no ofertas.yaml.
-const PRECO_BUMP_MAPAS = "{% if ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.checkout %}R${{ (ofertas.bump_mapas_casal.preco - ofertas.compat.preco) | moeda }}{% endif %}";
+const PRECO_BUMP_MAPAS = "{% if vende and ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.checkout %}R${{ (ofertas.bump_mapas_casal.preco - ofertas.compat.preco) | moeda }}{% endif %}";
 // só um cupom que existe na Cakto (lista do ofertas.yaml), em minúsculas
 function cupomDoVisitante() {
   const a = window.padAtribuicao ? padAtribuicao() : {};
@@ -171,7 +178,9 @@ function cupomDoVisitante() {
   return CUPONS.includes(c) ? c : "";
 }
 function precoMostrado() { return cupomDoVisitante() && PRECO_CUPOM ? PRECO_CUPOM : PRECO; }
+{%- if vende %}
 document.addEventListener("DOMContentLoaded", () => { const el = document.getElementById("preco-nota"); if (el) el.textContent = "R$" + precoMostrado(); });
+{%- endif %}
 
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -385,6 +394,7 @@ function desenharAmostra(d) {
         </ul>
         <p class="honesty">Nenhum índice é uma sentença: nota baixa é onde vocês precisam de atenção, não "não vai dar certo".</p>
       </div>
+      {%- if catalogo.vende("compat") %}
       <aside class="card price-card oferta" aria-labelledby="oferta-titulo">
         <p class="eyebrow">Leitura completa</p>
         <h3 id="oferta-titulo">Sinastria do casal</h3>
@@ -398,6 +408,9 @@ function desenharAmostra(d) {
           : `<p class="help">O pagamento desta versão ainda está sendo configurado.</p>
              <button type="button" class="button" disabled>Em breve</button>`}
       </aside>
+      {%- else %}
+      <div>{% set aviso_produto = catalogo.produto("compat") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}</div>
+      {%- endif %}
     </div>`;
   const res = $("#resultado");
   res.hidden = false;

@@ -30,6 +30,8 @@ hero:
     Sol, a sua Lua e o seu Ascendente agora, de graça.
   botao_principal: Ver meu mapa natal →
   botao_secundario: Fazer a sinastria do casal
+  # no lugar do botão da sinastria enquanto ela não estiver ativa no catálogo
+  botao_leituras: Ver todas as leituras
   # Selos embaixo dos botões (rodada visual, fase B). Só fatos do produto, já ditos
   # no "Como funciona" e nas perguntas: nada de número ou promessa nova.
   confianca:
@@ -109,6 +111,8 @@ card_exemplo:
 produtos:
   titulo: Escolha por onde começar
   sub: Todos têm amostra grátis. Você só paga se quiser o relatório completo.
+  # com a venda fechada (catalogo.yaml → vendas_abertas: false)
+  sub_venda_fechada: Comece pelo mapa natal, com amostra grátis. As outras leituras abrem aos poucos.
   compat:
     etiqueta: Para o casal
     titulo: Sinastria

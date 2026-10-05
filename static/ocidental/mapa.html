@@ -20,6 +20,7 @@
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/ocidental/amostra-email.js" defer></script>
+<script src="/static/ocidental/me-avise.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
@@ -52,8 +53,8 @@
           <form id="form" class="stack" novalidate aria-labelledby="titulo-form">
             <h2 id="titulo-form">Seus dados de nascimento</h2>
             <div class="field">
-              <label for="nome">Nome <span class="opcional">(opcional)</span></label>
-              <input id="nome" name="nome" autocomplete="given-name" maxlength="80">
+              <label for="nome">Nome</label>
+              <input id="nome" name="nome" autocomplete="given-name" maxlength="80" required>
             </div>
             <div class="campos-2">
               <div class="field">
@@ -98,7 +99,11 @@
 
   <section class="section container narrow" id="sobre-mapa">
     <h2>O que vem no mapa completo</h2>
+    {%- if catalogo.vende("mapa") %}
     <p class="secondary">A amostra é grátis. O completo (R${{ ofertas.mapa.preco | moeda }}) abre o mapa inteiro.</p>
+    {%- else %}
+    <p class="secondary">A amostra é grátis. A leitura completa abre em breve e vai trazer o mapa inteiro.</p>
+    {%- endif %}
     <ul class="lista-check">
       <li>A roda do seu mapa e a posição de todos os planetas, signo a signo e casa a casa</li>
       <li>Os aspectos principais: como os planetas conversam entre si</li>
@@ -115,12 +120,18 @@
 {% set nota_rodape %}Mapa pelo zodíaco tropical, casas Placidus. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional. Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos astronômicos: Swiss Ephemeris.{% endset %}{% include "ocidental/_rodape.html" %}
 
 <script>
+{%- if catalogo.vende("mapa") %}
 // Link vem de conteudo/ocidental/ofertas.yaml (trocado no servidor). Vazio = oferta ainda não existe na Cakto.
 const LINK_CHECKOUT_INDIVIDUAL = "{{ ofertas.mapa.checkout }}";
 const PRECO = "{{ ofertas.mapa.preco | moeda }}";
 const NOME_OFERTA = {{ ofertas.mapa.nome | tojson }};
 // taxa que a Cakto soma no checkout (ofertas.yaml → taxa_plataforma); vazio = não mostra a linha
 const TAXA = "{{ ofertas.mapa.taxa_plataforma | moeda }}";
+{%- else %}
+// Venda fechada (conteudo/ocidental/catalogo.yaml → vendas_abertas: false): sem preço,
+// sem link de compra; no lugar do bloco de compra, o "me avise" (static/ocidental/me-avise.js).
+const LINK_CHECKOUT_INDIVIDUAL = "";
+{%- endif %}
 const SIGNOS = ["aries","touro","gemeos","cancer","leao","virgem","libra","escorpiao","sagitario","capricornio","aquario","peixes"];
 const SIGNO_CURTO = { aries:"Ári", touro:"Tou", gemeos:"Gêm", cancer:"Cân", leao:"Leão", virgem:"Vir", libra:"Lib", escorpiao:"Esc", sagitario:"Sag", capricornio:"Cap", aquario:"Aqu", peixes:"Pei" };
 const ABREV = { sol:"Sol", lua:"Lua", mercurio:"Mer", venus:"Vên", marte:"Mar", jupiter:"Júp", saturno:"Sat", urano:"Ura", netuno:"Net", plutao:"Plu", nodo_norte:"Nodo" };
@@ -214,6 +225,7 @@ $("#form").addEventListener("submit", async (e) => {
   const data = dataParaISO($("#data").value);
   const semHora = $("#sem-hora").checked;
   const hora = semHora ? "" : $("#hora").value;
+  if ($("#nome").value.trim().length < 2) return mostrarErro("Preencha o seu nome.", $("#nome"));
   if (!data) return mostrarErro("Preencha a data de nascimento no formato dd/mm/aaaa.", $("#data"));
   if (!semHora && !/^\d{2}:\d{2}$/.test(hora)) return mostrarErro("Preencha a hora no formato hh:mm — ou marque \"Não sei a hora\".", $("#hora"));
   if (!cidadeEscolhida) return mostrarErro("Escolha a cidade na lista de sugestões.", $("#cidade"));
@@ -271,6 +283,7 @@ function desenharAmostra(d) {
         </ul>
         <p><a href="/mapa" id="corrigir">Corrigir meus dados</a></p>
       </div>
+      {%- if catalogo.vende("mapa") %}
       <aside class="card price-card" aria-labelledby="oferta-titulo">
         <p class="eyebrow">Leitura completa</p>
         <h3 id="oferta-titulo">${esc(NOME_OFERTA)}</h3>
@@ -282,10 +295,17 @@ function desenharAmostra(d) {
           : `<p class="help">O pagamento desta versão ainda está sendo configurado.</p>
              <button type="button" class="button" disabled>Em breve</button>`}
       </aside>
+      {%- else %}
+      <div>{% set aviso_produto = catalogo.produto("mapa") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}</div>
+      {%- endif %}
     </div>
+    {%- if catalogo.ativo("compat") %}
     <div class="card cross"><div><h3>É um casal?</h3><p class="secondary">A sinastria cruza os dois mapas em 8 dimensões — também com amostra grátis.</p></div>
-      <a class="button button--secondary" href="/compatibilidade">Ver a sinastria</a></div>`;
+      <a class="button button--secondary" href="/compatibilidade">Ver a sinastria</a></div>
+    {%- endif %}`;
   mostrarEstado("resultado");
+  // "me avise" (venda fechada): já vem com o nome e o e-mail que a pessoa digitou
+  if (window.padMeAvise) padMeAvise.preencher(res, { nome: ultimoPedido.nome, email: ultimoContato && ultimoContato.email });
   $("#corrigir").addEventListener("click", (e) => { e.preventDefault(); mostrarEstado("estado-form"); focar($("#nome")); });
   padEmail.ligar(() => pedir("/api/ocidental/mapa", { ...ultimoPedido, ...ultimoContato, nivel: "amostra" }));
   if (window.padTrack) padTrack("amostra_gerada", { produto: "mapa", sistema: "ocidental" });

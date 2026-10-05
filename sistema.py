@@ -66,6 +66,8 @@ PAGINAS = {
         "/lista": ("ocidental/lista.html", "lista"),
         "/numerologia": ("ocidental/numerologia.html", "numerologia"),
         "/tarot": ("ocidental/tarot.html", "tarot"),
+        # Todas as leituras (rodada 9): montada do catálogo (conteudo/ocidental/catalogo.yaml)
+        "/leituras": ("ocidental/leituras.html", "leituras"),
     },
 }
 

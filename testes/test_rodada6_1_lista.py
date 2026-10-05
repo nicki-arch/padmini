@@ -33,7 +33,8 @@ def test_mapa_natal_e_a_porta_de_entrada(lista):
 
 def test_interesse_mapa_primeiro_e_marcado(lista):
     radios = re.findall(r'<input type="radio" name="interesse" value="(\w+)"( checked)?>', lista)
-    assert radios == [("mapa", " checked"), ("compat", ""), ("ambos", "")]
+    # rodada 9: as opções vêm do catálogo (produtos ativos e em breve, na ordem do YAML)
+    assert radios == [("mapa", " checked"), ("compat", ""), ("numerologia", ""), ("tarot", "")]
     assert "Meu mapa natal" in lista and "Sinastria do casal" in lista
 
 
@@ -50,7 +51,8 @@ def test_revisao_da_dona_valderez(lista):
 
 def test_copy_vem_do_yaml(lista):
     t = textos.da_pagina("lista", "ocidental")
-    for trecho in (t["seo"]["titulo"], t["hero"]["eyebrow"], t["revisao"]["titulo"], t["formulario"]["botao"],
+    # o destaque da Dona Valderez saiu para revisao.yaml (regra de honestidade, rodada 9)
+    for trecho in (t["seo"]["titulo"], t["hero"]["eyebrow"], textos.frase_revisao("lista_titulo"), t["formulario"]["botao"],
                    t["pronto"]["titulo"], *(b["titulo"] for b in t["beneficios"])):
         assert trecho in lista
     html = (RAIZ / "static" / "ocidental" / "lista.html").read_text(encoding="utf-8")
