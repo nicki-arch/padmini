@@ -48,7 +48,7 @@ def test_a_roda_e_o_simbolo_no_cabecalho_rodape_e_favicon(ocidental):
 
 def test_fontes_novas_servidas_pelo_site(ocidental):
     tema = (RAIZ / "static" / "ocidental" / "tema.css").read_text(encoding="utf-8")
-    for familia in ("Fraunces", "Figtree", "Noto Sans Symbols 2"):
+    for familia in ("Fraunces", "Figtree", "Noto Sans Symbols", "Noto Sans Symbols 2"):
         assert f"font-family: '{familia}'" in tema
     html = cliente.get("/").text
     assert "fonts.googleapis" not in html and "fonts.gstatic" not in html

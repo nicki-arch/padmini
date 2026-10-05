@@ -54,6 +54,7 @@
 @font-face { font-family: 'Fraunces'; src: url('/static/valderez/fontes/Fraunces.woff2') format('woff2'); font-weight: 400 600; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Fraunces'; src: url('/static/valderez/fontes/Fraunces-Italic.woff2') format('woff2'); font-weight: 400 600; font-style: italic; font-display: swap; }
 @font-face { font-family: 'Figtree'; src: url('/static/valderez/fontes/Figtree.woff2') format('woff2'); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Noto Sans Symbols'; src: url('/static/valderez/fontes/NotoSansSymbols-astro.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Noto Sans Symbols 2'; src: url('/static/valderez/fontes/NotoSansSymbols2-astro.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
 
 /* Visual 2.0 (rodada 9, pacote valderez-design-2.0). Contraste dos pares usados:
@@ -120,9 +121,16 @@
   --vz-ok-borda: #CFE3D7;
   --vz-aviso-fundo: #FBF1E3;
   --vz-aviso-borda: #EBD3A8;
+  --vz-elemento-fogo: #F6E3DA;
+  --vz-elemento-terra: #F3EBDD;
+  --vz-elemento-ar: #F7F0EA;
+  --vz-elemento-agua: #EFE3E6;
+  --vz-ouro-linha: #C9A66A;
+  --vz-linha-casa: #D9C5BC;
+  --vz-miolo: #FFFDFB;
   --vz-f-titulo: 'Fraunces', Georgia, serif;
   --vz-f-texto: 'Figtree', 'Segoe UI', Arial, sans-serif;
-  --vz-f-glifos: 'Noto Sans Symbols 2';
+  --vz-f-glifos: 'Noto Sans Symbols', 'Noto Sans Symbols 2';
 }
 
 /* Nomes antigos, para as páginas ainda no base.css (tema escuro da Valderez).

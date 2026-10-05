@@ -127,7 +127,7 @@ Brief: `claude/brief-rodada-9-abertura-sem-venda.md` (no Project; cópia no zip
 
 ## Fase B — base visual, home, mapa natal e amostra por dimensões
 - **Tokens e fontes:** `paleta.VZ` (creme, papel, rosa-pó, vinho, ouro, noite…) e `paleta.FONTES_VZ`
-  (Fraunces, Figtree, Noto Sans Symbols 2 só com os glifos de signo e planeta), todos em WOFF2 do
+  (Fraunces, Figtree, Noto Sans Symbols com os glifos de signo e planeta e a Symbols 2 só para o ☉ — na Fase C se viu que a Symbols 2 sozinha não tem os signos), todos em WOFF2 do
   próprio site com as licenças OFL; `tema.css` regenerado (`--vz-*`). Contraste: `PARES_VZ`, todos AA.
   Duas trocas em relação às telas: o ouro claro não passa como texto no creme (números e rótulos usam
   o ouro-escuro) e a borda dos campos ficou mais escura (#8F7B86) para passar 3:1.
@@ -149,3 +149,25 @@ Brief: `claude/brief-rodada-9-abertura-sem-venda.md` (no Project; cópia no zip
   (`mt.trecho`); o texto desfocado é enfeite fixo do `mapa.yaml`. Em breve = cadeado. Selo
   "Revisado pela Dona Valderez" só vem da API, junto com um texto `revisado: true`.
 - Prints e comparações com o pacote: `docs/design/prints-rodada9-fase-b/` (`comparar-*.jpg`).
+
+## Fase C — produtos, leitura completa, legais, e-mails e PDF
+- **Páginas de produto** (`static/ocidental/produto.html`, texto em `conteudo/ocidental/produtos.yaml`,
+  `produtos_ocidental.py`): capa, o que recebe, como funciona, "veja como é por dentro", quem revisa,
+  perguntas e o "me avise". O trecho de dentro é **real**, calculado na hora (`trecho_real`): sinastria
+  de um casal de exemplo do motor, o número 2 do Caminho de Vida, a carta O Mago. Sinastria, numerologia
+  e tarot estão `em_breve`. Comunidade, cursos (`/cursos`, vitrine com filtros, `cursos.html`), o curso
+  `/cursos/astrologia-do-zero` e consulta estão prontos e **respondem 404** (`oculto`); o texto deles
+  é `rascunho: true` e o preço fica só em comentário. Ligar = mudar o `estado` no `catalogo.yaml`.
+- **Todas as leituras** (Produto-Catalogo): só `ativo`/`em_breve`, com o "quem revisa".
+- **Leitura completa** (Site-Leitura): a API (nível completo) devolve `dimensoes` com o texto inteiro,
+  a casa e os aspectos do mapa que tocam cada ponto; `roda` (SVG desenhado no servidor por
+  `roda_mapa.py`: signos por elemento, casas, AC/MC, planetas afastados, aspectos maiores do mapa) e
+  `resto` (as seções sem repetir as dimensões). Sem hora: roda sem casas nem AC/MC.
+  A amostra continua sem nada disso (texto pago não vai ao navegador).
+- **PDF**: capa ilustrada (`pdf-capa`, convertida para JPEG na hora, ~440 KB no total), a roda
+  (a mesma de `roda_mapa.py`), Fraunces/Figtree/Noto Sans Symbols em TTF em `fontes/` (OFL).
+- **E-mails**: casca nova (`entrega.casca_ocidental`): creme, cartão branco, Fraunces no título, o
+  símbolo, rodapé com Privacidade; venda fechada = nenhuma oferta (Fase A).
+- **Minhas leituras** (Sistema-MinhasLeituras) e **Privacidade/Termos** (Sistema-Legal: abas, índice,
+  "Em resumo"). O texto jurídico é o mesmo; controlador e Cakto não mudaram.
+- Prints e comparações: `docs/design/prints-rodada9-fase-c/`.

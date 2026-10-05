@@ -37,7 +37,8 @@ from reportlab.platypus import Paragraph  # noqa: E402
 # paleta.py (Cormorant Garamond + Inter, os TTF de fontes/, os mesmos do site em
 # WOFF2); o símbolo de marca.py. A estrutura (capa, tabelas, roda) é a de antes.
 _PAPEL = paleta.papel("ocidental")
-for _chave in ("fonte_titulo", "fonte_titulo_forte", "fonte_corpo", "fonte_corpo_forte"):
+for _chave in ("fonte_titulo", "fonte_titulo_forte", "fonte_titulo_italico", "fonte_corpo", "fonte_corpo_forte",
+               "fonte_glifos", "fonte_glifos_2"):
     _nome, _arquivo = _PAPEL[_chave]
     if _nome not in pdfmetrics.getRegisteredFontNames():
         pdfmetrics.registerFont(TTFont(_nome, str(gerar_pdf.FONTES / _arquivo)))
@@ -45,6 +46,8 @@ TITULO = _PAPEL["fonte_titulo"][0]          # Cormorant Garamond 500
 TITULO_FORTE = _PAPEL["fonte_titulo_forte"][0]  # Cormorant Garamond 600
 CORPO = _PAPEL["fonte_corpo"][0]            # Inter
 CORPO_FORTE = _PAPEL["fonte_corpo_forte"][0]
+GLIFOS = _PAPEL["fonte_glifos"][0]          # Noto Sans Symbols (signos e planetas da roda)
+GLIFOS_2 = _PAPEL["fonte_glifos_2"][0]      # Noto Sans Symbols 2 (o ☉)
 pdfmetrics.registerFontFamily(CORPO, normal=CORPO, bold=CORPO_FORTE, italic=CORPO, boldItalic=CORPO_FORTE)
 pdfmetrics.registerFontFamily(TITULO, normal=TITULO, bold=TITULO_FORTE, italic=TITULO, boldItalic=TITULO_FORTE)
 
@@ -72,6 +75,14 @@ for _k, _e in gerar_pdf.E.items():
     E[_k] = ParagraphStyle(f"oc_{_k}", parent=_e, fontName=_FONTE[_e.fontName],
                            fontSize=round(_e.fontSize * _f, 1), leading=round(_e.leading * _f, 1),
                            textColor=_COR.get(id(_e.textColor), _e.textColor))
+# a capa ilustrada (rodada 9): título e nome centralizados no terço de cima
+# a ilustração da capa é escura (noite): texto creme e ouro claro, como o rodapé do site
+E["capa_titulo_centro"] = ParagraphStyle("oc_capa_titulo_centro", parent=E["capa_titulo"], alignment=1,
+                                         fontSize=42, leading=48, textColor=colors.HexColor(paleta.VZ["noite-titulo"]))
+E["capa_nome_centro"] = ParagraphStyle("oc_capa_nome_centro", parent=E["capa_nome"], alignment=1,
+                                       textColor=colors.HexColor(paleta.VZ["ouro-claro"]))
+E["capa_marca_centro"] = ParagraphStyle("oc_capa_marca_centro", parent=E["capa_marca"], alignment=1,
+                                        textColor=colors.HexColor(paleta.VZ["ouro-claro"]))
 
 
 def _p(texto: str, estilo: str = "corpo") -> Paragraph:
@@ -108,7 +119,7 @@ def _caixas_resumo(itens):
 
 
 class Lotus(Flowable):
-    """A marca em traço de gravura (o mesmo desenho do site, marca.py)."""
+    """A marca (rodada 9: a roda dos 12 signos, static/valderez/favicon-512.png)."""
 
     def __init__(self, tamanho: float = 28):
         super().__init__()
@@ -118,7 +129,56 @@ class Lotus(Flowable):
         return self.t, self.t
 
     def draw(self):
-        marca.desenhar_pdf(self.canv, 0, 0, self.t, OURO, astro=ACENTO, traco=1.8)
+        self.canv.drawImage(str(marca.PASTA / "favicon-512.png"), 0, 0, self.t, self.t, mask="auto")
+
+
+class RodaDoMapa(Flowable):
+    """A roda do mapa (rodada 9): o MESMO desenho da página (roda_mapa.py)."""
+
+    def __init__(self, mapa: dict, lado: float):
+        super().__init__()
+        self.m, self.lado = mapa, lado
+
+    def wrap(self, *_):
+        return self.lado, self.lado
+
+    def draw(self):
+        import roda_mapa
+        roda_mapa.desenhar_pdf(self.canv, self.m, 0, 0, self.lado, GLIFOS, CORPO, CORPO_FORTE, GLIFOS_2)
+
+
+_CAPA_JPEG: dict = {}
+
+
+def _capa_jpeg() -> str | None:
+    """A capa em JPEG (o reportlab embute JPEG como está; a WebP viraria imagem crua de
+    ~2,5 MB). Convertida uma vez por processo, num arquivo temporário."""
+    import tempfile
+
+    import ilustracoes
+    from PIL import Image
+    arq = ilustracoes.caminho("pdf-capa")
+    if not arq:
+        return None
+    if str(arq) not in _CAPA_JPEG:
+        destino = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+        Image.open(arq).convert("RGB").save(destino, "JPEG", quality=82)
+        destino.close()
+        _CAPA_JPEG[str(arq)] = destino.name
+    return _CAPA_JPEG[str(arq)]
+
+
+def _capa_ilustrada(canvas, doc):
+    """A capa (rodada 9): a ilustração pdf-capa (vaga do ilustracoes.yaml) na página
+    inteira; o terço de cima fica livre para o título, que é texto do PDF."""
+    arq = _capa_jpeg()
+    canvas.saveState()
+    if arq:
+        canvas.drawImage(arq, 0, 0, LARGURA_PAGINA, ALTURA_PAGINA)
+    else:
+        canvas.setFillColor(SUPERFICIE)
+        canvas.rect(0, 0, LARGURA_PAGINA, ALTURA_PAGINA, stroke=0, fill=1)
+    canvas.restoreState()
 
 
 ABREV = {"sol": "Sol", "lua": "Lua", "mercurio": "Mer", "venus": "Vên", "marte": "Mar", "jupiter": "Júp",
@@ -275,13 +335,12 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
                             title=titulo_curto, author=MARCA, subject="Mapa natal (astrologia ocidental)")
     h = []
 
-    # ---- 1. capa
-    marca = Table([[Lotus(26), _p(MARCA, "capa_marca")]], colWidths=[34, 200], hAlign="LEFT")
-    marca.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
-    h += [marca, Spacer(1, 8 * mm), _p("Mapa Natal", "capa_titulo")]
+    # ---- 1. capa (rodada 9): a ilustração inteira e o título no terço de cima
+    h += [Spacer(1, 6 * mm), _p(MARCA, "capa_marca_centro"), Spacer(1, 6 * mm), _p("Mapa Natal", "capa_titulo_centro")]
     if nome_exibido:
-        h.append(_p(escape(nome_exibido), "capa_nome"))
-    h.append(Spacer(1, 3 * mm))
+        h.append(_p(escape(nome_exibido), "capa_nome_centro"))
+    h.append(PageBreak())
+    h.append(_p("O seu céu", "h1"))
     quando = data_nascimento.strftime("%d/%m/%Y") + (f"</b>, às <b>{escape(hora)}" if hora else "")
     fuso_txt = f"{fuso['nome_iana']} (UTC{'+' if offset >= 0 else ''}{offset:g})"
     h.append(_p(f"Nascimento em <b>{quando}</b>, em <b>{escape(cidade)}</b><br/>"
@@ -296,13 +355,13 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
          if "ascendente" in pts else "sem hora"),
     ]))
     h.append(Spacer(1, 7 * mm))
-    roda = Table([[RodaZodiacal(mapa, 130 * mm)]], colWidths=[LARGURA_UTIL])
+    roda = Table([[RodaDoMapa(mapa, 125 * mm)]], colWidths=[LARGURA_UTIL])
     roda.setStyle(TableStyle([("ALIGN", (0, 0), (-1, -1), "CENTER")]))
     h.append(roda)
     h.append(Spacer(1, 3 * mm))
-    h.append(_p("Zodíaco tropical. " + ("Ascendente à esquerda; linhas em cor são os eixos das casas 1–7 e 4–10. "
+    h.append(_p("Zodíaco tropical. " + ("Ascendente (AC) à esquerda; as linhas vinho são os eixos das casas 1–7 e 4–10. "
                                         if mapa["tem_hora"] else "Áries à esquerda (sem hora não há casas). ")
-                + "Linhas no miolo: aspectos (roxo = tensos, verde = harmônicos). R = retrógrado.", "nota"))
+                + "No miolo, os aspectos do seu mapa: tracejado dourado = harmonia, linha vermelha = tensão.", "nota"))
     h.append(PageBreak())
 
     # ---- 2. posições
@@ -365,7 +424,7 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
         "com o histórico oficial de cada lugar.",
         "O Ascendente muda de signo a cada duas horas, em média. Se a hora não for exata, confira a certidão: "
         "poucos minutos podem mudar o Ascendente e as casas.",
-        "Dados de cidades: GeoNames (CC BY 4.0). Fontes tipográficas: Cormorant Garamond e Inter "
+        "Dados de cidades: GeoNames (CC BY 4.0). Fontes tipográficas: Fraunces, Figtree e Noto Sans Symbols 2 "
         "(SIL Open Font License).",
     ]:
         h.append(_p(escape(texto)))
@@ -373,7 +432,7 @@ def gerar_pdf_ocidental(*, mapa: dict, secoes: dict, nome: str, cidade: str, dat
                 "substitui orientação médica, psicológica, jurídica ou financeira.</b>"))
 
     rodape = _rodape(titulo_curto)
-    doc.build(h, onFirstPage=rodape, onLaterPages=rodape)
+    doc.build(h, onFirstPage=_capa_ilustrada, onLaterPages=rodape)
     return buf.getvalue()
 
 

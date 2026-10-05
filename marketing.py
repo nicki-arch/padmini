@@ -121,6 +121,8 @@ def _botao(link: str, texto: str, sistema: str = "vedica") -> str:
 
 def _moldura(corpo: str, rodape: str = "", sistema: str = "vedica") -> str:
     c = _cor(sistema)
+    if sistema == "ocidental":  # rodada 9: a casca da tela Sistema-Emails
+        return entrega.casca_ocidental(corpo, rodape)
     return f"""<div style="font-family:{c['fonte']};background:{c['fundo']};color:{c['texto']};padding:32px;border-radius:12px;max-width:520px;margin:auto">
   {entrega.marca_do_email(c, sistema)}
   {corpo}

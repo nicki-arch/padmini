@@ -1,0 +1,194 @@
+# Valderez Astrologia (versão OCIDENTAL) — as PÁGINAS DE PRODUTO (rodada 9, Fase C;
+# telas Produto-* do pacote valderez-design-2.0). Um modelo só
+# (static/ocidental/produto.html): capa, o que você recebe, como funciona, trecho
+# real, quem revisa, perguntas e "me avise".
+#
+# A página aparece quando o produto está `em_breve` no catálogo (catalogo.yaml) —
+# ou `ativo` sem página própria. `oculto` = 404, mesmo com o texto pronto aqui.
+# Os produtos ainda ocultos (comunidade, curso, consulta) estão com
+# `rascunho: true`: são as propostas das telas, para o Nicolas e a Dona Valderez
+# fecharem antes de ligar.
+#
+# Preço NUNCA aqui: quando o produto vender, sai do ofertas.yaml. Os preços de
+# trabalho das telas ficam só como comentário.
+# O trecho real (`trecho: {de: …}`) é calculado na hora com a base de textos
+# (produtos_ocidental.trecho_real): nunca um texto inventado para a página.
+# Frases sobre a revisão da Dona Valderez: revisao.yaml (regra de honestidade).
+
+compat:
+  rotulo: Amor · sinastria do casal
+  titulo: Os mapas de vocês <em>dois</em>, juntos
+  lede: >-
+    Como o Sol, a Lua e Vênus de cada um conversam: o que aproxima, o que pede
+    cuidado e onde está o ponto mais forte do casal.
+  selos: [Entrega imediata, Leitura no site e PDF, Dados dos dois]
+  recebe_titulo: Tudo o que vem na <em>sinastria do casal</em>
+  recebe:
+    - {titulo: "8 dimensões do casal", texto: "Atração, emoções, comunicação, afeto, identidade, crescimento, compromisso e dia a dia."}
+    - {titulo: "Aspectos entre vocês", texto: "Como os planetas de um tocam os do outro, em linguagem clara."}
+    - {titulo: "Um nas casas do outro", texto: "Em que área da vida cada um mexe com o outro (pede a hora de nascimento)."}
+    - {titulo: "O ponto mais forte", texto: "Um cartão do casal para guardar e compartilhar."}
+  passos:
+    - {titulo: "Os dois nascimentos", texto: "Data, hora e cidade de cada um. Sem a hora também dá."}
+    - {titulo: "A amostra grátis", texto: "O começo de cada dimensão do casal, na hora."}
+    - {titulo: "A leitura completa", texto: "Se quiserem ir fundo, desbloqueiam tudo."}
+  trecho: {de: sinastria}
+  faq:
+    - {pergunta: "É uma previsão de se vai dar certo?", resposta: "Não. A sinastria mostra como os dois mapas conversam: onde é fácil, onde pede cuidado. O que vocês fazem com isso é de vocês."}
+    - {pergunta: "Precisa da hora dos dois?", resposta: "Ajuda. Sem a hora de pelo menos um, a dimensão das casas fica de fora e a leitura avisa."}
+    - {pergunta: "A outra pessoa precisa saber?", resposta: "Os dados dela entram no cálculo, então o certo é combinar com ela. A leitura fica só no seu e-mail."}
+
+numerologia:
+  rotulo: Numerologia · pelo seu nome
+  titulo: Os números do seu <em>nome</em> e da sua data
+  lede: >-
+    Do nome de registro e da data de nascimento saem os seis números que a
+    numerologia lê. Não precisa da hora nem da cidade.
+  selos: [Entrega imediata, Leitura no site e PDF, Só nome e data]
+  recebe_titulo: Tudo o que vem na <em>numerologia</em>
+  recebe:
+    - {titulo: "Caminho de Vida", texto: "O tema que acompanha você a vida inteira."}
+    - {titulo: "Expressão", texto: "Seus talentos e o jeito de agir."}
+    - {titulo: "Alma", texto: "O que te move por dentro."}
+    - {titulo: "Personalidade", texto: "Como os outros te veem primeiro."}
+    - {titulo: "Dia de nascimento", texto: "O talento que vem do dia em que você nasceu."}
+    - {titulo: "Ano Pessoal", texto: "O clima do seu ano, de aniversário a aniversário."}
+  passos:
+    - {titulo: "Nome e data", texto: "O nome completo de registro e a data de nascimento."}
+    - {titulo: "A amostra grátis", texto: "O seu Caminho de Vida, na hora."}
+    - {titulo: "A leitura completa", texto: "Os seis números, explicados."}
+  trecho: {de: numerologia, numero: caminho_de_vida, valor: 2}
+  faq:
+    - {pergunta: "Uso o nome de casada ou o de registro?", resposta: "O de registro, como está na certidão. Se quiser, dá para fazer de novo com o nome que você usa hoje."}
+    - {pergunta: "É a mesma coisa que o mapa natal?", resposta: "Não. A numerologia usa o nome e a data; o mapa natal usa a posição dos planetas. Um complementa o outro."}
+
+tarot:
+  rotulo: Tarot · para agora
+  titulo: Três cartas para pensar no <em>agora</em>
+  lede: >-
+    Situação, Desafio e Conselho. Uma tiragem para olhar o que você está vivendo,
+    com uma pergunta, se quiser.
+  selos: [Na hora, 3 cartas, Pergunta opcional]
+  recebe_titulo: Tudo o que vem no <em>tarot</em>
+  recebe:
+    - {titulo: "Situação", texto: "O cenário de agora e as forças em jogo."}
+    - {titulo: "Desafio", texto: "O que pede mais atenção."}
+    - {titulo: "Conselho", texto: "Um caminho para seguir."}
+    - {titulo: "Leitura de cada carta", texto: "O sentido da carta naquela posição."}
+  passos:
+    - {titulo: "Sua pergunta", texto: "Escreva o que quer pensar, ou deixe em branco."}
+    - {titulo: "As três cartas", texto: "A tiragem sai na hora."}
+    - {titulo: "A leitura", texto: "Cada carta explicada na posição em que caiu."}
+  trecho: {de: tarot, carta: o_mago}
+  faq:
+    - {pergunta: "O tarot prevê o futuro?", resposta: "Aqui, não. A tiragem é um jeito de olhar o momento e pensar nas suas escolhas."}
+    - {pergunta: "Posso tirar mais de uma vez?", resposta: "Pode. Cada tiragem é uma leitura nova, com as cartas daquele momento."}
+
+# ----------------------------------------------------------------- ocultos (rascunho)
+comunidade:
+  rascunho: true
+  # preço de trabalho da tela: R$29,90/mês (assinatura, Stripe) — formato a decidir
+  rotulo: Comunidade · assinatura
+  titulo: A astrologia da semana, <em>perto</em> da Dona Valderez
+  lede: >-
+    Um grupo geral com a Dona Valderez e o Pedro, e um grupo só com quem é do seu
+    signo solar. No WhatsApp, por convite.
+  selos: [Grupo do seu signo, Cancela quando quiser, Pix ou cartão]
+  recebe_titulo: Tudo o que vem na <em>comunidade</em>
+  recebe:
+    - {titulo: "Grupo geral", texto: "Conversas e avisos com a Dona Valderez e o Pedro."}
+    - {titulo: "Grupo do seu signo", texto: "Só com quem tem o mesmo signo solar."}
+    - {titulo: "Antes de todo mundo", texto: "Lançamentos e condições primeiro para quem assina."}
+    - {titulo: "Sem fidelidade", texto: "Cancela com um clique; o acesso sai no fim do mês pago."}
+  passos:
+    - {titulo: "Assine", texto: "Pix ou cartão, todo mês."}
+    - {titulo: "Receba o convite", texto: "O link dos grupos chega no seu e-mail."}
+    - {titulo: "Entre nos grupos", texto: "O geral e o do seu signo solar."}
+  trecho:
+    rotulo: Como funciona o acesso
+    titulo: Entrada e saída automáticas
+    texto: >-
+      O convite é individual e vale enquanto a assinatura estiver ativa. Se a
+      assinatura parar, o acesso aos grupos sai junto; voltou, entra de novo. O
+      que é publicado lá fica entre quem participa.
+  faq:
+    - {pergunta: "É pelo WhatsApp?", resposta: "Sim, em grupos por convite. O seu número só é visto por quem está no mesmo grupo."}
+    - {pergunta: "Como sei o meu signo solar?", resposta: "Pelo dia em que você nasceu. Se tiver dúvida, o seu mapa natal grátis mostra."}
+    - {pergunta: "Posso cancelar?", resposta: "Quando quiser, sem multa. O acesso vai até o fim do mês já pago."}
+
+astrologia-do-zero:
+  rascunho: true
+  # preço de trabalho da tela: R$197, acesso por 12 meses
+  rotulo: Cursos · Astrologia do zero
+  titulo: Aprenda a ler o <em>seu</em> mapa
+  lede: >-
+    As aulas que a Dona Valderez gravou explicando signo por signo, planeta por
+    planeta, organizadas do começo ao fim, com exercícios no seu próprio mapa.
+  selos: [Aulas gravadas, No seu ritmo, Com o seu mapa]
+  recebe_titulo: Tudo o que vem na <em>astrologia do zero</em>
+  recebe:
+    - {titulo: "Os 12 signos", texto: "O que cada um traz, com exemplos do dia a dia."}
+    - {titulo: "Os planetas", texto: "O que cada planeta mostra no mapa."}
+    - {titulo: "As 12 casas", texto: "As áreas da vida, uma por uma."}
+    - {titulo: "Lendo o seu mapa", texto: "Juntar tudo no seu próprio mapa."}
+  passos:
+    - {titulo: "Inscreva-se", texto: "Pix ou cartão."}
+    - {titulo: "Assista quando quiser", texto: "As aulas ficam na área do aluno."}
+    - {titulo: "Pratique", texto: "Os exercícios usam o seu mapa natal."}
+  trecho:
+    rotulo: Programa
+    titulo: Seis módulos
+    texto: >-
+      1. O que é um mapa natal · 2. Os 12 signos · 3. Os planetas · 4. As 12 casas
+      · 5. Os aspectos · 6. Lendo o seu próprio mapa.
+  faq:
+    - {pergunta: "Preciso saber alguma coisa antes?", resposta: "Não. O curso começa do zero."}
+    - {pergunta: "Quanto tempo tenho para assistir?", resposta: "12 meses de acesso, no seu ritmo."}
+    - {pergunta: "Tem certificado?", resposta: "A definir."}
+
+consulta:
+  rascunho: true
+  # preço de trabalho da tela: R$390 (casal R$490)
+  rotulo: Consulta · com a Dona Valderez
+  titulo: Uma conversa sobre o seu mapa com a <em>Dona Valderez</em>
+  lede: >-
+    Ela lê o seu mapa antes, e vocês conversam por vídeo sobre o que você quiser
+    entender. As vagas são poucas: abrem por mês, para quem está na lista.
+  selos: [Por vídeo, Mapa completo incluído, Vagas por mês]
+  recebe_titulo: Tudo o que vem na <em>consulta</em>
+  recebe:
+    - {titulo: "O seu mapa completo", texto: "Antes da conversa, para você chegar já tendo lido."}
+    - {titulo: "A conversa por vídeo", texto: "Com a Dona Valderez, sobre as suas perguntas."}
+    - {titulo: "A gravação", texto: "Para você ouvir de novo depois."}
+    - {titulo: "Versão para casal", texto: "Os dois mapas e a sinastria na mesma conversa."}
+  passos:
+    - {titulo: "Entre na lista", texto: "Avisamos quando abrirem as vagas do mês."}
+    - {titulo: "Escolha o horário", texto: "Paga e marca no mesmo passo."}
+    - {titulo: "Mande suas perguntas", texto: "Ela lê o mapa e as perguntas antes."}
+  trecho:
+    rotulo: Agenda
+    titulo: Vagas abrem uma vez por mês
+    texto: >-
+      A agenda é da Dona Valderez, e ela escolhe quantas conversas faz por mês.
+      Quem está na lista é avisado primeiro, por e-mail, no dia em que as vagas abrem.
+  faq:
+    - {pergunta: "Quanto tempo dura?", resposta: "A definir com a Dona Valderez."}
+    - {pergunta: "E se eu precisar remarcar?", resposta: "Até 48 horas antes, sem custo."}
+    - {pergunta: "É previsão?", resposta: "Não. É uma conversa de autoconhecimento a partir do seu mapa."}
+
+# ----------------------------------------------------------------- a vitrine /cursos (oculta)
+cursos:
+  rascunho: true
+  titulo: Aprenda com a <em>Dona Valderez</em>
+  lede: >-
+    Aulas gravadas, no seu ritmo, com exercícios no seu próprio mapa. Novos cursos
+    entram aqui conforme ficam prontos.
+  aviso: Comprou um curso? As aulas abrem pelo link que chega no seu e-mail, e você recupera os links em
+  filtros: [Astrologia, Tarot, Numerologia]
+  # Cada curso: `catalogo` = a chave no catalogo.yaml (estado e rota vêm de lá);
+  # sem `catalogo`, o curso aparece como "em breve" com o "me avise" da vitrine.
+  itens:
+    - {catalogo: "astrologia-do-zero", titulo: "Astrologia do zero", area: "Astrologia", nivel: "Iniciante", modulos: 6, resumo: "Ler o seu próprio mapa, do começo ao fim."}
+    - {titulo: "O mapa do casal", area: "Astrologia", nivel: "Intermediário", modulos: 4, resumo: "Ler a sinastria de duas pessoas."}
+    - {titulo: "Trânsitos: o céu de agora", area: "Astrologia", nivel: "Intermediário", modulos: 5, resumo: "Como o céu do momento toca o seu mapa."}
+    - {titulo: "Tarot para começar", area: "Tarot", nivel: "Iniciante", modulos: 4, resumo: "Os 22 arcanos maiores e as primeiras tiragens."}

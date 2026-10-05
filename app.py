@@ -220,6 +220,10 @@ _jinja.globals["faq"] = textos.faq
 import ilustracoes  # noqa: E402
 _jinja.globals["ilustracao"] = ilustracoes.tag
 _jinja.globals["ilustracao_url"] = ilustracoes.url
+# Páginas de produto (rodada 9, Fase C): texto em conteudo/ocidental/produtos.yaml
+import produtos_ocidental  # noqa: E402
+_jinja.globals["trecho_real"] = produtos_ocidental.trecho_real
+_jinja.globals["cursos"] = produtos_ocidental.cursos
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:
@@ -275,6 +279,17 @@ def _produto_fechado(request: Request, rota: str) -> dict | None:
     return prod
 
 
+def _pagina_de_produto(prod: dict) -> Response:
+    """A página de um produto que ainda não tem fluxo próprio no ar (rodada 9, Fase C):
+    a vitrine /cursos, o modelo de produto (produtos.yaml) ou, sem texto, o "em breve"."""
+    if prod["chave"] == "cursos":
+        return _pagina_montada("ocidental/cursos.html", "ocidental", "cursos", produto=prod)
+    tp = produtos_ocidental.pagina(prod["chave"])
+    if tp:
+        return _pagina_montada("ocidental/produto.html", "ocidental", "produto", produto=prod, tp=tp)
+    return _pagina_montada("ocidental/em_breve.html", "ocidental", "em_breve", produto=prod)
+
+
 def _pagina_ou_lista(request: Request, rota: str):
     fechado = _produto_fechado(request, rota)  # oculto = 404 até com a captura ligada
     chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
@@ -288,11 +303,11 @@ def _pagina_ou_lista(request: Request, rota: str):
             destino += "?" + request.url.query  # mantém ref/utm do afiliado
         return RedirectResponse(destino, status_code=302)
     if fechado:
-        resp = _pagina_montada("ocidental/em_breve.html", "ocidental", "em_breve", produto=fechado)
+        resp = _pagina_de_produto(fechado)
     elif rota in sistema.PAGINAS[_versao_do_pedido(request)]:
         resp = _pagina(rota, _versao_do_pedido(request))
-    else:  # produto do catálogo ativo ainda sem página própria: o "me avise"
-        resp = _pagina_montada("ocidental/em_breve.html", "ocidental", "em_breve", produto=catalogo.por_rota(rota))
+    else:  # produto do catálogo ativo ainda sem página própria: a página de produto
+        resp = _pagina_de_produto(catalogo.por_rota(rota))
     if chave and previa_url == chave:
         resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
                         secure=request.url.scheme == "https", samesite="lax")

@@ -1,66 +1,88 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="{{ cores.ground }}">
+<meta name="theme-color" content="#FBF6F1">
+{# Rodada 9, Fase C: tela Sistema-Legal do pacote valderez-design-2.0 (abas, índice,
+   "Em resumo"). O TEXTO jurídico é o mesmo de antes: quem é o controlador dos dados
+   e a operadora do pagamento (Cakto) não mudam nesta rodada. #}
 <title>Valderez Astrologia — Termos de Uso</title>
 <meta name="description" content="Termos de uso da Valderez Astrologia.">
 <meta name="robots" content="noindex">
 {% include "ocidental/_head_valderez.html" %}
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
-<link rel="stylesheet" href="/static/valderez/componentes.css">
+<link rel="stylesheet" href="/static/valderez/v2.css">
 </head>
-<body>
+<body class="vz">
 {% set atual = "/termos" %}{% include "ocidental/_cabecalho.html" %}
 
-<main id="conteudo" class="section container">
-<article class="article">
-  <p class="eyebrow">Valderez Astrologia</p>
-  <h1>Termos de Uso</h1>
-  <p class="caption">Última atualização: 30 de setembro de 2026. Serviço operado por <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Atendimento: <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
+<main id="conteudo">
+  <section class="secao degrade legal-topo">
+    <nav class="legal-abas" aria-label="Textos legais"><a class="chip" href="/privacidade">Privacidade</a><a class="chip chip-atual" aria-current="page" href="/termos">Termos de uso</a><a class="chip" href="/privacidade#cookies">Cookies</a></nav>
+    <h1 class="t1">Termos de <em>Uso</em></h1>
+  </section>
+  <section class="secao legal">
+    <nav class="legal-indice" aria-label="Nesta página">
+      <span class="olho">Nesta página</span>
+      <ol>
+        <li><a href="#s1">1. O que é a Valderez Astrologia</a></li>
+        <li><a href="#s2">2. Não é aconselhamento profissional</a></li>
+        <li><a href="#s3">3. Quem pode usar</a></li>
+        <li><a href="#s4">4. Amostra grátis, preços e pagamento</a></li>
+        <li><a href="#s5">5. Entrega</a></li>
+        <li><a href="#s6">6. Arrependimento, garantia e reembolso</a></li>
+        <li><a href="#s7">7. Propriedade intelectual</a></li>
+        <li><a href="#s8">8. Programa de afiliados</a></li>
+        <li><a href="#s9">9. Uso adequado</a></li>
+        <li><a href="#s10">10. Limitação de responsabilidade</a></li>
+        <li><a href="#s11">11. Privacidade</a></li>
+        <li><a href="#s12">12. Alterações, lei e foro</a></li>
+      </ol>
+    </nav>
+    <article class="legal-texto">
+  <p class="legal-data">Última atualização: 30 de setembro de 2026. Serviço operado por <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Atendimento: <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
 
   <p>Estes termos regulam o uso do site Valderez Astrologia (padmini.com.br) e a compra dos nossos produtos digitais. Ao usar o site ou comprar, você concorda com eles.</p>
 
-  <h2>1. O que é a Valderez Astrologia</h2>
+  <h2 id="s1">1. O que é a Valderez Astrologia</h2>
   <p>A Valderez Astrologia oferece leituras digitais de <strong>astrologia ocidental</strong> (o mapa natal e a sinastria do casal), de <strong>numerologia pitagórica</strong> e de <strong>tarot</strong> (tiragem de 3 cartas), além de combinações desses produtos. O mapa e a sinastria são calculados a partir dos dados de nascimento informados; a numerologia, a partir do nome completo de registro e da data de nascimento; no tarot, as cartas são sorteadas pelo nosso servidor no momento da tiragem. As leituras têm finalidade de <strong>autoconhecimento e entretenimento</strong>.</p>
 
-  <h2>2. Não é aconselhamento profissional</h2>
+  <h2 id="s2">2. Não é aconselhamento profissional</h2>
   <p>As leituras <strong>não</strong> são aconselhamento médico, psicológico, jurídico, financeiro ou de relacionamento, nem previsão garantida de acontecimentos — o que vale também para o tarot e a numerologia. As decisões que você tomar a partir delas são suas. Em questões de saúde, dinheiro ou direito, procure um profissional habilitado.</p>
 
-  <h2>3. Quem pode usar</h2>
+  <h2 id="s3">3. Quem pode usar</h2>
   <p>O serviço é destinado a maiores de 18 anos. Não é preciso criar conta. Você é responsável pela veracidade dos dados informados; a precisão da leitura depende deles, principalmente da hora de nascimento (no mapa e na sinastria) e do nome completo de registro (na numerologia). Ao informar dados de outra pessoa, você declara ter a autorização dela.</p>
 
-  <h2>4. Amostra grátis, preços e pagamento</h2>
+  <h2 id="s4">4. Amostra grátis, preços e pagamento</h2>
   <p>A amostra de cada leitura é gratuita. O relatório completo é pago, com o preço exibido no site e no checkout no momento da compra. Preços promocionais, como o desconto de cupom de afiliado, valem pelo prazo e pelas condições informados na oferta. O pagamento é processado pela plataforma <strong>Cakto</strong>, sujeito também aos termos dela.</p>
 
-  <h2>5. Entrega</h2>
+  <h2 id="s5">5. Entrega</h2>
   <p>O relatório completo é um conteúdo digital entregue por e-mail, por meio de um link pessoal, após a confirmação do pagamento — em geral em poucos minutos (no Pix, logo após a compensação). Se não receber, verifique a caixa de spam e fale com o atendimento. O link é pessoal e intransferível: não o compartilhe. No tarot, o link abre exatamente as cartas que você tirou antes de comprar.</p>
 
-  <h2>6. Arrependimento, garantia e reembolso</h2>
+  <h2 id="s6">6. Arrependimento, garantia e reembolso</h2>
   <p>Você pode desistir da compra em até <strong>7 (sete) dias</strong> a contar da compra, com devolução integral do valor pago, conforme o art. 49 do Código de Defesa do Consumidor. Para pedir, escreva para <strong>contato@pedrosperbmonteiro.com.br</strong> ou use o canal de reembolso da Cakto. O estorno segue os prazos da forma de pagamento usada.</p>
 
-  <h2>7. Propriedade intelectual</h2>
+  <h2 id="s7">7. Propriedade intelectual</h2>
   <p>A marca, os textos, o design e o software da Valderez Astrologia são protegidos pela legislação de direitos autorais e de propriedade industrial. O relatório comprado é para uso pessoal: não é permitido revendê-lo, copiá-lo em massa ou redistribuí-lo comercialmente. Os cálculos astronômicos usam a biblioteca Swiss Ephemeris, da Astrodienst, sob a licença AGPL.</p>
 
-  <h2>8. Programa de afiliados</h2>
+  <h2 id="s8">8. Programa de afiliados</h2>
   <p>Indicações e comissões de afiliados são geridas pela Cakto, conforme as regras do programa. A participação como afiliado depende de aprovação e das condições divulgadas. É proibido ao afiliado prometer resultados que o produto não oferece.</p>
 
-  <h2>9. Uso adequado</h2>
+  <h2 id="s9">9. Uso adequado</h2>
   <p>Não é permitido usar o site para fins ilícitos, tentar acessar áreas ou relatórios de outras pessoas, sobrecarregar o serviço de forma automatizada ou burlar o pagamento. Podemos bloquear acessos que violem estes termos.</p>
 
-  <h2>10. Limitação de responsabilidade</h2>
+  <h2 id="s10">10. Limitação de responsabilidade</h2>
   <p>Trabalhamos para manter o site disponível e as leituras corretas, mas não garantimos funcionamento ininterrupto. Na máxima extensão permitida em lei, não respondemos por decisões tomadas com base no conteúdo nem por indisponibilidades temporárias. Nada nestes termos limita os direitos garantidos pelo Código de Defesa do Consumidor.</p>
 
-  <h2>11. Privacidade</h2>
+  <h2 id="s11">11. Privacidade</h2>
   <p>O tratamento de dados pessoais segue a nossa <a href="/privacidade">Política de Privacidade</a>.</p>
 
-  <h2>12. Alterações, lei e foro</h2>
+  <h2 id="s12">12. Alterações, lei e foro</h2>
   <p>Podemos atualizar estes termos; a versão vigente fica sempre nesta página e vale para as compras feitas a partir da atualização. Aplica-se a lei brasileira. Fica eleito o foro do domicílio do consumidor.</p>
-
-  <p style="margin-top:30px"><a href="/">← Voltar ao início</a></p>
-</article>
+    </article>
+  </section>
 </main>
 
 {% include "ocidental/_rodape.html" %}

@@ -87,13 +87,13 @@ def test_fontes_sao_woff2_do_site_com_as_licencas():
     usadas = paleta.FONTES["ocidental"]["arquivos"]
     assert {f for f, _, _ in usadas} == {"Inter", "Cormorant Garamond"}
     novas = paleta.FONTES_VZ["arquivos"]
-    assert {f for f, _, _, _ in novas} == {"Fraunces", "Figtree", "Noto Sans Symbols 2"}
+    assert {f for f, _, _, _ in novas} == {"Fraunces", "Figtree", "Noto Sans Symbols", "Noto Sans Symbols 2"}
     for arquivo in [a for _, _, a in usadas] + [a for _, _, _, a in novas]:
         assert (VALDEREZ / "fontes" / arquivo).read_bytes()[:4] == b"wOF2", arquivo
-    for licenca in ("Inter", "CormorantGaramond", "Fraunces", "Figtree", "NotoSansSymbols2"):
+    for licenca in ("Inter", "CormorantGaramond", "Fraunces", "Figtree", "NotoSansSymbols", "NotoSansSymbols2"):
         assert (VALDEREZ / "fontes" / f"OFL-{licenca}.txt").exists(), licenca
     tema = (RAIZ / "static" / "ocidental" / "tema.css").read_text(encoding="utf-8")
-    assert tema.count("@font-face") == 8 and "format('woff2')" in tema
+    assert tema.count("@font-face") == 9 and "format('woff2')" in tema
 
 
 def test_svgs_servidos_leves_e_sem_fonte_embutida():

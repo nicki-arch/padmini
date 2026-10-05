@@ -1,46 +1,70 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="{{ cores.ground }}">
+<meta name="theme-color" content="#FBF6F1">
 {# Rodada 6: recuperar os links das leituras compradas, sem login (app.py, /api/minhas-leituras).
-   A resposta é sempre a mesma: a página não revela quem comprou. #}
+   A resposta é sempre a mesma: a página não revela quem comprou.
+   Rodada 9, Fase C: tela Sistema-MinhasLeituras do pacote valderez-design-2.0. O cartão
+   "Depois de enviar" só repete o e-mail que a própria pessoa digitou. #}
 <title>Valderez Astrologia — Minhas leituras</title>
-<meta name="description" content="Receba de novo, no seu e-mail, os links de todas as leituras que você comprou na Valderez Astrologia.">
+<meta name="description" content="Perdeu o link da sua leitura? Digite o e-mail da compra e mandamos de novo os links de todas as suas leituras.">
 <meta name="robots" content="noindex">
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/valderez/componentes.css">
+<link rel="stylesheet" href="/static/valderez/v2.css">
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
+<script src="/static/analytics.js" defer></script>
 </head>
-<body>
+<body class="vz">
 {% set atual = "/minhas-leituras" %}{% include "ocidental/_cabecalho.html" %}
 
-<main id="conteudo" class="section container narrow">
-  <p class="eyebrow">Suas leituras</p>
-  <h1>Recuperar minhas leituras</h1>
-  <p class="lede">Perdeu o e-mail com o link? Digite o e-mail que você usou na compra e mandamos de novo os links de todas as suas leituras — sem senha, sem cadastro.</p>
+<main id="conteudo">
+  <section class="secao degrade minhas">
+    <div class="minhas-intro">
+      <span class="olho">Minhas leituras</span>
+      <h1 class="t1">Perdeu o link da sua <em>leitura</em>?</h1>
+      <p class="lede">Digite o e-mail que você usou na compra e mandamos de novo os links de todas as suas leituras.</p>
+      <p class="miudo minhas-seguranca">Por segurança, a página nunca mostra se um e-mail comprou ou não: a resposta é sempre a mesma.</p>
+    </div>
 
-  <div class="card" style="margin-top:32px">
-    <form id="form" class="stack" novalidate>
-      <div class="field">
-        <label for="email">Seu e-mail</label>
-        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required placeholder="voce@exemplo.com" aria-describedby="erro">
-      </div>
-      <p class="form-erro" id="erro" role="alert" hidden></p>
-      <button class="button" id="enviar" type="submit">Mandar os meus links</button>
-    </form>
-    <p class="notice" id="resposta" role="status" aria-live="polite" hidden style="margin-top:24px"></p>
-  </div>
-  <p class="caption" style="margin-top:24px">Os links chegam só no e-mail da compra. Não achou nada? Confira o spam e se é o mesmo e-mail que você usou no pagamento — ou escreva para <a href="mailto:contato@pedrosperbmonteiro.com.br">contato@pedrosperbmonteiro.com.br</a>.</p>
+    <div class="cartao minhas-cartao" id="cartao-form">
+      <h2 class="t3">Mandar os meus links</h2>
+      <form id="form" novalidate>
+        <div class="campo">
+          <label for="email">E-mail que você usou na compra</label>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required placeholder="voce@exemplo.com" aria-describedby="erro">
+        </div>
+        <p class="form-erro" id="erro" role="alert" hidden></p>
+        <button class="bt bt-1 bt-cheio" id="enviar" type="submit">Mandar os meus links</button>
+      </form>
+      <p class="miudo">Sem senha e sem cadastro. Os links chegam só nesse e-mail.</p>
+    </div>
+
+    <div class="cartao minhas-cartao" id="cartao-pronto" hidden tabindex="-1">
+      <span class="chip chip-ok">Depois de enviar</span>
+      <svg class="minhas-ok" width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><circle cx="19" cy="19" r="17" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 19.5l5.5 5.5L27 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h2 class="t3">Confira a sua caixa de entrada</h2>
+      <p id="resposta" role="status" aria-live="polite"></p>
+      <ul class="minhas-dicas">
+        <li>Veja também o spam e a aba Promoções.</li>
+        <li>Confira se é o mesmo e-mail do pagamento.</li>
+        <li>Ainda nada? Escreva para <a href="mailto:contato@pedrosperbmonteiro.com.br">contato@pedrosperbmonteiro.com.br</a>.</li>
+      </ul>
+      <button class="bt bt-2" id="outro" type="button">Usar outro e-mail</button>
+    </div>
+  </section>
 </main>
 
 {% include "ocidental/_rodape.html" %}
 <script>
 const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 $("#form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const erro = $("#erro"), resp = $("#resposta"), botao = $("#enviar");
-  erro.hidden = true; resp.hidden = true;
+  const erro = $("#erro"), botao = $("#enviar");
+  erro.hidden = true;
   const email = $("#email").value.trim();
   $("#email").removeAttribute("aria-invalid");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { erro.textContent = "Confira o e-mail."; erro.hidden = false; $("#email").setAttribute("aria-invalid", "true"); $("#email").focus(); return; }
@@ -49,9 +73,13 @@ $("#form").addEventListener("submit", async (e) => {
     const r = await fetch("/api/minhas-leituras", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
     const c = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Não deu agora. Tente de novo em instantes.");
-    resp.textContent = c.mensagem; resp.hidden = false;
+    $("#resposta").innerHTML = `Se houver leituras com <strong>${esc(email)}</strong>, os links chegam em alguns minutos.`;
+    $("#cartao-form").hidden = true; $("#cartao-pronto").hidden = false; $("#cartao-pronto").focus();
   } catch (err) { erro.textContent = err.message; erro.hidden = false; }
   finally { botao.disabled = false; botao.removeAttribute("aria-busy"); botao.textContent = "Mandar os meus links"; }
+});
+$("#outro").addEventListener("click", () => {
+  $("#cartao-pronto").hidden = true; $("#cartao-form").hidden = false; $("#email").value = ""; $("#email").focus();
 });
 </script>
 </body>

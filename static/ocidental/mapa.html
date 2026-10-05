@@ -337,107 +337,66 @@ function desenharAmostra(d) {
   focar($("#titulo-resultado"));
 }
 
-// ---------- roda do mapa (SVG) ----------
-function separarRotulos(pontos, minimo = 12) {
-  const ordem = Object.entries(pontos).sort((a, b) => a[1] - b[1]);
-  const ang = Object.fromEntries(ordem);
-  for (let volta = 0; volta < 20 && ordem.length > 1; volta++) {
-    let mexeu = false;
-    for (let i = 0; i < ordem.length; i++) {
-      const a = ordem[i][0], b = ordem[(i + 1) % ordem.length][0];
-      const d = ((ang[b] - ang[a]) % 360 + 360) % 360;
-      if (d < minimo) { const e = (minimo - d) / 2; ang[a] -= e; ang[b] += e; mexeu = true; }
-    }
-    if (!mexeu) break;
-  }
-  return ang;
+// ---------- leitura completa (rodada 9, tela Site-Leitura) ----------
+// A roda vem desenhada do servidor (roda_mapa.py, a partir do motor); os textos, as
+// dimensões e os aspectos também: nada do completo existe na página sem a resposta
+// autorizada da API (token válido).
+const GLIFO = { sol:"☉", lua:"☽", mercurio:"☿", venus:"♀", marte:"♂", jupiter:"♃", saturno:"♄", urano:"♅", netuno:"♆", plutao:"♇", nodo_norte:"☊", ascendente:"AC", meio_do_ceu:"MC" };
+const DO_PONTO = { sol:"do seu Sol", lua:"da sua Lua", ascendente:"do seu Ascendente", mercurio:"do seu Mercúrio", venus:"da sua Vênus", marte:"do seu Marte" };
+function secaoDimensao(x, i, ativos) {
+  const prox = ativos[i + 1];
+  const imgs = `<div class="par-img" aria-hidden="true">${x.img_planeta && x.img_planeta !== x.img ? `<img src="${esc(x.img_planeta)}" alt="" class="par-a">` : ""}<img src="${esc(x.img)}" alt="" class="par-b"></div>`;
+  const aspectos = (x.aspectos || []).length ? `<h3>Os aspectos ${esc(DO_PONTO[x.ponto] || "")}</h3>
+      <p class="apoio">No seu mapa, ${esc(x.ponto_pt)} conversa com ${x.aspectos.length === 1 ? "um ponto" : x.aspectos.length + " pontos"}. Toque em cada um para ler o que ele traz.</p>
+      <div class="aspectos-lista">${x.aspectos.map((a) => `<details class="aspecto ${a.tipo}"><summary>${esc(a.titulo.replace(/ \(orbe.*\)$/, ""))} · ${esc(a.orbe)}</summary><p>${esc(a.texto)}</p></details>`).join("")}</div>` : "";
+  return `<section class="dimensao" id="dim-${esc(x.chave)}">
+      <span class="ponto">${esc(x.nome)} · ${esc(x.ponto_pt)}</span>
+      <div class="dimensao-topo">${imgs}<h2>${esc(x.ponto_pt)} em ${esc(x.signo_pt)}</h2></div>
+      ${x.selo ? `<span class="selo">✓ ${esc(x.selo)}</span>` : ""}
+      <p>${esc(x.texto)}</p>
+      ${x.casa ? `<h3>${esc(x.ponto_pt)} na casa ${x.casa}</h3><p>${esc(x.texto_casa)}</p>` : ""}
+      ${aspectos}
+      ${prox ? `<p class="proxima"><a href="#dim-${esc(prox.chave)}">Próxima: ${esc(prox.nome)} · ${esc(prox.ponto_pt)} em ${esc(prox.signo_pt)} ›</a></p>` : ""}
+    </section>`;
 }
-function roda(d) {
-  const T = 400, c = T / 2;
-  const pts = Object.fromEntries(d.pontos.map((p) => [p.id, p]));
-  const base = pts.ascendente ? pts.ascendente.longitude : 0;
-  const xy = (lng, r) => { const a = (180 + (lng - base)) * Math.PI / 180; return [c + r * Math.cos(a), c - r * Math.sin(a)]; };
-  const R = { ext: 196, sig: 168, pla: 140, mio: 104 };
-  let s = `<svg viewBox="0 0 ${T} ${T}" role="img" aria-label="Roda do mapa natal${pts.ascendente ? ", Ascendente à esquerda" : ""}">`;
-  s += `<circle cx="${c}" cy="${c}" r="${R.ext}" fill="var(--surface)" stroke="var(--border)"/>`;
-  s += `<circle cx="${c}" cy="${c}" r="${R.sig}" fill="var(--background)" stroke="var(--border)"/>`;
-  s += `<circle cx="${c}" cy="${c}" r="${R.mio}" fill="none" stroke="var(--border)" stroke-opacity=".5"/>`;
-  SIGNOS.forEach((sg, i) => {
-    const [x1, y1] = xy(i * 30, R.sig), [x2, y2] = xy(i * 30, R.ext), [tx, ty] = xy(i * 30 + 15, (R.sig + R.ext) / 2);
-    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--border)"/>`;
-    s += `<text x="${tx}" y="${ty + 4}" text-anchor="middle" font-size="11" fill="var(--text-secondary)">${SIGNO_CURTO[sg]}</text>`;
-  });
-  if (d.casas) {
-    d.casas.cuspides.forEach((cu, i) => {
-      const eixo = [0, 3, 6, 9].includes(i);
-      const [x1, y1] = xy(cu, R.mio), [x2, y2] = xy(cu, R.sig);
-      s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${eixo ? "var(--accent)" : "var(--border)"}" stroke-opacity="${eixo ? 1 : .5}" stroke-width="${eixo ? 1.6 : 1}"/>`;
-      const prox = d.casas.cuspides[(i + 1) % 12], meio = cu + (((prox - cu) % 360) + 360) % 360 / 2;
-      const [tx, ty] = xy(meio, R.mio + 10);
-      s += `<text x="${tx}" y="${ty + 3}" text-anchor="middle" font-size="9" fill="var(--text-muted)">${i + 1}</text>`;
-    });
-  }
-  (d.aspectos || []).filter((a) => ABREV[a.a] && ABREV[a.b] && a.a !== "nodo_norte" && a.b !== "nodo_norte").forEach((a) => {
-    const [x1, y1] = xy(pts[a.a].longitude, R.mio - 3), [x2, y2] = xy(pts[a.b].longitude, R.mio - 3);
-    const tenso = a.tipo === "quadratura" || a.tipo === "oposicao";
-    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${tenso ? "var(--rose)" : "var(--success)"}" stroke-width="${a.orbe > 3 ? .8 : 1.5}" stroke-opacity=".85"/>`;
-  });
-  const lng = Object.fromEntries(d.pontos.filter((p) => ABREV[p.id]).map((p) => [p.id, p.longitude]));
-  const rot = separarRotulos(lng);
-  Object.entries(lng).forEach(([k, v]) => {
-    const [x1, y1] = xy(v, R.sig), [x2, y2] = xy(v, R.sig - 6), [tx, ty] = xy(rot[k], R.pla);
-    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--text)"/>`;
-    s += `<text x="${tx}" y="${ty + 4}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text)">${ABREV[k]}${pts[k].retrogrado ? "℞" : ""}</text>`;
-  });
-  return s + `</svg>`;
-}
-
-// ---------- completo ----------
 function desenharResultado(d) {
-  const pts = Object.fromEntries(d.pontos.map((p) => [p.id, p]));
-  const lua = pts.lua;
-  const titulos = Object.keys(d.secoes);
-  const secoes = Object.entries(d.secoes).map(([t, c], i) => `<section id="secao-${i + 1}" class="bloco"><h2>${esc(t)}</h2>` + (Array.isArray(c) ? c : [c]).map((p) => `<p>${esc(p)}</p>`).join("") + `</section>`).join("");
-  const barras = (obj, rot) => Object.entries(obj).map(([k, v]) =>
-    `<span>${rot[k]}</span><i style="width:${Math.max(4, v.length * 12)}%" title="${esc(v.join(", "))}"></i><span class="num">${v.length}</span>`).join("");
+  const ativos = d.dimensoes.filter((x) => x.estado === "ativo");
+  const breves = d.dimensoes.filter((x) => x.estado !== "ativo");
+  const quando = `${dataBR(ultimoPedido.data)}${ultimoPedido.hora ? `, às ${esc(ultimoPedido.hora)}` : ""}${d.cidade ? `, em ${esc(d.cidade.split(",")[0])}` : ""}`;
+  const casasTxt = d.casas ? (d.casas.sistema === "porfirio" ? "casas Porfírio" : "casas Placidus") : "sem hora: sem casas";
+  const resto = Object.entries(d.resto).map(([t, c], i) => `<section class="bloco" id="resto-${i + 1}"><h2>${esc(t)}</h2>${(Array.isArray(c) ? c : [c]).map((p) => `<p>${esc(p)}</p>`).join("")}</section>`).join("");
+  const tabela = d.pontos.map((p) => `<tr><td><span class="glifo" aria-hidden="true">${GLIFO[p.id] || ""}</span> ${esc(p.nome)}${p.retrogrado ? ' <abbr title="retrógrado">℞</abbr>' : ""}</td><td>${p.signo_incerto ? esc(p.signos_possiveis_pt.join(" ou ")) : esc(p.signo_pt)} ${esc(p.grau)}</td>${d.tem_hora ? `<td class="num">${p.casa ? "casa " + p.casa : ""}</td>` : ""}</tr>`).join("");
   const res = $("#resultado");
-  res.innerHTML = `<section class="completo">${cabecalho({ ...d, nivel: "completo" })}
-    <div class="acoes"><button type="button" class="button" id="botao-pdf">Baixar mapa completo (PDF)</button><span class="nota" id="status-pdf">A roda, as posições, os aspectos e a leitura inteira.</span></div>
-    <div class="reading-layout">
-      <nav class="toc" aria-label="Sumário"><strong>Sumário</strong>
-        <a href="#posicoes">Posições</a><a href="#aspectos">Aspectos</a><a href="#elementos">Elementos e modalidades</a>
-        ${titulos.map((t, i) => `<a href="#secao-${i + 1}">${esc(t)}</a>`).join("")}
+  res.innerHTML = `<section class="amostra-topo degrade"><div class="amostra-topo-linha">
+      <div><span class="olho">Seu mapa natal completo</span><h1 class="t1" id="titulo-resultado" tabindex="-1">Mapa natal${d.nome ? ` de <em>${esc(d.nome)}</em>` : ""}</h1>
+        <p class="miudo">${quando} · zodíaco tropical, ${esc(casasTxt)}</p></div>
+      <div class="acoes"><button type="button" class="bt bt-2" id="botao-pdf">Baixar PDF</button><span class="miudo" id="status-pdf" aria-live="polite"></span></div></div>
+      ${d.aviso_horario ? `<p class="aviso">${esc(d.aviso_horario)}</p>` : ""}
+    </section>
+    <section class="leitura-grade">
+      <nav class="leitura-nav" aria-label="Dimensões"><span class="olho">Dimensões</span>
+        ${ativos.map((x) => `<a href="#dim-${esc(x.chave)}">${esc(x.nome)}</a>`).join("")}
+        ${breves.length ? `<span class="chip chip-breve">+${breves.length} em breve</span>` : ""}
+        <span class="olho" style="margin-top:18px">O mapa inteiro</span>
+        ${Object.keys(d.resto).map((t, i) => `<a href="#resto-${i + 1}">${esc(t)}</a>`).join("")}
       </nav>
-      <article class="article">
-        <div class="resumo">
-          <div><small>Sol</small><strong>${esc(pts.sol.signo_pt)}</strong></div>
-          <div><small>Lua</small><strong>${lua.signo_incerto ? esc(lua.signos_possiveis_pt.join(" ou ")) : esc(lua.signo_pt)}</strong></div>
-          <div><small>Ascendente</small><strong>${pts.ascendente ? esc(pts.ascendente.signo_pt) : "— (sem hora)"}</strong></div>
-        </div>
-        <section id="posicoes" class="bloco" style="margin-top:0"><h2>Posições</h2>
-          <div class="roda-e-tabela">
-            <div class="roda">${roda(d)}</div>
-            <div><div class="table-wrap" tabindex="0" role="region" aria-label="Posições dos planetas"><table>
-              <thead><tr><th scope="col">Ponto</th><th scope="col">Signo</th><th scope="col">Grau</th>${d.tem_hora ? '<th scope="col">Casa</th>' : ""}</tr></thead>
-              <tbody>${d.pontos.map((p) => `<tr><td>${esc(p.nome)}${p.retrogrado ? '&nbsp;<abbr title="retrógrado">℞</abbr>' : ""}</td><td>${p.signo_incerto ? esc(p.signos_possiveis_pt.join(" ou ")) : esc(p.signo_pt)}</td><td class="num">${esc(p.grau)}</td>${d.tem_hora ? `<td class="num">${p.casa ?? "—"}</td>` : ""}</tr>`).join("")}</tbody>
-            </table></div>
-            ${d.casas && d.casas.aviso ? `<p class="nota">${esc(d.casas.aviso)}</p>` : ""}
-            ${d.pontos.some((p) => p.retrogrado) ? '<p class="nota">℞ = planeta retrógrado na data do nascimento.</p>' : ""}</div>
-          </div>
-        </section>
-        <section id="aspectos" class="bloco"><h2>Aspectos</h2>
-          <ul class="aspectos">${d.aspectos.map((a) => `<li><span>${esc(a.titulo.replace(/ \(orbe.*\)$/, ""))}</span><span class="num nota">orbe ${esc(a.titulo.match(/orbe ([^)]+)/)[1])}</span></li>`).join("") || "<li>Nenhum aspecto maior dentro dos orbes.</li>"}</ul>
-          <p class="nota">Orbes: 8° (10° com o Sol ou a Lua); sextil, 6°.</p></section>
-        <section id="elementos" class="bloco"><h2>Elementos e modalidades</h2>
-          <div class="barras">${barras(d.elementos, ELEMENTO_PT)}</div><hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
-          <div class="barras">${barras(d.modalidades, MODALIDADE_PT)}</div></section>
+      <article class="leitura-texto">
+        ${ativos.map((x, i) => secaoDimensao(x, i, ativos)).join("")}
         <div id="relatorio" class="bloco">
-          ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="button button--secondary">Ler versão escrita por IA</button><span class="nota" id="status-ia"></span></div>` : ""}
-          <div id="texto-relatorio">${secoes}</div>
+          ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="bt bt-2 bt-p">Ler versão escrita por IA</button><span class="miudo" id="status-ia"></span></div>` : ""}
+          <div id="texto-relatorio"><h2 class="t3" style="margin-top:12px">O resto do seu mapa</h2>${resto}</div>
         </div>
-        <div class="card feedback bloco" id="feedback-mapa"></div>
+        <div class="cartao feedback bloco" id="feedback-mapa"></div>
       </article>
-    </div></section>`;
+      <aside class="cartao roda-lateral" aria-labelledby="titulo-roda">
+        <div class="roda-cab"><span class="olho" id="titulo-roda">Sua roda</span><span class="miudo">tropical · ${esc(casasTxt)}</span></div>
+        <div class="roda-caixa">${d.roda}</div>
+        <div class="roda-legenda"><span><i class="harm" aria-hidden="true"></i>harmonia</span><span><i class="tens" aria-hidden="true"></i>tensão</span></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Posições dos planetas"><table class="posicoes"><tbody>${tabela}</tbody></table></div>
+        ${d.casas && d.casas.aviso ? `<p class="miudo">${esc(d.casas.aviso)}</p>` : ""}
+        ${d.pontos.some((p) => p.retrogrado) ? '<p class="miudo">℞ = planeta retrógrado na data do nascimento.</p>' : ""}
+      </aside>
+    </section>`;
   mostrarEstado("resultado");
   if (window.padTrack) padTrack("completo_aberto", { produto: "mapa", sistema: "ocidental" });
   if (window.padFeedback) padFeedback("#feedback-mapa", "mapa");
@@ -459,7 +418,7 @@ async function baixarPDF() {
     setTimeout(() => URL.revokeObjectURL(url), 60000);
     status.textContent = original;
   } catch (err) { status.textContent = err.message; }
-  finally { botao.disabled = false; botao.textContent = "Baixar mapa completo (PDF)"; }
+  finally { botao.disabled = false; botao.textContent = "Baixar PDF"; }
 }
 
 let iaDisponivel = false;

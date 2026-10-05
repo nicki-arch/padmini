@@ -183,10 +183,12 @@ def test_remetente_muda_so_o_nome(monkeypatch):
 
 def test_email_da_ocidental_so_usa_pares_aprovados():
     """Texto do e-mail no fundo claro: só cores do tema claro que passam no fundo."""
-    c, claro = paleta.EMAIL["ocidental"], paleta.VALDEREZ["light"]
-    assert c["fundo"] == claro["background"] and c["texto"] == claro["text"]
+    # rodada 9: o visual 2.0 (paleta.VZ); o texto fica num cartão branco sobre o creme
+    c = paleta.EMAIL["ocidental"]
+    assert c["fundo"] == paleta.VZ["creme"] and c["texto"] == paleta.VZ["tinta"]
     for chave in ("texto", "suave", "fraco", "acento", "acento2"):
         assert paleta.contraste(c[chave], c["fundo"]) >= 4.5, chave
+        assert paleta.contraste(c[chave], c["cartao"]) >= 4.5, chave
     assert paleta.contraste(c["sobre_acento"], c["acento"]) >= 4.5
 
 

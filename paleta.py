@@ -123,13 +123,18 @@ VZ = {"creme": "#FBF6F1", "papel": "#F5EAE2", "rosa-po": "#F1D9D3", "rosa": "#E7
       # fundos e enfeites das telas (degradês, avisos, a moldura da foto)
       "aurora": "#F8E6DE", "hero-fundo": "#F6DCD2", "foto-1": "#F3DDD5", "foto-2": "#E9C9C0",
       "noite-foto": "#4A3A4E", "noite-citacao": "#F3E4E8", "erro-fundo": "#FBE9EC", "ok-fundo": "#E3F0E8",
-      "ok-borda": "#CFE3D7", "aviso-fundo": "#FBF1E3", "aviso-borda": "#EBD3A8"}
+      "ok-borda": "#CFE3D7", "aviso-fundo": "#FBF1E3", "aviso-borda": "#EBD3A8",
+      # a roda do mapa (roda_mapa.py, referência do pacote): setores por elemento e filetes
+      "elemento-fogo": "#F6E3DA", "elemento-terra": "#F3EBDD", "elemento-ar": "#F7F0EA", "elemento-agua": "#EFE3E6",
+      "ouro-linha": "#C9A66A", "linha-casa": "#D9C5BC", "miolo": "#FFFDFB"}
 FONTES_VZ = {"titulo": "'Fraunces', Georgia, serif", "texto": "'Figtree', 'Segoe UI', Arial, sans-serif",
-             "glifos": "'Noto Sans Symbols 2'",
+             # os signos e planetas estão na Noto Sans Symbols; o ☉, na Symbols 2
+             "glifos": "'Noto Sans Symbols', 'Noto Sans Symbols 2'",
              # (família, pesos, estilo, arquivo em static/valderez/fontes/)
              "arquivos": [("Fraunces", "400 600", "normal", "Fraunces.woff2"),
                           ("Fraunces", "400 600", "italic", "Fraunces-Italic.woff2"),
                           ("Figtree", "400 700", "normal", "Figtree.woff2"),
+                          ("Noto Sans Symbols", "400", "normal", "NotoSansSymbols-astro.woff2"),
                           ("Noto Sans Symbols 2", "400", "normal", "NotoSansSymbols2-astro.woff2")]}
 # (texto, fundo, mínimo): os pares que o CSS usa. Texto ≥ 4,5:1; contorno ≥ 3:1.
 PARES_VZ = ([(c, f, 4.5) for c in ("tinta", "tinta-2", "vinho", "ouro-esc", "erro") for f in ("creme", "papel", "branco")]
@@ -174,10 +179,13 @@ EMAIL = {
     # Fundo "background", texto "text", botão "accent" com "onAccent"; os textos
     # de apoio são textSecondary/textMuted, todos em pares aprovados no fundo claro.
     # O e-mail não baixa fonte: onde a Cormorant/Inter não existir, cai no Georgia/Arial.
-    "ocidental": {"fundo": "#F7F3F0", "texto": "#142234", "acento": "#715078", "sobre_acento": "#FFFFFF",
-                  "suave": "#495365", "fraco": "#656474", "linha": "#827587", "acento2": "#80506F",
-                  "fonte": "Inter,Arial,Helvetica,sans-serif",
-                  "fonte_marca": "'Cormorant Garamond',Georgia,serif", "raio_botao": "999px"},
+    # Rodada 9 (tela Sistema-Emails do pacote 2.0): creme por fora, cartão branco por
+    # dentro (entrega.casca_ocidental), vinho no botão; pares de PARES_VZ.
+    "ocidental": {"fundo": "#FBF6F1", "texto": "#2B2230", "acento": "#8C3F55", "sobre_acento": "#FFFFFF",
+                  "suave": "#5A4D58", "fraco": "#7A6B74", "linha": "#E6D6CE", "acento2": "#7E5A1E",
+                  "cartao": "#FFFFFF", "ouro": "#7E5A1E",
+                  "fonte": "Figtree,'Segoe UI',Arial,Helvetica,sans-serif",
+                  "fonte_marca": "Fraunces,Georgia,serif", "raio_botao": "999px"},
 }
 
 # ---------------------------------------------------------------------------
@@ -195,16 +203,19 @@ PAPEL = {
                "fonte_corpo_forte": ("Inter-SemiBold", "Inter-SemiBold.ttf")},
     # Valderez: tinta = text, acento = accent (títulos e filetes), noite = o azul
     # do tema escuro (capa); fontes = os TTF de fontes/ (os mesmos WOFF2 do site).
-    "ocidental": {"tinta": "#142234", "tinta_suave": "#495365", "noite": "#091321", "acento": "#715078",
-                  "acento_suave": "#F7F3F0", "superficie": "#F7F3F0", "fundo": "#FFFFFF", "linha": "#827587",
-                  "lotus": "#80506F", "harmonico": "#216342",
-                  # os mesmos nomes (e arquivos) que o gerar_pdf.py registra; sem itálico,
-                  # como no pacote (Cormorant 500/600, Inter 400/600)
-                  "fonte_titulo": ("Cormorant", "Cormorant-Medium.ttf"),
-                  "fonte_titulo_forte": ("Cormorant-SemiBold", "Cormorant-SemiBold.ttf"),
-                  "fonte_titulo_italico": ("Cormorant", "Cormorant-Medium.ttf"),
-                  "fonte_corpo": ("Inter", "Inter-Regular.ttf"),
-                  "fonte_corpo_forte": ("Inter-SemiBold", "Inter-SemiBold.ttf")},
+    # Rodada 9 (visual 2.0): tinta, vinho e ouro do pacote; Fraunces + Figtree (TTF
+    # estáticos em fontes/, gerados das mesmas fontes OFL do site) e os glifos da
+    # Noto Sans Symbols 2 na roda.
+    "ocidental": {"tinta": "#2B2230", "tinta_suave": "#5A4D58", "noite": "#231F33", "acento": "#8C3F55",
+                  "acento_suave": "#FBF6F1", "superficie": "#F5EAE2", "fundo": "#FFFFFF", "linha": "#E6D6CE",
+                  "lotus": "#7E5A1E", "harmonico": "#2F6B4F",
+                  "fonte_titulo": ("Fraunces", "Fraunces-Medium.ttf"),
+                  "fonte_titulo_forte": ("Fraunces", "Fraunces-Medium.ttf"),
+                  "fonte_titulo_italico": ("Fraunces-Italic", "Fraunces-MediumItalic.ttf"),
+                  "fonte_corpo": ("Figtree", "Figtree-Regular.ttf"),
+                  "fonte_corpo_forte": ("Figtree-SemiBold", "Figtree-SemiBold.ttf"),
+                  "fonte_glifos": ("NotoSymbols", "NotoSansSymbols-astro.ttf"),
+                  "fonte_glifos_2": ("NotoSymbols2", "NotoSansSymbols2-astro.ttf")},  # só o ☉
 }
 
 # Cores que eram da marca védica e não podem aparecer na ocidental (o teste
