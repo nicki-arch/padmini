@@ -1,28 +1,52 @@
-{# Cabeçalho da versão ocidental (marca Valderez Astrologia, pacote de design
-   docs/design/valderez-1.0/componentes/menu.html). Bloco escuro (data-theme).
+{# Cabeçalho da versão ocidental (rodada 9, pacote valderez-design-2.0): a roda
+   em SVG com 48 px, o nome "Valderez / Astrologia" em HTML e fundo sólido com
+   desfoque (static/valderez/casca.css). No celular, o menu é um details/summary
+   (tela Sistema-Menu-celular), sem JavaScript.
    Variáveis de quem inclui:
-     atual     rota da página (marca o link do menu com aria-current)
-     sem_menu  true na /lista: com a captura ligada, as outras páginas levam
-               de volta para a lista, então não há menu a mostrar.
-   O símbolo é SVG (marca.py) e o nome vai em HTML, com a fonte do site. #}
+     atual     rota da página (marca o link com aria-current)
+     sem_menu  true na /lista com a captura ligada: as outras páginas levam de
+               volta para a lista, então não há menu (aparece "Abre em breve"). #}
+{%- set _sem_menu = sem_menu is defined and sem_menu %}
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
-<header class="header" data-theme="dark">
-  <div class="container header-inner">
-    <a class="brand" href="{{ '/lista' if sem_menu is defined and sem_menu else '/' }}" aria-label="Valderez Astrologia, início">
-      <span class="brand-mark" aria-hidden="true">{{ marca.svg() }}</span>
-      <span class="brand-name">Valderez<small>Astrologia</small></span>
+<header class="cab">
+  <div class="cab-in">
+    <a class="marca" href="{{ '/lista' if _sem_menu else '/' }}" aria-label="Valderez Astrologia, início">
+      {{ marca.roda(48) }}<span class="marca-nome"><b>Valderez</b><i>Astrologia</i></span>
     </a>
-    {%- if not (sem_menu is defined and sem_menu) %}
-    <nav class="nav-desktop" aria-label="Principal">
+    {%- if _sem_menu %}
+    <span class="cab-chip">Abre em breve</span>
+    {%- else %}
+    <nav class="nav" aria-label="Principal">
       {% include "ocidental/_menu.html" %}
-      {%- if atual != "/mapa" and catalogo.ativo("mapa") %}
-      <a class="button" href="/mapa">Fazer meu mapa natal</a>
-      {%- endif %}
     </nav>
-    <details class="nav-mobile">
-      <summary>Menu</summary>
-      <nav aria-label="Principal no celular">
-        {% include "ocidental/_menu.html" %}
+    {%- if catalogo.ativo("mapa") and atual != "/mapa" %}
+    <a class="cab-bt" href="/mapa">Ver meu mapa grátis</a>
+    {%- endif %}
+    <details class="menu-cel">
+      <summary aria-label="Menu"><svg class="ico-abrir" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="ico-fechar" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></summary>
+      <nav class="menu-painel" aria-label="Menu">
+        {%- for p in catalogo.visiveis() if p.estado == "ativo" %}
+        <a href="{{ p.rota }}"{% if p.rota == atual %} aria-current="page"{% endif %}>{{ p.nome }}{% if p.chave == "mapa" %}<small>amostra grátis</small>{% endif %}</a>
+        {%- endfor %}
+        <a href="/leituras"{% if atual == "/leituras" %} aria-current="page"{% endif %}>Todas as leituras</a>
+        <a href="/#quem-revisa">Quem revisa</a>
+        <a href="/#perguntas">Perguntas</a>
+        {%- if blog.publicados() %}
+        <a href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>
+        {%- endif %}
+        <a href="/minhas-leituras"{% if atual == "/minhas-leituras" %} aria-current="page"{% endif %}>Minhas leituras<small>recuperar links</small></a>
+        {%- set _breve = catalogo.visiveis() | selectattr("estado", "equalto", "em_breve") | list %}
+        {%- if _breve %}
+        <div class="menu-breve"><span class="rotulo">Chegando em breve</span>
+          <div>{% for p in _breve %}<a href="{{ p.rota }}">{{ p.nome }} <span class="sr-only">(em breve)</span></a>{% endfor %}</div>
+        </div>
+        {%- endif %}
+        <div class="menu-pe">
+          <p>{{ revisao("assinatura") }}</p>
+          {%- if catalogo.ativo("mapa") %}
+          <a class="rod-bt" href="/mapa">Ver meu mapa grátis</a>
+          {%- endif %}
+        </div>
       </nav>
     </details>
     {%- endif %}

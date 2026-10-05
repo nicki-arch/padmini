@@ -104,7 +104,7 @@ def test_pdf_com_token(p):
 def test_pagina_do_mapa_na_versao_ocidental(versao):
     versao("ocidental")
     html = cliente.get("/mapa").text
-    assert "/api/ocidental/mapa" in html and "Mapa Natal" in html
+    assert "/api/ocidental/mapa" in html and "mapa natal" in html.lower()
     assert "védic" not in html.lower() and "पद्मिनी" not in html
     assert f"R${ofertas.preco('mapa', 'ocidental')}" in html
 

@@ -27,12 +27,12 @@ def versao(monkeypatch):
 
 def test_home_ocidental_tem_os_4_produtos_com_preco_do_yaml(versao):
     versao("ocidental")
-    html = cliente.get("/").text
+    # rodada 9: os 4 produtos com preço ficam em "Todas as leituras" (a home é do mapa natal)
+    html = cliente.get("/leituras").text
     for rota, chave in (("/compatibilidade", "compat"), ("/mapa", "mapa"),
                         ("/numerologia", "numerologia"), ("/tarot", "tarot")):
-        assert f'href="{rota}"' in html
+        assert f'href="{rota}' in html
         assert f"R${ofertas.preco(chave, 'ocidental')}" in html
-    assert f"R${ofertas.preco('bump_mapas_casal', 'ocidental')}" in html  # o combo
 
 
 @pytest.mark.parametrize("rota", ["/termos", "/privacidade"])

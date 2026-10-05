@@ -1,11 +1,16 @@
-{# Os links do menu da versão ocidental, MONTADOS DO CATÁLOGO (rodada 9,
-   conteudo/ocidental/catalogo.yaml): os produtos ativos e em breve, na ordem do
-   YAML (oculto não aparece), "Todas as leituras" e o blog. Usado pelo cabeçalho
-   (_cabecalho.html) no desktop e no painel do celular. Quem inclui define
-   `atual` ("/", "/compatibilidade", "/mapa"…). #}
-{%- for p in catalogo.visiveis() %}
-<a href="{{ p.rota }}"{% if p.rota == atual %} aria-current="page"{% endif %}>{{ p.nome }}{% if p.estado == "em_breve" %} <small class="menu-breve">em breve</small>{% endif %}</a>
+{# Links do menu DESKTOP da versão ocidental (rodada 9). Os produtos vêm do
+   catálogo (conteudo/ocidental/catalogo.yaml): só os ativos; os em breve ficam no
+   painel do celular ("Chegando em breve"), no rodapé e em "Todas as leituras".
+   Depois, as âncoras da home (dimensões, quem revisa, perguntas), como na tela do
+   pacote 2.0. Quem inclui define `atual`. #}
+{%- for p in catalogo.visiveis() if p.estado == "ativo" %}
+<a href="{{ p.rota }}"{% if p.rota == atual %} aria-current="page"{% endif %}>{{ p.nome }}</a>
 {%- endfor %}
+{%- if catalogo.ativo("mapa") %}
+<a href="/#dimensoes">Dimensões</a>
+{%- endif %}
+<a href="/#quem-revisa">Quem revisa</a>
+<a href="/#perguntas">Perguntas</a>
 <a href="/leituras"{% if atual == "/leituras" %} aria-current="page"{% endif %}>Todas as leituras</a>
 {%- if blog.publicados() %}
 <a href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>

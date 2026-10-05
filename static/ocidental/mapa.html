@@ -1,130 +1,124 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="{{ cores.ground }}">
-<title>Valderez Astrologia — Mapa Natal</title>
-<meta name="description" content="Seu mapa natal: Sol, Lua e Ascendente, os planetas nos signos e nas casas e os aspectos entre eles. Amostra grátis.">
+<meta name="theme-color" content="#FBF6F1">
+<title>{{ t.seo.titulo }}</title>
+<meta name="description" content="{{ t.seo.descricao }}">
 <link rel="canonical" href="https://padmini.com.br/mapa">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
-<meta property="og:title" content="Seu mapa natal — Valderez Astrologia">
-<meta property="og:description" content="Sol, Lua e Ascendente, calculados para o seu nascimento. Amostra grátis.">
+<meta property="og:title" content="{{ t.seo.og_titulo }}">
+<meta property="og:description" content="{{ t.seo.og_descricao }}">
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-mapa.png">
 <meta property="og:url" content="https://padmini.com.br/mapa">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/valderez/componentes.css">
-<link rel="stylesheet" href="/static/ocidental/movimento.css">
-<script src="/static/ocidental/movimento.js" defer></script>
+<link rel="stylesheet" href="/static/valderez/v2.css">
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/ocidental/amostra-email.js" defer></script>
 <script src="/static/ocidental/me-avise.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
-{# Mapa natal da versão ocidental (marca Valderez Astrologia; desenho de
-   docs/design/valderez-1.0/telas/mapa-formulario, mapa-carregando, mapa-amostra
-   e leitura-completa). São ESTADOS desta página, não rotas: #estado-form,
-   #estado-carregando e #estado-resultado (amostra ou, com token, o completo).
-   Preço, taxa e link de checkout: conteudo/ocidental/ofertas.yaml. Textos do mapa:
-   conteudo/ocidental/textos/. API: /api/ocidental/mapa e /api/ocidental/pdf. #}
+{# Mapa natal da versão ocidental — rodada 9, telas Site-Mapa, Sistema-Calculando-celular
+   e Site-Amostra (+ -celular) do pacote valderez-design-2.0. São ESTADOS desta
+   página, não rotas: #estado-form → #estado-carregando → #resultado (a amostra por
+   dimensões ou, com token, o completo). No celular o formulário vem antes de tudo.
+   Texto: conteudo/ocidental/mapa.yaml. Dimensões: catalogo.yaml (a API manda só o
+   começo de cada uma; o desfocado é enfeite). Preço, taxa e checkout: ofertas.yaml,
+   só com a venda aberta (catalogo.vende); fechada, o "me avise" no lugar.
+   API: /api/ocidental/mapa e /api/ocidental/pdf. #}
 </head>
-<body>
+<body class="vz">
 {% set atual = "/mapa" %}{% include "ocidental/_cabecalho.html" %}
+{%- set vende = catalogo.vende("mapa") %}
 
 <main id="conteudo">
-  <section class="section container">
-    <ol class="stepbar" id="etapas" aria-label="Etapas">
-      <li aria-current="step">01 Dados</li><li>02 Cálculo</li><li>03 Amostra</li>
-    </ol>
-
-    <div class="estado" id="estado-form">
-      <div class="mapa-grade">
-        <div class="mapa-intro">
-          <p class="eyebrow">Mapa natal</p>
-          <h1>Seu mapa natal</h1>
-          <p class="lede">Com a data, a hora e a cidade de nascimento, calculamos o seu Sol, a sua Lua e o seu Ascendente — e, no completo, onde cada planeta estava e como eles conversam entre si.</p>
-          <div class="trust"><span>Amostra grátis, na hora</span><span>Sem cadastro nem senha</span><span>O completo chega no seu e-mail</span></div>
-        </div>
-
-        <div class="card mapa-form">
-          <form id="form" class="stack" novalidate aria-labelledby="titulo-form">
-            <h2 id="titulo-form">Seus dados de nascimento</h2>
-            <div class="field">
-              <label for="nome">Nome</label>
-              <input id="nome" name="nome" autocomplete="given-name" maxlength="80" required>
-            </div>
-            <div class="campos-2">
-              <div class="field">
-                <label for="data">Data de nascimento</label>
-                <input id="data" name="data" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" maxlength="10" required aria-describedby="erro">
-              </div>
-              <div class="field">
-                <label for="hora">Hora de nascimento</label>
-                <input id="hora" name="hora" type="text" inputmode="numeric" autocomplete="off" placeholder="hh:mm" maxlength="5" aria-describedby="hora-ajuda">
-                <label class="consent"><input type="checkbox" id="sem-hora" name="sem-hora"><span>Não sei a hora</span></label>
-              </div>
-            </div>
-            <p class="help" id="hora-ajuda">Use a hora da certidão. Ela define o Ascendente e as casas.</p>
-            <div class="field">
-              <label for="cidade" id="cidade-label">Cidade de nascimento</label>
-              <div class="auto">
-                <input id="cidade" name="cidade" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cidades" autocomplete="off" placeholder="Comece a digitar, ex.: Porto Alegre" required>
-                <ul id="cidades" role="listbox" aria-labelledby="cidade-label" hidden></ul>
-              </div>
-              <p class="cidade-status" id="cidade-status" aria-live="polite"></p>
-            </div>
-            {% include "ocidental/_campo_email.html" %}
-            <p class="form-erro" id="erro" role="alert" hidden></p>
-            <button class="button" id="enviar" type="submit">Gerar meu mapa</button>
-          </form>
-        </div>
-
-        <div class="mapa-arte"><img src="/static/valderez/papeis.svg" alt="" width="500" height="500"></div>
+  <div class="estado" id="estado-form">
+    <section class="mapa-form degrade">
+      <div class="mapa-intro">
+        <ol class="passos-topo" aria-label="Etapas">{% for p in t.passos %}<li{% if loop.first %} aria-current="step"{% endif %}>{{ loop.index }} {{ p }}</li>{% endfor %}</ol>
+        <span class="olho">{{ t.form.olho }}</span>
+        <h1 class="t1">{{ t.form.titulo }}</h1>
+        <p class="lead">{{ t.form.lede }}</p>
+        <ul class="itens-dim">
+          {%- for i in t.form.itens %}
+          <li><span class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span>
+            <span><b>{{ i.titulo }}</b><br><span class="miudo">{{ i.get("sub") or (i.sub_venda if vende else i.sub_fechada) }}</span></span></li>
+          {%- endfor %}
+        </ul>
       </div>
-    </div>
 
-    <div class="estado" id="estado-carregando" hidden>
-      <div class="card loading narrow" aria-busy="true">
-        <span class="spinner" aria-hidden="true"></span>
-        <h2 id="titulo-carregando" tabindex="-1">Calculando o seu mapa</h2>
-        <p role="status">Estamos posicionando o Sol, a Lua e os planetas para o seu nascimento.</p>
+      <form id="form" class="cartao cartao-form form" novalidate aria-labelledby="titulo-form">
+        <h2 id="titulo-form" class="t3">{{ t.form.titulo_cartao }}</h2>
+        <div class="campo">
+          <label for="nome">{{ t.form.nome }}</label>
+          <input id="nome" name="nome" autocomplete="given-name" maxlength="80" required aria-describedby="nome-ajuda">
+          <span class="ajuda" id="nome-ajuda">{{ t.form.nome_ajuda }}</span>
+        </div>
+        <div class="campos-2">
+          <div class="campo">
+            <label for="data">{{ t.form.data }}</label>
+            <input id="data" name="data" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" maxlength="10" required>
+          </div>
+          <div class="campo">
+            <label for="hora">{{ t.form.hora }}</label>
+            <input id="hora" name="hora" type="text" inputmode="numeric" autocomplete="off" placeholder="hh:mm" maxlength="5" aria-describedby="hora-ajuda">
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="sem-hora" name="sem-hora"><span>{{ t.form.sem_hora }}</span></label>
+        <span class="ajuda miudo" id="hora-ajuda">{{ t.form.hora_ajuda }}</span>
+        <div class="campo">
+          <label for="cidade" id="cidade-label">{{ t.form.cidade }}</label>
+          <div class="auto">
+            <input id="cidade" name="cidade" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cidades" autocomplete="off" placeholder="Comece a digitar, ex.: Porto Alegre" required aria-describedby="cidade-status">
+            <ul id="cidades" role="listbox" aria-labelledby="cidade-label" hidden></ul>
+          </div>
+          <span class="ajuda" id="cidade-status" aria-live="polite">{{ t.form.cidade_ajuda }}</span>
+        </div>
+        {% include "ocidental/_campo_email_vz.html" %}
+        <p class="form-erro" id="erro" role="alert" tabindex="-1" hidden></p>
+        <button class="bt bt-1 bt-cheio" id="enviar" type="submit">{{ t.form.botao }}</button>
+        <p class="miudo" style="text-align:center">{{ t.form.miudo }} <a href="/privacidade">Privacidade</a></p>
+      </form>
+    </section>
+
+    <section class="secao secao-papel perguntas" id="sobre-mapa">
+      <h2 class="t2">{{ t.faq.titulo }}</h2>
+      <div class="faq">
+        {%- for item in faq(t.faq.itens, vende) %}
+        <details{% if loop.first %} open{% endif %}><summary>{{ item.pergunta }}</summary><p>{{ item.resposta }}</p></details>
+        {%- endfor %}
       </div>
-    </div>
+    </section>
+  </div>
 
-    <div class="estado" id="resultado" aria-live="polite" hidden></div>
-  </section>
+  <div class="estado degrade" id="estado-carregando" hidden>
+    <section class="calculando" aria-busy="true">
+      <ol class="passos-topo" aria-label="Etapas">{% for p in t.passos %}<li{% if loop.index == 2 %} aria-current="step"{% endif %}>{{ p }}</li>{% endfor %}</ol>
+      <div class="roda-gira" aria-hidden="true">{{ marca.roda(220) }}{{ ilustracao("dim-sol", classe="meio", carregar="eager") }}</div>
+      <h1 class="t3" id="titulo-carregando" tabindex="-1">{{ t.calculando.titulo }} <em id="data-carregando"></em></h1>
+      <p class="apoio" role="status">{{ t.calculando.sub }}</p>
+      <ul class="cartao etapas-calc" id="etapas-calc">
+        {%- for e in t.calculando.etapas %}
+        <li><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/></svg>{{ e }}</li>
+        {%- endfor %}
+      </ul>
+    </section>
+  </div>
 
-  <section class="section container narrow" id="sobre-mapa">
-    <h2>O que vem no mapa completo</h2>
-    {%- if catalogo.vende("mapa") %}
-    <p class="secondary">A amostra é grátis. O completo (R${{ ofertas.mapa.preco | moeda }}) abre o mapa inteiro.</p>
-    {%- else %}
-    <p class="secondary">A amostra é grátis. A leitura completa abre em breve e vai trazer o mapa inteiro.</p>
-    {%- endif %}
-    <ul class="lista-check">
-      <li>A roda do seu mapa e a posição de todos os planetas, signo a signo e casa a casa</li>
-      <li>Os aspectos principais: como os planetas conversam entre si</li>
-      <li>Elementos, modalidades e o regente do seu Ascendente</li>
-      <li>O relatório em PDF para guardar</li>
-    </ul>
-    <details class="faq" open><summary>É a mesma coisa que o horóscopo?</summary><p>Não. O horóscopo usa só o signo do Sol. O mapa natal considera a posição de todos os planetas no momento exato do seu nascimento — por isso duas pessoas do mesmo signo podem ser tão diferentes.</p></details>
-    <details class="faq"><summary>E se eu não souber a hora?</summary><p>Dá para fazer. Sem a hora não há Ascendente nem casas, mas os planetas nos signos e os aspectos entre eles estão todos lá — e o mapa avisa o que ficou de fora.</p></details>
-    <details class="faq"><summary>Preciso criar conta?</summary><p>Não. Você preenche os dados, vê a amostra e, se comprar, o completo chega no seu e-mail — sem cadastro nem senha.</p></details>
-    <details class="faq"><summary>Como recebo o mapa completo?</summary><p>Por e-mail, com um link pessoal, logo após a confirmação do pagamento.</p></details>
-  </section>
+  <div class="estado" id="resultado" aria-live="polite" hidden></div>
 </main>
 
 {% set nota_rodape %}Mapa pelo zodíaco tropical, casas Placidus. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional. Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos astronômicos: Swiss Ephemeris.{% endset %}{% include "ocidental/_rodape.html" %}
 
 <script>
-{%- if catalogo.vende("mapa") %}
+{%- if vende %}
 // Link vem de conteudo/ocidental/ofertas.yaml (trocado no servidor). Vazio = oferta ainda não existe na Cakto.
 const LINK_CHECKOUT_INDIVIDUAL = "{{ ofertas.mapa.checkout }}";
 const PRECO = "{{ ofertas.mapa.preco | moeda }}";
-const NOME_OFERTA = {{ ofertas.mapa.nome | tojson }};
 // taxa que a Cakto soma no checkout (ofertas.yaml → taxa_plataforma); vazio = não mostra a linha
 const TAXA = "{{ ofertas.mapa.taxa_plataforma | moeda }}";
 {%- else %}
@@ -132,6 +126,8 @@ const TAXA = "{{ ofertas.mapa.taxa_plataforma | moeda }}";
 // sem link de compra; no lugar do bloco de compra, o "me avise" (static/ocidental/me-avise.js).
 const LINK_CHECKOUT_INDIVIDUAL = "";
 {%- endif %}
+const TA = {{ t.amostra | tojson }};
+const PASSOS = {{ t.passos | tojson }};
 const SIGNOS = ["aries","touro","gemeos","cancer","leao","virgem","libra","escorpiao","sagitario","capricornio","aquario","peixes"];
 const SIGNO_CURTO = { aries:"Ári", touro:"Tou", gemeos:"Gêm", cancer:"Cân", leao:"Leão", virgem:"Vir", libra:"Lib", escorpiao:"Esc", sagitario:"Sag", capricornio:"Cap", aquario:"Aqu", peixes:"Pei" };
 const ABREV = { sol:"Sol", lua:"Lua", mercurio:"Mer", venus:"Vên", marte:"Mar", jupiter:"Júp", saturno:"Sat", urano:"Ura", netuno:"Net", plutao:"Plu", nodo_norte:"Nodo" };
@@ -154,10 +150,13 @@ function aplicarMascara(el, tamanhos, separador) {
 aplicarMascara($("#data"), [2, 2, 4], "/");
 aplicarMascara($("#hora"), [2, 2], ":");
 $("#sem-hora").addEventListener("change", (e) => { $("#hora").disabled = e.target.checked; if (e.target.checked) $("#hora").value = ""; });
+// a data digitada na home ("Quando você nasceu?") chega pelo sessionStorage, nunca pela URL
+try { const d = sessionStorage.getItem("pad_data_nasc"); if (d) { $("#data").value = d; sessionStorage.removeItem("pad_data_nasc"); } } catch (_) {}
 function dataParaISO(brasileira) {
   const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(brasileira.trim());
   return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
 }
+const dataBR = (iso) => iso.split("-").reverse().join("/");
 
 // ---------- autocomplete de cidade ----------
 let cidadeEscolhida = null, opcoes = [], ativa = -1, timer;
@@ -195,15 +194,12 @@ input.addEventListener("keydown", (e) => {
 lista.addEventListener("mousedown", (e) => { const li = e.target.closest("li"); if (li) { e.preventDefault(); escolher(Number(li.id.slice(3))); } });
 input.addEventListener("blur", () => setTimeout(fecharLista, 100));
 
-// ---------- envio ----------
+
 // ---------- estados da página: formulário → calculando → resultado ----------
 function mostrarEstado(qual) {
   for (const id of ["estado-form", "estado-carregando", "resultado"]) $("#" + id).hidden = id !== qual;
-  $("#sobre-mapa").hidden = qual !== "estado-form";
-  const passo = { "estado-form": 0, "estado-carregando": 1, "resultado": 2 }[qual];
-  document.querySelectorAll("#etapas li").forEach((li, i) => { if (i === passo) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current"); });
 }
-// foco no título do estado novo (tabindex=-1 temporário), para quem usa leitor de tela
+// foco no título do estado novo (tabindex=-1), para quem usa leitor de tela
 function focar(el) { if (!el) return; el.setAttribute("tabindex", "-1"); el.focus({ preventScroll: true }); el.scrollIntoView({ behavior: "smooth", block: "start" }); }
 
 // mensagem de erro; `campo` é o primeiro campo com problema: recebe o foco e aria-invalid
@@ -217,6 +213,16 @@ async function pedir(url, corpo) {
   const c = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Confira os dados informados.");
   return c;
+}
+
+// as etapas do "calculando" andam enquanto o servidor responde (só enfeite: a resposta manda)
+let timerEtapas = null;
+function animarEtapas() {
+  const itens = [...document.querySelectorAll("#etapas-calc li")];
+  let i = 0;
+  itens.forEach((li) => li.className = "");
+  const passo = () => { itens.forEach((li, j) => li.className = j < i ? "feito" : j === i ? "agora" : ""); i = Math.min(i + 1, itens.length - 1); };
+  passo(); clearInterval(timerEtapas); timerEtapas = setInterval(passo, 700);
 }
 
 $("#form").addEventListener("submit", async (e) => {
@@ -233,9 +239,10 @@ $("#form").addEventListener("submit", async (e) => {
   if (contato.erro) return mostrarErro(contato.erro, $("#email"));
   const botao = $("#enviar");
   botao.disabled = true; botao.setAttribute("aria-busy", "true"); botao.textContent = "Calculando…";
-  mostrarEstado("estado-carregando"); focar($("#titulo-carregando"));
+  $("#data-carregando").textContent = $("#data").value;
+  mostrarEstado("estado-carregando"); animarEtapas(); focar($("#titulo-carregando"));
   try {
-    ultimoPedido = { nome: $("#nome").value, data, hora, lat: cidadeEscolhida.lat, lon: cidadeEscolhida.lon, cidade: cidadeEscolhida.rotulo };
+    ultimoPedido = { nome: $("#nome").value.trim(), data, hora, lat: cidadeEscolhida.lat, lon: cidadeEscolhida.lon, cidade: cidadeEscolhida.rotulo };
     ultimoContato = contato;
     desenharAmostra(await pedir("/api/ocidental/mapa", { ...ultimoPedido, ...contato, nivel: "amostra" }));
   } catch (err) {
@@ -243,65 +250,83 @@ $("#form").addEventListener("submit", async (e) => {
     mostrarEstado("estado-form");
     mostrarErro(err.message || "Não foi possível calcular o mapa. Tente de novo.", $("#erro"));
   } finally {
-    botao.disabled = false; botao.removeAttribute("aria-busy"); botao.textContent = "Gerar meu mapa";
+    clearInterval(timerEtapas);
+    botao.disabled = false; botao.removeAttribute("aria-busy"); botao.textContent = {{ t.form.botao | tojson }};
   }
 });
 
-// ---------- pedaços comuns ----------
+// ---------- completo: cabeçalho ----------
 function cabecalho(d) {
   const titulo = d.nome ? `Mapa de ${esc(d.nome)}` : "Seu mapa";
   const off = d.fuso.offset_horas_na_data;
-  return `<div class="resultado-topo"><p class="eyebrow">${d.nivel === "completo" ? "Leitura completa" : "Sua amostra"}</p>
-    <h1 id="titulo-resultado" tabindex="-1">${titulo}</h1>
-    <p class="secondary">${esc(d.cidade)} · fuso ${esc(d.fuso.nome_iana)} (UTC${off >= 0 ? "+" : ""}${off}) na data do nascimento${d.tem_hora ? "" : " · sem hora de nascimento"}</p></div>
+  return `<div class="amostra-topo-linha"><div><span class="olho">${d.nivel === "completo" ? "Leitura completa" : "Sua amostra"}</span>
+    <h1 class="t2" id="titulo-resultado" tabindex="-1">${titulo}</h1>
+    <p class="apoio">${esc(d.cidade)} · fuso ${esc(d.fuso.nome_iana)} (UTC${off >= 0 ? "+" : ""}${off}) na data do nascimento${d.tem_hora ? "" : " · sem hora de nascimento"}</p></div></div>
     ${d.aviso_horario ? `<p class="aviso">${esc(d.aviso_horario)}</p>` : ""}`;
 }
-function triade(a) {
-  const avisos = (a.avisos || []).map((t) => `<p class="aviso">${esc(t)}</p>`).join("");
-  // na amostra, só o Sol vem com texto; Lua e Ascendente chegam por e-mail
-  return avisos + `<div class="grid grid--3 triade">${a.triade.map((i) => `
-    <article class="card result-card"><p class="eyebrow">${esc(i.nome)}</p><p class="value">${esc(i.signo)}</p><p class="grau">${esc(i.nome)} em ${esc(i.signo)} · ${esc(i.grau)}</p>${i.texto ? `<p class="secondary">${esc(i.texto)}</p>` : `<p class="nota">O texto foi para o seu e-mail.</p>`}</article>`).join("")}</div>
-    ${a.aspecto ? `<article class="card result-card" style="margin-top:24px"><p class="eyebrow">O aspecto mais exato do seu mapa</p><h3>${esc(a.aspecto.titulo)}</h3><p class="secondary">${esc(a.aspecto.texto)}</p></article>` : ""}`;
-}
 
-// ---------- amostra ----------
+// ---------- amostra por dimensões ----------
+const icoCadeado = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+function cartaoDimensao(dm, completos) {
+  if (dm.estado === "em_breve") {
+    return `<article class="cartao dim leitura breve"><div class="topo-dim">${dm.img ? `<img class="redondo" src="${esc(dm.img)}" alt="" loading="lazy">` : ""}<div><span class="ponto">${esc(dm.nome)}</span><h3>{{ catalogo.textos().dimensao_em_breve.titulo }}</h3></div></div>
+      <p class="miudo">${esc(dm.descricao)} {{ catalogo.textos().dimensao_em_breve.texto }}</p></article>`;
+  }
+  if (dm.estado === "sem_hora") {
+    return `<article class="cartao dim leitura breve"><div class="topo-dim">${dm.img ? `<img class="redondo" src="${esc(dm.img)}" alt="" loading="lazy">` : ""}<div><span class="ponto">${esc(dm.nome)}</span><h3>${esc(TA.sem_hora_titulo)}</h3></div></div>
+      <p class="miudo">${esc(TA.sem_hora_texto)}</p></article>`;
+  }
+  // se o e-mail não saiu, a amostra veio inteira: Sol, Lua e Ascendente com o texto todo
+  const inteiro = completos[dm.ponto];
+  const destino = LINK_CHECKOUT_INDIVIDUAL ? "#comprar" : "#me-avise";
+  return `<article class="cartao dim leitura"><div class="topo-dim"><img class="redondo" src="${esc(dm.img)}" alt="" loading="lazy"><div><span class="ponto">${esc(dm.nome)}</span><h3>${esc(dm.ponto_pt)} em ${esc(dm.signo_pt)}</h3></div></div>
+    ${dm.selo ? `<span class="selo">✓ ${esc(dm.selo)}</span>` : ""}
+    <p>${esc(inteiro || dm.trecho)}</p>
+    ${inteiro ? "" : `<div class="vela"><p class="fumo" aria-hidden="true">${esc(TA.fumo)}</p><div class="tampa"><a class="bt bt-2" href="${destino}">${icoCadeado}${esc(LINK_CHECKOUT_INDIVIDUAL ? TA.desbloquear : TA.avisar)}</a></div></div>`}
+  </article>`;
+}
 function desenharAmostra(d) {
   const cta = LINK_CHECKOUT_INDIVIDUAL ? linkCheckout(LINK_CHECKOUT_INDIVIDUAL, { produto: "mapa", ...ultimoPedido }, { email: ultimoContato && ultimoContato.email }) : "";
+  const completos = Object.fromEntries((d.amostra.triade || []).filter((i) => i.texto && !d.parcial).map((i) => [i.ponto, i.texto]));
+  const ativos = d.dimensoes.filter((x) => x.signo_pt);
+  const nomes = ativos.slice(0, 3).map((x) => esc(x.signo_pt));
+  const titulo = nomes.length > 1 ? `${nomes.slice(0, -1).join(", ")} e <em>${nomes[nomes.length - 1]}</em>` : (nomes[0] || "");
+  const quando = `${dataBR(ultimoPedido.data)}${ultimoPedido.hora ? `, às ${esc(ultimoPedido.hora)}` : ""}, em ${esc(ultimoPedido.cidade.split(",")[0])}`;
+  const emailOk = d.email && d.email.enviado;
   const res = $("#resultado");
-  // padEmail.aviso(d) só devolve o aviso "foi para o seu e-mail" com o envio
-  // confirmado pelo servidor; se o e-mail falhou, a amostra já veio inteira.
-  res.innerHTML = `${cabecalho({ ...d, nivel: "amostra" })}${padEmail.aviso(d)}${triade(d.amostra)}
-    <div class="split section">
-      <div>
-        <h2>O que o mapa completo acrescenta</h2>
-        <p class="secondary">A amostra mostra o essencial. O completo abre o mapa inteiro:</p>
-        <ul class="lista-check">
-          <li>A roda do seu mapa e todos os planetas, signo a signo${d.tem_hora ? " e casa a casa" : ""}</li>
-          <li>Os aspectos principais entre os planetas</li>
-          <li>Elementos, modalidades${d.tem_hora ? " e o regente do Ascendente" : ""}</li>
-          <li>O relatório em PDF para guardar</li>
-        </ul>
-        <p><a href="/mapa" id="corrigir">Corrigir meus dados</a></p>
+  res.innerHTML = `<section class="amostra-topo degrade">
+      <ol class="passos-topo" aria-label="Etapas">${PASSOS.map((p, i) => `<li${i === 2 ? ' aria-current="step"' : ""}>${i + 1} ${esc(p)}</li>`).join("")}</ol>
+      <div class="amostra-topo-linha">
+        <div><span class="olho">${esc(TA.olho)} ${esc(ultimoPedido.nome)}</span><h1 class="t1" id="titulo-resultado" tabindex="-1">${titulo}</h1><p class="apoio">${quando} · ${esc(TA.subtitulo)}</p></div>
+        ${emailOk ? `<div class="aviso-ok" role="status"><span>${esc(TA.email_foi)} <b>${esc(d.email.para)}</b>. <button type="button" class="bt bt-2 bt-p" id="reenviar-amostra" style="margin-top:8px">${esc(TA.email_reenviar)}</button> <span class="miudo" id="reenvio-status" aria-live="polite"></span></span></div>` : ""}
       </div>
-      {%- if catalogo.vende("mapa") %}
-      <aside class="card price-card" aria-labelledby="oferta-titulo">
-        <p class="eyebrow">Leitura completa</p>
-        <h3 id="oferta-titulo">${esc(NOME_OFERTA)}</h3>
-        <p class="price">R$${esc(PRECO)}</p>
-        ${TAXA ? `<p class="caption ptaxa">+ R$${esc(TAXA)} de taxa da plataforma</p>` : ""}
-        ${cta
-          ? `<p class="help">Pagamento único. Garantia de 7 dias.</p>
-             <a class="button" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">Quero o mapa completo</a>`
-          : `<p class="help">O pagamento desta versão ainda está sendo configurado.</p>
-             <button type="button" class="button" disabled>Em breve</button>`}
-      </aside>
+      ${(d.amostra.avisos || []).map((t) => `<p class="aviso">${esc(t)}</p>`).join("")}
+      ${d.aviso_horario ? `<p class="aviso">${esc(d.aviso_horario)}</p>` : ""}
+    </section>
+    <section class="amostra">
+      <div>
+        <div class="grade-amostra">${d.dimensoes.map((x) => cartaoDimensao(x, completos)).join("")}</div>
+        ${d.amostra.aspecto ? `<article class="cartao leitura" style="margin-top:20px"><span class="olho">${esc(TA.aspecto)}</span><h3 style="margin:8px 0">${esc(d.amostra.aspecto.titulo)}</h3><p>${esc(d.amostra.aspecto.texto)}</p></article>` : ""}
+        <p style="margin-top:24px"><a href="/mapa" id="corrigir">${esc(TA.corrigir)}</a></p>
+      </div>
+      <aside class="cartao lateral" id="comprar">
+      {%- if vende %}
+        <span class="olho">${esc(TA.lateral_olho)}</span>
+        <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>
+        <div style="display:flex;align-items:baseline;gap:10px"><span class="preco">R${{ ofertas.mapa.preco | moeda }}</span><span class="miudo">${esc(TA.pagamento_unico)}</span></div>
+        ${TAXA ? `<p class="miudo">+ R$${esc(TAXA)} de taxa da plataforma</p>` : ""}
+        <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+        ${cta ? `<a class="bt bt-1 bt-cheio" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} R${{ ofertas.mapa.preco | moeda }}</a>
+          <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p><button type="button" class="bt bt-1 bt-cheio" disabled>Em breve</button>`}
       {%- else %}
-      <div>{% set aviso_produto = catalogo.produto("mapa") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}</div>
+        {% set aviso_produto = catalogo.produto("mapa") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}
       {%- endif %}
-    </div>
+        <div class="assina"><div class="foto arco" aria-hidden="true">{{ marca.roda(28) }}</div><p class="miudo">{{ revisao("assinatura") }}</p></div>
+      </aside>
+    </section>
     {%- if catalogo.ativo("compat") %}
-    <div class="card cross"><div><h3>É um casal?</h3><p class="secondary">A sinastria cruza os dois mapas em 8 dimensões — também com amostra grátis.</p></div>
-      <a class="button button--secondary" href="/compatibilidade">Ver a sinastria</a></div>
+    <section class="secao secao-papel"><div class="cartao" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center"><div><h3>${esc(TA.casal_titulo)}</h3><p class="apoio">${esc(TA.casal_texto)}</p></div>
+      <a class="bt bt-2" href="/compatibilidade">${esc(TA.casal_botao)}</a></div></section>
     {%- endif %}`;
   mostrarEstado("resultado");
   // "me avise" (venda fechada): já vem com o nome e o e-mail que a pessoa digitou
@@ -312,107 +337,66 @@ function desenharAmostra(d) {
   focar($("#titulo-resultado"));
 }
 
-// ---------- roda do mapa (SVG) ----------
-function separarRotulos(pontos, minimo = 12) {
-  const ordem = Object.entries(pontos).sort((a, b) => a[1] - b[1]);
-  const ang = Object.fromEntries(ordem);
-  for (let volta = 0; volta < 20 && ordem.length > 1; volta++) {
-    let mexeu = false;
-    for (let i = 0; i < ordem.length; i++) {
-      const a = ordem[i][0], b = ordem[(i + 1) % ordem.length][0];
-      const d = ((ang[b] - ang[a]) % 360 + 360) % 360;
-      if (d < minimo) { const e = (minimo - d) / 2; ang[a] -= e; ang[b] += e; mexeu = true; }
-    }
-    if (!mexeu) break;
-  }
-  return ang;
+// ---------- leitura completa (rodada 9, tela Site-Leitura) ----------
+// A roda vem desenhada do servidor (roda_mapa.py, a partir do motor); os textos, as
+// dimensões e os aspectos também: nada do completo existe na página sem a resposta
+// autorizada da API (token válido).
+const GLIFO = { sol:"☉", lua:"☽", mercurio:"☿", venus:"♀", marte:"♂", jupiter:"♃", saturno:"♄", urano:"♅", netuno:"♆", plutao:"♇", nodo_norte:"☊", ascendente:"AC", meio_do_ceu:"MC" };
+const DO_PONTO = { sol:"do seu Sol", lua:"da sua Lua", ascendente:"do seu Ascendente", mercurio:"do seu Mercúrio", venus:"da sua Vênus", marte:"do seu Marte" };
+function secaoDimensao(x, i, ativos) {
+  const prox = ativos[i + 1];
+  const imgs = `<div class="par-img" aria-hidden="true">${x.img_planeta && x.img_planeta !== x.img ? `<img src="${esc(x.img_planeta)}" alt="" class="par-a">` : ""}<img src="${esc(x.img)}" alt="" class="par-b"></div>`;
+  const aspectos = (x.aspectos || []).length ? `<h3>Os aspectos ${esc(DO_PONTO[x.ponto] || "")}</h3>
+      <p class="apoio">No seu mapa, ${esc(x.ponto_pt)} conversa com ${x.aspectos.length === 1 ? "um ponto" : x.aspectos.length + " pontos"}. Toque em cada um para ler o que ele traz.</p>
+      <div class="aspectos-lista">${x.aspectos.map((a) => `<details class="aspecto ${a.tipo}"><summary>${esc(a.titulo.replace(/ \(orbe.*\)$/, ""))} · ${esc(a.orbe)}</summary><p>${esc(a.texto)}</p></details>`).join("")}</div>` : "";
+  return `<section class="dimensao" id="dim-${esc(x.chave)}">
+      <span class="ponto">${esc(x.nome)} · ${esc(x.ponto_pt)}</span>
+      <div class="dimensao-topo">${imgs}<h2>${esc(x.ponto_pt)} em ${esc(x.signo_pt)}</h2></div>
+      ${x.selo ? `<span class="selo">✓ ${esc(x.selo)}</span>` : ""}
+      <p>${esc(x.texto)}</p>
+      ${x.casa ? `<h3>${esc(x.ponto_pt)} na casa ${x.casa}</h3><p>${esc(x.texto_casa)}</p>` : ""}
+      ${aspectos}
+      ${prox ? `<p class="proxima"><a href="#dim-${esc(prox.chave)}">Próxima: ${esc(prox.nome)} · ${esc(prox.ponto_pt)} em ${esc(prox.signo_pt)} ›</a></p>` : ""}
+    </section>`;
 }
-function roda(d) {
-  const T = 400, c = T / 2;
-  const pts = Object.fromEntries(d.pontos.map((p) => [p.id, p]));
-  const base = pts.ascendente ? pts.ascendente.longitude : 0;
-  const xy = (lng, r) => { const a = (180 + (lng - base)) * Math.PI / 180; return [c + r * Math.cos(a), c - r * Math.sin(a)]; };
-  const R = { ext: 196, sig: 168, pla: 140, mio: 104 };
-  let s = `<svg viewBox="0 0 ${T} ${T}" role="img" aria-label="Roda do mapa natal${pts.ascendente ? ", Ascendente à esquerda" : ""}">`;
-  s += `<circle cx="${c}" cy="${c}" r="${R.ext}" fill="var(--surface)" stroke="var(--border)"/>`;
-  s += `<circle cx="${c}" cy="${c}" r="${R.sig}" fill="var(--background)" stroke="var(--border)"/>`;
-  s += `<circle cx="${c}" cy="${c}" r="${R.mio}" fill="none" stroke="var(--border)" stroke-opacity=".5"/>`;
-  SIGNOS.forEach((sg, i) => {
-    const [x1, y1] = xy(i * 30, R.sig), [x2, y2] = xy(i * 30, R.ext), [tx, ty] = xy(i * 30 + 15, (R.sig + R.ext) / 2);
-    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--border)"/>`;
-    s += `<text x="${tx}" y="${ty + 4}" text-anchor="middle" font-size="11" fill="var(--text-secondary)">${SIGNO_CURTO[sg]}</text>`;
-  });
-  if (d.casas) {
-    d.casas.cuspides.forEach((cu, i) => {
-      const eixo = [0, 3, 6, 9].includes(i);
-      const [x1, y1] = xy(cu, R.mio), [x2, y2] = xy(cu, R.sig);
-      s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${eixo ? "var(--accent)" : "var(--border)"}" stroke-opacity="${eixo ? 1 : .5}" stroke-width="${eixo ? 1.6 : 1}"/>`;
-      const prox = d.casas.cuspides[(i + 1) % 12], meio = cu + (((prox - cu) % 360) + 360) % 360 / 2;
-      const [tx, ty] = xy(meio, R.mio + 10);
-      s += `<text x="${tx}" y="${ty + 3}" text-anchor="middle" font-size="9" fill="var(--text-muted)">${i + 1}</text>`;
-    });
-  }
-  (d.aspectos || []).filter((a) => ABREV[a.a] && ABREV[a.b] && a.a !== "nodo_norte" && a.b !== "nodo_norte").forEach((a) => {
-    const [x1, y1] = xy(pts[a.a].longitude, R.mio - 3), [x2, y2] = xy(pts[a.b].longitude, R.mio - 3);
-    const tenso = a.tipo === "quadratura" || a.tipo === "oposicao";
-    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${tenso ? "var(--rose)" : "var(--success)"}" stroke-width="${a.orbe > 3 ? .8 : 1.5}" stroke-opacity=".85"/>`;
-  });
-  const lng = Object.fromEntries(d.pontos.filter((p) => ABREV[p.id]).map((p) => [p.id, p.longitude]));
-  const rot = separarRotulos(lng);
-  Object.entries(lng).forEach(([k, v]) => {
-    const [x1, y1] = xy(v, R.sig), [x2, y2] = xy(v, R.sig - 6), [tx, ty] = xy(rot[k], R.pla);
-    s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--text)"/>`;
-    s += `<text x="${tx}" y="${ty + 4}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text)">${ABREV[k]}${pts[k].retrogrado ? "℞" : ""}</text>`;
-  });
-  return s + `</svg>`;
-}
-
-// ---------- completo ----------
 function desenharResultado(d) {
-  const pts = Object.fromEntries(d.pontos.map((p) => [p.id, p]));
-  const lua = pts.lua;
-  const titulos = Object.keys(d.secoes);
-  const secoes = Object.entries(d.secoes).map(([t, c], i) => `<section id="secao-${i + 1}" class="bloco"><h2>${esc(t)}</h2>` + (Array.isArray(c) ? c : [c]).map((p) => `<p>${esc(p)}</p>`).join("") + `</section>`).join("");
-  const barras = (obj, rot) => Object.entries(obj).map(([k, v]) =>
-    `<span>${rot[k]}</span><i style="width:${Math.max(4, v.length * 12)}%" title="${esc(v.join(", "))}"></i><span class="num">${v.length}</span>`).join("");
+  const ativos = d.dimensoes.filter((x) => x.estado === "ativo");
+  const breves = d.dimensoes.filter((x) => x.estado !== "ativo");
+  const quando = `${dataBR(ultimoPedido.data)}${ultimoPedido.hora ? `, às ${esc(ultimoPedido.hora)}` : ""}${d.cidade ? `, em ${esc(d.cidade.split(",")[0])}` : ""}`;
+  const casasTxt = d.casas ? (d.casas.sistema === "porfirio" ? "casas Porfírio" : "casas Placidus") : "sem hora: sem casas";
+  const resto = Object.entries(d.resto).map(([t, c], i) => `<section class="bloco" id="resto-${i + 1}"><h2>${esc(t)}</h2>${(Array.isArray(c) ? c : [c]).map((p) => `<p>${esc(p)}</p>`).join("")}</section>`).join("");
+  const tabela = d.pontos.map((p) => `<tr><td><span class="glifo" aria-hidden="true">${GLIFO[p.id] || ""}</span> ${esc(p.nome)}${p.retrogrado ? ' <abbr title="retrógrado">℞</abbr>' : ""}</td><td>${p.signo_incerto ? esc(p.signos_possiveis_pt.join(" ou ")) : esc(p.signo_pt)} ${esc(p.grau)}</td>${d.tem_hora ? `<td class="num">${p.casa ? "casa " + p.casa : ""}</td>` : ""}</tr>`).join("");
   const res = $("#resultado");
-  res.innerHTML = `${cabecalho({ ...d, nivel: "completo" })}
-    <div class="acoes"><button type="button" class="button" id="botao-pdf">Baixar mapa completo (PDF)</button><span class="nota" id="status-pdf">A roda, as posições, os aspectos e a leitura inteira.</span></div>
-    <div class="reading-layout">
-      <nav class="toc" aria-label="Sumário"><strong>Sumário</strong>
-        <a href="#posicoes">Posições</a><a href="#aspectos">Aspectos</a><a href="#elementos">Elementos e modalidades</a>
-        ${titulos.map((t, i) => `<a href="#secao-${i + 1}">${esc(t)}</a>`).join("")}
+  res.innerHTML = `<section class="amostra-topo degrade"><div class="amostra-topo-linha">
+      <div><span class="olho">Seu mapa natal completo</span><h1 class="t1" id="titulo-resultado" tabindex="-1">Mapa natal${d.nome ? ` de <em>${esc(d.nome)}</em>` : ""}</h1>
+        <p class="miudo">${quando} · zodíaco tropical, ${esc(casasTxt)}</p></div>
+      <div class="acoes"><button type="button" class="bt bt-2" id="botao-pdf">Baixar PDF</button><span class="miudo" id="status-pdf" aria-live="polite"></span></div></div>
+      ${d.aviso_horario ? `<p class="aviso">${esc(d.aviso_horario)}</p>` : ""}
+    </section>
+    <section class="leitura-grade">
+      <nav class="leitura-nav" aria-label="Dimensões"><span class="olho">Dimensões</span>
+        ${ativos.map((x) => `<a href="#dim-${esc(x.chave)}">${esc(x.nome)}</a>`).join("")}
+        ${breves.length ? `<span class="chip chip-breve">+${breves.length} em breve</span>` : ""}
+        <span class="olho" style="margin-top:18px">O mapa inteiro</span>
+        ${Object.keys(d.resto).map((t, i) => `<a href="#resto-${i + 1}">${esc(t)}</a>`).join("")}
       </nav>
-      <article class="article">
-        <div class="resumo">
-          <div><small>Sol</small><strong>${esc(pts.sol.signo_pt)}</strong></div>
-          <div><small>Lua</small><strong>${lua.signo_incerto ? esc(lua.signos_possiveis_pt.join(" ou ")) : esc(lua.signo_pt)}</strong></div>
-          <div><small>Ascendente</small><strong>${pts.ascendente ? esc(pts.ascendente.signo_pt) : "— (sem hora)"}</strong></div>
-        </div>
-        <section id="posicoes" class="bloco" style="margin-top:0"><h2>Posições</h2>
-          <div class="roda-e-tabela">
-            <div class="roda">${roda(d)}</div>
-            <div><div class="table-wrap" tabindex="0" role="region" aria-label="Posições dos planetas"><table>
-              <thead><tr><th scope="col">Ponto</th><th scope="col">Signo</th><th scope="col">Grau</th>${d.tem_hora ? '<th scope="col">Casa</th>' : ""}</tr></thead>
-              <tbody>${d.pontos.map((p) => `<tr><td>${esc(p.nome)}${p.retrogrado ? '&nbsp;<abbr title="retrógrado">℞</abbr>' : ""}</td><td>${p.signo_incerto ? esc(p.signos_possiveis_pt.join(" ou ")) : esc(p.signo_pt)}</td><td class="num">${esc(p.grau)}</td>${d.tem_hora ? `<td class="num">${p.casa ?? "—"}</td>` : ""}</tr>`).join("")}</tbody>
-            </table></div>
-            ${d.casas && d.casas.aviso ? `<p class="nota">${esc(d.casas.aviso)}</p>` : ""}
-            ${d.pontos.some((p) => p.retrogrado) ? '<p class="nota">℞ = planeta retrógrado na data do nascimento.</p>' : ""}</div>
-          </div>
-        </section>
-        <section id="aspectos" class="bloco"><h2>Aspectos</h2>
-          <ul class="aspectos">${d.aspectos.map((a) => `<li><span>${esc(a.titulo.replace(/ \(orbe.*\)$/, ""))}</span><span class="num nota">orbe ${esc(a.titulo.match(/orbe ([^)]+)/)[1])}</span></li>`).join("") || "<li>Nenhum aspecto maior dentro dos orbes.</li>"}</ul>
-          <p class="nota">Orbes: 8° (10° com o Sol ou a Lua); sextil, 6°.</p></section>
-        <section id="elementos" class="bloco"><h2>Elementos e modalidades</h2>
-          <div class="barras">${barras(d.elementos, ELEMENTO_PT)}</div><hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
-          <div class="barras">${barras(d.modalidades, MODALIDADE_PT)}</div></section>
+      <article class="leitura-texto">
+        ${ativos.map((x, i) => secaoDimensao(x, i, ativos)).join("")}
         <div id="relatorio" class="bloco">
-          ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="button button--secondary">Ler versão escrita por IA</button><span class="nota" id="status-ia"></span></div>` : ""}
-          <div id="texto-relatorio">${secoes}</div>
+          ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="bt bt-2 bt-p">Ler versão escrita por IA</button><span class="miudo" id="status-ia"></span></div>` : ""}
+          <div id="texto-relatorio"><h2 class="t3" style="margin-top:12px">O resto do seu mapa</h2>${resto}</div>
         </div>
-        <div class="card feedback bloco" id="feedback-mapa"></div>
+        <div class="cartao feedback bloco" id="feedback-mapa"></div>
       </article>
-    </div>`;
+      <aside class="cartao roda-lateral" aria-labelledby="titulo-roda">
+        <div class="roda-cab"><span class="olho" id="titulo-roda">Sua roda</span><span class="miudo">tropical · ${esc(casasTxt)}</span></div>
+        <div class="roda-caixa">${d.roda}</div>
+        <div class="roda-legenda"><span><i class="harm" aria-hidden="true"></i>harmonia</span><span><i class="tens" aria-hidden="true"></i>tensão</span></div>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Posições dos planetas"><table class="posicoes"><tbody>${tabela}</tbody></table></div>
+        ${d.casas && d.casas.aviso ? `<p class="miudo">${esc(d.casas.aviso)}</p>` : ""}
+        ${d.pontos.some((p) => p.retrogrado) ? '<p class="miudo">℞ = planeta retrógrado na data do nascimento.</p>' : ""}
+      </aside>
+    </section>`;
   mostrarEstado("resultado");
   if (window.padTrack) padTrack("completo_aberto", { produto: "mapa", sistema: "ocidental" });
   if (window.padFeedback) padFeedback("#feedback-mapa", "mapa");
@@ -434,7 +418,7 @@ async function baixarPDF() {
     setTimeout(() => URL.revokeObjectURL(url), 60000);
     status.textContent = original;
   } catch (err) { status.textContent = err.message; }
-  finally { botao.disabled = false; botao.textContent = "Baixar mapa completo (PDF)"; }
+  finally { botao.disabled = false; botao.textContent = "Baixar PDF"; }
 }
 
 let iaDisponivel = false;
@@ -464,13 +448,16 @@ async function pedirTextoIA() {
   ultimoPedido = { nome: p.get("nome") || "", data, hora, lat, lon, cidade: p.get("cidade") || "", token };
   // O completo só é desenhado com a resposta autorizada do servidor (token válido);
   // sem ela, nada do pago aparece.
-  $("#etapas").hidden = true;
   $("#titulo-carregando").textContent = "Abrindo o seu mapa completo";
-  mostrarEstado("estado-carregando");
-  pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "completo" }).then(desenharResultado).catch((e) => {
-    const res = $("#resultado");
-    res.innerHTML = `<p class="notice notice--error" role="alert">Não foi possível abrir o mapa completo: ${esc(e.message)} Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a> ou fale com a gente.</p>`;
-    mostrarEstado("resultado");
+  mostrarEstado("estado-carregando"); animarEtapas();
+  pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "completo" }).then((d) => { clearInterval(timerEtapas); desenharResultado(d); }).catch((e) => {
+    clearInterval(timerEtapas);
+    // tela "Este link de leitura não abriu" (Sistema-Erros)
+    $("#resultado").innerHTML = `<section class="erro-topo"><div><span class="chip chip-breve">Link de leitura</span>
+      <h1 class="t2" id="titulo-resultado" tabindex="-1">Este link de leitura <em>não abriu</em></h1>
+      <p class="lead">Ele pode ter sido copiado pela metade. Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a>: chegam no e-mail da compra. (${esc(e.message)})</p>
+      <div class="botoes"><a class="bt bt-1" href="/minhas-leituras">Recuperar meus links</a><a class="bt bt-2" href="mailto:contato@pedrosperbmonteiro.com.br">Falar com a gente</a></div></div></section>`;
+    mostrarEstado("resultado"); focar($("#titulo-resultado"));
   });
 })();
 </script>

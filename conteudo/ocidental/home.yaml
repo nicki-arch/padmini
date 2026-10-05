@@ -1,10 +1,11 @@
 # Valderez Astrologia (versão OCIDENTAL) — texto da home. FONTE ÚNICA da copy desta página,
 # inclusive o <head> (título e descrição para buscador e redes).
-# Mesma estrutura do conteudo/vedica/home.yaml; o desenho está em
-# static/ocidental/home.html. Quatro produtos, nesta ordem (rodada 6, decisão
-# do Nicolas de 27/set): mapa natal (a porta de entrada), sinastria,
-# numerologia e tarot.
-# Preço NÃO fica aqui: conteudo/ocidental/ofertas.yaml.
+# Rodada 9 (5/out/2026): desenho do pacote valderez-design-2.0 (telas Site-Home e
+# Site-Home-celular), em static/ocidental/home.html. Os produtos e as dimensões
+# vêm do catálogo (conteudo/ocidental/catalogo.yaml); o preço, do ofertas.yaml.
+# Frases sobre a revisão da Dona Valderez: revisao.yaml (regra de honestidade).
+# Onde há `_venda` e `_fechada`, vale a primeira com a venda aberta e a segunda
+# com vendas_abertas: false.
 
 seo:
   titulo: Valderez Astrologia — Astrologia para autoconhecimento
@@ -14,183 +15,91 @@ seo:
   og_titulo: O seu mapa natal — Valderez Astrologia
   og_descricao: O Sol, a Lua e o Ascendente de quando você nasceu. Amostra grátis.
 
-menu:
-  mapa: Mapa natal
-  compatibilidade: Sinastria do casal
-  numerologia: Numerologia
-  tarot: Tarot
-
 hero:
-  eyebrow: Valderez Astrologia · Astrologia para autoconhecimento
   titulo: O céu de quando você <em>nasceu</em>, lido com cuidado.
   lede: >-
-    Não é horóscopo de signo. O mapa natal parte da data, da hora e da cidade
-    do seu nascimento para mostrar onde estavam o Sol, a Lua e cada planeta —
-    e o que isso diz do seu jeito de sentir, de amar e de escolher. Veja o seu
-    Sol, a sua Lua e o seu Ascendente agora, de graça.
-  botao_principal: Ver meu mapa natal →
-  botao_secundario: Fazer a sinastria do casal
-  # no lugar do botão da sinastria enquanto ela não estiver ativa no catálogo
-  botao_leituras: Ver todas as leituras
-  # Selos embaixo dos botões (rodada visual, fase B). Só fatos do produto, já ditos
-  # no "Como funciona" e nas perguntas: nada de número ou promessa nova.
-  confianca:
-    - Amostra grátis, na hora
-    - Sem cadastro nem senha
-    - O completo chega no seu e-mail
-
-como_funciona:
-  titulo: Como funciona
-  sub: Três passos. Leva dois minutos.
-  passos:
-    - titulo: O seu nascimento
-      texto: Você preenche data, hora e cidade — as suas, ou as do casal. Sem a hora também dá.
-    - titulo: A amostra grátis
-      texto: >-
-        Na hora, o seu Sol, a sua Lua e o seu Ascendente — ou, no casal, o
-        {indice} e o ponto mais forte, num card para compartilhar.
-    - titulo: O relatório completo
-      texto: Se quiser ir fundo, o completo abre tudo e chega no seu e-mail.
+    Não é horóscopo de signo. O seu mapa natal mostra onde estavam o Sol, a Lua
+    e cada planeta no momento exato em que você nasceu, e o que isso diz de você.
+  rotulo_data: Quando você nasceu?
+  botao: Ver meu mapa grátis
+  selos_venda: ["Amostra grátis, na hora", Entrega imediata, Pix ou cartão]
+  selos_fechada: ["Amostra grátis, na hora", Sem cadastro nem senha, O resto chega no seu e-mail]
 
 dimensoes:
-  eyebrow: Para o casal · Sinastria
-  titulo: As oito dimensões do casal
+  olho: O que o seu mapa mostra
+  titulo: Seu mapa, <em>dimensão</em> por dimensão
   sub: >-
-    A sinastria organiza o encontro dos dois mapas em oito frentes. Cada uma
-    olha para planetas diferentes de vocês dois.
+    Cada dimensão olha para um planeta ou ponto do seu mapa. Novas dimensões
+    chegam ao seu mapa completo sem custo extra.
+
+passos:
+  - titulo: Seu nascimento
+    texto: Data, hora e cidade. Sem a hora também dá.
+  - titulo: A amostra grátis
+    texto: Na hora, o começo de cada dimensão do seu mapa.
+  - titulo: O mapa completo
+    texto_venda: Se quiser ir fundo, desbloqueie tudo e receba no e-mail.
+    texto_fechada: A leitura completa abre em breve; quem pedir é avisado primeiro.
+
+recebe:
+  olho: O que você recebe
+  titulo: Um relatório completo, <em>claro</em> e só seu
+  mockup_alt: Capa e páginas do relatório do mapa natal
+  olho_caixa: Mapa natal completo
+  pagamento_unico: pagamento único
   itens:
-    - nome: Vênus × Marte
-      titulo: Atração
-      texto: A química e o desejo entre vocês.
-      icone: '<circle cx="12" cy="12" r="3"/><path d="M3.5 12H7M17 12h3.5M5.5 10l-2 2 2 2M18.5 10l2 2-2 2"/>'
-    - nome: Lua × Lua, Sol
-      titulo: Emoções
-      texto: Como os sentimentos de um tocam os do outro.
-      icone: '<path d="M12 4c3.6 0 6.5 3.6 6.5 8S15.6 20 12 20"/><path d="M12 4C8.4 4 5.5 7.6 5.5 12S8.4 20 12 20"/><path d="M12 4v16"/>'
-    - nome: Mercúrio
-      titulo: Comunicação
-      texto: O jeito de conversar e decidir juntos.
-      icone: '<path d="M4 9.5c2.7-2 5.3-2 8 0s5.3 2 8 0"/><path d="M4 15c2.7-2 5.3-2 8 0s5.3 2 8 0"/>'
-    - nome: Vênus × Vênus, Lua
-      titulo: Afeto e valores
-      texto: O jeito de dar carinho e o que cada um valoriza.
-      icone: '<ellipse cx="12" cy="9.3" rx="4.4" ry="5"/><ellipse cx="12" cy="14.7" rx="4.4" ry="5"/>'
-    - nome: Sol × Sol, Ascendente
-      titulo: Identidade
-      texto: Como o jeito de ser de um combina com o do outro.
-      icone: '<path d="M12 3 4 20h16L12 3Z"/><path d="M8.6 13h6.8"/>'
-    - nome: Júpiter
-      titulo: Crescimento
-      texto: O quanto um faz o outro se expandir.
-      icone: '<path d="M12 3.5 14 9.6h6.2l-5 3.8 1.9 6-5.1-3.7L6.9 19.4l1.9-6-5-3.8H10L12 3.5Z"/>'
-    - nome: Saturno
-      titulo: Compromisso
-      texto: Estabilidade, responsabilidade e o longo prazo.
-      icone: '<circle cx="12" cy="6" r="2.2"/><circle cx="6.5" cy="16" r="2.2"/><circle cx="17.5" cy="16" r="2.2"/><path d="M12 8.2 7.6 14M12 8.2 16.4 14M8.7 16h6.6"/>'
-    - nome: Ascendente e casas
-      titulo: Dia a dia
-      texto: A convivência, a rotina e a parceria prática.
-      icone: '<path d="M3 12h3.4l2.3-6 3 13 2.6-9.4 1.9 4.4H21"/>'
+    - As 6 dimensões completas, com o texto de cada posição
+    - A roda do seu mapa, casas e aspectos
+    - Novas dimensões entram no seu mapa sem custo
+    - PDF para guardar, no seu e-mail
+  botao: Ver minha amostra grátis
+  pagamento: Pix ou cartão · pagamento seguro pela Cakto
+  abre_em_breve: A leitura completa abre em breve. Comece pela amostra grátis.
 
-# Casais de exemplo (round 5): nascimentos inventados, calculados pelo mesmo
-# método do site (exemplos_ocidental.py) — índice, rosa e ponto forte NÃO ficam
-# aqui, saem do cálculo. A legenda diz que são fictícios.
-card_exemplo:
-  titulo: Como fica a de vocês
-  sub: >-
-    Toda sinastria termina num card assim — o {indice}, a rosa das oito
-    dimensões e o ponto mais forte do casal, feito para compartilhar.
-  rotulo: "{indice} · método próprio"
-  frase: "O ponto mais forte de vocês:"
-  legenda: >-
-    Exemplos com nascimentos fictícios, calculados pelo mesmo método que vai
-    calcular o de vocês. Na rosa, cada pétala é uma dimensão: quanto maior,
-    mais o encontro flui ali; a pétala colorida é o ponto mais forte.
-  link: Veja como fica um relatório completo →
+quem:
+  olho: Quem revisa
+  nome: Dona Valderez
+  sobre: É ela quem aparece nos vídeos explicando signo por signo, ao lado do neto, Pedro.
 
-produtos:
-  titulo: Escolha por onde começar
-  sub: Todos têm amostra grátis. Você só paga se quiser o relatório completo.
-  # com a venda fechada (catalogo.yaml → vendas_abertas: false)
-  sub_venda_fechada: Comece pelo mapa natal, com amostra grátis. As outras leituras abrem aos poucos.
-  compat:
-    etiqueta: Para o casal
-    titulo: Sinastria
-    texto: >-
-      As 8 dimensões, os aspectos entre os planetas de vocês e os planetas de
-      um nas casas do outro.
-    botao: Ver nossa sinastria →
-  mapa:
-    etiqueta: Comece por aqui
-    titulo: Mapa natal
-    texto: >-
-      Sol, Lua e Ascendente, todos os planetas em signos e casas, os aspectos
-      e o PDF para guardar.
-    botao: Fazer meu mapa →
-  numerologia:
-    etiqueta: Pelo seu nome
-    titulo: Numerologia
-    texto: >-
-      Caminho de Vida, Expressão, Alma, Personalidade, o talento do dia de
-      nascimento e o seu Ano Pessoal. Só precisa do nome e da data.
-    botao: Ver meus números →
-  tarot:
-    etiqueta: Para agora
-    titulo: Tarot
-    texto: >-
-      Três cartas — Situação, Desafio e Conselho — para pensar no que você
-      está vivendo. Com uma pergunta, se quiser.
-    botao: Tirar as cartas →
-  combo: >-
-    Sinastria com os mapas natais dos dois:
+em_breve:
+  olho: Outras leituras
+  titulo: Chegando em breve
+
 # Só aparece com depoimento real e autorizado (conteudo/ocidental/depoimentos.yaml).
 depoimentos:
   titulo: O que dizem
 
-# Texto confirmado pelo Nicolas em 26/set/2026.
-tradicao:
-  titulo: Uma tradição de família
-  texto: >-
-    Astrologia estudada e praticada em família, passada adiante por quem hoje
-    conduz a leitura. Não é um app frio: é gente por trás de cada texto.
-
 faq:
-  titulo: Perguntas
+  titulo: Perguntas <em>frequentes</em>
+  # `revisao: <chave>` = a resposta vem de revisao.yaml (a versão que é verdade hoje);
+  # `so_com_venda: true` = some com a venda fechada.
   itens:
-    - pergunta: É a mesma coisa que o horóscopo?
+    - pergunta: É a mesma coisa que horóscopo?
       resposta: >-
-        Não. O horóscopo de jornal usa só o signo do Sol. Aqui é o mapa natal
-        inteiro — todos os planetas no momento exato do nascimento — e, no
-        casal, o cruzamento dos dois mapas.
-    - pergunta: Preciso saber a hora exata de nascimento?
+        Não. O horóscopo usa só o signo do Sol. O mapa natal parte da data, da
+        hora e da cidade do seu nascimento e mostra onde estava cada planeta
+        naquele momento.
+    - pergunta: Preciso saber a hora em que nasci?
       resposta: >-
-        Quanto mais exata, melhor: a hora define o Ascendente e as casas. Sem
-        ela dá para fazer assim mesmo, e a leitura avisa o que ficou de fora.
-    - pergunta: O que é o {indice}?
+        Ajuda muito: a hora define o Ascendente e as casas. Sem ela, você recebe
+        o mapa com Sol, Lua e planetas, e a gente avisa o que fica de fora.
+    - pergunta: Quem escreve os textos?
+      revisao: faq_textos
+    - pergunta: Como recebo o mapa completo?
+      so_com_venda: true
       resposta: >-
-        É um método próprio nosso para resumir a sinastria num número de 0 a
-        100, somando os aspectos entre os planetas de vocês em oito dimensões.
-        A astrologia tradicional não tem uma nota única para casais — por isso
-        explicamos o método no relatório.
-    - pergunta: E se o índice der baixo?
+        Logo depois do pagamento: o link chega no seu e-mail, com o PDF para
+        guardar.
+    - pergunta: Como pago?
+      so_com_venda: true
+      resposta: Pix ou cartão de crédito, num pagamento seguro processado pela Cakto.
+    - pergunta: Quando abre a leitura completa?
+      so_sem_venda: true
       resposta: >-
-        Índice baixo não condena nada. Ele mostra onde vocês são diferentes em
-        coisas que importam — e o completo explica como lidar com isso.
-    - pergunta: Qual nome eu uso na numerologia?
-      resposta: >-
-        O nome completo de registro, como está na certidão de nascimento, mesmo
-        que hoje você use outro. Cada letra entra na conta.
-    - pergunta: O tarot prevê o futuro?
-      resposta: >-
-        Não. As cartas são um espelho para pensar no momento: mostram o cenário,
-        o que pede atenção e uma direção possível. Quem decide é você.
+        Em breve. Faça a sua amostra grátis agora e, se quiser, peça para ser
+        avisado: quem pede recebe o aviso primeiro.
 
 fechamento:
-  titulo: Comece pelo seu mapa.
-  sub: A amostra é grátis e sai na hora. Leva dois minutos.
-  botao: Ver meu mapa natal →
-
-rodape:
-  linha1: Valderez Astrologia — astrologia para autoconhecimento.
-  linha2: >-
-    O conteúdo tem fins de reflexão e não substitui aconselhamento profissional.
+  titulo: O seu céu, lido <em>com cuidado</em>.
+  sub: Veja o começo de cada dimensão do seu mapa agora, de graça.
+  botao: Ver meu mapa grátis

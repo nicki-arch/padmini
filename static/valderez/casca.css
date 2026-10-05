@@ -1,78 +1,107 @@
 /* ==========================================================================
-   Valderez Astrologia — a "casca" comum a todas as páginas da versão ocidental:
-   pular para o conteúdo, cabeçalho, menu, rodapé e o aviso de cookies.
-   Do pacote docs/design/valderez-1.0/assets/css/components.css. Os tokens vêm do
-   static/ocidental/tema.css (gerado de paleta.py); aqui não há cor escrita.
-
-   Carregado também pelas páginas que ainda usam o base.css (até as fases B e C
-   da rodada visual): por isso as regras abaixo desfazem o que o base.css põe nos
-   elementos header, nav e footer.
+   Valderez Astrologia — a "casca" de TODAS as páginas da versão ocidental
+   (visual 2.0, rodada 9; pacote valderez-design-2.0): pular para o conteúdo,
+   cabeçalho (a roda de 48 px, o nome em HTML, fundo sólido com desfoque), menu
+   (desktop e o painel do celular com details/summary), rodapé escuro e o aviso
+   de cookies. Os tokens vêm do static/ocidental/tema.css (--vz-*, gerado de
+   paleta.py); aqui não há cor nova. As classes são só da casca (.cab, .rod,
+   .menu-cel, .cookie…): valem também nas páginas que ainda usam o componentes.css.
    ========================================================================== */
-
-.skip { position: absolute; top: 8px; left: 8px; transform: translateY(-180%); z-index: 60;
-  background: var(--surface); color: var(--text); padding: 12px; border-radius: var(--radius-control); }
+.skip { position: absolute; top: 8px; left: 8px; transform: translateY(-180%); z-index: 70; background: var(--vz-branco);
+  color: var(--vz-tinta); padding: 12px 16px; border-radius: 12px; font: 600 15px/1.4 var(--vz-f-texto); }
 .skip:focus { transform: none; }
-.container { width: min(100% - var(--gutter) * 2, var(--container)); margin-inline: auto; }
+.container { width: min(100% - 32px, 1264px); margin-inline: auto; }
 
-.header[data-theme], .footer[data-theme] { background: var(--background); color: var(--text); }
-.header { padding: 0; border-bottom: 1px solid var(--border); font: 400 var(--body-size)/var(--body-line) var(--font-sans); }
-.header-inner { min-height: 100px; display: flex; gap: 24px; justify-content: space-between; align-items: center; }
-.brand { display: inline-flex; color: var(--text); text-decoration: none; align-items: center; gap: 12px; }
-.brand-mark { width: 44px; height: 44px; color: var(--rose); flex-shrink: 0; display: inline-flex; }
-.brand-mark svg { width: 100%; height: 100%; }
-.brand-name { font: 500 32px/32px var(--font-editorial); letter-spacing: .02em; }
-.brand-name small { display: block; font: 400 10px/18px var(--font-sans); letter-spacing: .23em; text-transform: uppercase; }
+/* --- cabeçalho --- */
+.cab { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--vz-linha); color: var(--vz-tinta);
+  font: 400 16px/1.6 var(--vz-f-texto); }
+/* fundo sólido com desfoque num pseudo-elemento: o backdrop-filter no próprio .cab viraria
+   o contêiner do painel do menu (position: fixed) e o prenderia dentro do cabeçalho */
+.cab::before { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(251, 246, 241, .94);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.cab-in { display: flex; align-items: center; gap: 24px; min-height: 76px; padding: 12px clamp(16px, 6vw, 88px); }
+.cab a.marca, .rod a.marca, .marca { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; margin-right: auto; }
+.marca img { width: 48px; height: 48px; flex: none; }
+.marca-nome { display: flex; flex-direction: column; }
+.marca-nome b { font: 500 28px/1.05 var(--vz-f-titulo); color: var(--vz-tinta); letter-spacing: 0; }
+.marca-nome i { font: 600 10px/1.6 var(--vz-f-texto); font-style: normal; letter-spacing: .32em; text-transform: uppercase;
+  color: var(--vz-ouro-esc); }
+.cab .nav { display: none; gap: 28px; align-items: center; font-size: 15px; }
+.cab .nav a { color: var(--vz-tinta-2); text-decoration: none; padding: 10px 0; white-space: nowrap; }
+.cab .nav a:hover, .cab .nav a[aria-current=page] { color: var(--vz-vinho); text-decoration: underline;
+  text-underline-offset: 6px; text-decoration-thickness: 2px; }
+.cab-chip { display: inline-flex; align-items: center; font: 600 12px/1 var(--vz-f-texto); padding: 8px 12px;
+  border-radius: 999px; background: var(--vz-rosa-po); color: var(--vz-vinho-esc); }
+.cab a.cab-bt, .cab a.rod-bt, .rod a.rod-bt { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 22px;
+  border-radius: 999px; background: var(--vz-vinho); color: var(--vz-branco); font: 600 15px/1 var(--vz-f-texto);
+  text-decoration: none; box-shadow: 0 10px 24px rgba(140, 63, 85, .25); white-space: nowrap; }
+.cab a.cab-bt:hover, .cab a.rod-bt:hover { background: var(--vz-vinho-esc); color: var(--vz-branco); }
+.cab a.cab-bt { display: none; }
 
-.header .button, .cookie .button { display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  min-height: 48px; padding: 13px 24px; border: 1px solid transparent; border-radius: var(--radius-pill);
-  background: var(--accent); color: var(--on-accent); font: 600 var(--button-size)/var(--button-line) var(--font-sans);
-  text-decoration: none; cursor: pointer; text-align: center; max-width: 100%; }
-.header .button:hover, .cookie .button:hover { background: var(--accent-hover); }
+/* --- menu do celular (details/summary, sem JavaScript) --- */
+.menu-cel > summary { list-style: none; width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--vz-linha);
+  background: var(--vz-branco); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  color: var(--vz-tinta); }
+.menu-cel > summary::-webkit-details-marker { display: none; }
+.menu-cel .ico-fechar, .menu-cel[open] .ico-abrir { display: none; }
+.menu-cel[open] .ico-fechar { display: block; }
+.menu-painel { position: fixed; left: 0; right: 0; top: 76px; bottom: 0; z-index: 60; overflow-y: auto;
+  background: var(--vz-creme); padding: 12px 24px 28px; display: flex; flex-direction: column; gap: 4px; }
+.cab .menu-painel > a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 0;
+  border-bottom: 1px solid var(--vz-linha); text-decoration: none; color: var(--vz-tinta); font: 500 24px/1.2 var(--vz-f-titulo); }
+.cab .menu-painel > a small { font: 400 13px/1.3 var(--vz-f-texto); color: var(--vz-tinta-3); }
+.cab .menu-painel > a[aria-current=page] { color: var(--vz-vinho); }
+.menu-breve { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.menu-breve .rotulo { font: 600 12px/1.4 var(--vz-f-texto); letter-spacing: .22em; text-transform: uppercase; color: var(--vz-vinho); }
+.menu-breve div { display: flex; gap: 8px; flex-wrap: wrap; }
+.cab .menu-breve a { font: 600 13px/1 var(--vz-f-texto); padding: 9px 12px; border-radius: 999px; background: var(--vz-papel);
+  color: var(--vz-tinta-2); border: 1px dashed var(--vz-borda-campo); text-decoration: none; }
+.menu-pe { margin-top: auto; padding-top: 24px; display: flex; flex-direction: column; gap: 14px; }
+.menu-pe p { margin: 0; font: 400 13px/1.5 var(--vz-f-texto); color: var(--vz-tinta-3); }
+.menu-pe .rod-bt { width: 100%; min-height: 52px; font-size: 16px; }
 
-.nav-desktop { display: none; gap: 24px; align-items: center; flex-wrap: nowrap; }
-.nav-desktop > a:not(.button) { color: var(--text); padding: 12px 0; text-decoration: none; white-space: nowrap; }
-.nav-desktop > a:not(.button):hover { text-decoration: underline; }
-.nav-desktop [aria-current=page] { text-decoration: underline !important; text-decoration-thickness: 2px !important; text-underline-offset: 6px; }
-.nav-mobile { position: relative; }
-.nav-mobile summary { min-height: 48px; min-width: 64px; padding: 0 14px; display: grid; place-items: center; list-style: none;
-  border: 1px solid var(--border); border-radius: var(--radius-control); cursor: pointer; color: var(--text); }
-.nav-mobile summary::-webkit-details-marker { display: none; }
-.nav-mobile nav { display: block; position: absolute; right: 0; top: 60px; width: min(300px, calc(100vw - 48px));
-  padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; z-index: 40;
-  box-shadow: var(--shadow-card); }
-.nav-mobile a { display: block; padding: 12px; color: var(--text); text-decoration: none; }
-.nav-mobile a[aria-current=page] { text-decoration: underline; text-decoration-thickness: 2px; }
-.header :focus-visible, .footer :focus-visible, .cookie :focus-visible, .skip:focus-visible {
-  outline: 3px solid var(--focus); outline-offset: 3px; }
+/* --- rodapé (bloco noite) --- */
+.rod { background: var(--vz-noite); color: var(--vz-noite-texto); font: 400 15px/1.6 var(--vz-f-texto); }
+.rod-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px 48px; padding: 44px clamp(16px, 6vw, 88px); }
+.rod .marca-nome b { color: var(--vz-noite-titulo); }
+.rod .marca-nome i { color: var(--vz-ouro-claro); }
+.rod-marca { display: flex; flex-direction: column; gap: 12px; max-width: 380px; }
+.rod-marca p { margin: 0; font-size: 14px; color: var(--vz-noite-claro); }
+.rod-cols { display: flex; flex-wrap: wrap; gap: 24px 48px; }
+.rod-cols nav { display: flex; flex-direction: column; gap: 4px; }
+.rod .rod-in a { color: var(--vz-noite-titulo); text-decoration: none; font-size: 14px; min-height: 32px; display: inline-flex; align-items: center; }
+.rod .rod-in a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.rod .nota-rodape { flex-basis: 100%; margin: 0; font-size: 13px; color: var(--vz-noite-claro); max-width: 80ch; }
+.rod .rod-in .nota-rodape a { display: inline; min-height: 0; color: var(--vz-noite-titulo); text-decoration: underline; }
+.rod-breve { color: var(--vz-noite-claro); font-size: 12px; }
 
-.footer { margin: 0; padding: 40px 0; border-top: 1px solid var(--border); text-align: left;
-  font: 400 var(--body-size)/var(--body-line) var(--font-sans); }
-.footer .footer-inner { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; max-width: none; }
-.footer nav { display: flex; gap: 8px 16px; flex-wrap: wrap; align-items: center; }
-.footer a { color: var(--accent); min-height: 44px; display: inline-flex; align-items: center; text-underline-offset: 4px; }
-.footer .caption { margin: 0; max-width: 46ch; font-size: var(--caption-size); line-height: var(--caption-line); color: var(--text-muted); }
-.footer .nota-rodape { flex-basis: 100%; max-width: 72ch; }
-.footer .nota-rodape a { min-height: 0; display: inline; }
-.footer .brand { align-self: start; }
+/* --- aviso de cookies (static/ocidental/consentimento.js): Aceitar e Recusar do mesmo tamanho --- */
+.cookie { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 80; max-width: 440px; padding: 22px;
+  background: var(--vz-branco); color: var(--vz-tinta); border: 1px solid var(--vz-linha); border-radius: 22px;
+  box-shadow: 0 20px 50px rgba(35, 31, 51, .22); font: 400 14px/1.6 var(--vz-f-texto); }
+.cookie h2 { font: 500 22px/1.2 var(--vz-f-titulo); margin: 0 0 10px; color: var(--vz-tinta); }
+.cookie p { margin: 0 0 14px; color: var(--vz-tinta-2); }
+.cookie p a { color: var(--vz-vinho); }
+.cookie-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cookie button.button { min-height: 46px; padding: 0 12px; border-radius: 999px; font: 600 15px/1 var(--vz-f-texto); cursor: pointer;
+  border: 1.5px solid var(--vz-vinho); background: var(--vz-branco); color: var(--vz-vinho); width: 100%; }
+.cookie button.button[data-cookies=aceito] { background: var(--vz-vinho); color: var(--vz-branco); }
 
-/* Aviso de cookies (static/ocidental/consentimento.js): "Aceitar" e "Recusar"
-   do mesmo tamanho e com o mesmo destaque. */
-.cookie { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 50; max-width: 700px; margin: 0 auto;
-  padding: 24px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--surface);
-  color: var(--text); box-shadow: var(--shadow-card); font: 400 14px/22px var(--font-sans); }
-.cookie h2 { font: 600 var(--h4-size)/var(--h4-line) var(--font-editorial); margin: 0 0 8px; color: var(--text); }
-.cookie p { margin: 0 0 16px; max-width: none; }
-.cookie a { color: var(--accent); }
-.cookie-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.cookie-actions .button { width: 100%; padding-inline: 12px; }
+.cab :focus-visible, .rod :focus-visible, .cookie :focus-visible, .menu-painel :focus-visible, .skip:focus-visible {
+  outline: 3px solid var(--vz-vinho); outline-offset: 3px; }
+.rod :focus-visible { outline-color: var(--vz-ouro-claro); }
 
-@media (min-width: 1100px) { .nav-desktop { display: flex; } .nav-mobile { display: none; } }
-@media (max-width: 767px) {
-  .header-inner { gap: 12px; min-height: 88px; }
-  .brand-name { font-size: 28px; }
-  .brand-mark { width: 36px; height: 36px; }
-  .footer .footer-inner { display: grid; }
-  .cookie { padding: 20px; }
+@media (min-width: 1100px) {
+  .cab .nav { display: flex; }
+  .cab a.cab-bt { display: inline-flex; }
+  .menu-cel { display: none; }
+  .cookie { left: 32px; bottom: 32px; right: auto; }
 }
-@media (prefers-reduced-motion: no-preference) { .header .button, .cookie .button { transition: background-color .18s, border-color .18s; } }
-@media print { .header, .footer, .cookie { display: none; } }
+@media (max-width: 767px) {
+  .cab-in { min-height: 72px; padding: 12px 20px; gap: 12px; }
+  .marca-nome b { font-size: 23px; }
+  .menu-painel { top: 72px; }
+}
+@media print { .cab, .rod, .cookie, .skip { display: none; } }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0; }

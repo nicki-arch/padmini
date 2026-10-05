@@ -14,6 +14,8 @@ quantos faltam — é a lista de trabalho da família do Pedro
 from functools import lru_cache
 from pathlib import Path
 
+import re
+
 import yaml
 
 import textos
@@ -137,6 +139,58 @@ def triade(mapa: dict) -> list[dict]:
     return itens
 
 
+# --------------------------------------------------------------------------
+# Amostra por dimensões (rodada 9). A tela mostra, para cada dimensão ATIVA do
+# catálogo (conteudo/ocidental/catalogo.yaml), só o começo do texto real dela
+# (1 ou 2 frases). O resto que aparece desfocado na tela é enfeite fixo do
+# template: o texto pago nunca vai para o navegador.
+# --------------------------------------------------------------------------
+_FIM_DE_FRASE = re.compile(r"(?<=[.!?])\s+(?=[A-ZÀ-Ý\"“])")
+MAX_TRECHO = 260
+
+
+def trecho(texto: str) -> str:
+    """As primeiras 1–2 frases (a segunda só se couber em MAX_TRECHO caracteres)."""
+    frases = _FIM_DE_FRASE.split((texto or "").strip())
+    if not frases or not frases[0]:
+        return ""
+    saida = frases[0]
+    if len(frases) > 1 and len(saida) + 1 + len(frases[1]) <= MAX_TRECHO:
+        saida += " " + frases[1]
+    return saida
+
+
+def revisado_signo(ponto: str, signo: str) -> bool:
+    """O texto daquele ponto naquele signo tem `revisado: true`? (selo da Dona Valderez)"""
+    no = (base("ascendente").get(signo) if ponto == "ascendente"
+          else base("planetas_signos").get(ponto, {}).get(signo))
+    return bool(isinstance(no, dict) and no.get("revisado") is True)
+
+
+def dimensoes_amostra(mapa: dict) -> list[dict]:
+    """Um item por dimensão do catálogo, na ordem dele. Ativa com o ponto no mapa:
+    o signo, o grau, o trecho, se o texto é revisado e a vaga da ilustração do
+    signo. Sem o ponto (Ascendente sem hora) ou em breve: só o nome e o estado."""
+    import catalogo
+    itens = []
+    for d in catalogo.dimensoes_mapa():
+        item = {"chave": d["chave"], "nome": d["nome"], "rotulo": d["rotulo"], "descricao": d["descricao"],
+                "estado": d["estado"], "vaga": d["vaga"]}
+        p = mapa["pontos"].get(d["ponto"]) if d["estado"] == "ativo" and d["ponto"] else None
+        if d["estado"] == "ativo" and p is None:
+            item["estado"] = "sem_hora"
+        elif p is not None:
+            signo = p["signo"]
+            item.update({"ponto": d["ponto"], "ponto_pt": mo.PONTO_PT[d["ponto"]], "signo": signo,
+                         "signo_pt": _nome_signo(p), "grau": p["grau_texto"],
+                         "trecho": trecho(texto_signo(d["ponto"], signo)),
+                         "revisado": revisado_signo(d["ponto"], signo), "vaga": f"signo-{signo}"})
+            if item["revisado"]:
+                item["selo"] = textos.SELO  # regra de honestidade: o selo vem só com texto revisado
+        itens.append(item)
+    return itens
+
+
 def montar_amostra(mapa: dict) -> dict:
     destaque = mo.aspecto_de_destaque(mapa)
     avisos = []
@@ -153,9 +207,39 @@ def montar_amostra(mapa: dict) -> dict:
     }
 
 
-def montar_secoes(mapa: dict) -> dict:
+def dimensoes_completo(mapa: dict) -> list[dict]:
+    """Leitura completa por dimensões (rodada 9, tela Site-Leitura): para cada
+    dimensão ativa, o texto inteiro do ponto no signo, o da casa (com hora) e os
+    aspectos DO MAPA que tocam aquele ponto, cada um com o seu texto."""
+    import ilustracoes
+    itens = []
+    principais = aspectos_principais(mapa)
+    for d in dimensoes_amostra(mapa):
+        if d["estado"] != "ativo":
+            itens.append(d)
+            continue
+        ponto, p = d["ponto"], mapa["pontos"][d["ponto"]]
+        if p.get("signo_incerto"):
+            texto = " ".join(texto_signo(ponto, s) for s in p["signos_possiveis"])
+        else:
+            texto = texto_signo(ponto, p["signo"])
+        casa = p.get("casa") if ponto in mo.PLANETAS and mapa["tem_hora"] else None
+        aspectos = [{"titulo": titulo_aspecto(a), "tipo": a["tipo"], "orbe": mo.grau_minuto(a["orbe"]),
+                     "com": mo.PONTO_PT[a["b"] if a["a"] == ponto else a["a"]],
+                     "texto": texto_aspecto(a["a"], a["b"], a["tipo"])}
+                    for a in principais if ponto in (a["a"], a["b"])]
+        vaga_planeta = f"planeta-{ponto}" if f"planeta-{ponto}" in ilustracoes.VAGAS else d["vaga"]
+        itens.append({**{k: v for k, v in d.items() if k != "trecho"}, "texto": texto, "casa": casa,
+                      "texto_casa": texto_casa(ponto, casa) if casa else "", "aspectos": aspectos,
+                      "vaga_planeta": vaga_planeta})
+    return itens
+
+
+def montar_secoes(mapa: dict, omitir: tuple = ()) -> dict:
     """O relatório completo em seções: {título: [parágrafos]} (mesmo formato da
-    védica, que o PDF, o live e o prompt da IA já sabem ler)."""
+    védica, que o PDF, o live e o prompt da IA já sabem ler).
+    `omitir`: pontos que a página já mostra nas dimensões (rodada 9) — saem da
+    tríade e das listas de planetas, para o texto não aparecer duas vezes."""
     s = {}
     avisos = []
     if not mapa["tem_hora"]:
@@ -167,10 +251,14 @@ def montar_secoes(mapa: dict) -> dict:
     if avisos:
         s["Antes de começar"] = avisos
 
-    s["Sol, Lua e Ascendente"] = [f"{i['nome']} em {i['signo']}. {i['texto']}" for i in triade(mapa)]
+    if not {"sol", "lua", "ascendente"} <= set(omitir):
+        s["Sol, Lua e Ascendente"] = [f"{i['nome']} em {i['signo']}. {i['texto']}" for i in triade(mapa)
+                                      if i["ponto"] not in omitir]
 
     planetas = []
     for ponto in ("mercurio", "venus", "marte", "jupiter", "saturno", "urano", "netuno", "plutao"):
+        if ponto in omitir:
+            continue
         p = mapa["pontos"][ponto]
         r = " (retrógrado)" if p.get("retrogrado") else ""
         planetas.append(f"{mo.PONTO_PT[ponto]} em {p['signo_pt']}{r}. {texto_signo(ponto, p['signo'])}")
@@ -181,7 +269,7 @@ def montar_secoes(mapa: dict) -> dict:
         s["Os planetas nas casas"] = [
             f"{mo.PONTO_PT[ponto]} na casa {mapa['pontos'][ponto]['casa']}. "
             f"{texto_casa(ponto, mapa['pontos'][ponto]['casa'])}"
-            for ponto in mo.PLANETAS]
+            for ponto in mo.PLANETAS if ponto not in omitir]
 
     s["Os aspectos principais"] = [
         f"{titulo_aspecto(a)}. {texto_aspecto(a['a'], a['b'], a['tipo'])}"

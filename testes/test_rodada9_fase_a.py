@@ -51,9 +51,15 @@ def _mudar(**estados):
 
 
 def _menu(html: str) -> list[str]:
-    nav = re.search(r'<nav class="nav-desktop".*?</nav>', html, re.S).group(0)
-    nav = re.sub(r'<a class="button"[^>]*>.*?</a>', "", nav)
-    return re.findall(r'href="(/[a-z/-]*)"', nav)
+    """Páginas de produto no cabeçalho (menu do desktop + painel do celular, rodada 9:
+    os em breve ficam em "Chegando em breve" no painel), sem âncoras nem repetição."""
+    cab = html[html.index('<header class="cab">'):html.index("</header>")]
+    cab = re.sub(r'<a class="(cab-bt|rod-bt)"[^>]*>.*?</a>', "", cab)
+    vistos = []
+    for h in re.findall(r'href="(/[a-z/-]*)"', cab):
+        if h not in vistos and h not in ("/", "/minhas-leituras", "/blog"):
+            vistos.append(h)
+    return vistos
 
 
 def _sitemap() -> list[str]:
@@ -119,12 +125,12 @@ def test_em_breve_mostra_o_me_avise_sem_o_formulario_do_produto(ocidental):
 
 def test_menu_home_rodape_e_leituras_vem_do_catalogo(ocidental):
     home = cliente.get("/").text
-    assert _menu(home) == ["/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras"]
+    assert _menu(home) == ["/mapa", "/leituras", "/compatibilidade", "/numerologia", "/tarot"]
     assert home.count("em breve") >= 3  # os três produtos em breve no menu
     rodape = home.split('<footer', 1)[1]
     assert all(f'href="{r}"' in rodape for r in ("/mapa", "/compatibilidade", "/leituras"))
     leituras = cliente.get("/leituras").text
-    assert re.findall(r'<h2>([^<]+)</h2>', leituras) == ["Mapa natal", "Sinastria do casal", "Numerologia", "Tarot"]
+    assert re.findall(r'<h2 class="t3">([^<]+)</h2>', leituras) == ["Mapa natal", "Sinastria do casal", "Numerologia", "Tarot"]
     assert _sitemap() == ["/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras"]
 
 
@@ -133,8 +139,8 @@ def test_trocar_um_estado_no_yaml_muda_o_que_aparece(ocidental):
     _mudar(compat="ativo")
     html = cliente.get("/compatibilidade").text
     assert "/api/ocidental/sinastria" in html
-    assert re.search(r'href="/compatibilidade"[^>]*>Sinastria do casal</a>', html)
-    assert "As oito dimensões do casal" in cliente.get("/").text  # seção do casal volta na home
+    assert re.search(r'<nav class="nav".*href="/compatibilidade"', html, re.S)  # vai para o menu do desktop
+    assert 'href="/compatibilidade#me-avise"' not in cliente.get("/").text  # sai de "Chegando em breve"
     # tarot oculto: 404, some do menu, da home, de "Todas as leituras" e do sitemap
     _mudar(tarot="oculto")
     assert cliente.get("/tarot", headers=HTML).status_code == 404
@@ -217,7 +223,7 @@ def test_amostra_do_mapa_traz_o_me_avise_no_lugar_da_compra(ocidental):
 
 def test_me_avise_tem_nome_email_e_whatsapp_obrigatorios(ocidental):
     html = cliente.get("/numerologia").text
-    form = re.search(r'<form class="stack" data-me-avise="numerologia".*?</form>', html, re.S).group(0)
+    form = re.search(r'<form class="form stack" data-me-avise="numerologia".*?</form>', html, re.S).group(0)
     for campo in ("nome", "email", "whatsapp", "aceita_email"):
         assert re.search(rf'name="{campo}"[^>]*required', form), campo
     assert re.search(r'name="aceita_whatsapp"(?![^>]*(required|checked))', form)

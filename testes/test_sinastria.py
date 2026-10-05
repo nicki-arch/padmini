@@ -192,7 +192,8 @@ def test_precos_do_casal_ocidental_no_yaml():
 def test_home_e_lista_ocidentais(ocidental):
     home = cliente.get("/").text
     assert "Sinastria" in home and "védic" not in home.lower() and "पद्मिनी" not in home
-    assert f"R${ofertas.preco('compat', 'ocidental')}" in home
+    # rodada 9: a home só tem o preço do mapa natal; o da sinastria fica em "Todas as leituras"
+    assert f"R${ofertas.preco('compat', 'ocidental')}" in cliente.get("/leituras").text
     lista = cliente.get("/lista").text
     assert "védic" not in lista.lower() and "पद्मिनी" not in lista
 

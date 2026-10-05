@@ -100,6 +100,56 @@ VALDEREZ = {
              "rose": "#DCB1CF", "gold": "#D9BE8D"},
 }
 
+# ---------------------------------------------------------------------------
+# Valderez 2.0 (rodada 9, 5/out/2026; pacote valderez-design-2.0, valderez.css e
+# as telas): o visual que substitui o de 29/set. Tema claro (creme, papel,
+# rosa-pó, vinho, ouro) com o rodapé e os blocos "noite". No CSS saem como
+# --vz-<nome> (tema.css, gerado). Fontes: Fraunces (títulos), Figtree (texto) e
+# Noto Sans Symbols 2 (só os glifos de signo e planeta), todas OFL e servidas
+# pelo site.
+#
+# Duas mudanças em relação às telas, por contraste (WCAG AA, PARES_VZ abaixo):
+#   - o ouro #B98A3E não passa como texto no creme (2,9:1): os números e rótulos
+#     dourados usam o ouro-esc (5,8:1); o ouro claro fica só em enfeite e no
+#     rodapé escuro;
+#   - a borda dos campos #D9C5BC some no branco (1,7:1): os campos usam a
+#     borda-campo #8F7B86 (3,9:1), o mínimo de contorno de controle.
+# ---------------------------------------------------------------------------
+VZ = {"creme": "#FBF6F1", "papel": "#F5EAE2", "rosa-po": "#F1D9D3", "rosa": "#E7B9B3", "pessego": "#F4D3BC",
+      "vinho": "#8C3F55", "vinho-esc": "#6E2E42", "ouro": "#B98A3E", "ouro-esc": "#7E5A1E", "ouro-claro": "#D9B77A",
+      "noite": "#231F33", "noite-2": "#2F2638", "tinta": "#2B2230", "tinta-2": "#5A4D58", "tinta-3": "#7A6B74",
+      "linha": "#E6D6CE", "borda-campo": "#8F7B86", "ok": "#2F6B4F", "erro": "#A3324A", "branco": "#FFFFFF",
+      "noite-texto": "#EDE2E6", "noite-claro": "#CDBFC6", "noite-titulo": "#FBF1EE",
+      # fundos e enfeites das telas (degradês, avisos, a moldura da foto)
+      "aurora": "#F8E6DE", "hero-fundo": "#F6DCD2", "foto-1": "#F3DDD5", "foto-2": "#E9C9C0",
+      "noite-foto": "#4A3A4E", "noite-citacao": "#F3E4E8", "erro-fundo": "#FBE9EC", "ok-fundo": "#E3F0E8",
+      "ok-borda": "#CFE3D7", "aviso-fundo": "#FBF1E3", "aviso-borda": "#EBD3A8",
+      # a roda do mapa (roda_mapa.py, referência do pacote): setores por elemento e filetes
+      "elemento-fogo": "#F6E3DA", "elemento-terra": "#F3EBDD", "elemento-ar": "#F7F0EA", "elemento-agua": "#EFE3E6",
+      "ouro-linha": "#C9A66A", "linha-casa": "#D9C5BC", "miolo": "#FFFDFB"}
+FONTES_VZ = {"titulo": "'Fraunces', Georgia, serif", "texto": "'Figtree', 'Segoe UI', Arial, sans-serif",
+             # os signos e planetas estão na Noto Sans Symbols; o ☉, na Symbols 2
+             "glifos": "'Noto Sans Symbols', 'Noto Sans Symbols 2'",
+             # (família, pesos, estilo, arquivo em static/valderez/fontes/)
+             "arquivos": [("Fraunces", "400 600", "normal", "Fraunces.woff2"),
+                          ("Fraunces", "400 600", "italic", "Fraunces-Italic.woff2"),
+                          ("Figtree", "400 700", "normal", "Figtree.woff2"),
+                          ("Noto Sans Symbols", "400", "normal", "NotoSansSymbols-astro.woff2"),
+                          ("Noto Sans Symbols 2", "400", "normal", "NotoSansSymbols2-astro.woff2")]}
+# (texto, fundo, mínimo): os pares que o CSS usa. Texto ≥ 4,5:1; contorno ≥ 3:1.
+PARES_VZ = ([(c, f, 4.5) for c in ("tinta", "tinta-2", "vinho", "ouro-esc", "erro") for f in ("creme", "papel", "branco")]
+            + [("tinta-3", "creme", 4.5), ("tinta-3", "branco", 4.5), ("ok", "branco", 4.5),
+               ("branco", "vinho", 4.5), ("branco", "vinho-esc", 4.5), ("vinho-esc", "rosa-po", 4.5),
+               ("noite-texto", "noite", 4.5), ("noite-claro", "noite", 4.5), ("ouro-claro", "noite", 4.5),
+               ("noite-titulo", "noite", 4.5), ("rosa", "noite", 4.5),
+               ("borda-campo", "branco", 3.0), ("vinho", "branco", 3.0)])
+
+
+def contrastes_vz() -> list[dict]:
+    return [{"texto": a, "fundo": b, "cor_texto": VZ[a], "cor_fundo": VZ[b], "razao": contraste(VZ[a], VZ[b]),
+             "regra": f"≥ {m:g}".replace(".", ","), "passa": contraste(VZ[a], VZ[b]) >= m} for a, b, m in PARES_VZ]
+
+
 # Os pares aprovados do tokens.json: (primeiro plano, fundo, mínimo). Os mesmos
 # nos dois temas.
 _TEXTOS = ("text", "textSecondary", "textMuted", "accent", "error", "success", "rose", "gold")
@@ -129,10 +179,13 @@ EMAIL = {
     # Fundo "background", texto "text", botão "accent" com "onAccent"; os textos
     # de apoio são textSecondary/textMuted, todos em pares aprovados no fundo claro.
     # O e-mail não baixa fonte: onde a Cormorant/Inter não existir, cai no Georgia/Arial.
-    "ocidental": {"fundo": "#F7F3F0", "texto": "#142234", "acento": "#715078", "sobre_acento": "#FFFFFF",
-                  "suave": "#495365", "fraco": "#656474", "linha": "#827587", "acento2": "#80506F",
-                  "fonte": "Inter,Arial,Helvetica,sans-serif",
-                  "fonte_marca": "'Cormorant Garamond',Georgia,serif", "raio_botao": "999px"},
+    # Rodada 9 (tela Sistema-Emails do pacote 2.0): creme por fora, cartão branco por
+    # dentro (entrega.casca_ocidental), vinho no botão; pares de PARES_VZ.
+    "ocidental": {"fundo": "#FBF6F1", "texto": "#2B2230", "acento": "#8C3F55", "sobre_acento": "#FFFFFF",
+                  "suave": "#5A4D58", "fraco": "#7A6B74", "linha": "#E6D6CE", "acento2": "#7E5A1E",
+                  "cartao": "#FFFFFF", "ouro": "#7E5A1E",
+                  "fonte": "Figtree,'Segoe UI',Arial,Helvetica,sans-serif",
+                  "fonte_marca": "Fraunces,Georgia,serif", "raio_botao": "999px"},
 }
 
 # ---------------------------------------------------------------------------
@@ -150,16 +203,19 @@ PAPEL = {
                "fonte_corpo_forte": ("Inter-SemiBold", "Inter-SemiBold.ttf")},
     # Valderez: tinta = text, acento = accent (títulos e filetes), noite = o azul
     # do tema escuro (capa); fontes = os TTF de fontes/ (os mesmos WOFF2 do site).
-    "ocidental": {"tinta": "#142234", "tinta_suave": "#495365", "noite": "#091321", "acento": "#715078",
-                  "acento_suave": "#F7F3F0", "superficie": "#F7F3F0", "fundo": "#FFFFFF", "linha": "#827587",
-                  "lotus": "#80506F", "harmonico": "#216342",
-                  # os mesmos nomes (e arquivos) que o gerar_pdf.py registra; sem itálico,
-                  # como no pacote (Cormorant 500/600, Inter 400/600)
-                  "fonte_titulo": ("Cormorant", "Cormorant-Medium.ttf"),
-                  "fonte_titulo_forte": ("Cormorant-SemiBold", "Cormorant-SemiBold.ttf"),
-                  "fonte_titulo_italico": ("Cormorant", "Cormorant-Medium.ttf"),
-                  "fonte_corpo": ("Inter", "Inter-Regular.ttf"),
-                  "fonte_corpo_forte": ("Inter-SemiBold", "Inter-SemiBold.ttf")},
+    # Rodada 9 (visual 2.0): tinta, vinho e ouro do pacote; Fraunces + Figtree (TTF
+    # estáticos em fontes/, gerados das mesmas fontes OFL do site) e os glifos da
+    # Noto Sans Symbols 2 na roda.
+    "ocidental": {"tinta": "#2B2230", "tinta_suave": "#5A4D58", "noite": "#231F33", "acento": "#8C3F55",
+                  "acento_suave": "#FBF6F1", "superficie": "#F5EAE2", "fundo": "#FFFFFF", "linha": "#E6D6CE",
+                  "lotus": "#7E5A1E", "harmonico": "#2F6B4F",
+                  "fonte_titulo": ("Fraunces", "Fraunces-Medium.ttf"),
+                  "fonte_titulo_forte": ("Fraunces", "Fraunces-Medium.ttf"),
+                  "fonte_titulo_italico": ("Fraunces-Italic", "Fraunces-MediumItalic.ttf"),
+                  "fonte_corpo": ("Figtree", "Figtree-Regular.ttf"),
+                  "fonte_corpo_forte": ("Figtree-SemiBold", "Figtree-SemiBold.ttf"),
+                  "fonte_glifos": ("NotoSymbols", "NotoSansSymbols-astro.ttf"),
+                  "fonte_glifos_2": ("NotoSymbols2", "NotoSansSymbols2-astro.ttf")},  # só o ☉
 }
 
 # Cores que eram da marca védica e não podem aparecer na ocidental (o teste

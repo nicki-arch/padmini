@@ -214,7 +214,7 @@ def test_pagina_so_na_versao_ocidental(versao):
     html = cliente.get("/tarot").text
     assert "/api/ocidental/tarot/tirar" in html and 'maxlength="140"' in html
     assert f"R${ofertas.preco('tarot', 'ocidental')}" in html and "védic" not in html.lower()
-    assert "<img" not in html  # cartas só tipográficas
+    assert "<img" not in html.split("<main", 1)[1].split("</main>")[0]  # cartas só tipográficas (a marca fica no cabeçalho)
 
 
 def test_link_pago_abre_mesmo_com_a_vedica_no_ar(versao):

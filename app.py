@@ -117,6 +117,23 @@ async def _nao_encontrada(request: Request, exc: StarletteHTTPException):
             cores=paleta.tela("ocidental"), marca=marca, blog=blog, sem_menu=_captura_ligada())
         return Response(html, status_code=404, media_type="text/html; charset=utf-8")
     return await http_exception_handler(request, exc)
+@app.exception_handler(Exception)
+async def _erro_interno(request: Request, exc: Exception):
+    """Erro 500 (rodada 9, tela "Algo deu errado do nosso lado"): na ocidental, uma
+    página HTML para quem pediu página; API e védica, o texto de sempre. O alerta
+    para a equipe sai antes, no middleware _avisar_erro_500."""
+    log.exception("erro 500 em %s", request.url.path, exc_info=exc)
+    if (sistema.ativo() == "ocidental" and not request.url.path.startswith(_SEM_PAGINA_404)
+            and "text/html" in request.headers.get("accept", "")):
+        try:
+            html = _jinja.get_template("ocidental/404.html").render(
+                erro_500=True, cores=paleta.tela("ocidental"), marca=marca, blog=blog, sem_menu=_captura_ligada())
+            return Response(html, status_code=500, media_type="text/html; charset=utf-8")
+        except Exception:  # noqa: BLE001  (a página de erro nunca pode dar outro erro)
+            log.exception("erro 500: falha ao montar a página de erro")
+    return Response("Internal Server Error", status_code=500, media_type="text/plain")
+
+
 # Rotas da versão ocidental (/api/ocidental/*): existem sempre, qualquer que seja
 # a versão no ar — um link já entregue precisa abrir depois de uma troca.
 app.include_router(rotas_ocidental.rotas)
@@ -197,6 +214,16 @@ _jinja.globals["indice"] = textos.NOME_INDICE
 # e revisao.yaml. Usados pelo menu, rodapé, home, "me avise"...
 _jinja.globals["catalogo"] = catalogo
 _jinja.globals["revisao"] = textos.frase_revisao
+_jinja.globals["faq"] = textos.faq
+# Ilustrações trocáveis (rodada 9): o template pede a VAGA, nunca o arquivo
+# (conteudo/ocidental/ilustracoes.yaml; ilustracoes.py).
+import ilustracoes  # noqa: E402
+_jinja.globals["ilustracao"] = ilustracoes.tag
+_jinja.globals["ilustracao_url"] = ilustracoes.url
+# Páginas de produto (rodada 9, Fase C): texto em conteudo/ocidental/produtos.yaml
+import produtos_ocidental  # noqa: E402
+_jinja.globals["trecho_real"] = produtos_ocidental.trecho_real
+_jinja.globals["cursos"] = produtos_ocidental.cursos
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:
@@ -252,6 +279,17 @@ def _produto_fechado(request: Request, rota: str) -> dict | None:
     return prod
 
 
+def _pagina_de_produto(prod: dict) -> Response:
+    """A página de um produto que ainda não tem fluxo próprio no ar (rodada 9, Fase C):
+    a vitrine /cursos, o modelo de produto (produtos.yaml) ou, sem texto, o "em breve"."""
+    if prod["chave"] == "cursos":
+        return _pagina_montada("ocidental/cursos.html", "ocidental", "cursos", produto=prod)
+    tp = produtos_ocidental.pagina(prod["chave"])
+    if tp:
+        return _pagina_montada("ocidental/produto.html", "ocidental", "produto", produto=prod, tp=tp)
+    return _pagina_montada("ocidental/em_breve.html", "ocidental", "em_breve", produto=prod)
+
+
 def _pagina_ou_lista(request: Request, rota: str):
     fechado = _produto_fechado(request, rota)  # oculto = 404 até com a captura ligada
     chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
@@ -265,11 +303,11 @@ def _pagina_ou_lista(request: Request, rota: str):
             destino += "?" + request.url.query  # mantém ref/utm do afiliado
         return RedirectResponse(destino, status_code=302)
     if fechado:
-        resp = _pagina_montada("ocidental/em_breve.html", "ocidental", "em_breve", produto=fechado)
+        resp = _pagina_de_produto(fechado)
     elif rota in sistema.PAGINAS[_versao_do_pedido(request)]:
         resp = _pagina(rota, _versao_do_pedido(request))
-    else:  # produto do catálogo ativo ainda sem página própria: o "me avise"
-        resp = _pagina_montada("ocidental/em_breve.html", "ocidental", "em_breve", produto=catalogo.por_rota(rota))
+    else:  # produto do catálogo ativo ainda sem página própria: a página de produto
+        resp = _pagina_de_produto(catalogo.por_rota(rota))
     if chave and previa_url == chave:
         resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
                         secure=request.url.scheme == "https", samesite="lax")

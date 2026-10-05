@@ -1,0 +1,71 @@
+# Valderez Astrologia (versão OCIDENTAL) — ILUSTRAÇÕES TROCÁVEIS (rodada 9).
+#
+# Cada imagem é uma VAGA com nome fixo (hero-home, dim-sol, capa-tarot,
+# signo-touro…) dentro de um CONJUNTO (static/ilustracoes/<conjunto>/<vaga>.webp).
+# Templates, e-mail e PDF pedem a vaga (ilustracoes.py: `ilustracao("dim-sol")`,
+# `url("dim-sol")`), nunca o arquivo. Vaga que faltar no conjunto ativo cai no
+# reserva; se nenhum tiver, sai um fundo liso na cor papel (nunca imagem quebrada).
+#
+# Para trocar o estilo: entregar static/ilustracoes/<conjunto-novo>/ com os
+# mesmos nomes (WebP), rodar `python scripts/checar_ilustracoes.py <conjunto-novo>`
+# e trocar `conjunto_ativo` aqui. Nada de texto dentro das imagens.
+# Especificação completa: claude/especificacao-ilustracoes.md (no Project).
+#
+# `proporcao` é conferida com 2% de folga; `minimo` é o menor tamanho aceito
+# (o do conjunto entregue em 5/out); cada arquivo tem de ter menos de 300 KB.
+# As vagas foto-valderez-* (fotos, não ilustração) ainda não foram fotografadas:
+# o site mostra a roda no lugar.
+
+conjunto_ativo: aquarela-2026
+conjunto_reserva: aquarela-2026
+conjuntos:
+  aquarela-2026: {origem: "ChatGPT (imagem)", data: 2026-10-02, licenca: "conferir os termos de uso do ChatGPT"}
+
+vagas:
+  capa-amor: {proporcao: [4, 5], minimo: [900, 1124], usada_em: [home, leituras, produto-sinastria]}
+  capa-comunidade: {proporcao: [4, 5], minimo: [1080, 1350], usada_em: [produto-comunidade]}
+  capa-consulta: {proporcao: [4, 5], minimo: [1080, 1350], usada_em: [produto-consulta]}
+  capa-curso: {proporcao: [4, 5], minimo: [1080, 1350], usada_em: [produto-curso, cursos]}
+  capa-mapa: {proporcao: [4, 5], minimo: [900, 1124], usada_em: [home, leituras]}
+  capa-numerologia: {proporcao: [4, 5], minimo: [900, 1124], usada_em: [home, leituras, produto-numerologia]}
+  capa-tarot: {proporcao: [4, 5], minimo: [900, 1124], usada_em: [home, leituras, produto-tarot]}
+  dim-asc: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-carreira: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-dinheiro: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-familia: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-lua: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-marte: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-merc: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-proposito: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-sol: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  dim-venus: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  fundo-redes-1: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
+  fundo-redes-2: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
+  fundo-redes-3: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
+  fundo-redes-4: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
+  fundo-redes-5: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
+  hero-home: {proporcao: [7, 3], minimo: [1908, 824], usada_em: [home]}
+  pdf-capa: {proporcao: [1, 1.414], minimo: [1055, 1491], usada_em: [pdf]}
+  planeta-jupiter: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-lua: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-marte: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-mercurio: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-netuno: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-plutao: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-saturno: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-sol: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-urano: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  planeta-venus: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  relatorio-mockup: {proporcao: [4, 3], minimo: [1617, 1213], usada_em: [home]}
+  signo-aquario: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-aries: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-cancer: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-capricornio: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-escorpiao: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-gemeos: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-leao: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-libra: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-peixes: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-sagitario: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-touro: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}
+  signo-virgem: {proporcao: [1, 1], minimo: [1080, 1080], usada_em: [amostra, leitura]}

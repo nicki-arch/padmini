@@ -59,6 +59,8 @@ def _recursos(html):
         tag = m.group(0)
         if tag.lower().startswith("<link") and re.search(r'rel="(canonical|alternate)"', tag):
             continue
+        if "${" in m.group(1):
+            continue  # marcador de template string do JavaScript (o endereço vem da API: ver test_rodada9_fase_b)
         yield m.group(1)
 
 
@@ -80,20 +82,25 @@ def test_css_da_ocidental_nao_chama_nada_de_fora():
 
 
 def test_fontes_sao_woff2_do_site_com_as_licencas():
+    # rodada 9: Fraunces, Figtree e Noto Sans Symbols 2 (visual 2.0); Inter e Cormorant
+    # continuam enquanto a fase C não vestir as páginas restantes
     usadas = paleta.FONTES["ocidental"]["arquivos"]
     assert {f for f, _, _ in usadas} == {"Inter", "Cormorant Garamond"}
-    for _, _, arquivo in usadas:
+    novas = paleta.FONTES_VZ["arquivos"]
+    assert {f for f, _, _, _ in novas} == {"Fraunces", "Figtree", "Noto Sans Symbols", "Noto Sans Symbols 2"}
+    for arquivo in [a for _, _, a in usadas] + [a for _, _, _, a in novas]:
         assert (VALDEREZ / "fontes" / arquivo).read_bytes()[:4] == b"wOF2", arquivo
-    assert (VALDEREZ / "fontes" / "OFL-Inter.txt").exists()
-    assert (VALDEREZ / "fontes" / "OFL-CormorantGaramond.txt").exists()
+    for licenca in ("Inter", "CormorantGaramond", "Fraunces", "Figtree", "NotoSansSymbols", "NotoSansSymbols2"):
+        assert (VALDEREZ / "fontes" / f"OFL-{licenca}.txt").exists(), licenca
     tema = (RAIZ / "static" / "ocidental" / "tema.css").read_text(encoding="utf-8")
-    assert tema.count("@font-face") == 4 and "format('woff2')" in tema
+    assert tema.count("@font-face") == 9 and "format('woff2')" in tema
 
 
 def test_svgs_servidos_leves_e_sem_fonte_embutida():
-    for svg in VALDEREZ.glob("*.svg"):
+    # rodada 9: todo SVG servido tem menos de 30 KB (a roda tem ~22 KB)
+    for svg in (RAIZ / "static").rglob("*.svg"):
         texto = svg.read_text(encoding="utf-8")
-        assert svg.stat().st_size < 20_000, svg.name
+        assert svg.stat().st_size < 30_000, svg.name
         assert "<text" not in texto and "@font-face" not in texto and "http" not in texto.replace(
             "http://www.w3.org/2000/svg", ""), svg.name
         assert "[" not in texto, svg.name  # nada das marcações entre colchetes do pacote
@@ -108,7 +115,7 @@ def test_arquivos_de_marca_sao_os_de_marca_py():
 
 
 def test_cores_das_ilustracoes_sao_da_paleta():
-    todas = {v.lower() for tema in paleta.VALDEREZ.values() for v in tema.values()}
+    todas = {v.lower() for tema in paleta.VALDEREZ.values() for v in tema.values()} | {v.lower() for v in paleta.VZ.values()}
     for svg in VALDEREZ.glob("*.svg"):
         for cor in re.findall(r"#[0-9a-fA-F]{6}\b", svg.read_text(encoding="utf-8")):
             assert cor.lower() in todas, (svg.name, cor)
@@ -137,7 +144,7 @@ def test_pares_de_cor_da_ocidental_sao_os_aprovados():
 def test_tema_css_so_usa_cores_da_paleta():
     tema = (RAIZ / "static" / "ocidental" / "tema.css").read_text(encoding="utf-8")
     corpo = tema[tema.index("*/") + 2:]  # o comentário do topo lista os pares
-    todas = {v.lower() for t in paleta.VALDEREZ.values() for v in t.values()}
+    todas = {v.lower() for t in paleta.VALDEREZ.values() for v in t.values()} | {v.lower() for v in paleta.VZ.values()}
     for cor in re.findall(r"#[0-9a-fA-F]{6}\b", corpo):
         assert cor.lower() in todas, cor
 
@@ -145,7 +152,7 @@ def test_tema_css_so_usa_cores_da_paleta():
 def test_css_das_paginas_novas_nao_escreve_cor():
     """Cor só por token (var(--…)): nada de hexadecimal no casca.css e no componentes.css
     (a impressão, que força preto no branco, é a exceção)."""
-    for nome in ("casca.css", "componentes.css"):
+    for nome in ("casca.css", "componentes.css", "v2.css"):
         texto = (VALDEREZ / nome).read_text(encoding="utf-8")
         texto = re.sub(r"@media print\{.*?\}\}", "", texto, flags=re.S)
         assert not re.findall(r"#[0-9a-fA-F]{3,6}\b", texto), nome
@@ -171,7 +178,7 @@ def test_textos_legais_trocam_a_marca_mas_nao_o_responsavel(ocidental):
     marca, agora é Valderez Astrologia; o responsável pelos dados e o CNPJ não mudam."""
     for rota in LEGAIS:
         html = _pagina(rota)
-        assert "<title>Valderez Astrologia — " in html and 'class="brand"' in html, rota
+        assert "<title>Valderez Astrologia — " in html and 'class="marca"' in html, rota
         assert "Pedro Sperb Monteiro LTDA" in html and "55.428.936/0001-00" in html, rota
         assert "Valderez Astrologia (padmini.com.br)" in html, rota
 
@@ -199,10 +206,13 @@ def test_nenhum_template_tem_a_barra_de_referencia():
 @pytest.mark.parametrize("rota", PUBLICAS)
 def test_cabecalho_e_rodape_da_valderez(rota, ocidental):
     html = _pagina(rota)
-    assert '<header class="header" data-theme="dark">' in html and '<footer class="footer" data-theme="dark">' in html
+    # rodada 9: cabeçalho claro com a roda; rodapé noite com a roda clara
+    assert '<header class="cab">' in html and '<footer class="rod">' in html
+    assert 'src="/static/valderez/roda.svg" width="48" height="48"' in html
+    assert 'src="/static/valderez/roda-claro.svg"' in html.split('<footer class="rod">')[1]
     assert 'href="#conteudo"' in html and 'id="conteudo"' in html
     assert 'href="/static/valderez/favicon.svg"' in html
-    rodape = html[html.index('<footer class="footer"'):]
+    rodape = html[html.index('<footer class="rod"'):]
     for destino in ("/privacidade", "/termos", "mailto:", "/minhas-leituras", "github.com/nicki-arch/padmini",
                     'id="preferencias-cookies"'):
         assert destino in rodape, (rota, destino)
@@ -215,7 +225,7 @@ def test_lista_com_a_captura_ligada(monkeypatch):
     try:
         assert cliente.get("/", follow_redirects=False).headers["location"].startswith("/lista")
         html = cliente.get("/lista").text
-        assert 'data-theme="light"' in html and "/static/valderez/componentes.css" in html
+        assert "/static/valderez/v2.css" in html  # rodada 9: visual 2.0
         assert "/static/base.css" not in html  # a lista já é toda do pacote novo
         cabecalho = html[html.index("<header"):html.index("</header>")]
         assert 'href="/lista"' in cabecalho and "/mapa" not in cabecalho  # sem menu para páginas trancadas
@@ -227,7 +237,7 @@ def test_lista_com_a_captura_ligada(monkeypatch):
             assert trecho in html, trecho
         assert not re.search(r'<input type="checkbox" id="aceita-email"[^>]*checked', html)  # nunca pré-marcado
         # no celular o formulário vem antes das vantagens e da ilustração
-        assert html.index('class="lista-form"') < html.index('class="lista-mais"')
+        assert html.index('lista-form"') < html.index('lista-mais"')
     finally:
         app_mod._paginas_prontas.clear()
 

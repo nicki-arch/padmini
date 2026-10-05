@@ -42,6 +42,21 @@ def _fontes() -> str:
         for familia, peso, arquivo in paleta.FONTES["ocidental"]["arquivos"])
 
 
+def _fontes_vz() -> str:
+    return "\n".join(
+        f"@font-face {{ font-family: '{familia}'; src: url('/static/valderez/fontes/{arquivo}') format('woff2'); "
+        f"font-weight: {pesos}; font-style: {estilo}; font-display: swap; }}"
+        for familia, pesos, estilo, arquivo in paleta.FONTES_VZ["arquivos"])
+
+
+def _vz() -> str:
+    """Tokens do visual 2.0 (rodada 9): --vz-<nome> e as fontes."""
+    linhas = [f"  --vz-{k}: {v};" for k, v in paleta.VZ.items()]
+    linhas += [f"  --vz-f-titulo: {paleta.FONTES_VZ['titulo']};", f"  --vz-f-texto: {paleta.FONTES_VZ['texto']};",
+               f"  --vz-f-glifos: {paleta.FONTES_VZ['glifos']};"]
+    return ":root {\n" + "\n".join(linhas) + "\n}\n"
+
+
 def _tema(nome: str) -> str:
     esquema = "light" if nome == "light" else "dark"
     linhas = [f"  --{k}: {v};" for k, v in paleta.valderez_css(nome).items()]
@@ -78,7 +93,10 @@ def gerar() -> str:
         "   Pacote de design: docs/design/valderez-1.0/. Pares de contraste aprovados (WCAG):\n"
         f"{contrastes}\n"
         "   ========================================================================== */\n"
-        + _fontes() + "\n\n"
+        + _fontes() + "\n" + _fontes_vz() + "\n\n"
+        "/* Visual 2.0 (rodada 9, pacote valderez-design-2.0). Contraste dos pares usados:\n"
+        + "\n".join(f"   {c['texto']:<12} sobre {c['fundo']:<7} {c['razao']}:1 ({c['regra']})" for c in paleta.contrastes_vz())
+        + " */\n" + _vz() + "\n"
         "/* Nomes antigos, para as páginas ainda no base.css (tema escuro da Valderez).\n"
         "   Vêm ANTES dos temas: --on-accent, --accent-hover e --focus existem nos dois\n"
         "   conjuntos, e na mesma especificidade o tema (depois) é que vale. */\n"
