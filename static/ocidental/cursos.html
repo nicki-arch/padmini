@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6F1">
+{# Vitrine de cursos (rodada 9, Fase C; tela Produto-Cursos). Oculta no catálogo:
+   responde 404 até ligar. Cursos e filtros: conteudo/ocidental/produtos.yaml → cursos.
+   Os filtros são botões que escondem os cartões de outra área (sem recarregar). #}
+<title>Valderez Astrologia — Cursos</title>
+<meta name="robots" content="noindex">
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+<script src="/static/ocidental/me-avise.js" defer></script>
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
+</head>
+<body class="vz">
+{% set atual = "/cursos" %}{% include "ocidental/_cabecalho.html" %}
+{%- set c = cursos() %}
+<main id="conteudo">
+  <section class="secao degrade">
+    <div class="secao-cab"><div><span class="olho">Cursos</span><h1 class="t1">{{ c.titulo }}</h1></div>
+      <p>{{ c.lede }}</p></div>
+    <p class="miudo">{{ c.aviso }} <a href="/minhas-leituras">Minhas leituras</a>.</p>
+    <div class="filtros" role="group" aria-label="Filtrar por área">
+      <button type="button" class="chip" aria-pressed="true" data-area="">Todos</button>
+      {%- for f in c.filtros %}<button type="button" class="chip chip-breve" aria-pressed="false" data-area="{{ f }}">{{ f }}</button>{% endfor %}
+    </div>
+    <div class="grade-capas" id="lista-cursos" style="margin-top:28px">
+      {%- for item in c.itens %}
+      {%- set p = catalogo.produto(item.catalogo) if item.catalogo else none %}
+      {%- set ativo = p and p.estado == "ativo" %}
+      <div class="cartao capa" data-area="{{ item.area }}">
+        <div class="capa-img">{{ ilustracao("capa-curso") }}<span class="chip{% if not ativo %} chip-breve{% endif %}">{{ "Disponível" if ativo else "Em breve" }}</span></div>
+        <div class="capa-corpo">
+          <span class="miudo">{{ item.area }} · {{ item.nivel }} · {{ item.modulos }} módulos</span>
+          <h2 class="t3">{{ item.titulo }}</h2>
+          <p>{{ item.resumo }}</p>
+          {%- if p and p.estado != "oculto" %}
+          <a class="bt {{ 'bt-1' if ativo else 'bt-2' }} bt-p" href="{{ p.rota }}">{{ "Ver o curso" if ativo else "Me avise quando abrir" }}</a>
+          {%- else %}
+          <a class="bt bt-2 bt-p" href="#me-avise">Me avise quando abrir</a>
+          {%- endif %}
+        </div>
+      </div>
+      {%- endfor %}
+    </div>
+  </section>
+  <section class="secao" style="max-width:720px">{% set aviso_produto = catalogo.produto("cursos") %}{% include "ocidental/_me_avise.html" %}</section>
+</main>
+{% include "ocidental/_rodape.html" %}
+<script>
+document.querySelectorAll(".filtros button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".filtros button").forEach((x) => { const sim = x === b; x.setAttribute("aria-pressed", String(sim)); x.classList.toggle("chip-breve", !sim); });
+  document.querySelectorAll("#lista-cursos [data-area]").forEach((c) => { c.hidden = !!b.dataset.area && c.dataset.area !== b.dataset.area; });
+}));
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6F1">
+{# Página de produto da versão ocidental (rodada 9, Fase C; telas Produto-Sinastria,
+   -Numerologia, -Tarot, -Comunidade, -Curso e -Consulta do pacote 2.0). Um modelo só:
+   capa, o que você recebe, como funciona, trecho real, quem revisa, perguntas e o
+   "me avise". Aparece com o produto `em_breve` no catálogo (ou `ativo` sem página
+   própria); `oculto` = 404. Texto: conteudo/ocidental/produtos.yaml (`tp`); o trecho
+   real vem da base de textos (produtos_ocidental.trecho_real). Sem preço: o produto
+   não vende enquanto não estiver no ofertas.yaml e ativo. #}
+<title>Valderez Astrologia — {{ produto.nome }}</title>
+<meta name="description" content="{{ produto.resumo }}">
+<link rel="canonical" href="https://padmini.com.br{{ produto.rota }}">
+{%- if tp.rascunho %}
+<meta name="robots" content="noindex">
+{%- endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Valderez Astrologia">
+<meta property="og:title" content="{{ produto.nome }} — Valderez Astrologia">
+<meta property="og:description" content="{{ produto.resumo }}">
+<meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
+<meta name="twitter:card" content="summary_large_image">
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+<script src="/static/afiliado.js" defer></script>
+<script src="/static/ocidental/me-avise.js" defer></script>
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+</head>
+<body class="vz">
+{% set atual = produto.rota %}{% include "ocidental/_cabecalho.html" %}
+{%- set trecho = trecho_real(produto.chave) %}
+<main id="conteudo">
+  <section class="produto-topo degrade">
+    <div class="produto-texto">
+      <span class="chip{% if produto.estado != 'ativo' %} chip-breve{% endif %}">{{ "Disponível" if produto.estado == "ativo" else "Em breve" }}</span>
+      <span class="olho">{{ tp.rotulo }}</span>
+      <h1 class="t1">{{ tp.titulo }}</h1>
+      <p class="lead">{{ tp.lede }}</p>
+      <ul class="selos selos-leves">{% for s in tp.selos %}<li>{{ s }}</li>{% endfor %}</ul>
+      <div class="produto-aviso">{% set aviso_produto = produto %}{% include "ocidental/_me_avise.html" %}
+        {%- if catalogo.ativo("mapa") and produto.chave != "mapa" %}
+        <p class="miudo" style="text-align:center;margin-top:12px">Enquanto isso, <a href="/mapa">veja o seu mapa natal grátis</a>.</p>
+        {%- endif %}
+      </div>
+    </div>
+    {%- if produto.vaga %}{{ ilustracao(produto.vaga, classe="produto-capa", carregar="eager") }}{% endif %}
+  </section>
+
+  <section class="secao">
+    <div class="secao-cab"><div><span class="olho">O que você recebe</span><h2 class="t2">{{ tp.recebe_titulo }}</h2></div></div>
+    <div class="grade-recebe">
+      {%- for r in tp.recebe %}
+      <div class="cartao dim"><span class="ico-recebe" aria-hidden="true">{{ marca.roda(22) }}</span><h3>{{ r.titulo }}</h3><p>{{ r.texto }}</p></div>
+      {%- endfor %}
+    </div>
+  </section>
+
+  <section class="secao secao-papel">
+    <ol class="tres-passos" style="list-style:none;margin:0;padding:0">
+      {%- for p in tp.passos %}
+      <li><span class="n" aria-hidden="true">{{ loop.index }}</span><h3>{{ p.titulo }}</h3><p>{{ p.texto }}</p></li>
+      {%- endfor %}
+    </ol>
+  </section>
+
+  {%- if trecho.texto %}
+  <section class="secao trecho">
+    <div><span class="olho">Antes de decidir</span><h2 class="t2">Veja como é <em>por dentro</em></h2></div>
+    <article class="cartao">
+      <span class="ponto">{{ trecho.rotulo }}</span>
+      <h3>{{ trecho.titulo }}</h3>
+      <p>{{ trecho.texto }}</p>
+      {%- if trecho.nota %}<p class="miudo">{{ trecho.nota }}</p>{% endif %}
+    </article>
+  </section>
+  {%- endif %}
+
+  <section class="secao secao-noite quem quem-curto" id="quem-revisa">
+    <div class="arco foto-grande" aria-hidden="true">{{ marca.roda(120, clara=True) }}</div>
+    <div class="quem-texto"><span class="olho">Quem revisa</span><h2>Dona Valderez</h2><p class="citacao">{{ revisao("quem_revisa") }}</p></div>
+  </section>
+
+  <section class="secao perguntas-produto">
+    <div>
+      <h2 class="t2">Perguntas <em>frequentes</em></h2>
+      <div class="faq">
+        {%- for item in tp.faq %}
+        <details{% if loop.first %} open{% endif %}><summary>{{ item.pergunta }}</summary><p>{{ item.resposta }}</p></details>
+        {%- endfor %}
+      </div>
+    </div>
+    {%- set outras = catalogo.visiveis() | rejectattr("chave", "equalto", produto.chave) | list %}
+    {%- if outras %}
+    <aside class="outras"><span class="olho">Outras leituras</span>
+      {%- for o in outras[:3] %}
+      <a class="cartao outra" href="{{ o.rota }}">{{ ilustracao(o.vaga, classe="outra-img") if o.vaga else "" }}<span><b>{{ o.nome }}</b><span class="miudo">{{ o.resumo }}</span></span></a>
+      {%- endfor %}
+    </aside>
+    {%- endif %}
+  </section>
+</main>
+{% include "ocidental/_rodape.html" %}
+</body>
+</html>

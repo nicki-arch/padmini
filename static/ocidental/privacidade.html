@@ -1,29 +1,62 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="{{ cores.ground }}">
+<meta name="theme-color" content="#FBF6F1">
+{# Rodada 9, Fase C: tela Sistema-Legal do pacote valderez-design-2.0 (abas, índice,
+   "Em resumo"). O TEXTO jurídico é o mesmo de antes: quem é o controlador dos dados
+   e a operadora do pagamento (Cakto) não mudam nesta rodada. #}
 <title>Valderez Astrologia — Política de Privacidade</title>
 <meta name="description" content="Como a Valderez Astrologia coleta, usa e protege seus dados (LGPD).">
 <meta name="robots" content="noindex">
 {% include "ocidental/_head_valderez.html" %}
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
-<link rel="stylesheet" href="/static/valderez/componentes.css">
+<link rel="stylesheet" href="/static/valderez/v2.css">
 </head>
-<body>
+<body class="vz">
 {% set atual = "/privacidade" %}{% include "ocidental/_cabecalho.html" %}
 
-<main id="conteudo" class="section container">
-<article class="article">
-  <p class="eyebrow">Valderez Astrologia</p>
-  <h1>Política de Privacidade</h1>
-  <p class="caption">Última atualização: 5 de outubro de 2026. Controlador dos dados: <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Encarregado de dados (LGPD): <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
+<main id="conteudo">
+  <section class="secao degrade legal-topo">
+    <nav class="legal-abas" aria-label="Textos legais"><a class="chip chip-atual" aria-current="page" href="/privacidade">Privacidade</a><a class="chip" href="/termos">Termos de uso</a><a class="chip" href="/privacidade#cookies">Cookies</a></nav>
+    <h1 class="t1">Política de <em>Privacidade</em></h1>
+  </section>
+  <section class="secao legal">
+    <nav class="legal-indice" aria-label="Nesta página">
+      <span class="olho">Nesta página</span>
+      <ol>
+        <li><a href="#s1">1. Quais dados coletamos</a></li>
+        <li><a href="#s2">2. Dados de outra pessoa</a></li>
+        <li><a href="#s3">3. Para que usamos e com qual base legal</a></li>
+        <li><a href="#s4">4. Com quem compartilhamos</a></li>
+        <li><a href="#s5">5. Transferência internacional</a></li>
+        <li><a href="#cookies">6. Cookies e armazenamento no navegador</a></li>
+        <li><a href="#s7">7. Por quanto tempo guardamos</a></li>
+        <li><a href="#s8">8. Segurança</a></li>
+        <li><a href="#s9">9. Seus direitos</a></li>
+        <li><a href="#s10">10. Menores de idade</a></li>
+        <li><a href="#s11">11. Alterações</a></li>
+      </ol>
+    </nav>
+    <article class="legal-texto">
+  <p class="legal-data">Última atualização: 5 de outubro de 2026. Controlador dos dados: <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Encarregado de dados (LGPD): <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
+
+  <div class="legal-resumo">
+    <p><strong>Em resumo</strong></p>
+    <ul>
+      <li>Usamos seus dados de nascimento só para calcular e entregar a sua leitura.</li>
+      <li>Não guardamos CPF nem dados de cartão.</li>
+      <li>Cookies de medição e anúncios só com a sua permissão.</li>
+      <li>Você pode pedir para apagar tudo, a qualquer momento.</li>
+    </ul>
+  </div>
+
 
   <p>Esta política explica quais dados pessoais a Valderez Astrologia (padmini.com.br) coleta, para que usa, com quem compartilha e quais são os seus direitos, conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 — LGPD).</p>
 
-  <h2>1. Quais dados coletamos</h2>
+  <h2 id="s1">1. Quais dados coletamos</h2>
   <ul>
     <li><strong>Dados de nascimento</strong> que você informa para gerar as leituras: data, hora e cidade de nascimento, e o seu nome. No produto de casal, também os da outra pessoa.</li>
     <li><strong>Numerologia</strong>: o nome completo de registro e a data de nascimento que você informa.</li>
@@ -34,10 +67,10 @@
     <li><strong>Dados de navegação</strong>: páginas visitadas, dispositivo e origem do acesso, usados de forma agregada para medir e melhorar o site.</li>
   </ul>
 
-  <h2>2. Dados de outra pessoa</h2>
+  <h2 id="s2">2. Dados de outra pessoa</h2>
   <p>Ao informar os dados de nascimento de outra pessoa (por exemplo, na sinastria do casal), você declara que ela sabe e concorda com esse uso. Esses dados servem apenas para gerar a leitura pedida.</p>
 
-  <h2>3. Para que usamos e com qual base legal</h2>
+  <h2 id="s3">3. Para que usamos e com qual base legal</h2>
   <ul>
     <li><strong>Calcular e entregar as leituras</strong> que você pede e compra — execução de contrato (art. 7º, V).</li>
     <li><strong>Enviar o link do relatório</strong> e comunicações sobre a sua compra — execução de contrato.</li>
@@ -50,7 +83,7 @@
     <li><strong>Segurança, prevenção a fraudes e melhoria do site</strong> — legítimo interesse (art. 7º, IX), sempre com o mínimo de dados necessário.</li>
   </ul>
 
-  <h2>4. Com quem compartilhamos</h2>
+  <h2 id="s4">4. Com quem compartilhamos</h2>
   <p>Não vendemos seus dados. Usamos prestadores que operam o serviço em nosso nome, cada um com acesso apenas ao necessário:</p>
   <ul>
     <li><strong>Cakto</strong> — processamento do pagamento e programa de afiliados.</li>
@@ -63,7 +96,7 @@
     <li>Autoridades públicas, quando exigido por lei ou ordem judicial.</li>
   </ul>
 
-  <h2>5. Transferência internacional</h2>
+  <h2 id="s5">5. Transferência internacional</h2>
   <p>Alguns desses prestadores armazenam ou processam dados fora do Brasil (por exemplo, nos Estados Unidos e no Canadá). Nesses casos, adotamos prestadores com garantias contratuais de proteção de dados, conforme o art. 33 da LGPD.</p>
 
   <h2 id="cookies">6. Cookies e armazenamento no navegador</h2>
@@ -71,7 +104,7 @@
   <p><strong>De medição e de anúncios</strong> (só com a sua permissão): quando você clica em “Aceitar” no aviso de cookies, carregamos o PostHog (estatísticas de uso do site), o Pixel da Meta (Facebook e Instagram), o Pixel do TikTok e a tag do Google (Google Analytics e Google Ads). Eles servem para medir as visitas e saber quais anúncios trazem pessoas ao site. Registram, por exemplo, que uma página de produto foi vista ou que uma amostra foi pedida — <strong>nunca</strong> os seus dados de nascimento, nome, e-mail ou a pergunta do tarot. Base legal: consentimento (art. 7º, I).</p>
   <p>Se você recusar, nenhum deles é carregado e o site funciona do mesmo jeito. A sua escolha vale por 12 meses; para mudar a qualquer momento, use o link “Preferências de cookies” no rodapé das páginas. Ao retirar a permissão, apagamos os cookies que esses serviços gravaram neste site. O pagamento acontece na página da Cakto, que tem os próprios cookies e a própria política.</p>
 
-  <h2>7. Por quanto tempo guardamos</h2>
+  <h2 id="s7">7. Por quanto tempo guardamos</h2>
   <ul>
     <li><strong>Dados de compra</strong>: pelo prazo exigido pela legislação fiscal e de defesa do consumidor (em geral, 5 anos).</li>
     <li><strong>Lista de espera</strong>: até você pedir para sair ou até 24 meses sem nenhuma interação.</li>
@@ -79,20 +112,19 @@
     <li><strong>Pergunta do tarot</strong>: não é guardada por nós (nem na amostra por e-mail); o texto por IA gerado com ela também não é guardado.</li>
   </ul>
 
-  <h2>8. Segurança</h2>
+  <h2 id="s8">8. Segurança</h2>
   <p>Adotamos medidas técnicas e organizacionais para proteger seus dados, como conexão criptografada, acesso restrito ao banco de dados e links de relatório assinados individualmente. Nenhum sistema é totalmente imune a incidentes; se houver um incidente relevante, comunicaremos os afetados e a ANPD, conforme a LGPD.</p>
 
-  <h2>9. Seus direitos</h2>
+  <h2 id="s9">9. Seus direitos</h2>
   <p>Você pode, a qualquer momento e sem custo: confirmar se tratamos seus dados e acessá-los; corrigi-los; pedir anonimização, bloqueio ou eliminação; pedir portabilidade; saber com quem foram compartilhados; e retirar o consentimento, o que inclui sair da lista de espera e se descadastrar dos e-mails pelo link que vai em cada um (art. 18 da LGPD). Escreva para <strong>contato@pedrosperbmonteiro.com.br</strong>. Respondemos em até 15 dias. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).</p>
 
-  <h2>10. Menores de idade</h2>
+  <h2 id="s10">10. Menores de idade</h2>
   <p>A Valderez Astrologia é destinada a maiores de 18 anos. Não coletamos intencionalmente dados de menores.</p>
 
-  <h2>11. Alterações</h2>
+  <h2 id="s11">11. Alterações</h2>
   <p>Podemos atualizar esta política. A versão vigente fica sempre nesta página, com a data de atualização no topo. Mudanças relevantes serão avisadas a quem estiver na lista ou tiver comprado.</p>
-
-  <p style="margin-top:30px"><a href="/">← Voltar ao início</a></p>
-</article>
+    </article>
+  </section>
 </main>
 
 {% include "ocidental/_rodape.html" %}

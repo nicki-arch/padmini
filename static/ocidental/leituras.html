@@ -6,8 +6,7 @@
 <meta name="theme-color" content="{{ cores.ground }}">
 {# Todas as leituras (rodada 9): montada do catálogo (conteudo/ocidental/catalogo.yaml),
    só os produtos `ativo` e `em_breve`, na ordem do YAML. Preço só com a venda aberta
-   e o produto ativo (catalogo.vende). A Fase C veste esta página com a tela
-   Produto-Catalogo do pacote 2.0. #}
+   e o produto ativo (catalogo.vende). Tela Produto-Catalogo do pacote 2.0. #}
 {%- set tl = catalogo.textos().leituras %}
 <title>Valderez Astrologia — {{ tl.titulo }}</title>
 <meta name="description" content="{{ tl.sub }}">
@@ -30,7 +29,7 @@
 
 <main id="conteudo">
   <section class="secao degrade">
-    <div class="secao-cab"><div><span class="olho">Leituras</span><h1 class="t1">{{ tl.titulo }}</h1></div><p>{{ tl.sub }}</p></div>
+    <div class="secao-cab"><div><span class="olho">Leituras</span>{%- set _t = tl.titulo.rsplit(" ", 1) %}<h1 class="t1">{{ _t[0] }} <em>{{ _t[1] }}</em></h1></div><p>{{ tl.sub }}</p></div>
     <div class="grade-capas">
       {%- for p in catalogo.visiveis() %}
       <div class="cartao capa">
@@ -50,6 +49,11 @@
       </div>
       {%- endfor %}
     </div>
+  </section>
+
+  <section class="secao secao-noite quem quem-curto" id="quem-revisa">
+    <div class="arco foto-grande" aria-hidden="true">{{ marca.roda(120, clara=True) }}</div>
+    <div class="quem-texto"><span class="olho">Quem revisa</span><h2>Dona Valderez</h2><p class="citacao">{{ revisao("quem_revisa") }}</p></div>
   </section>
 </main>
 

@@ -207,9 +207,39 @@ def montar_amostra(mapa: dict) -> dict:
     }
 
 
-def montar_secoes(mapa: dict) -> dict:
+def dimensoes_completo(mapa: dict) -> list[dict]:
+    """Leitura completa por dimensões (rodada 9, tela Site-Leitura): para cada
+    dimensão ativa, o texto inteiro do ponto no signo, o da casa (com hora) e os
+    aspectos DO MAPA que tocam aquele ponto, cada um com o seu texto."""
+    import ilustracoes
+    itens = []
+    principais = aspectos_principais(mapa)
+    for d in dimensoes_amostra(mapa):
+        if d["estado"] != "ativo":
+            itens.append(d)
+            continue
+        ponto, p = d["ponto"], mapa["pontos"][d["ponto"]]
+        if p.get("signo_incerto"):
+            texto = " ".join(texto_signo(ponto, s) for s in p["signos_possiveis"])
+        else:
+            texto = texto_signo(ponto, p["signo"])
+        casa = p.get("casa") if ponto in mo.PLANETAS and mapa["tem_hora"] else None
+        aspectos = [{"titulo": titulo_aspecto(a), "tipo": a["tipo"], "orbe": mo.grau_minuto(a["orbe"]),
+                     "com": mo.PONTO_PT[a["b"] if a["a"] == ponto else a["a"]],
+                     "texto": texto_aspecto(a["a"], a["b"], a["tipo"])}
+                    for a in principais if ponto in (a["a"], a["b"])]
+        vaga_planeta = f"planeta-{ponto}" if f"planeta-{ponto}" in ilustracoes.VAGAS else d["vaga"]
+        itens.append({**{k: v for k, v in d.items() if k != "trecho"}, "texto": texto, "casa": casa,
+                      "texto_casa": texto_casa(ponto, casa) if casa else "", "aspectos": aspectos,
+                      "vaga_planeta": vaga_planeta})
+    return itens
+
+
+def montar_secoes(mapa: dict, omitir: tuple = ()) -> dict:
     """O relatório completo em seções: {título: [parágrafos]} (mesmo formato da
-    védica, que o PDF, o live e o prompt da IA já sabem ler)."""
+    védica, que o PDF, o live e o prompt da IA já sabem ler).
+    `omitir`: pontos que a página já mostra nas dimensões (rodada 9) — saem da
+    tríade e das listas de planetas, para o texto não aparecer duas vezes."""
     s = {}
     avisos = []
     if not mapa["tem_hora"]:
@@ -221,10 +251,14 @@ def montar_secoes(mapa: dict) -> dict:
     if avisos:
         s["Antes de começar"] = avisos
 
-    s["Sol, Lua e Ascendente"] = [f"{i['nome']} em {i['signo']}. {i['texto']}" for i in triade(mapa)]
+    if not {"sol", "lua", "ascendente"} <= set(omitir):
+        s["Sol, Lua e Ascendente"] = [f"{i['nome']} em {i['signo']}. {i['texto']}" for i in triade(mapa)
+                                      if i["ponto"] not in omitir]
 
     planetas = []
     for ponto in ("mercurio", "venus", "marte", "jupiter", "saturno", "urano", "netuno", "plutao"):
+        if ponto in omitir:
+            continue
         p = mapa["pontos"][ponto]
         r = " (retrógrado)" if p.get("retrogrado") else ""
         planetas.append(f"{mo.PONTO_PT[ponto]} em {p['signo_pt']}{r}. {texto_signo(ponto, p['signo'])}")
@@ -235,7 +269,7 @@ def montar_secoes(mapa: dict) -> dict:
         s["Os planetas nas casas"] = [
             f"{mo.PONTO_PT[ponto]} na casa {mapa['pontos'][ponto]['casa']}. "
             f"{texto_casa(ponto, mapa['pontos'][ponto]['casa'])}"
-            for ponto in mo.PLANETAS]
+            for ponto in mo.PLANETAS if ponto not in omitir]
 
     s["Os aspectos principais"] = [
         f"{titulo_aspecto(a)}. {texto_aspecto(a['a'], a['b'], a['tipo'])}"
