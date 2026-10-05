@@ -1,32 +1,37 @@
-{# Rodapé da versão ocidental (pacote de design, componentes/rodape.html). Bloco
-   escuro. Os produtos vêm do catálogo (rodada 9; oculto não aparece). Links reais: minhas leituras, privacidade, termos, contato, código-fonte
-   (a publicação do código cumpre a AGPL do Swiss Ephemeris; ver CLAUDE.md) e
-   "Preferências de cookies" (consentimento.js mostra o link quando há o que
-   consentir). Quem inclui pode definir `nota_rodape` (HTML) com o aviso da página. #}
-<footer class="footer" data-theme="dark">
-  <div class="container footer-inner">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">{{ marca.svg() }}</span>
-      <span class="brand-name">Valderez<small>Astrologia</small></span>
+{# Rodapé da versão ocidental (rodada 9, pacote valderez-design-2.0): bloco noite
+   com a roda clara (static/valderez/roda-claro.svg). Os produtos vêm do catálogo
+   (oculto não aparece). Links: minhas leituras, lista, privacidade, termos,
+   contato, código-fonte (a publicação do código cumpre a AGPL do Swiss Ephemeris;
+   ver CLAUDE.md) e "Preferências de cookies" (consentimento.js mostra o link
+   quando há o que consentir). A frase sobre a revisão é a que é verdade hoje
+   (revisao.yaml). Quem inclui pode definir `nota_rodape` (HTML). #}
+<footer class="rod">
+  <div class="rod-in">
+    <div class="rod-marca">
+      <a class="marca" href="/" aria-label="Valderez Astrologia, início">{{ marca.roda(48, clara=True) }}<span class="marca-nome"><b>Valderez</b><i>Astrologia</i></span></a>
+      <p>{{ revisao("rodape") }}</p>
     </div>
-    <nav aria-label="Leituras">
-      {%- for p in catalogo.visiveis() %}
-      <a href="{{ p.rota }}">{{ p.nome }}{% if p.estado == "em_breve" %} (em breve){% endif %}</a>
-      {%- endfor %}
-      <a href="/leituras">Todas as leituras</a>
-    </nav>
-    <nav aria-label="Rodapé">
-      <a href="/minhas-leituras">Minhas leituras</a>
-      <a href="/privacidade">Privacidade</a>
-      <a href="/termos">Termos de uso</a>
-      <a href="mailto:contato@pedrosperbmonteiro.com.br">Contato</a>
-      <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
-      <a href="#" id="preferencias-cookies" hidden>Preferências de cookies</a>
-    </nav>
-    {# frase sobre a revisão da Dona Valderez: só diz "revisados" quando for verdade (revisao.yaml) #}
-    <p class="caption">{{ revisao("rodape") }}</p>
+    <div class="rod-cols">
+      <nav aria-label="Leituras">
+        {%- for p in catalogo.visiveis() %}
+        <a href="{{ p.rota }}">{{ p.nome }}{% if p.estado == "em_breve" %}&nbsp;<span class="rod-breve">(em breve)</span>{% endif %}</a>
+        {%- endfor %}
+        <a href="/leituras">Todas as leituras</a>
+      </nav>
+      <nav aria-label="Ajuda">
+        <a href="/minhas-leituras">Minhas leituras</a>
+        <a href="/lista">Lista de espera</a>
+        <a href="mailto:contato@pedrosperbmonteiro.com.br">Contato</a>
+      </nav>
+      <nav aria-label="Rodapé">
+        <a href="/termos">Termos</a>
+        <a href="/privacidade">Privacidade</a>
+        <a href="#" id="preferencias-cookies" hidden>Preferências de cookies</a>
+        <a href="https://github.com/nicki-arch/padmini" rel="noopener">Código-fonte</a>
+      </nav>
+    </div>
     {%- if nota_rodape is defined and nota_rodape %}
-    <p class="caption nota-rodape">{{ nota_rodape }}</p>
+    <p class="nota-rodape">{{ nota_rodape }}</p>
     {%- endif %}
   </div>
 </footer>

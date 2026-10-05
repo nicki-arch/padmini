@@ -117,6 +117,23 @@ async def _nao_encontrada(request: Request, exc: StarletteHTTPException):
             cores=paleta.tela("ocidental"), marca=marca, blog=blog, sem_menu=_captura_ligada())
         return Response(html, status_code=404, media_type="text/html; charset=utf-8")
     return await http_exception_handler(request, exc)
+@app.exception_handler(Exception)
+async def _erro_interno(request: Request, exc: Exception):
+    """Erro 500 (rodada 9, tela "Algo deu errado do nosso lado"): na ocidental, uma
+    página HTML para quem pediu página; API e védica, o texto de sempre. O alerta
+    para a equipe sai antes, no middleware _avisar_erro_500."""
+    log.exception("erro 500 em %s", request.url.path, exc_info=exc)
+    if (sistema.ativo() == "ocidental" and not request.url.path.startswith(_SEM_PAGINA_404)
+            and "text/html" in request.headers.get("accept", "")):
+        try:
+            html = _jinja.get_template("ocidental/404.html").render(
+                erro_500=True, cores=paleta.tela("ocidental"), marca=marca, blog=blog, sem_menu=_captura_ligada())
+            return Response(html, status_code=500, media_type="text/html; charset=utf-8")
+        except Exception:  # noqa: BLE001  (a página de erro nunca pode dar outro erro)
+            log.exception("erro 500: falha ao montar a página de erro")
+    return Response("Internal Server Error", status_code=500, media_type="text/plain")
+
+
 # Rotas da versão ocidental (/api/ocidental/*): existem sempre, qualquer que seja
 # a versão no ar — um link já entregue precisa abrir depois de uma troca.
 app.include_router(rotas_ocidental.rotas)
@@ -197,6 +214,12 @@ _jinja.globals["indice"] = textos.NOME_INDICE
 # e revisao.yaml. Usados pelo menu, rodapé, home, "me avise"...
 _jinja.globals["catalogo"] = catalogo
 _jinja.globals["revisao"] = textos.frase_revisao
+_jinja.globals["faq"] = textos.faq
+# Ilustrações trocáveis (rodada 9): o template pede a VAGA, nunca o arquivo
+# (conteudo/ocidental/ilustracoes.yaml; ilustracoes.py).
+import ilustracoes  # noqa: E402
+_jinja.globals["ilustracao"] = ilustracoes.tag
+_jinja.globals["ilustracao_url"] = ilustracoes.url
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:

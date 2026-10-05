@@ -48,15 +48,8 @@ def test_exemplos_variados():
     assert len({c["ponto_forte"] for c in cs}) == len(cs)
 
 
-def test_home_mostra_os_exemplos_calculados_e_diz_que_sao_ficticios(ocidental):
-    html = cliente.get("/").text
-    for c in ex.casais():
-        assert f'{c["nomes"]["a"]} &amp; {c["nomes"]["b"]}' in html
-        assert f'<div class="score">{c["indice"]}<span>' in html
-        assert c["ponto_forte"].lower() in html
-    assert html.count('class="rosa"') == len(ex.casais())
-    assert "nascimentos fictícios" in html
-    assert "/compatibilidade#como-fica" in html
+# rodada 9: a home do pacote 2.0 não tem mais os casais de exemplo; eles continuam na
+# página do casal (test_pagina_do_casal_mostra_como_fica_o_completo).
 
 
 def test_pagina_do_casal_mostra_como_fica_o_completo(ocidental):
@@ -128,7 +121,8 @@ def test_movimento_respeita_reduzir_movimento():
 
 
 def test_paginas_ocidentais_carregam_o_movimento(ocidental):
-    for rota in PAGINAS_OC:
+    # rodada 9: home e /mapa estão no visual 2.0 (a roda gira só com prefers-reduced-motion: no-preference, v2.css)
+    for rota in [r for r in PAGINAS_OC if r not in ("/", "/mapa")]:
         html = cliente.get(rota).text
         assert "/static/ocidental/movimento.css" in html and "/static/ocidental/movimento.js" in html, rota
 
@@ -157,7 +151,7 @@ def test_menu_com_os_quatro_produtos_em_todas_as_paginas(ocidental):
         html = cliente.get(rota).text
         # rodada visual (Valderez): o menu fica no cabeçalho (nav-desktop; no celular, o mesmo
         # _menu.html num details). O botão "Fazer meu mapa natal" não conta como item do menu.
-        menu = re.sub(r'<a class="button"[^>]*>.*?</a>', "", re.search(r'<nav class="nav-desktop".*?</nav>', html, re.S).group(0))
+        menu = re.search(r'<nav class="nav".*?</nav>', html, re.S).group(0)  # rodada 9: cabeçalho 2.0
         for destino in ("/compatibilidade", "/mapa", "/numerologia", "/tarot"):
             assert f'href="{destino}"' in menu, (rota, destino)
         atual = re.findall(r'href="([^"]+)" aria-current="page"', menu)
@@ -183,7 +177,10 @@ def test_json_ld_da_home_bate_com_a_pagina(ocidental):
     assert tipos == {"Organization", "WebSite", "FAQPage"}
     faq = next(g for g in dados["@graph"] if g["@type"] == "FAQPage")["mainEntity"]
     t = textos.da_pagina("home", "ocidental")
-    assert [q["name"] for q in faq] == [i["pergunta"] for i in t["faq"]["itens"]]
+    import catalogo
+    assert [q["name"] for q in faq] == [i["pergunta"] for i in textos.faq(t["faq"]["itens"], catalogo.vendas_abertas())]
+    for q in faq:
+        assert q["acceptedAnswer"]["text"].split()[0] in html  # a resposta é a mesma da página
     assert "aggregateRating" not in bloco and "review" not in bloco.lower()  # não temos avaliações
 
 

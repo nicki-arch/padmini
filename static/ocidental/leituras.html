@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -19,36 +19,38 @@
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/valderez/componentes.css">
+<link rel="stylesheet" href="/static/valderez/v2.css">
 <script src="/static/afiliado.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 </head>
-<body>
+<body class="vz">
 {% set atual = "/leituras" %}{% include "ocidental/_cabecalho.html" %}
 
-<main id="conteudo" class="section container">
-  <p class="eyebrow">Leituras</p>
-  <h1>{{ tl.titulo }}</h1>
-  <p class="lede">{{ tl.sub }}</p>
-  <div class="produtos" style="margin-top:32px">
-    {%- for p in catalogo.visiveis() %}
-    <div class="card prod{% if p.estado == 'ativo' %} anchor{% endif %}">
-      <span class="plab">{{ tl.rotulo_ativo if p.estado == "ativo" else tl.rotulo_em_breve }}</span>
-      <h2>{{ p.nome }}</h2>
-      <p>{{ p.resumo }}</p>
-      {%- if catalogo.vende(p.chave) and p.oferta and ofertas[p.oferta] %}
-      <div class="pprice">R${{ ofertas[p.oferta].preco | moeda }}</div>
-      {%- endif %}
-      {%- if p.estado == "ativo" %}
-      <a class="button" href="{{ p.rota }}">{{ p.botao or tl.botao_ativo }}</a>
-      {%- else %}
-      <a class="button button--secondary" href="{{ p.rota }}#me-avise">{{ tl.botao_em_breve }}</a>
-      {%- endif %}
+<main id="conteudo">
+  <section class="secao degrade">
+    <div class="secao-cab"><div><span class="olho">Leituras</span><h1 class="t1">{{ tl.titulo }}</h1></div><p>{{ tl.sub }}</p></div>
+    <div class="grade-capas">
+      {%- for p in catalogo.visiveis() %}
+      <div class="cartao capa">
+        <div class="capa-img">{{ ilustracao(p.vaga) if p.vaga else "" }}<span class="chip{% if p.estado != 'ativo' %} chip-breve{% endif %}">{{ tl.rotulo_ativo if p.estado == "ativo" else tl.rotulo_em_breve }}</span></div>
+        <div class="capa-corpo">
+          <h2 class="t3">{{ p.nome }}</h2>
+          <p>{{ p.resumo }}</p>
+          {%- if catalogo.vende(p.chave) and p.oferta and ofertas[p.oferta] %}
+          <p class="preco" style="font-size:40px">R${{ ofertas[p.oferta].preco | moeda }}</p>
+          {%- endif %}
+          {%- if p.estado == "ativo" %}
+          <a class="bt bt-1 bt-p" href="{{ p.rota }}">{{ p.botao or tl.botao_ativo }}</a>
+          {%- else %}
+          <a class="bt bt-2 bt-p" href="{{ p.rota }}#me-avise">{{ tl.botao_em_breve }}<span class="sr-only">: {{ p.nome }}</span></a>
+          {%- endif %}
+        </div>
+      </div>
+      {%- endfor %}
     </div>
-    {%- endfor %}
-  </div>
+  </section>
 </main>
 
 {% include "ocidental/_rodape.html" %}

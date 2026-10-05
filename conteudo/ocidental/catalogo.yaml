@@ -91,16 +91,31 @@ produtos:
 # As dimensões do mapa natal, na ordem da amostra. `ponto` é a chave do motor
 # (mapa_ocidental.py); `vaga`, a ilustração. As `em_breve` aparecem com cadeado.
 dimensoes_mapa:
-  - {chave: essencia, nome: Essência, ponto: sol, estado: ativo, vaga: dim-sol}
-  - {chave: emocoes, nome: Emoções, ponto: lua, estado: ativo, vaga: dim-lua}
-  - {chave: como-voce-chega, nome: Como você chega, ponto: ascendente, estado: ativo, vaga: dim-asc}
-  - {chave: mente, nome: Mente, ponto: mercurio, estado: ativo, vaga: dim-merc}
-  - {chave: amor, nome: Amor, ponto: venus, estado: ativo, vaga: dim-venus}
-  - {chave: acao, nome: Ação, ponto: marte, estado: ativo, vaga: dim-marte}
-  - {chave: carreira, nome: Carreira, estado: em_breve, vaga: dim-carreira}
-  - {chave: dinheiro, nome: Dinheiro, estado: em_breve, vaga: dim-dinheiro}
-  - {chave: familia, nome: Família, estado: em_breve, vaga: dim-familia}
-  - {chave: proposito, nome: Propósito, estado: em_breve, vaga: dim-proposito}
+  - {chave: essencia, nome: Essência, ponto: sol, rotulo: Sol, estado: ativo, vaga: dim-sol,
+     descricao: "Quem você é e o que te dá energia."}
+  - {chave: emocoes, nome: Emoções, ponto: lua, rotulo: Lua, estado: ativo, vaga: dim-lua,
+     descricao: "O que você sente e o que te acolhe."}
+  - {chave: como-voce-chega, nome: Como você chega, ponto: ascendente, rotulo: Ascendente, estado: ativo, vaga: dim-asc,
+     descricao: "A primeira impressão e o jeito de começar."}
+  - {chave: mente, nome: Mente, ponto: mercurio, rotulo: Mercúrio, estado: ativo, vaga: dim-merc,
+     descricao: "Como você pensa, aprende e conversa."}
+  - {chave: amor, nome: Amor, ponto: venus, rotulo: Vênus, estado: ativo, vaga: dim-venus,
+     descricao: "O que você valoriza nos afetos."}
+  - {chave: acao, nome: Ação, ponto: marte, rotulo: Marte, estado: ativo, vaga: dim-marte,
+     descricao: "Sua coragem e como vai atrás do que quer."}
+  - {chave: carreira, nome: Carreira, rotulo: Casa 10 e regente, estado: em_breve, vaga: dim-carreira,
+     descricao: "Vocação e como você se destaca."}
+  - {chave: dinheiro, nome: Dinheiro, rotulo: Casa 2 e Júpiter, estado: em_breve, vaga: dim-dinheiro,
+     descricao: "Sua relação com segurança e recursos."}
+  - {chave: familia, nome: Família, rotulo: Casa 4 e Lua, estado: em_breve, vaga: dim-familia,
+     descricao: "Raízes, casa e herança afetiva."}
+  - {chave: proposito, nome: Propósito, rotulo: Nodo Norte, estado: em_breve, vaga: dim-proposito,
+     descricao: "O caminho que pede para crescer."}
+
+# Na amostra, a dimensão em breve diz isto (a tela do pacote 2.0).
+dimensao_em_breve:
+  titulo: Chega em breve no seu mapa
+  texto: Quem tem o mapa completo recebe sem pagar de novo.
 
 # Texto do "me avise" (a mesma caixa no mapa natal com a venda fechada e nas
 # páginas `em_breve`). {produto} = o nome do produto, em minúsculas.

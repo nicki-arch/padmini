@@ -65,6 +65,9 @@ def da_pagina(pagina: str, sistema: str | None = None) -> dict:
 _REVISAO = yaml.safe_load((PASTA / "ocidental" / "revisao.yaml").read_text(encoding="utf-8")) or {}
 
 
+SELO = _REVISAO["selo"]  # só ao lado de um texto com `revisado: true`
+
+
 def tudo_revisado() -> bool:
     import montar_texto_ocidental as mt  # aqui dentro: montar_texto_ocidental importa este módulo
     revisados, total = mt.contagem_de_revisao()["_total"]
@@ -75,3 +78,16 @@ def frase_revisao(chave: str) -> str:
     """A frase `chave` de revisao.yaml na versão que é verdade hoje."""
     frase = _REVISAO[chave]
     return frase["quando_revisado" if tudo_revisado() else "enquanto_isso"]
+
+
+def faq(itens: list, vendas: bool) -> list[dict]:
+    """Perguntas prontas para mostrar (página e JSON-LD): sem as que dependem da
+    venda (`so_com_venda` / `so_sem_venda`) e com a resposta de revisao.yaml
+    quando o item diz `revisao: <chave>` (regra de honestidade)."""
+    saida = []
+    for i in itens:
+        if (i.get("so_com_venda") and not vendas) or (i.get("so_sem_venda") and vendas):
+            continue
+        resposta = frase_revisao(i["revisao"]) if i.get("revisao") else i["resposta"]
+        saida.append({"pergunta": i["pergunta"], "resposta": resposta})
+    return saida

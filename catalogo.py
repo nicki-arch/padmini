@@ -53,6 +53,8 @@ def validar(dados: dict) -> dict:
     for d in dados.get("dimensoes_mapa") or []:
         if d.get("estado") not in ("ativo", "em_breve"):
             raise CatalogoInvalido(f"catalogo.yaml: dimensão {d.get('chave')!r} com estado inválido.")
+        for campo in ("ponto", "rotulo", "descricao", "vaga"):
+            d.setdefault(campo, "")
     return dados
 
 
@@ -123,4 +125,4 @@ def dimensoes_mapa() -> list[dict]:
 
 def textos() -> dict:
     """A copy do catálogo (me avise, em breve, todas as leituras)."""
-    return {k: _dados.get(k) or {} for k in ("me_avise", "em_breve", "leituras")}
+    return {k: _dados.get(k) or {} for k in ("me_avise", "em_breve", "leituras", "dimensao_em_breve")}

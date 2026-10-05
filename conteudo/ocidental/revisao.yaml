@@ -58,3 +58,33 @@ lista_seo:
   enquanto_isso: >-
     O seu mapa natal, com a Dona Valderez, que estuda astrologia há mais de 40
     anos. Entre na lista de espera e receba o aviso da abertura.
+
+# o pé do menu do celular, a aside da amostra e o selo curto ao lado da foto
+assinatura:
+  quando_revisado: Textos revisados pela Dona Valderez, 40 anos de astrologia.
+  enquanto_isso: Com a Dona Valderez, 40 anos de astrologia.
+
+# a linha curta do topo da home e da lista (ao lado da foto/roda)
+selo_topo:
+  quando_revisado: revisa cada texto
+  enquanto_isso: está revendo cada texto
+
+# o olho (rótulo) do topo da home
+olho_home:
+  quando_revisado: Mapa natal · revisado pela Dona Valderez
+  enquanto_isso: Mapa natal · com a Dona Valderez
+
+# a pergunta "Quem escreve os textos?" da home
+faq_textos:
+  quando_revisado: >-
+    O mapa é calculado pelo nosso sistema. Os textos de cada posição foram
+    escritos para o mapa natal e revisados pela Dona Valderez, um por um.
+  enquanto_isso: >-
+    O mapa é calculado pelo nosso sistema. Os textos de cada posição foram
+    escritos para o mapa natal e estão passando pela Dona Valderez, um por um;
+    os que ela já aprovou levam o selo.
+
+# O SELO de um texto específico (amostra e leitura completa). Não tem as duas
+# versões: só aparece ao lado de um texto com `revisado: true` (o servidor manda
+# o selo junto com o texto; a página não tem esta frase escrita).
+selo: Revisado pela Dona Valderez

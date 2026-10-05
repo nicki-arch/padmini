@@ -110,8 +110,9 @@ def test_simbolo_da_valderez():
     assert 'fill="none"' in svg and "<circle" in svg and svg.count("<path") == 2 and "currentColor" in svg
     ref = (RAIZ / "docs" / "design" / "valderez-1.0" / "marca" / "simbolo-claro.svg").read_text(encoding="utf-8")
     assert "M32 5v54M5 32h54M13 13l38 38M13 51l38-38" in ref and 'r="24"' in ref  # o mesmo desenho
+    # rodada 9: o favicon é a roda dos 12 signos (pacote valderez-design-2.0)
     uri = marca.favicon_uri()
-    assert uri.startswith("data:image/svg+xml,") and paleta.VALDEREZ["dark"]["rose"][1:] in uri
+    assert uri.startswith("data:image/svg+xml,") and paleta.VZ["ouro"][1:] in uri
     assert (RAIZ / "static" / "valderez" / "favicon.svg").read_text(encoding="utf-8") == marca.favicon_svg()
 
 
@@ -197,7 +198,9 @@ def test_og_images_da_ocidental(nome):
     assert img.size == (1200, 630)
     cores = dict((c, n) for n, c in img.getcolors(1200 * 630))
     fundo = max(cores, key=cores.get)
-    assert fundo == paleta._rgb(paleta.VALDEREZ["dark"]["background"])
+    # rodada 9: a imagem da home (scripts/gerar_marca.py) é a roda no creme; as outras, até a fase C, no azul
+    esperado = paleta.VZ["creme"] if nome == "home" else paleta.VALDEREZ["dark"]["background"]
+    assert fundo == paleta._rgb(esperado)
     for antiga in ("#241522", "#e7a24a", "#e2a89d", "#2b1a29"):
         assert paleta._rgb(antiga) not in cores, f"og-oc-{nome}.png tem {antiga}"
 

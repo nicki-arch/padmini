@@ -111,7 +111,7 @@ def test_trocar_o_nome_e_uma_linha(ocidental, monkeypatch):
     monkeypatch.setitem(app_mod._jinja.globals, "indice", novo)
     textos._lidos.clear(); blog.todos.cache_clear()
     try:
-        for rota in ("/", "/compatibilidade"):
+        for rota in ("/compatibilidade",):  # rodada 9: a home não fala mais do índice (sinastria em breve)
             html = cliente.get(rota).text
             assert novo in html and "Índice Padmini" not in html, rota
         artigo = next(a for a in blog.todos() if a["slug"] == "como-ler-o-indice-padmini")

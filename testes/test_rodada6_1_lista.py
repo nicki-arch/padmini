@@ -24,9 +24,9 @@ def lista(monkeypatch):
 
 
 def test_mapa_natal_e_a_porta_de_entrada(lista):
-    h1 = re.search(r"<h1>(.*?)</h1>", lista, re.S).group(1)
+    h1 = re.search(r'<h1 class="t1">(.*?)</h1>', lista, re.S).group(1)
     assert "nasceu" in h1 and "dois" not in h1
-    lede = re.search(r'<p class="lede">(.*?)</p>', lista, re.S).group(1)
+    lede = re.search(r'<p class="lead">(.*?)</p>', lista, re.S).group(1)
     assert lede.index("mapa natal") < lede.index("sinastria")
     assert "O seu mapa natal — Valderez Astrologia" in lista and "A sinastria de vocês dois" not in lista
 
@@ -42,7 +42,7 @@ def test_sem_promessa_de_preco(lista):
     assert "o que se paga" not in lista
     assert not re.search(r"R\$\s?\d", lista)  # nem preço nem valor de fundador na lista
     assert not re.search(r"\d+\s?%", re.sub(r"<[^>]*>", " ", lista.split("<main", 1)[1].split("</main>")[0]))  # nem percentual de desconto
-    assert "Condição especial para quem está na lista" in lista
+    assert "Condição de fundador" in lista  # rodada 9: o selo da tela Site-Lista
 
 
 def test_revisao_da_dona_valderez(lista):
@@ -53,7 +53,7 @@ def test_copy_vem_do_yaml(lista):
     t = textos.da_pagina("lista", "ocidental")
     # o destaque da Dona Valderez saiu para revisao.yaml (regra de honestidade, rodada 9)
     for trecho in (t["seo"]["titulo"], t["hero"]["eyebrow"], textos.frase_revisao("lista_titulo"), t["formulario"]["botao"],
-                   t["pronto"]["titulo"], *(b["titulo"] for b in t["beneficios"])):
+                   t["pronto"]["titulo"], *(b["selo"] for b in t["beneficios"])):
         assert trecho in lista
     html = (RAIZ / "static" / "ocidental" / "lista.html").read_text(encoding="utf-8")
     assert "Sinastria do casal" not in html and "Entrar na lista</button>" not in html

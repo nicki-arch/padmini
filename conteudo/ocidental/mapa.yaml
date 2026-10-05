@@ -1,0 +1,98 @@
+# Valderez Astrologia (versão OCIDENTAL) — texto do /mapa (rodada 9: telas Site-Mapa,
+# Sistema-Calculando-celular e Site-Amostra do pacote valderez-design-2.0). Os três
+# estados (formulário → calculando → amostra) são a mesma página
+# (static/ocidental/mapa.html). Preço: ofertas.yaml (só com a venda aberta).
+# Dimensões: catalogo.yaml. Frases sobre a revisão: revisao.yaml.
+
+seo:
+  titulo: Valderez Astrologia — Mapa natal
+  descricao: >-
+    Seu mapa natal: o começo de cada dimensão (Sol, Lua, Ascendente, Mercúrio,
+    Vênus e Marte) na hora, de graça.
+  og_titulo: Seu mapa natal — Valderez Astrologia
+  og_descricao: O começo de cada dimensão do seu mapa natal, na hora. Amostra grátis.
+
+passos: [Seus dados, Calculando, Sua amostra]
+
+form:
+  olho: Mapa natal
+  titulo: Vamos montar o <em>seu</em> mapa
+  lede: >-
+    Com a data, a hora e a cidade do seu nascimento, calculamos onde estava
+    cada planeta. Você vê na hora o começo de cada dimensão, de graça.
+  itens:
+    - {titulo: "Essência, Emoções e Como você chega", sub: "Sol, Lua e Ascendente"}
+    - {titulo: "Mente, Amor e Ação", sub: "Mercúrio, Vênus e Marte"}
+    - {titulo: O resto do texto fica guardado, sub_venda: Você desbloqueia se quiser ir fundo,
+       sub_fechada: A leitura completa abre em breve}
+  titulo_cartao: Seus dados de nascimento
+  nome: Seu nome
+  nome_ajuda: A leitura é escrita para você, com o seu nome.
+  data: Data
+  hora: Hora
+  sem_hora: Não sei a hora em que nasci
+  hora_ajuda: Use a hora da certidão. Ela define o Ascendente e as casas.
+  cidade: Cidade de nascimento
+  cidade_ajuda: Escolha a cidade na lista para acertarmos o fuso.
+  botao: Ver meu mapa grátis
+  miudo: Usamos seus dados só para calcular e enviar a sua leitura.
+
+calculando:
+  titulo: Calculando o céu de
+  sub: Leva só alguns segundos.
+  etapas:
+    - Hora local e fuso da cidade
+    - Posição do Sol, da Lua e dos planetas
+    - Ascendente e casas
+    - Separando o começo de cada dimensão
+
+amostra:
+  olho: Mapa natal de
+  subtitulo: Sol, Lua e Ascendente
+  # O texto desfocado depois de cada trecho é ENFEITE (o mesmo em todo cartão):
+  # o texto pago nunca vai para o navegador.
+  fumo: >-
+    Esse traço aparece com mais força quando a vida pede escolha e você precisa
+    decidir entre o conhecido e o novo; nas relações próximas ele se mostra de
+    outro jeito, e há um ponto de atenção que vale conhecer.
+  desbloquear: Desbloquear o resto
+  avisar: Me avise quando abrir
+  sem_hora_titulo: Precisa da hora de nascimento
+  sem_hora_texto: Sem a hora não dá para calcular o Ascendente. Se descobrir a hora, refaça o mapa.
+  aspecto: O aspecto mais exato do seu mapa
+  corrigir: Corrigir meus dados
+  lateral_olho: Desbloquear meu mapa
+  lateral_titulo: Leia cada dimensão <em>inteira</em>
+  pagamento_unico: pagamento único
+  lateral_itens:
+    - As 6 dimensões completas
+    - Roda do mapa, casas e aspectos
+    - Novas dimensões sem custo extra
+    - PDF no seu e-mail, na hora
+  botao_comprar: Desbloquear por
+  pagamento: Pix ou cartão · pagamento seguro pela Cakto
+  email_foi: O resto da sua amostra foi para
+  email_reenviar: Reenviar o e-mail
+  casal_titulo: É um casal?
+  casal_texto: A sinastria cruza os dois mapas em 8 dimensões — também com amostra grátis.
+  casal_botao: Ver a sinastria
+
+faq:
+  titulo: Perguntas sobre o mapa natal
+  itens:
+    - pergunta: É a mesma coisa que o horóscopo?
+      resposta: >-
+        Não. O horóscopo usa só o signo do Sol. O mapa natal considera a posição
+        de todos os planetas no momento exato do seu nascimento — por isso duas
+        pessoas do mesmo signo podem ser tão diferentes.
+    - pergunta: E se eu não souber a hora?
+      resposta: >-
+        Dá para fazer. Sem a hora não há Ascendente nem casas, mas os planetas
+        nos signos e os aspectos entre eles estão todos lá — e o mapa avisa o
+        que ficou de fora.
+    - pergunta: Preciso criar conta?
+      resposta: >-
+        Não. Você preenche os dados e vê a amostra, sem cadastro nem senha.
+    - pergunta: Como recebo o mapa completo?
+      so_com_venda: true
+      resposta: Por e-mail, com um link pessoal, logo após a confirmação do pagamento.

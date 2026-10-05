@@ -25,30 +25,32 @@ def ocidental(monkeypatch):
 def test_hero_e_do_mapa_natal(ocidental):
     html = cliente.get("/").text
     hero = html[html.index('<section class="hero'):html.index("</section>")]
-    assert "nasceu" in hero and "Ver meu mapa natal" in hero
-    assert re.search(r'class="button" href="/mapa"', hero)  # rodada visual: botão principal do pacote
-    assert 'href="/compatibilidade"' in hero  # a sinastria continua a um clique
-    fim = html[html.rindex("<h2>"):]
-    assert 'class="button" href="/mapa"' in fim
+    # rodada 9 (tela Site-Home 2.0): a data de nascimento já no topo, e o botão leva ao /mapa
+    assert "nasceu" in hero and "Ver meu mapa grátis" in hero
+    assert 'action="/mapa"' in hero and 'id="h-data"' in hero
+    fim = html[html.rindex('<section class="secao fecho">'):]
+    assert 'class="bt bt-1" href="/mapa"' in fim
 
 
 def test_ordem_dos_cards_e_do_menu(ocidental):
-    html = cliente.get("/").text
-    cards = html[html.index('class="produtos"'):]
-    cards = cards[:cards.index("</section>")]
-    assert re.findall(r'<a class="button[^"]*" href="(/[a-z]+)"', cards) == ORDEM
-    assert 'prod anchor"' in cards[:cards.index("/compatibilidade")]  # o destaque é do mapa
+    # rodada 9: "Todas as leituras" segue a ordem do catálogo (mapa natal primeiro)
+    html = cliente.get("/leituras").text
+    assert re.findall(r'class="bt bt-[12] bt-p" href="(/[a-z]+)', html) == ORDEM
     for rota in ("/", "/mapa", "/tarot"):
-        menu = re.search(r'<nav class="nav-desktop".*?</nav>', cliente.get(rota).text, re.S).group(0)
-        menu = re.sub(r'<a class="button"[^>]*>.*?</a>', "", menu)  # o botão do cabeçalho não é item do menu
+        menu = re.search(r'<nav class="nav".*?</nav>', cliente.get(rota).text, re.S).group(0)
         # rodada 9: o menu vem do catálogo e termina em "Todas as leituras"
         assert re.findall(r'href="(/[a-z]+)"', menu) == ORDEM + ["/leituras"], rota
 
 
-def test_sinastria_continua_na_home_mais_abaixo(ocidental):
+def test_home_com_a_sinastria_em_breve_mostra_o_me_avise(ocidental):
+    """Rodada 9: a home do pacote 2.0 é do mapa natal; a sinastria aparece em "Chegando em
+    breve" quando está em breve (o conftest a deixa ativa: aqui, o catálogo de verdade)."""
+    import catalogo
+    catalogo.usar(catalogo.carregar())
+    app_mod._paginas_prontas.clear()
     html = cliente.get("/").text
-    assert html.index('class="produtos"') < html.index("As oito dimensões do casal") < html.index('class="galeria"')
-    assert html.count('class="rosa"') == 3
+    assert html.index('id="dimensoes"') < html.index('id="em-breve"')
+    assert 'href="/compatibilidade#me-avise"' in html
 
 
 def test_head_e_json_ld_falam_do_mapa(ocidental):
@@ -74,5 +76,8 @@ def test_precos_da_home_saem_das_ofertas(ocidental):
     import ofertas
     html = cliente.get("/").text
     of = ofertas.do_sistema("ocidental")
+    # rodada 9: na home, só o preço do mapa natal (tela Site-Home); os outros em "Todas as leituras"
+    assert f"R${ofertas.moeda(of['mapa']['preco'])}" in html
+    leituras = cliente.get("/leituras").text
     for p in ("mapa", "compat", "numerologia", "tarot"):
-        assert f"R${ofertas.moeda(of[p]['preco'])}" in html, p
+        assert f"R${ofertas.moeda(of[p]['preco'])}" in leituras, p

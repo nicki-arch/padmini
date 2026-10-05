@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="{{ cores.ground }}">
-{# Página de um produto `em_breve` do catálogo (rodada 9, Fase A): o nome, o resumo
-   e o "me avise". Sem preço e sem botão de compra. A Fase C troca por o modelo
-   completo (capa, o que você recebe, como funciona, trecho real, perguntas).
+{# Página de um produto `em_breve` do catálogo (rodada 9): o nome, o resumo, a capa
+   e o "me avise", no visual 2.0. Sem preço e sem botão de compra. A Fase C troca
+   pelo modelo completo (capa, o que você recebe, como funciona, trecho real, perguntas).
    Variável: `produto` (entrada de conteudo/ocidental/catalogo.yaml). #}
 <title>Valderez Astrologia — {{ produto.nome }} (em breve)</title>
 <meta name="description" content="{{ produto.resumo }} Em breve na Valderez Astrologia.">
@@ -18,25 +18,30 @@
 <meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/valderez/componentes.css">
+<link rel="stylesheet" href="/static/valderez/v2.css">
 <script src="/static/afiliado.js" defer></script>
 <script src="/static/ocidental/me-avise.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
 <script src="/static/ocidental/consentimento.js" defer></script>
 <script src="/static/analytics.js" defer></script>
 </head>
-<body>
+<body class="vz">
 {% set atual = produto.rota %}{% include "ocidental/_cabecalho.html" %}
 
-<main id="conteudo" class="section container narrow">
-  <p class="chip">{{ catalogo.textos().em_breve.eyebrow }}</p>
-  <h1>{{ produto.nome }}</h1>
-  <p class="lede">{{ produto.resumo }}</p>
-  {% set aviso_produto = produto %}{% include "ocidental/_me_avise.html" %}
-  {%- if catalogo.ativo("mapa") and produto.chave != "mapa" %}
-  <p style="margin-top:32px"><a href="/mapa">{{ catalogo.textos().em_breve.enquanto_isso }}</a></p>
-  {%- endif %}
-  <p><a href="/leituras">Todas as leituras</a></p>
+<main id="conteudo">
+  <section class="mapa-form degrade">
+    <div class="mapa-intro">
+      <span class="chip chip-breve">{{ catalogo.textos().em_breve.eyebrow }}</span>
+      <h1 class="t1">{{ produto.nome }}</h1>
+      <p class="lead">{{ produto.resumo }}</p>
+      {%- if produto.vaga %}{{ ilustracao(produto.vaga, classe="dim-img", carregar="eager") }}{% endif %}
+      {%- if catalogo.ativo("mapa") and produto.chave != "mapa" %}
+      <p><a href="/mapa">{{ catalogo.textos().em_breve.enquanto_isso }}</a></p>
+      {%- endif %}
+      <p><a href="/leituras">Todas as leituras</a></p>
+    </div>
+    <div>{% set aviso_produto = produto %}{% include "ocidental/_me_avise.html" %}</div>
+  </section>
 </main>
 
 {% include "ocidental/_rodape.html" %}

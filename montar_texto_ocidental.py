@@ -14,6 +14,8 @@ quantos faltam — é a lista de trabalho da família do Pedro
 from functools import lru_cache
 from pathlib import Path
 
+import re
+
 import yaml
 
 import textos
@@ -134,6 +136,58 @@ def triade(mapa: dict) -> list[dict]:
             texto = texto_signo(ponto, p["signo"])
         itens.append({"ponto": ponto, "nome": mo.PONTO_PT[ponto], "signo": _nome_signo(p),
                       "grau": p["grau_texto"], "texto": texto})
+    return itens
+
+
+# --------------------------------------------------------------------------
+# Amostra por dimensões (rodada 9). A tela mostra, para cada dimensão ATIVA do
+# catálogo (conteudo/ocidental/catalogo.yaml), só o começo do texto real dela
+# (1 ou 2 frases). O resto que aparece desfocado na tela é enfeite fixo do
+# template: o texto pago nunca vai para o navegador.
+# --------------------------------------------------------------------------
+_FIM_DE_FRASE = re.compile(r"(?<=[.!?])\s+(?=[A-ZÀ-Ý\"“])")
+MAX_TRECHO = 260
+
+
+def trecho(texto: str) -> str:
+    """As primeiras 1–2 frases (a segunda só se couber em MAX_TRECHO caracteres)."""
+    frases = _FIM_DE_FRASE.split((texto or "").strip())
+    if not frases or not frases[0]:
+        return ""
+    saida = frases[0]
+    if len(frases) > 1 and len(saida) + 1 + len(frases[1]) <= MAX_TRECHO:
+        saida += " " + frases[1]
+    return saida
+
+
+def revisado_signo(ponto: str, signo: str) -> bool:
+    """O texto daquele ponto naquele signo tem `revisado: true`? (selo da Dona Valderez)"""
+    no = (base("ascendente").get(signo) if ponto == "ascendente"
+          else base("planetas_signos").get(ponto, {}).get(signo))
+    return bool(isinstance(no, dict) and no.get("revisado") is True)
+
+
+def dimensoes_amostra(mapa: dict) -> list[dict]:
+    """Um item por dimensão do catálogo, na ordem dele. Ativa com o ponto no mapa:
+    o signo, o grau, o trecho, se o texto é revisado e a vaga da ilustração do
+    signo. Sem o ponto (Ascendente sem hora) ou em breve: só o nome e o estado."""
+    import catalogo
+    itens = []
+    for d in catalogo.dimensoes_mapa():
+        item = {"chave": d["chave"], "nome": d["nome"], "rotulo": d["rotulo"], "descricao": d["descricao"],
+                "estado": d["estado"], "vaga": d["vaga"]}
+        p = mapa["pontos"].get(d["ponto"]) if d["estado"] == "ativo" and d["ponto"] else None
+        if d["estado"] == "ativo" and p is None:
+            item["estado"] = "sem_hora"
+        elif p is not None:
+            signo = p["signo"]
+            item.update({"ponto": d["ponto"], "ponto_pt": mo.PONTO_PT[d["ponto"]], "signo": signo,
+                         "signo_pt": _nome_signo(p), "grau": p["grau_texto"],
+                         "trecho": trecho(texto_signo(d["ponto"], signo)),
+                         "revisado": revisado_signo(d["ponto"], signo), "vaga": f"signo-{signo}"})
+            if item["revisado"]:
+                item["selo"] = textos.SELO  # regra de honestidade: o selo vem só com texto revisado
+        itens.append(item)
     return itens
 
 

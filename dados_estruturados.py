@@ -21,6 +21,8 @@ def _script(dados: dict) -> str:
 
 
 def home(t: dict) -> str:
+    import catalogo
+    import textos
     """O bloco da home ocidental, a partir de conteudo/ocidental/home.yaml."""
     return _script({"@context": "https://schema.org", "@graph": [
         {"@type": "Organization", "@id": f"{SITE}/#org", "name": "Valderez Astrologia", "url": f"{SITE}/",
@@ -30,5 +32,5 @@ def home(t: dict) -> str:
         {"@type": "FAQPage", "@id": f"{SITE}/#perguntas", "mainEntity": [
             {"@type": "Question", "name": _texto(i["pergunta"]),
              "acceptedAnswer": {"@type": "Answer", "text": _texto(i["resposta"])}}
-            for i in t["faq"]["itens"]]},
+            for i in textos.faq(t["faq"]["itens"], catalogo.vendas_abertas())]},
     ]})

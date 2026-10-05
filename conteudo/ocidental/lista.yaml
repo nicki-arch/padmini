@@ -17,20 +17,21 @@ seo:
   og_descricao: Estamos abrindo. Entre na lista e seja avisado primeiro.
 
 hero:
-  eyebrow: Valderez Astrologia · lista de espera
-  titulo: O céu de quando você <em>nasceu</em>, lido com cuidado. Está quase abrindo.
+  eyebrow: Lista de espera
+  titulo: O céu de quando você <em>nasceu</em>, lido com cuidado.
   lede: >-
-    O seu mapa natal: o Sol, a Lua, o Ascendente e cada planeta, calculados
-    para a data, a hora e a cidade do seu nascimento. E, se quiser, a sinastria
-    do casal — o que os mapas de vocês dois dizem juntos. Entre na lista e seja
-    avisado primeiro.
+    O seu mapa natal e, em breve, a sinastria do casal — com a Dona Valderez,
+    que estuda astrologia há mais de 40 anos. Está quase abrindo.
 
 beneficios:
   - titulo: Aviso no dia da abertura
+    selo: Aviso no dia da abertura
     texto: Você fica sabendo antes de todo mundo, por e-mail (e pelo WhatsApp, se quiser).
   - titulo: Condição especial para quem está na lista
+    selo: Condição de fundador
     texto: No lançamento, quem entrou na lista tem uma condição de fundador. Os detalhes chegam no aviso da abertura.
   - titulo: Amostra grátis, como sempre
+    selo: Amostra grátis
     texto: Você vê o seu Sol, a sua Lua e o seu Ascendente antes de decidir qualquer coisa.
 
 # O destaque sobre a Dona Valderez mora em revisao.yaml (lista_titulo, lista_texto):

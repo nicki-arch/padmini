@@ -43,8 +43,8 @@ def ocidental(monkeypatch):
 def test_404_da_ocidental_e_a_tela_do_pacote_com_status_404(ocidental):
     r = cliente.get("/uma-pagina-que-nao-existe", headers=HTML)
     assert r.status_code == 404 and r.headers["content-type"].startswith("text/html")
-    assert "Esta página não foi encontrada" in r.text and 'href="/"' in r.text
-    assert '<header class="header"' in r.text and "Valderez Astrologia" in r.text
+    assert "Esta página <em>não foi encontrada</em>" in r.text and 'href="/"' in r.text
+    assert '<header class="cab"' in r.text and "Valderez Astrologia" in r.text  # rodada 9: visual 2.0
     # rota que existe mas diz 404 (estilo sem chave) também
     assert cliente.get("/estilo", headers=HTML).status_code == 404
 
@@ -70,18 +70,24 @@ def test_404_da_api_e_da_vedica_continuam_json(ocidental, monkeypatch):
 # ------------------------------------------------------------------ páginas vestidas
 @pytest.mark.parametrize("rota", VESTIDAS)
 def test_paginas_vestidas_nao_carregam_o_base_css(rota, ocidental):
+    # rodada 9: home, /mapa, /lista, 404, "em breve" e /leituras estão no visual 2.0 (v2.css);
+    # as outras ainda no componentes.css até a fase C. Nenhuma no base.css.
     html = cliente.get(rota).text
-    assert "/static/base.css" not in html and "/static/valderez/componentes.css" in html, rota
-    assert '<html lang="pt-BR" data-theme="light">' in html, rota
+    assert "/static/base.css" not in html, rota
+    if rota in ("/", "/mapa", "/lista"):
+        assert "/static/valderez/componentes.css" not in html, rota
+        assert "/static/valderez/v2.css" in html and '<body class="vz">' in html, rota
+    else:
+        assert "/static/valderez/componentes.css" in html or "/static/valderez/v2.css" in html, rota
 
 
 def test_home_mantem_as_secoes(ocidental):
+    # rodada 9: as seções da tela Site-Home do pacote 2.0
     html = cliente.get("/").text
-    for trecho in ('class="produtos"', "As oito dimensões do casal", 'class="galeria"', "Como funciona",
-                   "Uma tradição de família", "Perguntas", "/static/valderez/celeste.svg",
-                   '<section class="hero" data-theme="dark">'):
+    for trecho in ('<section class="hero"', 'id="dimensoes"', "tres-passos", "Um relatório completo",
+                   'id="quem-revisa"', 'id="perguntas"', "O seu céu, lido", "hero-home.webp"):
         assert trecho in html, trecho
-    assert html.count('class="cardc exemplo"') == 3
+    assert html.count('class="cartao dim') == 10  # as dez dimensões do catálogo
 
 
 # ------------------------------------------------------------------ /mapa
@@ -89,9 +95,10 @@ def test_mapa_tem_os_tres_estados_na_mesma_pagina(ocidental):
     html = cliente.get("/mapa").text
     for estado in ('id="estado-form"', 'id="estado-carregando"', 'id="resultado"'):
         assert estado in html, estado
-    assert '<ol class="stepbar" id="etapas"' in html
-    # no celular, o formulário vem antes da ilustração (ordem no HTML)
-    assert html.index('class="card mapa-form"') < html.index('class="mapa-arte"')
+    assert '<ol class="passos-topo" aria-label="Etapas">' in html
+    # no celular, o formulário vem antes de qualquer ilustração (ordem no HTML)
+    form = html.index('<form id="form"')
+    assert "/static/ilustracoes/" not in html[html.index('id="estado-form"'):form]
     # os campos e contratos de sempre
     for trecho in ('id="form"', 'id="data"', 'id="hora"', 'id="sem-hora"', 'id="cidade" name="cidade" role="combobox"',
                    'id="cidades" role="listbox"', 'id="email"', 'id="aceita-sequencia"', "/api/ocidental/mapa",
@@ -127,7 +134,8 @@ def test_aviso_de_email_so_com_o_envio_confirmado():
 def test_completo_so_com_a_resposta_do_servidor(ocidental):
     html = cliente.get("/mapa?data=1990-05-15&hora=14:30&lat=-23.5&lon=-46.6&token=oc-falso").text
     # a página não traz nada do completo: ele é desenhado com a resposta da API
-    assert 'pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "completo" }).then(desenharResultado)' in html
+    assert 'pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "completo" }).then(' in html
+    assert "desenharResultado(d)" in html
     assert "Elementos e modalidades</h2>" not in html.split("<script>")[0]
     r = cliente.post("/api/ocidental/mapa", json={"data": "1990-05-15", "hora": "14:30", "lat": -23.5, "lon": -46.6,
                                                    "nivel": "completo", "token": "oc-falso"})

@@ -1,31 +1,43 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="{{ cores.ground }}">
-{# Página não encontrada da versão ocidental (docs/design/valderez-1.0/telas/404.html).
-   Servida por app._nao_encontrada com HTTP 404: a estética não muda o status. #}
-<title>Página não encontrada — Valderez Astrologia</title>
+<meta name="theme-color" content="#FBF6F1">
+{# Página não encontrada da versão ocidental — rodada 9, telas Sistema-Erros e
+   Sistema-Erro-celular. Servida por app._nao_encontrada com HTTP 404; a mesma
+   casca serve o erro 500 (`erro_500`), com o texto "Algo deu errado do nosso lado". #}
+<title>{{ "Algo deu errado" if erro_500 is defined and erro_500 else "Página não encontrada" }} — Valderez Astrologia</title>
 {% include "ocidental/_head_valderez.html" %}
-<link rel="stylesheet" href="/static/valderez/componentes.css">
+<link rel="stylesheet" href="/static/valderez/v2.css">
 </head>
-<body>
+<body class="vz">
 {% set atual = "" %}{% include "ocidental/_cabecalho.html" %}
-<main id="conteudo" class="section container narrow nao-achei">
-  <p class="eyebrow">404</p>
-  <h1>Esta página não foi encontrada</h1>
-  <p class="secondary">Confira o endereço ou volte ao início. Se você chegou por um link de leitura comprada, <a href="/minhas-leituras">peça os seus links de novo</a>.</p>
-  <div class="row">
-    {%- if sem_menu %}
-    <a class="button" href="/lista">Ir para a lista de espera</a>
-    {%- else %}
-    <a class="button" href="/">Voltar ao início</a>
-    <a class="button button--secondary" href="/mapa">Ver mapa natal</a>
-    {%- endif %}
-  </div>
-  <img src="/static/valderez/celeste.svg" alt="" width="540" height="520">
+<main id="conteudo" class="degrade">
+  <section class="erro-topo">
+    <div>
+      {%- if erro_500 is defined and erro_500 %}
+      <span class="chip chip-breve">Erro no site</span>
+      <h1 class="t2">Algo deu errado <em>do nosso lado</em></h1>
+      <p class="lead">Já fomos avisados. Tente de novo em alguns minutos; se você acabou de pagar, a sua leitura também chega por e-mail.</p>
+      <div class="botoes"><a class="bt bt-1" href="">Tentar de novo</a><a class="bt bt-2" href="/">Voltar ao início</a></div>
+      {%- else %}
+      <span class="erro-num" aria-hidden="true">404</span>
+      <h1 class="t2">Esta página <em>não foi encontrada</em></h1>
+      <p class="lead">Confira o endereço ou volte ao início. Se você chegou por um link de leitura comprada, <a href="/minhas-leituras">peça os seus links de novo</a>.</p>
+      <div class="botoes">
+        {%- if sem_menu %}
+        <a class="bt bt-1" href="/lista">Ir para a lista de espera</a>
+        {%- else %}
+        <a class="bt bt-1" href="/">Voltar ao início</a>
+        {%- if catalogo.ativo("mapa") %}<a class="bt bt-2" href="/mapa">Ver meu mapa grátis</a>{% endif %}
+        {%- endif %}
+      </div>
+      {%- endif %}
+    </div>
+    {{ ilustracao("dim-proposito", classe="erro-img", carregar="eager") }}
+  </section>
 </main>
 {% include "ocidental/_rodape.html" %}
 </body>

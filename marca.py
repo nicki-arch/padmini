@@ -10,9 +10,38 @@ HTML, com a fonte do site). Um desenho só, definido aqui, que vira:
   - traço de reportlab para o PDF (`desenhar_pdf()`).
 A védica continua com o lótus de sempre (preenchido, dois tons, no base.css).
 """
+from pathlib import Path
 from urllib.parse import quote
 
 import paleta
+
+# ---------------------------------------------------------------------------
+# Rodada 9 (5/out/2026): o símbolo da marca passa a ser a RODA com os 12 signos
+# (pacote valderez-design-2.0, marca/valderez-roda-glifos*.svg), em todos os
+# tamanhos. Os arquivos servidos ficam em static/valderez/: roda.svg (ouro e
+# vinho, para fundo claro), roda-claro.svg (para o rodapé escuro) e favicon.svg;
+# favicon-32/192/512.png e a og:image saem dela (scripts/gerar_marca.py).
+# A estrela de oito raios abaixo continua só onde a fase C ainda vai trocar
+# (cartas do tarot, card do casal, PDF).
+# ---------------------------------------------------------------------------
+PASTA = Path(__file__).parent / "static" / "valderez"
+RODA = PASTA / "roda.svg"
+RODA_CLARA = PASTA / "roda-claro.svg"
+FAVICON = PASTA / "favicon.svg"
+
+
+def roda_svg(clara: bool = False) -> str:
+    """O SVG da roda (o arquivo servido), para quem precisa do desenho inline."""
+    return (RODA_CLARA if clara else RODA).read_text(encoding="utf-8")
+
+
+def roda(tamanho: int = 48, clara: bool = False, classe: str = "", rotulo: str = "") -> str:
+    """<img> da roda (o arquivo é baixado uma vez e fica no cache do navegador)."""
+    arquivo = "roda-claro.svg" if clara else "roda.svg"
+    cls = f' class="{classe}"' if classe else ""
+    escondido = "" if rotulo else ' aria-hidden="true"'
+    return (f'<img{cls} src="/static/valderez/{arquivo}" width="{tamanho}" height="{tamanho}" '
+            f'alt="{rotulo}"{escondido}>')
 
 # Grade de 64×64 (y para baixo, como no SVG).
 CIRCULO = (32, 32, 24)       # cx, cy, r — traço com opacidade .65
@@ -60,12 +89,8 @@ def svg_arquivo(cor: str, fundo: str | None = None) -> str:
 
 
 def favicon_svg() -> str:
-    """O favicon do pacote: o símbolo rosa no quadrado azul-noite (tema escuro).
-    A 16px o traço fino some; o do favicon é um pouco mais grosso."""
-    t = paleta.VALDEREZ["dark"]
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
-            f'<rect width="64" height="64" rx="14" fill="{t["background"]}"/>'
-            f'<g transform="translate(5 5) scale(.84)">{_desenho(t["rose"], t["rose"], 3)}</g></svg>')
+    """O favicon (rodada 9): a roda, do pacote valderez-design-2.0 (marca/favicon.svg)."""
+    return FAVICON.read_text(encoding="utf-8")
 
 
 def favicon_uri(sistema: str = "ocidental") -> str:

@@ -124,3 +124,28 @@ Brief: `claude/brief-rodada-9-abertura-sem-venda.md` (no Project; cópia no zip
 - **Smoke:** com `vendas_abertas: false` e a captura desligada, confere 200 em `/`, `/mapa` e
   `/leituras`, "em breve" na sinastria, 404 em `/comunidade` e nenhum `R$` / `pay.cakto`.
 - Prints: `docs/design/prints-rodada9-fase-a/`.
+
+## Fase B — base visual, home, mapa natal e amostra por dimensões
+- **Tokens e fontes:** `paleta.VZ` (creme, papel, rosa-pó, vinho, ouro, noite…) e `paleta.FONTES_VZ`
+  (Fraunces, Figtree, Noto Sans Symbols 2 só com os glifos de signo e planeta), todos em WOFF2 do
+  próprio site com as licenças OFL; `tema.css` regenerado (`--vz-*`). Contraste: `PARES_VZ`, todos AA.
+  Duas trocas em relação às telas: o ouro claro não passa como texto no creme (números e rótulos usam
+  o ouro-escuro) e a borda dos campos ficou mais escura (#8F7B86) para passar 3:1.
+- **Marca:** a roda dos 12 signos (`static/valderez/roda.svg`, `roda-claro.svg` no rodapé, `favicon.svg`
+  + PNG 32/192/512). `scripts/gerar_marca.py` gera os PNG e a og:image da home a partir dela.
+- **Casca:** cabeçalho claro com a roda de 48 px e fundo sólido com desfoque; menu do celular em
+  `details/summary` (tela Sistema-Menu-celular, com "Chegando em breve"); rodapé noite; cookies com
+  Aceitar e Recusar do mesmo tamanho. Vale para todas as páginas ocidentais (as que a fase C ainda vai
+  vestir mantêm o `componentes.css` no corpo).
+- **Ilustrações:** `conteudo/ocidental/ilustracoes.yaml` + `ilustracoes.py` + `scripts/checar_ilustracoes.py`;
+  conjunto `aquarela-2026` (47 vagas; `capa-curso` recomprimida para ficar abaixo de 300 KB; os fundos
+  de rede renomeados para `fundo-redes-N` e o mockup para `relatorio-mockup`, como na especificação).
+- **Páginas:** home (Site-Home), `/mapa` com os três estados (Site-Mapa, Sistema-Calculando-celular,
+  Site-Amostra), `/lista` (Site-Lista, sem redirecionar), 404 e 500 (Sistema-Erros), "em breve" e
+  "Todas as leituras" já no visual novo. A data digitada na home vai para o `/mapa` pelo
+  `sessionStorage`, nunca pela URL.
+- **Amostra por dimensões:** a API (`/api/ocidental/mapa`, nível amostra) devolve `dimensoes`: para
+  cada dimensão ativa, o signo, o grau, a imagem do signo e só as 1–2 primeiras frases do texto real
+  (`mt.trecho`); o texto desfocado é enfeite fixo do `mapa.yaml`. Em breve = cadeado. Selo
+  "Revisado pela Dona Valderez" só vem da API, junto com um texto `revisado: true`.
+- Prints e comparações com o pacote: `docs/design/prints-rodada9-fase-b/` (`comparar-*.jpg`).

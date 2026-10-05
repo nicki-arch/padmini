@@ -210,7 +210,10 @@ def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
         # Amostra grátis: a tríade (Sol, Lua, Ascendente) e o aspecto mais exato —
         # parte na tela, o resto por e-mail.
         amostra = mt.montar_amostra(mapa)
-        cab = _cabecalho(p, mapa, aviso, "amostra")
+        # rodada 9: o começo (1–2 frases) de cada dimensão ativa, na tela e no "inteira"
+        import ilustracoes
+        dims = [{**d, "img": ilustracoes.url(d["vaga"]) if d.get("vaga") else ""} for d in mt.dimensoes_amostra(mapa)]
+        cab = {**_cabecalho(p, mapa, aviso, "amostra"), "dimensoes": dims}
         dados = {"nome": p.nome.strip()[:80], "data": p.data.isoformat(), "hora": p.hora,
                  "lat": p.lat, "lon": p.lon, "cidade": p.cidade[:200]}
         return entregar_amostra(request, p, email, "mapa", dados, dados["nome"],
