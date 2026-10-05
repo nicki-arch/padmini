@@ -171,3 +171,16 @@ Brief: `claude/brief-rodada-9-abertura-sem-venda.md` (no Project; cópia no zip
 - **Minhas leituras** (Sistema-MinhasLeituras) e **Privacidade/Termos** (Sistema-Legal: abas, índice,
   "Em resumo"). O texto jurídico é o mesmo; controlador e Cakto não mudaram.
 - Prints e comparações: `docs/design/prints-rodada9-fase-c/`.
+
+## Rodada 9.1 — ajustes visuais depois da abertura
+- **Ícones de traço por item** (`icones.py` + `static/valderez/icones/<nome>.svg`, tirados das telas do
+  pacote): o YAML diz `icone: sol` (lista do `/mapa` em `mapa.yaml`; "O que você recebe" em
+  `produtos.yaml`) e o template chama `icone(...)`. Item sem ícone válido quebra na subida. A roda é
+  só a marca: não existe ícone "roda".
+- **Colunas das grades de capas** (`catalogo.colunas`): acompanham o número de cartões, sem nenhum
+  sozinho na última linha (4 → 4, 5 → 3+2, 7 → 4+3). No celular, uma coluna.
+- **"Preferências de cookies"** sempre no rodapé. Sem pixel configurado, abre um painel dizendo que
+  só há cookies necessários; sem JavaScript, leva à seção de cookies da privacidade.
+- **Topo da home no celular**: a imagem termina limpa; o cartão da Dona Valderez vem logo abaixo
+  dela, antes do olho e do título.
+- Prints: `docs/design/prints-rodada9-1/`.

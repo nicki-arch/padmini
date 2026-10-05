@@ -45,7 +45,7 @@
         <p class="lead">{{ t.form.lede }}</p>
         <ul class="itens-dim">
           {%- for i in t.form.itens %}
-          <li><span class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span>
+          <li><span class="ico" aria-hidden="true">{{ icone(i.icone) }}</span>
             <span><b>{{ i.titulo }}</b><br><span class="miudo">{{ i.get("sub") or (i.sub_venda if vende else i.sub_fechada) }}</span></span></li>
           {%- endfor %}
         </ul>

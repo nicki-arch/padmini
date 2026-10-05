@@ -170,29 +170,53 @@
     document.body.appendChild(el);
   }
 
+  // Sem pixel nem métrica configurados não há o que aceitar ou recusar: as
+  // preferências mostram que hoje só há cookies necessários (rodada 9.1).
+  function mostrarSoNecessarios() {
+    if (document.getElementById("aviso-cookies")) return;
+    var el = document.createElement("aside");
+    el.id = "aviso-cookies"; el.className = "cookie"; el.setAttribute("role", "dialog");
+    el.setAttribute("data-theme", tema());
+    el.setAttribute("aria-labelledby", "aviso-cookies-titulo"); el.setAttribute("aria-live", "polite");
+    el.innerHTML =
+      '<h2 id="aviso-cookies-titulo">Preferências de cookies</h2>' +
+      '<p>Hoje este site usa só cookies necessários: a sua escolha sobre cookies, a indicação ' +
+      'de um afiliado ou cupom durante a visita e, no tarot, a sua pergunta, que fica só neste aparelho. Nenhum cookie de ' +
+      'medição ou de anúncio está ativo, então não há nada para aceitar. ' +
+      '<a href="/privacidade#cookies">Saiba mais</a>.</p>' +
+      '<div class="cookie-actions cookie-actions-um">' +
+      '<button type="button" class="button" data-cookies-fechar>Entendi</button></div>';
+    el.addEventListener("click", function (ev) { if (ev.target.closest("[data-cookies-fechar]")) fecharAviso(); });
+    document.body.appendChild(el);
+    var b = el.querySelector("[data-cookies-fechar]"); if (b) b.focus();
+  }
+
+  function haOQueConsentir() { return !!(cfg && (algumPixel(cfg) || cfg.posthog_key)); }
+  function mostrarPreferencias() { if (haOQueConsentir()) mostrarAviso(); else mostrarSoNecessarios(); }
+
   function linkNoRodape() {
-    // O rodapé da Valderez (_rodape.html) já traz o link, escondido até haver o
-    // que consentir; em página sem ele, o link é criado no fim do rodapé.
+    // O rodapé da Valderez (_rodape.html) já traz o link, sempre visível; em
+    // página sem ele, o link é criado no fim do rodapé.
     var a = document.getElementById("preferencias-cookies");
     if (a && a.getAttribute("data-ligado")) return;
     if (!a) {
       var rodape = document.querySelector("footer nav") || document.querySelector("footer");
       if (!rodape) return;
       a = document.createElement("a");
-      a.href = "#"; a.id = "preferencias-cookies"; a.textContent = "Preferências de cookies";
+      a.href = "/privacidade#cookies"; a.id = "preferencias-cookies"; a.textContent = "Preferências de cookies";
       rodape.appendChild(a);
     }
     a.hidden = false; a.setAttribute("data-ligado", "1");
-    a.addEventListener("click", function (ev) { ev.preventDefault(); mostrarAviso(); });
+    a.addEventListener("click", function (ev) { ev.preventDefault(); mostrarPreferencias(); });
   }
 
-  window.padConsentimento = { escolha: escolhaGuardada, mostrar: mostrarAviso };
+  window.padConsentimento = { escolha: escolhaGuardada, mostrar: mostrarPreferencias };
 
   function iniciar(c) {
     cfg = c || {};
+    linkNoRodape();  // sempre: sem nada configurado, abre o "só cookies necessários"
     // sem nenhum pixel nem métrica configurados, não há o que consentir
-    if (!algumPixel(cfg) && !cfg.posthog_key) return;
-    linkNoRodape();
+    if (!haOQueConsentir()) return;
     ouvirAmostras();
     var e = escolhaGuardada();
     if (e === "aceito") { avisar("aceito"); carregar(); }
@@ -200,7 +224,7 @@
   }
 
   var aoCarregar = function () {
-    fetch("/api/config").then(function (r) { return r.json(); }).then(iniciar).catch(function () {});
+    fetch("/api/config").then(function (r) { return r.json(); }).then(iniciar).catch(function () { iniciar({}); });
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", aoCarregar);
   else aoCarregar();

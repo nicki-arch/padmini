@@ -30,8 +30,9 @@
 <main id="conteudo">
   <section class="secao degrade">
     <div class="secao-cab"><div><span class="olho">Leituras</span>{%- set _t = tl.titulo.rsplit(" ", 1) %}<h1 class="t1">{{ _t[0] }} <em>{{ _t[1] }}</em></h1></div><p>{{ tl.sub }}</p></div>
-    <div class="grade-capas">
-      {%- for p in catalogo.visiveis() %}
+    {%- set visiveis = catalogo.visiveis() %}
+    <div class="grade-capas" style="--colunas:{{ catalogo.colunas(visiveis | length) }}">
+      {%- for p in visiveis %}
       <div class="cartao capa">
         <div class="capa-img">{{ ilustracao(p.vaga) if p.vaga else "" }}<span class="chip{% if p.estado != 'ativo' %} chip-breve{% endif %}">{{ tl.rotulo_ativo if p.estado == "ativo" else tl.rotulo_em_breve }}</span></div>
         <div class="capa-corpo">

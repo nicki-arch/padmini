@@ -120,7 +120,7 @@
   {%- if breve %}
   <section class="secao" id="em-breve">
     <div class="secao-cab"><div><span class="olho">{{ t.em_breve.olho }}</span><h2 class="t2">{{ t.em_breve.titulo }}</h2></div></div>
-    <div class="grade-capas">
+    <div class="grade-capas" style="--colunas:{{ catalogo.colunas(breve | length) }}">
       {%- for p in breve %}
       <div class="cartao capa">
         <div class="capa-img">{{ ilustracao(p.vaga) if p.vaga else "" }}<span class="chip chip-breve">Em breve</span></div>
@@ -139,7 +139,7 @@
   {%- if deps %}
   <section class="secao">
     <h2 class="t2">{{ t.depoimentos.titulo }}</h2>
-    <div class="grade-capas" style="margin-top:32px">
+    <div class="grade-capas" style="margin-top:32px;--colunas:{{ catalogo.colunas(deps[:3] | length) }}">
       {%- for d in deps[:3] %}
       <figure class="cartao" style="margin:0"><blockquote style="margin:0 0 12px">“{{ d.texto }}”</blockquote><figcaption class="miudo">{{ d.nome }} · {{ d.produto_nome }}</figcaption></figure>
       {%- endfor %}

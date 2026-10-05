@@ -9,6 +9,7 @@ from pathlib import Path
 
 import yaml
 
+import icones
 import textos
 
 ARQUIVO = Path(__file__).parent / "conteudo" / "ocidental" / "produtos.yaml"
@@ -17,6 +18,9 @@ for _p in _dados.values():  # os templates usam StrictUndefined
     for _campo, _vazio in (("rascunho", False), ("selos", []), ("recebe", []), ("passos", []), ("faq", []),
                            ("trecho", {})):
         _p.setdefault(_campo, _vazio)
+for _chave, _p in _dados.items():  # todo item de "O que você recebe" tem o seu ícone
+    if _chave != "cursos":
+        icones.conferir(_p["recebe"], f"produtos.yaml, {_chave}")
 for _item in (_dados.get("cursos") or {}).get("itens") or []:
     _item.setdefault("catalogo", "")
 

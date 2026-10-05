@@ -27,7 +27,7 @@
       <button type="button" class="chip" aria-pressed="true" data-area="">Todos</button>
       {%- for f in c.filtros %}<button type="button" class="chip chip-breve" aria-pressed="false" data-area="{{ f }}">{{ f }}</button>{% endfor %}
     </div>
-    <div class="grade-capas" id="lista-cursos" style="margin-top:28px">
+    <div class="grade-capas" id="lista-cursos" style="margin-top:28px;--colunas:{{ catalogo.colunas(c.itens | length) }}">
       {%- for item in c.itens %}
       {%- set p = catalogo.produto(item.catalogo) if item.catalogo else none %}
       {%- set ativo = p and p.estado == "ativo" %}

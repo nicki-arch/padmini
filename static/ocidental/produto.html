@@ -55,7 +55,7 @@
     <div class="secao-cab"><div><span class="olho">O que você recebe</span><h2 class="t2">{{ tp.recebe_titulo }}</h2></div></div>
     <div class="grade-recebe">
       {%- for r in tp.recebe %}
-      <div class="cartao dim"><span class="ico-recebe" aria-hidden="true">{{ marca.roda(22) }}</span><h3>{{ r.titulo }}</h3><p>{{ r.texto }}</p></div>
+      <div class="cartao dim"><span class="ico-recebe" aria-hidden="true">{{ icone(r.icone) }}</span><h3>{{ r.titulo }}</h3><p>{{ r.texto }}</p></div>
       {%- endfor %}
     </div>
   </section>
