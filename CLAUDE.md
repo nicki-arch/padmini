@@ -66,6 +66,8 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `sinastria.py` | Sinastria ocidental: aspectos cruzados, casas, 8 dimensões e o índice (método próprio, pesos em `docs/ocidental.md`). **O nome do índice mora só em `conteudo/ocidental/marca.yaml`** (nos textos, `{indice}`; no código, `textos.NOME_INDICE`) |
 | `docs/ocidental.md` | Decisões de método da versão ocidental (orbes, nodo, sem hora, validação) |
 | `sistema.py` | `PADMINI_SISTEMA` (vedica \| ocidental): páginas, termos/privacidade (`LEGAIS`), e-mails e tokens de cada versão |
+| `catalogo.py` + `conteudo/ocidental/catalogo.yaml` | **O que está no ar na ocidental (rodada 9)**: estado de cada produto (`ativo` / `em_breve` = "me avise" / `oculto` = 404 e some de menu, rodapé, sitemap), ordem, dimensões do mapa natal e o **interruptor de venda `vendas_abertas`** (false = nenhum preço, botão ou link da Cakto em página nem e-mail; lembrete, carrinho e boas-vindas parados). Menu, home, rodapé e `/leituras` saem daqui. Token, `/live`, webhook e `/minhas-leituras` não olham para o catálogo. Nos testes, o `conftest` abre a venda; `@pytest.mark.catalogo_real` usa o YAML como está |
+| `conteudo/ocidental/revisao.yaml` + `textos.frase_revisao` | **Regra de honestidade**: frase sobre a revisão da Dona Valderez com `quando_revisado` / `enquanto_isso`; "revisado" só aparece quando todos os textos tiverem `revisado: true` (teste) |
 | `ofertas.py` + `conteudo/<versão>/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML. Preço na tela sempre por `ofertas.moeda` / `{{ x \| moeda }}` (R$96,52, nunca R$96.52); preço com cupom é calculado de `cupom_percentual`; `taxa_plataforma` (topo do YAML) é a taxa da Cakto mostrada ao lado do preço |
 | `cidades.py` + `data/cidades_index.tsv` | Autocomplete de cidades (GeoNames) |
 | `gerar_pdf.py` | PDF do completo |
@@ -82,7 +84,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `.github/workflows/` | `testes` (CI), `pos-deploy` (smoke de hora em hora; **nunca** no push, senão trava o deploy da Render), `tarefas` (lembretes diários + limpeza de marketing: descadastro ou 24 meses sem interação, `db.limpar_marketing`), `backup` (semanal, criptografado), `manter-ativo` |
 | `docs/melhorias-2026-09.md` | O que entrou em 25/set (preços, e-mails de venda, alertas, backup) e a configuração pendente |
 | `docs/seguranca.md` | **Revisão de segurança (25/set/2026)**: o que foi corrigido, limites, pendências |
-| `static/lista.html` + `/api/lista` | Lista de espera do lançamento. `PADMINI_CAPTURA=1` trava home/mapa/compat e manda para `/lista` (links de entrega com `token` e quem tem `?previa=<PADMINI_PREVIA_CHAVE>` passam) |
+| `static/lista.html` + `/api/lista` | Lista de espera e **"me avise"** (`static/ocidental/_me_avise.html` + `me-avise.js`, `interesse` = chave do catálogo; na ocidental nome e WhatsApp obrigatórios, o aviso por WhatsApp depende da caixa própria). Lista de espera do lançamento. `PADMINI_CAPTURA=1` trava home/mapa/compat e manda para `/lista` (links de entrega com `token` e quem tem `?previa=<PADMINI_PREVIA_CHAVE>` passam) |
 
 ## Regras (cada uma vem de um erro real)
 1. **Rodar os testes antes de commitar:** `python -m pytest -q testes`. Tudo verde ou não sobe.

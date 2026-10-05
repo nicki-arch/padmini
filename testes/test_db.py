@@ -184,6 +184,17 @@ def test_lead_gravado_com_consentimentos_e_origem():
     assert origem == {"ref": "PEDRO", "utm_source": "tiktok"}
 
 
+def test_me_avise_soma_os_interesses_do_mesmo_email(monkeypatch):
+    """Rodada 9: o "me avise" de vários produtos não apaga o interesse anterior."""
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    with db._conectar() as c:
+        c.execute("TRUNCATE leads")
+    pedido = {"nome": "Ana", "email": "ana@teste.com", "whatsapp": "51999998888", "aceita_email": True}
+    for interesse in ("mapa", "tarot", "mapa", "compat"):
+        assert base.cliente.post("/api/lista", json={**pedido, "interesse": interesse}).status_code == 200
+    assert _linhas("SELECT interesse FROM leads") == [("mapa,tarot,compat",)]
+
+
 def test_modo_live_registra_cada_leitura(monkeypatch):
     with db._conectar() as c:
         c.execute("TRUNCATE live_geracoes")

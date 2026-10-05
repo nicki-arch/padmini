@@ -1,0 +1,131 @@
+# Valderez Astrologia (versão OCIDENTAL) — CATÁLOGO. FONTE ÚNICA do que está no ar.
+#
+# Rodada 9 (5/out/2026). Liberar ou esconder um produto é mudar o `estado` dele
+# aqui (uma linha) e fazer o deploy — sem mexer em HTML. O catálogo diz:
+#   - o que aparece no menu, na home, no rodapé, no sitemap e em "Todas as leituras";
+#   - qual página cada rota mostra;
+#   - se o site vende (`vendas_abertas`).
+#
+# Estados:
+#   ativo     aparece em todo lugar, com a página do produto funcionando
+#   em_breve  aparece com "em breve"; a página mostra o "me avise" (grava em `leads`
+#             com interesse = chave do produto)
+#   oculto    não aparece em lugar nenhum; a rota responde 404 até ligar
+#
+# Links já entregues (com `token`) abrem sempre, qualquer que seja o estado: quem
+# comprou antes continua lendo. O webhook da Cakto também não olha para cá.
+#
+# Preço e link de checkout NÃO ficam aqui: conteudo/ocidental/ofertas.yaml
+# (`oferta` = a chave do produto lá).
+
+# INTERRUPTOR DE VENDA (decisão do Nicolas, 5/out). Com `false`: nenhuma página
+# nem e-mail mostra preço, botão de compra ou link da Cakto; o desbloqueio da
+# amostra vira "me avise"; lembrete, carrinho abandonado, boas-vindas e a oferta
+# do pós-compra ficam parados. Com `true`, tudo volta como antes, pela Cakto.
+vendas_abertas: false
+
+# Na ordem em que aparecem (menu, home, "Todas as leituras").
+produtos:
+  - chave: mapa
+    nome: Mapa natal
+    rota: /mapa
+    estado: ativo
+    oferta: mapa
+    resumo: "O céu de quando você nasceu: 6 dimensões, roda e PDF."
+    vaga: capa-mapa
+
+  - chave: compat
+    nome: Sinastria do casal
+    # A tela do pacote usa /sinastria; a rota que existe (e que já foi compartilhada)
+    # continua sendo /compatibilidade.
+    rota: /compatibilidade
+    estado: em_breve
+    oferta: compat
+    resumo: Os mapas de vocês dois juntos.
+    vaga: capa-amor
+
+  - chave: numerologia
+    nome: Numerologia
+    rota: /numerologia
+    estado: em_breve
+    oferta: numerologia
+    resumo: Os números do seu nome e da sua data.
+    vaga: capa-numerologia
+
+  - chave: tarot
+    nome: Tarot
+    rota: /tarot
+    estado: em_breve
+    oferta: tarot
+    resumo: Três cartas para pensar no agora.
+    vaga: capa-tarot
+
+  - chave: comunidade
+    nome: Comunidade
+    rota: /comunidade
+    estado: oculto
+    resumo: Encontros e conversas sobre astrologia com a Dona Valderez.
+    vaga: capa-comunidade
+
+  - chave: cursos
+    nome: Cursos
+    rota: /cursos
+    estado: oculto
+    resumo: Cursos de astrologia com a Dona Valderez.
+    vaga: capa-curso
+
+  - chave: astrologia-do-zero
+    nome: Astrologia do zero
+    rota: /cursos/astrologia-do-zero
+    estado: oculto
+    resumo: O curso para aprender a ler um mapa natal desde o começo.
+    vaga: capa-curso
+
+  - chave: consulta
+    nome: Consulta
+    rota: /consulta
+    estado: oculto
+    resumo: Uma conversa com a Dona Valderez sobre o seu mapa.
+    vaga: capa-consulta
+
+# As dimensões do mapa natal, na ordem da amostra. `ponto` é a chave do motor
+# (mapa_ocidental.py); `vaga`, a ilustração. As `em_breve` aparecem com cadeado.
+dimensoes_mapa:
+  - {chave: essencia, nome: Essência, ponto: sol, estado: ativo, vaga: dim-sol}
+  - {chave: emocoes, nome: Emoções, ponto: lua, estado: ativo, vaga: dim-lua}
+  - {chave: como-voce-chega, nome: Como você chega, ponto: ascendente, estado: ativo, vaga: dim-asc}
+  - {chave: mente, nome: Mente, ponto: mercurio, estado: ativo, vaga: dim-merc}
+  - {chave: amor, nome: Amor, ponto: venus, estado: ativo, vaga: dim-venus}
+  - {chave: acao, nome: Ação, ponto: marte, estado: ativo, vaga: dim-marte}
+  - {chave: carreira, nome: Carreira, estado: em_breve, vaga: dim-carreira}
+  - {chave: dinheiro, nome: Dinheiro, estado: em_breve, vaga: dim-dinheiro}
+  - {chave: familia, nome: Família, estado: em_breve, vaga: dim-familia}
+  - {chave: proposito, nome: Propósito, estado: em_breve, vaga: dim-proposito}
+
+# Texto do "me avise" (a mesma caixa no mapa natal com a venda fechada e nas
+# páginas `em_breve`). {produto} = o nome do produto, em minúsculas.
+me_avise:
+  eyebrow: Abre em breve
+  titulo_venda_fechada: A leitura completa abre em breve
+  titulo: Me avise quando abrir
+  texto: Um e-mail no dia do lançamento, com a condição de quem pediu para ser avisado.
+  aceita_email: "Quero receber o aviso do lançamento por e-mail: {produto}."
+  aceita_whatsapp: Também quero o aviso pelo WhatsApp.
+  ajuda_whatsapp: Com DDD. Só mandamos mensagem se você marcar a caixa abaixo.
+  botao: Me avise
+  pronto_titulo: Pronto, avisamos você.
+  pronto_texto: Assim que abrir, você recebe o aviso no seu e-mail.
+  miudo: Usamos seus dados só para o aviso e as novidades da Valderez Astrologia. Você sai quando quiser.
+
+# Página de cada produto `em_breve` (até a Fase C trazer o modelo completo).
+em_breve:
+  eyebrow: Em breve
+  enquanto_isso: Enquanto isso, veja o seu mapa natal grátis.
+
+leituras:
+  titulo: Todas as leituras
+  sub: Comece pelo mapa natal, com amostra grátis. As outras leituras abrem aos poucos; peça para ser avisado.
+  rotulo_ativo: Disponível
+  rotulo_em_breve: Em breve
+  botao_ativo: Ver meu mapa grátis
+  botao_em_breve: Me avise quando abrir

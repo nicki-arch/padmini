@@ -41,7 +41,8 @@ def test_ordem_dos_cards_e_do_menu(ocidental):
     for rota in ("/", "/mapa", "/tarot"):
         menu = re.search(r'<nav class="nav-desktop".*?</nav>', cliente.get(rota).text, re.S).group(0)
         menu = re.sub(r'<a class="button"[^>]*>.*?</a>', "", menu)  # o botão do cabeçalho não é item do menu
-        assert re.findall(r'href="(/[a-z]+)"', menu) == ORDEM, rota
+        # rodada 9: o menu vem do catálogo e termina em "Todas as leituras"
+        assert re.findall(r'href="(/[a-z]+)"', menu) == ORDEM + ["/leituras"], rota
 
 
 def test_sinastria_continua_na_home_mais_abaixo(ocidental):

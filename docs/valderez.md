@@ -93,3 +93,34 @@ da Valderez — ficam coerentes até serem vestidas de novo.
 - **Leitura completa:** sumário lateral (`.toc`) com posições, aspectos, elementos e cada seção.
 - **SVGs do pacote** com fonte embutida (~190 KB) não são servidos: símbolo em SVG + nome em
   HTML; `papeis.svg` sem texto (≈1 KB).
+
+# Rodada 9 (5/out/2026): site aberto, sem venda
+
+Brief: `claude/brief-rodada-9-abertura-sem-venda.md` (no Project; cópia no zip
+`valderez-design-2.0`). Substitui o visual de 29/set. Um PR por fase.
+
+## Fase A — catálogo por estados e venda desligada
+- **`conteudo/ocidental/catalogo.yaml`** (lido por `catalogo.py`): produtos em ordem, com
+  `estado` (`ativo`, `em_breve`, `oculto`), e `vendas_abertas`. Hoje: mapa natal ativo;
+  sinastria, numerologia e tarot em breve; comunidade, cursos, "Astrologia do zero" e
+  consulta ocultos; venda fechada. Também as 10 dimensões do mapa natal (6 ativas, 4 em breve).
+- **Rotas:** `oculto` = 404 (mesmo com a captura ligada); `em_breve` = `static/ocidental/em_breve.html`
+  (nome, resumo e "me avise"; a Fase C troca pelo modelo completo); link com `token` abre a
+  página de verdade em qualquer estado. `/leituras` (Todas as leituras) é nova. A sinastria
+  continua em `/compatibilidade` (a tela do pacote fala em `/sinastria`).
+- **Menu, rodapé, home, `/leituras`, `/lista` (opções de interesse) e sitemap** saem do catálogo.
+  As seções do casal da home só aparecem com a sinastria ativa.
+- **Venda fechada:** os templates só mostram preço/checkout com `catalogo.vende(produto)`
+  (venda aberta e produto ativo); no lugar do bloco de compra entra o "me avise".
+  `marketing.link_checkout` devolve a página do produto; o e-mail da amostra diz que a
+  leitura completa abre em breve; lembrete, carrinho abandonado e boas-vindas ficam parados
+  (não são marcados: voltam quando a venda abrir); o passo 2 do pós-compra (a próxima leitura)
+  é pulado; o e-mail de entrega não oferece nada. O webhook não muda.
+- **"Me avise":** `/api/lista` (uma rota só, o mesmo limite). Na ocidental, nome e WhatsApp
+  obrigatórios (422); `interesse` = chave de produto visível; vários avisos do mesmo e-mail
+  somam os interesses (`mapa,tarot`). O formulário do mapa também exige o nome (422 no servidor).
+- **Honestidade:** `conteudo/ocidental/revisao.yaml` + `textos.frase_revisao()`. Rodapé e `/lista`
+  já usam; a home, o mapa e os e-mails passam a usar nas fases B e C.
+- **Smoke:** com `vendas_abertas: false` e a captura desligada, confere 200 em `/`, `/mapa` e
+  `/leituras`, "em breve" na sinastria, 404 em `/comunidade` e nenhum `R$` / `pay.cakto`.
+- Prints: `docs/design/prints-rodada9-fase-a/`.

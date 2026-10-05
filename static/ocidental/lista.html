@@ -10,7 +10,7 @@
    WhatsApp, interesse) vestidas com os mesmos componentes. No celular, o
    formulário vem logo depois do título (antes das vantagens e da ilustração). #}
 <title>{{ t.seo.titulo }}</title>
-<meta name="description" content="{{ t.seo.descricao }}">
+<meta name="description" content="{{ revisao("lista_seo") }}">
 <link rel="canonical" href="https://padmini.com.br/lista">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
@@ -44,23 +44,25 @@
           <form id="form" class="stack" novalidate aria-labelledby="titulo-form">
             <h2 id="titulo-form">{{ t.formulario.titulo }}</h2>
             <div class="field">
-              <label for="nome">Nome <span class="opcional">(opcional)</span></label>
-              <input id="nome" name="nome" autocomplete="given-name" maxlength="80">
+              <label for="nome">Nome</label>
+              <input id="nome" name="nome" autocomplete="given-name" maxlength="80" required>
             </div>
             <div class="field">
               <label for="email">E-mail</label>
               <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required aria-describedby="erro">
             </div>
             <div class="field">
-              <label for="whatsapp">WhatsApp <span class="opcional">(opcional, com DDD)</span></label>
-              <input id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20">
+              <label for="whatsapp">WhatsApp <span class="opcional">(com DDD)</span></label>
+              <input id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(51) 99999-9999" maxlength="20" required aria-describedby="zap-ajuda">
+              <span class="help" id="zap-ajuda">{{ t.formulario.ajuda_whatsapp }}</span>
             </div>
             <fieldset class="escolha">
               <legend>{{ t.formulario.interesse }}</legend>
               <div class="opcoes">
-                <label><input type="radio" name="interesse" value="mapa" checked><span>{{ t.formulario.opcoes.mapa }}</span></label>
-                <label><input type="radio" name="interesse" value="compat"><span>{{ t.formulario.opcoes.compat }}</span></label>
-                <label><input type="radio" name="interesse" value="ambos"><span>{{ t.formulario.opcoes.ambos }}</span></label>
+                {#- do catálogo (rodada 9): os produtos ativos e em breve #}
+                {%- for p in catalogo.visiveis() %}
+                <label><input type="radio" name="interesse" value="{{ p.chave }}"{% if loop.first %} checked{% endif %}><span>{{ t.formulario.opcoes[p.chave] if p.chave in t.formulario.opcoes else p.nome }}</span></label>
+                {%- endfor %}
               </div>
             </fieldset>
             <div>
@@ -88,7 +90,8 @@
           {% for b in t.beneficios %}<li><span class="num" aria-hidden="true">{{ loop.index }}</span><div><b>{{ b.titulo }}</b><span>{{ b.texto }}</span></div></li>
           {% endfor %}
         </ol>
-        <aside class="destaque"><b>{{ t.revisao.titulo }}</b><p>{{ t.revisao.texto }}</p></aside>
+        {# regra de honestidade: "revisados" só quando for verdade (conteudo/ocidental/revisao.yaml) #}
+        <aside class="destaque"><b>{{ revisao("lista_titulo") }}</b><p>{{ revisao("lista_texto") }}</p></aside>
         <img class="lista-arte" src="/static/valderez/celeste.svg" alt="" width="540" height="520">
       </div>
     </div>
@@ -107,7 +110,7 @@ fetch("/api/config").then((r) => r.json()).then((c) => {
   if (c.data_abertura) { const el = $("#data-abertura"); el.textContent = "Abre em " + c.data_abertura; el.hidden = false; }
 }).catch(() => {});
 
-// WhatsApp: a caixa do WhatsApp só faz sentido com número preenchido
+// WhatsApp (obrigatório desde a rodada 9): a caixa de mandar mensagem só com número preenchido
 const zap = $("#whatsapp"), aceitaZap = $("#aceita-whatsapp"), linhaZap = $("#linha-zap");
 zap.addEventListener("input", () => {
   const d = zap.value.replace(/\D/g, "").slice(0, 11);
@@ -123,7 +126,7 @@ zap.addEventListener("input", () => {
 // mensagem de erro; `campo` recebe o foco (e aria-invalid) para quem usa leitor de tela
 function erro(msg, campo) {
   const el = $("#erro"); el.textContent = msg || ""; el.hidden = !msg;
-  $("#email").removeAttribute("aria-invalid");
+  document.querySelectorAll("#form [aria-invalid]").forEach((x) => x.removeAttribute("aria-invalid"));
   if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
 }
 
@@ -131,7 +134,9 @@ $("#form").addEventListener("submit", async (e) => {
   e.preventDefault();
   erro("");
   const email = $("#email").value.trim();
+  if ($("#nome").value.trim().length < 2) return erro("Preencha o seu nome.", $("#nome"));
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return erro("Confira o e-mail.", $("#email"));
+  if (zap.value.replace(/\D/g, "").length < 10) return erro("Preencha o seu WhatsApp com DDD.", zap);
   if (!$("#aceita-email").checked) return erro("Marque a autorização para receber o aviso por e-mail.", $("#aceita-email"));
   const botao = $("#enviar"); botao.disabled = true; botao.setAttribute("aria-busy", "true"); botao.textContent = "Enviando…";
   try {

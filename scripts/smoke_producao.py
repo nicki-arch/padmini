@@ -108,7 +108,7 @@ def _():
 
 @checar("botões de compra apontam para a Cakto")
 def _():
-    if _captura_no_ar():
+    if _captura_no_ar() or not _vendas_abertas():
         return True
     return (b"pay.cakto.com.br" in req("/mapa")[1]
             and b"pay.cakto.com.br" in req("/compatibilidade")[1])
@@ -187,6 +187,18 @@ def _ofertas_do_yaml(versao: str) -> dict:
     return yaml.safe_load((_raiz() / "conteudo" / versao / "ofertas.yaml").read_text(encoding="utf-8")) or {}
 
 
+def _vendas_abertas() -> bool:
+    """Interruptor de venda da ocidental (catalogo.yaml → vendas_abertas), via /api/config.
+    Site anterior à rodada 9 (sem o campo) = vende, como sempre. Venda fechada: as
+    checagens de botão e preço dão lugar às de "venda fechada" (abaixo)."""
+    st, corpo = req("/api/config")
+    aberta = json.loads(corpo).get("vendas_abertas", True) if st == 200 else True
+    if not aberta and not any("venda fechada" in a for a in AVISOS):
+        AVISOS.append("venda fechada (catalogo.yaml → vendas_abertas: false): conferido que NÃO há preço nem "
+                      "link da Cakto nas páginas, em vez dos botões de compra")
+    return aberta
+
+
 def _versao_no_ar() -> str:
     """PADMINI_SISTEMA do site publicado (vedica | ocidental), via /api/config."""
     st, corpo = req("/api/config")
@@ -196,7 +208,7 @@ def _versao_no_ar() -> str:
 @checar("página do casal mostra o preço do ofertas.yaml")
 def _():
     import re
-    if _captura_no_ar():
+    if _captura_no_ar() or not _vendas_abertas():
         return True
     preco = _ofertas_do_yaml(_versao_no_ar())["compat"]["preco"]
     return re.search(rf"relatório completo por <b[^>]*>R\${preco}</b>".encode(), req("/compatibilidade")[1]) is not None
@@ -247,9 +259,47 @@ def _():
 
 @checar("[ocidental no ar] botões de compra dos 4 produtos apontam para a Cakto")
 def _():
-    if _versao_no_ar() != "ocidental" or _captura_no_ar():
-        return True  # só vale com a ocidental no ar (a védica é conferida acima)
+    if _versao_no_ar() != "ocidental" or _captura_no_ar() or not _vendas_abertas():
+        return True  # só vale com a ocidental no ar vendendo (a védica é conferida acima)
     return all(b"pay.cakto.com.br" in req(p)[1] for p in ("/mapa", "/compatibilidade", "/numerologia", "/tarot"))
+
+
+# ---------------------------------------------------------------------------
+# Rodada 9: catálogo e venda fechada (ocidental). Com a captura desligada e
+# vendas_abertas: false, o site abre sem vender: a amostra do mapa natal sai, a
+# sinastria aparece "em breve", os produtos ocultos respondem 404 e nenhuma
+# página mostra preço nem link da Cakto.
+# ---------------------------------------------------------------------------
+PAGINAS_PUBLICAS = ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras")
+
+
+@checar("[ocidental] produto oculto responde 404 (/comunidade)")
+def _():
+    if _versao_no_ar() != "ocidental":
+        return True
+    return req("/comunidade")[0] == 404
+
+
+@checar("[venda fechada] /, /mapa e /leituras respondem 200; a sinastria mostra \"em breve\"")
+def _():
+    if _versao_no_ar() != "ocidental" or _captura_no_ar() or _vendas_abertas():
+        return True
+    st, sinastria = req("/compatibilidade")
+    return (all(req(p)[0] == 200 for p in ("/", "/mapa", "/leituras"))
+            and st == 200 and "em breve" in sinastria.decode("utf-8", "replace").lower())
+
+
+@checar("[venda fechada] nenhuma página mostra preço nem link da Cakto")
+def _():
+    if _versao_no_ar() != "ocidental" or _captura_no_ar() or _vendas_abertas():
+        return True
+    ok = True
+    for p in PAGINAS_PUBLICAS:
+        corpo = req(p)[1]
+        if b"R$" in corpo or b"pay.cakto" in corpo:
+            print(f"       {p}: tem preço ou link da Cakto")
+            ok = False
+    return ok
 
 
 # ---------------------------------------------------------------------------

@@ -379,3 +379,10 @@ abbr[title] { text-decoration: none; cursor: help; }
   .posicao .texto-pos { display: flex; flex-direction: column; gap: 4px; }
 }
 .field .consent { font-weight: 400; }
+
+/* Rodada 9 (Fase A): catálogo e "me avise". A Fase B troca o visual pelo pacote 2.0. */
+.prod h2 { margin: 0; font-size: var(--h3-size, 28px); line-height: var(--h3-line, 34px); }
+.menu-breve { font-size: 12px; color: var(--text-muted); letter-spacing: .04em; }
+.me-avise { margin-top: 32px; }
+.me-avise h2 { margin-top: 0; }
+.me-avise-pronto h3 { margin-top: 0; }

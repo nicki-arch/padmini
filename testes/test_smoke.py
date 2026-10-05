@@ -90,6 +90,26 @@ def test_smoke_passa_no_app_local(versao, monkeypatch):
     assert not any("captura" in a for a in smoke.AVISOS)
 
 
+@pytest.mark.catalogo_real
+@pytest.mark.parametrize("captura", [True, False])
+def test_smoke_com_o_catalogo_de_verdade(captura, monkeypatch):
+    """Rodada 9: os dois cenários do brief — captura ligada (como hoje) e captura
+    desligada com vendas_abertas: false (o site abre sem vender)."""
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    if captura:
+        monkeypatch.setenv("PADMINI_CAPTURA", "1")
+    else:
+        monkeypatch.delenv("PADMINI_CAPTURA", raising=False)
+    _local(monkeypatch)
+    smoke.AVISOS.clear()
+    app_mod._paginas_prontas.clear()
+    falhas = [nome for nome, f in smoke.CHECAGENS if not any(t in nome for t in SEM_REDE) and not f()]
+    app_mod._paginas_prontas.clear()
+    assert falhas == []
+    assert any("captura" in a for a in smoke.AVISOS) == captura
+    assert any("venda fechada" in a for a in smoke.AVISOS) == (not captura)
+
+
 def test_smoke_cobre_os_4_produtos():
     nomes = " ".join(n for n, _ in smoke.CHECAGENS)
     # rodada 6: as amostras pedem e-mail (o smoke confere o 422); o tarot completo

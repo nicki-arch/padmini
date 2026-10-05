@@ -29,6 +29,7 @@ import logging
 import os
 from datetime import datetime, timedelta, timezone
 
+import catalogo
 import db
 import entrega
 import marketing
@@ -122,7 +123,8 @@ def email_boas_vindas(passo: int, produto: str, dados: dict, email: str) -> tupl
     """(assunto, html) do passo `passo` da boas-vindas."""
     c = _cor(SISTEMA)
     nome = _primeiro_nome(produto, dados)
-    preco = ofertas.moeda(ofertas.oferta(produto, SISTEMA).get("preco"))
+    # venda fechada (catalogo.yaml): sem preço (a tarefa nem chega aqui; isto é a segunda trava)
+    preco = ofertas.moeda(ofertas.oferta(produto, SISTEMA).get("preco")) if catalogo.vende(produto, SISTEMA) else ""
     link = marketing.link_checkout(produto, dados, f"boas_vindas_{passo}", SISTEMA)
     if passo == 1:
         assunto, titulo, texto = trecho_extra(produto, dados)
@@ -180,7 +182,9 @@ def email_pos_compra(passo: int, produto: str, nome: str, email: str, comprados:
                       'de 7 dias continua valendo: é só responder pedindo o reembolso.</span>'))
     elif passo == 2:
         prox = proxima_da_escada(comprados)
-        if not prox:
+        # o passo 2 só existe para oferecer a próxima leitura: com a venda fechada
+        # (ou a próxima leitura fora do ar), é pulado
+        if not prox or not catalogo.vende(prox, SISTEMA):
             return None
         titulo, texto = marketing.TEXTO_OUTRO_PRODUTO[prox]
         assunto = f"A próxima leitura: {titulo.lower()}"
@@ -247,7 +251,9 @@ def rodar(agora: datetime | None = None) -> dict:
         contagem[r] += 1
         if r == "enviado":
             ja_hoje.add(item["email"])
-    for item in db.candidatos_boas_vindas():
+    # Boas-vindas existe para levar à compra: com a venda fechada (catalogo.yaml),
+    # fica parada — nenhum passo sai nem é marcado; volta quando a venda abrir.
+    for item in (db.candidatos_boas_vindas() if catalogo.vendas_abertas(SISTEMA) else []):
         passo = item["feitos"] + 1
         if passo > 3 or item["recebeu_hoje"] or item["email"] in ja_hoje or item["sistema"] != SISTEMA:
             continue

@@ -38,6 +38,7 @@ import acesso
 import alertas
 import blog
 import cakto
+import catalogo
 import dados_estruturados
 import db
 import depoimentos
@@ -191,13 +192,26 @@ _jinja = jinja2.Environment(
 _jinja.filters["moeda"] = ofertas.moeda
 # Nome do índice da sinastria (ocidental), fonte única em conteudo/ocidental/marca.yaml.
 _jinja.globals["indice"] = textos.NOME_INDICE
+# Catálogo da ocidental (produtos, estados, interruptor de venda) e as frases de
+# revisão que são verdade hoje (regra de honestidade): conteudo/ocidental/catalogo.yaml
+# e revisao.yaml. Usados pelo menu, rodapé, home, "me avise"...
+_jinja.globals["catalogo"] = catalogo
+_jinja.globals["revisao"] = textos.frase_revisao
 
 
-def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:
+def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:
     """Serve uma página montada de uma versão do site. O resultado fica em
-    memória: os arquivos só mudam em deploy, que reinicia o processo."""
-    if (versao, arquivo) not in _paginas_prontas:
-        _paginas_prontas[(versao, arquivo)] = _jinja.get_template(arquivo).render(
+    memória: os arquivos só mudam em deploy, que reinicia o processo.
+    `extra` vai para o template (e entra na chave do cache: ex. o produto da
+    página "em breve")."""
+    chave = (versao, arquivo) + tuple(sorted((k, str(v.get("chave") if isinstance(v, dict) else v))
+                                             for k, v in extra.items()))
+    if chave not in _paginas_prontas:
+        _paginas_prontas[chave] = _jinja.get_template(arquivo).render(
+            **extra,
+            # interruptor de venda (catalogo.yaml): False = sem preço, sem botão de compra,
+            # sem link da Cakto. A védica vende sempre.
+            vendas=catalogo.vendas_abertas(versao),
             t=textos.da_pagina(pagina, versao),
             ofertas=ofertas.do_sistema(versao),
             # cores, fontes e a marca da versão (paleta.py / marca.py): as páginas
@@ -206,7 +220,7 @@ def _pagina_montada(arquivo: str, versao: str, pagina: str) -> Response:
             # casais de exemplo calculados pelo motor (só a ocidental chama; calcula uma vez)
             exemplos=exemplos_ocidental, ld=dados_estruturados, blog=blog, depoimentos=depoimentos,
         )
-    return Response(_paginas_prontas[(versao, arquivo)], media_type="text/html; charset=utf-8")
+    return Response(_paginas_prontas[chave], media_type="text/html; charset=utf-8")
 
 
 def _pagina(rota: str, versao: str | None = None) -> Response:
@@ -224,7 +238,22 @@ def _versao_do_pedido(request: Request) -> str:
     return sistema.ativo()
 
 
+def _produto_fechado(request: Request, rota: str) -> dict | None:
+    """Catálogo da ocidental (catalogo.yaml) para a página `rota`, sem token:
+    oculto → 404; em_breve → o produto (a página mostra o "me avise"); senão None
+    (a página de sempre). Link com `token` (compra já feita) abre sempre."""
+    if "token" in request.query_params or _versao_do_pedido(request) != "ocidental":
+        return None
+    prod = catalogo.por_rota(rota)
+    if prod is None or prod["estado"] == "ativo":
+        return None
+    if prod["estado"] == "oculto":
+        raise HTTPException(404, "Página não encontrada.")
+    return prod
+
+
 def _pagina_ou_lista(request: Request, rota: str):
+    fechado = _produto_fechado(request, rota)  # oculto = 404 até com a captura ligada
     chave = os.environ.get("PADMINI_PREVIA_CHAVE", "")
     previa_url = request.query_params.get("previa", "")
     liberado = (not _captura_ligada()
@@ -235,7 +264,12 @@ def _pagina_ou_lista(request: Request, rota: str):
         if request.url.query:
             destino += "?" + request.url.query  # mantém ref/utm do afiliado
         return RedirectResponse(destino, status_code=302)
-    resp = _pagina(rota, _versao_do_pedido(request))
+    if fechado:
+        resp = _pagina_montada("ocidental/em_breve.html", "ocidental", "em_breve", produto=fechado)
+    elif rota in sistema.PAGINAS[_versao_do_pedido(request)]:
+        resp = _pagina(rota, _versao_do_pedido(request))
+    else:  # produto do catálogo ativo ainda sem página própria: o "me avise"
+        resp = _pagina_montada("ocidental/em_breve.html", "ocidental", "em_breve", produto=catalogo.por_rota(rota))
     if chave and previa_url == chave:
         resp.set_cookie("pad_previa", chave, max_age=60 * 60 * 24 * 60, httponly=True,
                         secure=request.url.scheme == "https", samesite="lax")
@@ -274,6 +308,31 @@ def pagina_numerologia(request: Request):
 @app.api_route("/tarot", methods=["GET", "HEAD"])
 def pagina_tarot(request: Request):
     return _pagina_so_da_ocidental(request, "/tarot")
+
+
+@app.api_route("/leituras", methods=["GET", "HEAD"])
+def pagina_leituras(request: Request):
+    """Todas as leituras (ocidental): os produtos ativos e em breve do catálogo."""
+    if sistema.ativo() != "ocidental":
+        raise HTTPException(404, "Página não encontrada.")
+    return _pagina_ou_lista(request, "/leituras")
+
+
+def _rota_do_catalogo(rota: str):
+    """Produtos do catálogo sem rota própria no app (comunidade, cursos, consulta):
+    só existem na ocidental; oculto = 404 (_produto_fechado)."""
+    def pagina(request: Request):
+        if sistema.ativo() != "ocidental" and "token" not in request.query_params:
+            raise HTTPException(404, "Página não encontrada.")
+        if catalogo.por_rota(rota) is None:
+            raise HTTPException(404, "Página não encontrada.")
+        return _pagina_ou_lista(request, rota)
+    return pagina
+
+
+for _p in catalogo.produtos():
+    if _p["rota"] not in ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras"):
+        app.api_route(_p["rota"], methods=["GET", "HEAD"])(_rota_do_catalogo(_p["rota"]))
 
 
 def _tem_previa(request: Request) -> bool:
@@ -456,23 +515,34 @@ _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 @app.post("/api/lista")
 def inscrever_na_lista(ins: Inscricao, request: Request):
+    """Lista de espera (/lista) e "me avise" (rodada 9): uma rota só, com os mesmos
+    limites. Na ocidental, nome e WhatsApp são obrigatórios (decisão de 5/out) e
+    `interesse` é a chave de um produto visível do catálogo. Mandar mensagem no
+    WhatsApp depende da caixa própria (desmarcada), não do número."""
     limites.exigir(limites.LISTA, request)
     if ins.site:
         return {"ok": True}  # robô preencheu o campo escondido: finge sucesso e descarta
+    ocidental = sistema.ativo() == "ocidental"
+    nome = " ".join(ins.nome.split())[:80]
+    if ocidental and len(nome) < 2:
+        raise HTTPException(422, "Preencha o seu nome.")
     email = ins.email.strip().lower()
     if not _EMAIL_RE.match(email):
         raise HTTPException(422, "Confira o e-mail.")
-    if not ins.aceita_email:
-        raise HTTPException(422, "Marque a autorização para receber o aviso por e-mail.")
     zap = re.sub(r"\D", "", ins.whatsapp)
+    if ocidental and not zap:
+        raise HTTPException(422, "Preencha o seu WhatsApp (com DDD).")
     if zap and not (10 <= len(zap) <= 13):
         raise HTTPException(422, "Confira o WhatsApp (com DDD).")
+    if not ins.aceita_email:
+        raise HTTPException(422, "Marque a autorização para receber o aviso por e-mail.")
     if zap and len(zap) in (10, 11):
         zap = "55" + zap
     origem = {k: str(v)[:80] for k, v in (ins.origem or {}).items()
               if k in ("ref", "cupom", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term")}
-    interesse = ins.interesse if ins.interesse in ("mapa", "compat", "ambos") else ""
-    if not db.registrar_lead(ins.nome.strip()[:80], email, zap, True,
+    aceitos = (catalogo.interesses() + ("ambos",)) if ocidental else ("mapa", "compat", "ambos")
+    interesse = ins.interesse if ins.interesse in aceitos else ""
+    if not db.registrar_lead(nome, email, zap, True,
                              bool(zap) and ins.aceita_whatsapp, interesse, origem):
         raise HTTPException(503, "Não conseguimos salvar agora. Tente de novo em instantes.")
     return {"ok": True}
@@ -599,6 +669,10 @@ def sitemap():
     # anunciar as três no sitemap faria o buscador indexar redirecionamento.
     # Na ocidental entram também numerologia e tarot (as rotas públicas de PAGINAS, sem a lista).
     publicas = [r for r in sistema.PAGINAS[sistema.ativo()] if r != "/lista"]
+    if sistema.ativo() == "ocidental":
+        # o catálogo decide: oculto não entra; em_breve entra (a página do "me avise")
+        publicas = [r for r in publicas if (catalogo.por_rota(r) or {}).get("estado", "ativo") != "oculto"]
+        publicas += [p["rota"] for p in catalogo.visiveis() if p["rota"] not in publicas]
     if sistema.ativo() == "ocidental" and blog.publicados():
         publicas += ["/blog"] + [f"/blog/{a['slug']}" for a in blog.publicados()]
     caminhos = ["/lista"] if _captura_ligada() else publicas
@@ -659,6 +733,8 @@ def config():
         "data_abertura": os.environ.get("PADMINI_DATA_ABERTURA", ""),
         # "receber a amostra por e-mail" só aparece se o envio estiver configurado
         "amostra_email": bool(os.environ.get("RESEND_API_KEY")),
+        # interruptor de venda da ocidental (catalogo.yaml); o smoke usa
+        "vendas_abertas": catalogo.vendas_abertas(sistema.ativo()),
         # Pixels de anúncio (rodada 6): só com a ocidental no ar, e o navegador só os
         # carrega depois do "Aceitar" (static/ocidental/consentimento.js). Vazio = não carrega.
         **seguranca.pixels(),
@@ -1008,6 +1084,10 @@ def _tratar_abandono(evento: dict) -> dict:
         return {"ok": True, "ignorado": "já tratado, comprou ou descadastrado"}
     checkout = str(d.get("checkoutUrl") or "")
     nome = str(d.get("customerName") or "").split(" ")[0]
+    if not catalogo.vende(produto, versao):
+        # venda fechada (catalogo.yaml): nada de e-mail de recuperação; só registra
+        db.registrar_abandono(email, nome, oferta_id, checkout, False, versao)
+        return {"ok": True, "abandono": produto, "email_enviado": False, "motivo": "venda fechada"}
     if versao != sistema.ativo():
         db.registrar_abandono(email, nome, oferta_id, checkout, False, versao)
         return {"ok": True, "abandono": produto, "email_enviado": False,
@@ -1167,6 +1247,8 @@ def enviar_lembretes(request: Request):
     for item in db.lembretes_pendentes():
         # a versão do registro (a da página em que a pessoa estava), não a do ar
         versao = item.get("sistema") or "vedica"
+        if not catalogo.vende(item["produto"], versao):
+            continue  # o lembrete só existe para vender: com a venda fechada, espera (não é marcado)
         try:
             amostra = (rotas_ocidental.montar_amostra_email(item["produto"], item["dados"]) if versao == "ocidental"
                        else _montar_amostra(item["produto"], item["dados"]))

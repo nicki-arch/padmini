@@ -22,6 +22,7 @@ import os
 import urllib.parse
 
 import acesso
+import catalogo
 import entrega
 import ofertas
 import paleta
@@ -65,8 +66,8 @@ PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia":
 
 def link_checkout(produto: str, dados: dict | None, campanha: str, sistema: str = "vedica") -> str:
     """Checkout da Cakto com os dados de nascimento no `sck` e utm de e-mail."""
-    base = ofertas.checkout(produto, sistema)
-    if not base:  # oferta sem link: a página do produto (vale para os 4)
+    base = ofertas.checkout(produto, sistema) if catalogo.vende(produto, sistema) else ""
+    if not base:  # oferta sem link, ou venda fechada (catalogo.yaml): a página do produto
         return f"{entrega.SITE_URL}/{PAGINA_DO_PRODUTO.get(produto, 'mapa')}"
     q = {"utm_source": "email", "utm_medium": campanha, "utm_campaign": campanha}
     if dados:
@@ -283,6 +284,15 @@ def email_amostra_html(produto: str, amostra: dict, dados: dict, email: str, nom
                        sistema: str = "vedica") -> str:
     preco = ofertas.moeda(ofertas.oferta(produto, sistema).get("preco"))
     oque = TEXTOS[sistema]["completo_abre"][produto]
+    if not catalogo.vende(produto, sistema):
+        # venda fechada (catalogo.yaml): a amostra, sem preço nem botão de compra
+        corpo = (_ola(nome)
+                 + _p(f"Aqui está a amostra que você gerou na {_sistema.MARCA[sistema]}:")
+                 + _resumo_amostra(produto, amostra, sistema)
+                 + _p(f"A leitura completa abre em breve. Ela vai trazer {oque}.", "margin:18px 0 0")
+                 + _p(f'<a href="{_e(link_site(produto, "amostra"))}#me-avise" style="color:{_cor(sistema)["acento"]}">'
+                      "Quero ser avisado quando abrir →</a>"))
+        return _moldura(corpo, _rodape_descadastro(email, sistema), sistema)
     corpo = (_ola(nome)
              + _p(f"Aqui está a amostra que você gerou na {_sistema.MARCA[sistema]}:")
              + _resumo_amostra(produto, amostra, sistema)
@@ -366,7 +376,8 @@ def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedi
     Cupom opcional: `cupom_pos_compra` da oferta em conteudo/<versão>/ofertas.yaml.
     """
     if sistema == "ocidental":
-        return _venda_cruzada_ocidental(produto_comprado, dados)
+        # venda fechada: o e-mail de entrega (de uma compra antiga) não oferece nada
+        return _venda_cruzada_ocidental(produto_comprado, dados) if catalogo.vendas_abertas(sistema) else ""
     textos = TEXTO_VENDA_CRUZADA[sistema]
     if produto_comprado == "compat":
         alvo = ofertas.oferta("mapa", sistema)
