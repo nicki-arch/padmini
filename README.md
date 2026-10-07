@@ -118,6 +118,22 @@ python scripts/smoke_producao.py         # depois de cada deploy: confere o site
 
 A validação de compatibilidade contra o Prokerala (`validacao-compatibilidade.md`) ainda está pendente — **gate antes de cobrar**.
 
+## Licença
+
+- **Código:** GNU Affero General Public License v3.0 (AGPL-3.0), texto completo em
+  [`LICENSE`](LICENSE). O site usa o [Swiss Ephemeris](https://www.astro.com/swisseph/)
+  (Astrodienst, via `pyswisseph`) sob a AGPL; por isso o código-fonte do site é
+  publicado (link "Código-fonte" no rodapé), em vez de comprar a licença profissional.
+- **Conteúdo editorial: todos os direitos reservados, fora da AGPL.** Os textos de
+  interpretação (que não ficam neste repositório: moram no repositório privado
+  `padmini-conteudo` e entram só na hora do build), a copy das páginas, as ilustrações
+  de `static/ilustracoes/` (conjunto `aquarela-2026`, geradas por IA) e as marcas
+  "Valderez Astrologia" e "Padmini", com os seus símbolos (a roda), não estão cobertos
+  pela AGPL nem por nenhuma outra licença livre.
+- **De terceiros, com as próprias licenças:** fontes em `static/valderez/fontes/` e
+  `fontes/` (SIL Open Font License; o texto de cada uma está ao lado do arquivo) e o índice de cidades do [GeoNames](https://www.geonames.org/) (CC BY 4.0,
+  com o crédito no rodapé).
+
 ## Pendências conhecidas
 
 - **Validar** as tabelas preliminares de compatibilidade (Vashya, meio de Yoni, direção de Gana) contra o Prokerala.
@@ -126,5 +142,5 @@ A validação de compatibilidade contra o Prokerala (`validacao-compatibilidade.
 - Textos de planeta em cada casa (108) ainda não existem.
 - Raj Yoga só por conjunção; Neecha Bhanga só condição principal; Mangal Dosha (individual) sem cancelamento.
 - Busca de cidades entende só o nome; nomes estrangeiros aparecem em inglês.
-- **Licença AGPL** do Swiss Ephemeris: site público obriga a publicar o código, ou comprar a licença profissional.
+- **Licença AGPL:** os textos já estiveram públicos neste repositório (ocidentais desde 26/set, védicos desde 16/set) e continuam no histórico do Git; a AGPL talvez alcance conteúdo de que o programa precisa para rodar ("obra combinada") — revisar com advogado quando houver faturamento. Ver a seção Licença.
 - GeoNames (CC BY 4.0) exige o crédito do rodapé.

@@ -30,14 +30,23 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 - **Produção:** https://padmini.com.br (Render, serviço `srv-dalfcj3l550s73b38jmg`,
   deploy automático a cada push na `master`). O endereço `padmini.onrender.com`
   continua respondendo e é usado pelo ping diário, que assim não depende de DNS.
-- **`base_significacoes.py` mora em um repositório PRIVADO separado**
-  (`github.com/nicki-arch/padmini-conteudo`), não neste. Isso mantém o texto de
-  interpretação — o diferencial do produto — fora de um repositório que precisa ser
-  público (ver regra 10). `build.sh` (Render) e o passo equivalente em
-  `.github/workflows/testes.yml` buscam o arquivo de lá na hora do build/CI, usando
-  `PADMINI_CONTEUDO_TOKEN` / secret `CONTEUDO_REPO_TOKEN` (token de leitura, só
-  daquele repo). Se você está numa sessão nova e o arquivo não existe no checkout,
-  é isso — não é regressão. Para editar o conteúdo, mexa no repo `padmini-conteudo`.
+- **Conteúdo proprietário fora do repositório público (rodada 10, decisão de 6/out/2026).**
+  Os textos de interpretação — `base_significacoes.py` (védica), `conteudo/ocidental/textos/`
+  e `conteudo/ocidental/blog/` — passam a morar no repositório PRIVADO
+  `github.com/nicki-arch/padmini-conteudo`, nos mesmos caminhos relativos. O `build.sh` clona
+  esse repositório na hora do build (Render) e o `.github/workflows/testes.yml` faz o mesmo no
+  CI, com um token de leitura só daquele repo: `PADMINI_CONTEUDO_TOKEN` na Render (serviços
+  `padmini` e `padmini-previa`) e o secret `CONTEUDO_REPO_TOKEN` no GitHub.
+  **A Render precisa rodar `bash build.sh`** (Settings → Build Command), não só
+  `pip install -r requirements.txt`: o `render.yaml` não é lido, porque os serviços foram
+  criados pelo painel. Estado em 7/out: a prévia já roda o `build.sh`; a produção troca depois
+  que o conteúdo estiver no repo privado. Até a fase 3 da rodada 10 entrar, os arquivos ainda
+  estão também aqui (transição). Se você está numa sessão nova e eles não existem no checkout,
+  é isso — não é regressão. Para editar texto, mexa no `padmini-conteudo`.
+- **Licença:** código sob AGPL-3.0 (`LICENSE`); textos, copy, ilustrações e as marcas
+  "Valderez Astrologia" e "Padmini" com todos os direitos reservados (seção "Licença" do
+  `README.md`). Os textos já estiveram públicos e continuam no histórico do Git (ocidentais
+  desde 26/set, védicos desde 16/set): a rodada 10 protege daqui para a frente.
 
 ## Mapa do código
 | Arquivo | Papel |
@@ -105,9 +114,13 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 8. Não gravar CPF nem dados de cartão no banco (vêm no payload da Cakto).
 9. `PADMINI_MODO_ABERTO=1` só em staging, **nunca** em produção.
 10. **O repositório público é o que cumpre a licença AGPL do Swiss Ephemeris** (publicar
-    o código é a via gratuita, em vez de comprar a licença comercial). Por isso o
-    conteúdo proprietário (significações) foi para fora dele — ver acima — em vez de
-    o repositório inteiro virar privado.
+    o código, com o `LICENSE` AGPL-3.0, é a via gratuita, em vez de comprar a licença
+    profissional, CHF 700 — revisitar quando houver faturamento). Por isso o conteúdo
+    proprietário (textos de interpretação védicos e ocidentais, rascunhos do blog) fica
+    fora dele, no `padmini-conteudo` — ver "Fontes de verdade" —, em vez de o repositório
+    inteiro virar privado. **Nunca recolocar esses arquivos aqui.** Ressalva (não é parecer
+    jurídico): a AGPL talvez alcance conteúdo de que o programa precisa para rodar ("obra
+    combinada"); revisar com advogado quando houver faturamento.
 
 11. **O `sck` é dado do comprador, não prova de pagamento.** Qual produto entregar sai só da
     oferta paga que a Cakto informa (`cakto.produto_pago`). Ver `docs/seguranca.md`.
