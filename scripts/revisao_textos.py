@@ -6,12 +6,18 @@ Quantos textos da versão ocidental ainda faltam revisar (campo `revisado`).
     python scripts/revisao_textos.py --lista  # + cada texto que falta, arquivo e caminho
 
 Revisou um texto? Troque `revisado: false` por `revisado: true` no YAML
-(conteudo/ocidental/textos/). O LEIA.md da pasta explica o formato e o tom.
+(conteudo/ocidental/textos/ do repositório PRIVADO nicki-arch/padmini-conteudo;
+--conteudo PASTA ou PADMINI_CONTEUDO_DIR apontam para o clone). O LEIA.md da pasta
+explica o formato e o tom.
 """
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+import conteudo_privado  # noqa: E402
+# Os textos moram no repo privado (rodada 10): --conteudo PASTA ou PADMINI_CONTEUDO_DIR
+sys.argv = conteudo_privado.tirar_argumento(sys.argv)
 
 import montar_texto_ocidental as mt  # noqa: E402
 

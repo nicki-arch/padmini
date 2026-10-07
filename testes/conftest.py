@@ -6,6 +6,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import conteudo_privado  # noqa: E402,F401  (PADMINI_CONTEUDO_DIR: textos do repo privado, rodada 10)
 import limites  # noqa: E402
 
 

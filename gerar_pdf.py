@@ -31,6 +31,7 @@ from reportlab.platypus import (
     CondPageBreak, Flowable, KeepTogether, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle,
 )
 
+import conteudo_privado  # noqa: F401,E402  (acha base_significacoes no repo privado)
 from base_significacoes import NOME_PT, SIGNO_PT
 from compute_chart import SIGNOS, VIMSHOTTARI_ANOS, VIMSHOTTARI_SEQ, nakshatra_de
 import paleta

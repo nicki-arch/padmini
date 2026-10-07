@@ -12,3 +12,10 @@ data/countryInfo.txt
 
 # planilha de revisão gerada por scripts/exportar_revisao.py (vai para o Drive, não para o git)
 revisao-textos*.xlsx
+
+# Rodada 10: conteúdo proprietário. Mora no repositório PRIVADO nicki-arch/padmini-conteudo
+# e entra só no build (scripts/buscar_conteudo.sh copia para cá). Nunca versionar aqui:
+# testes/test_conteudo_fora_do_repo.py falha se algum destes voltar.
+/base_significacoes.py
+/conteudo/ocidental/textos/
+/conteudo/ocidental/blog/

@@ -3,6 +3,7 @@ Gera a planilha de revisão dos textos da versão ocidental para a família do P
 
     python scripts/exportar_revisao.py                 # cria revisao-textos.xlsx
     python scripts/exportar_revisao.py outro-nome.xlsx
+    python scripts/exportar_revisao.py --conteudo ../padmini-conteudo   # textos do repo privado
 
 Uma aba "Como revisar" e uma aba por produto (Mapa natal, Sinastria, ...), com
 os textos ainda não revisados primeiro. Depois de preenchida, a planilha volta
@@ -14,6 +15,10 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+import conteudo_privado  # noqa: E402
+# Os textos moram no repo privado (rodada 10): --conteudo PASTA ou PADMINI_CONTEUDO_DIR
+sys.argv = conteudo_privado.tirar_argumento(sys.argv)
 
 from openpyxl import Workbook  # noqa: E402
 from openpyxl.styles import Alignment, Font, PatternFill  # noqa: E402

@@ -3,8 +3,10 @@ Rodada 10, fase 1: o repositório publica o código sob AGPL-3.0 (é assim que c
 licença do Swiss Ephemeris) e diz, no README, que o conteúdo editorial não está coberto.
 """
 import hashlib
+from pathlib import Path
 
-from test_app import RAIZ  # noqa: F401  (mesma raiz dos outros testes)
+# Sem importar o app: este teste roda também em PR de fork, sem o conteúdo privado.
+RAIZ = Path(__file__).resolve().parents[1]
 
 # md5 do texto oficial da FSF (https://www.gnu.org/licenses/agpl-3.0.txt)
 MD5_AGPL3 = "eb1e647870add0502f8f010b19de32af"

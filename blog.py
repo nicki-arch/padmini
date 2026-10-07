@@ -15,13 +15,13 @@ Formato:
 import re
 from datetime import date
 from functools import lru_cache
-from pathlib import Path
 
 import yaml
 
+import conteudo_privado
 import textos
 
-PASTA = Path(__file__).resolve().parent / "conteudo" / "ocidental" / "blog"
+PASTA = conteudo_privado.BLOG  # repositório privado (rodada 10): os rascunhos não são públicos
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 OBRIGATORIOS = ("titulo", "descricao", "data", "revisado", "abertura", "secoes", "chamada")
 

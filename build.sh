@@ -1,34 +1,19 @@
 #!/bin/bash
-# Build da Render. Busca base_significacoes.py de um repositório PRIVADO separado
-# (nicki-arch/padmini-conteudo) antes de instalar as dependências, para que o
-# texto de interpretação não fique visível no repositório público do código.
+# Build da Render. O Build Command no painel TEM de ser `bash build.sh` (o render.yaml
+# não é lido: os serviços foram criados pelo painel).
 #
-# Por que assim, e não guardando no banco: o site precisa continuar funcionando
-# mesmo se o Supabase estiver fora do ar (regra do db.py). Buscar aqui, só na
-# hora do build, mantém essa garantia — depois de instalado, o processo não
+# Rodada 10: os textos de interpretação (o ativo vendido) moram no repositório PRIVADO
+# nicki-arch/padmini-conteudo, fora do repositório público do código (AGPL-3.0). O
+# scripts/buscar_conteudo.sh clona esse repo com PADMINI_CONTEUDO_TOKEN e copia
+# base_significacoes.py, conteudo/ocidental/textos/ e conteudo/ocidental/blog/.
+# Sem o token, o build FALHA com mensagem clara: não existe mais o modo de transição
+# que seguia com os arquivos do repositório público (segurança falha fechada).
+#
+# Por que no build, e não no banco: o site precisa continuar funcionando mesmo se o
+# Supabase estiver fora do ar (regra do db.py). Depois de instalado, o processo não
 # depende de rede nenhuma para gerar um relatório.
-#
-# Compatível com a transição: se PADMINI_CONTEUDO_TOKEN ainda não está configurado
-# E o arquivo já existe no repositório (fase antes da migração), o build segue
-# normalmente sem baixar nada.
 
-set -e
+set -euo pipefail
 
-if [ -n "$PADMINI_CONTEUDO_TOKEN" ]; then
-    echo "Buscando base_significacoes.py do repositório privado de conteúdo..."
-    rm -rf /tmp/padmini-conteudo
-    git clone --depth 1 \
-        "https://x-access-token:${PADMINI_CONTEUDO_TOKEN}@github.com/nicki-arch/padmini-conteudo.git" \
-        /tmp/padmini-conteudo
-    cp /tmp/padmini-conteudo/base_significacoes.py ./base_significacoes.py
-    rm -rf /tmp/padmini-conteudo
-    echo "OK: base_significacoes.py atualizado a partir do repositório privado."
-elif [ -f "base_significacoes.py" ]; then
-    echo "PADMINI_CONTEUDO_TOKEN não definido — usando base_significacoes.py já presente no repositório (fase de transição)."
-else
-    echo "ERRO: base_significacoes.py não existe e PADMINI_CONTEUDO_TOKEN não está definido."
-    echo "Configure PADMINI_CONTEUDO_TOKEN na Render com um token de leitura do repositório nicki-arch/padmini-conteudo."
-    exit 1
-fi
-
+bash scripts/buscar_conteudo.sh
 pip install -r requirements.txt
