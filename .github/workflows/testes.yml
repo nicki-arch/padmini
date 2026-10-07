@@ -31,14 +31,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      # base_significacoes.py mora em um repositório PRIVADO separado
-      # (nicki-arch/padmini-conteudo) para não expor o texto de interpretação
-      # no repositório público. Mesmo fallback do build.sh: sem o secret
-      # configurado, segue com o arquivo do checkout (fase de transição).
-      - name: Buscar conteúdo privado (significações)
+      # O conteúdo proprietário mora no repositório PRIVADO nicki-arch/padmini-conteudo
+      # (rodada 10). Transição (fases 1 e 2): o clone prova que o secret funciona; o
+      # que já estiver lá substitui o arquivo do checkout, e o que ainda não estiver
+      # segue com o do checkout. A fase 3 tira este fallback (sem o conteúdo, falha).
+      - name: Buscar conteúdo privado (transição)
         if: ${{ env.PADMINI_CONTEUDO_TOKEN != '' }}
         run: |
           git clone --depth 1 "https://x-access-token:${PADMINI_CONTEUDO_TOKEN}@github.com/nicki-arch/padmini-conteudo.git" /tmp/padmini-conteudo
-          cp /tmp/padmini-conteudo/base_significacoes.py ./base_significacoes.py
+          echo "OK: o secret CONTEUDO_REPO_TOKEN clonou o repositório privado."
+          if [ -f /tmp/padmini-conteudo/base_significacoes.py ]; then
+            cp /tmp/padmini-conteudo/base_significacoes.py ./base_significacoes.py
+          else
+            echo "Repo privado ainda sem base_significacoes.py: usando o do checkout (transição)."
+          fi
+          for pasta in conteudo/ocidental/textos conteudo/ocidental/blog; do
+            if [ -d "/tmp/padmini-conteudo/$pasta" ]; then
+              rm -rf "./$pasta" && mkdir -p "./$pasta" && cp -R "/tmp/padmini-conteudo/$pasta/." "./$pasta/"
+            fi
+          done
       - run: pip install -r requirements.txt pytest httpx
       - run: python -m pytest -q testes
