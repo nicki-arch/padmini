@@ -1,0 +1,31 @@
+# O que NÃO vai para o espelho público nicki-arch/padmini-codigo (rodada 10.1), mesmo
+# estando neste repositório. Lido por scripts/publicar_codigo.py, que roda no workflow
+# .github/workflows/codigo-publico.yml a cada push na master.
+#
+# Regra: CÓDIGO QUE RODA O SITE NUNCA ENTRA AQUI. A AGPL-3.0 (Swiss Ephemeris) pede o
+# código correspondente ao que roda em padmini.com.br. Entram aqui só documentos
+# internos, dados de teste com texto renderizado e material com todos os direitos
+# reservados. O conteúdo proprietário (textos, blog, base_significacoes.py) nem está
+# neste repositório, e o script trava se aparecer (conteudo_privado.CAMINHOS).
+#
+# Formato: um padrão por linha (fnmatch, relativo à raiz); "/" no fim = a pasta inteira.
+
+# Dados de teste com páginas e respostas da API renderizadas: o completo védico traz o
+# texto de interpretação (foto da védica de testes/test_sistema.py).
+testes/dados/vedica_html/
+
+# Pacotes de design e prints: marca com direitos reservados, e os prints da leitura
+# completa mostram os textos de interpretação em imagem.
+docs/design/
+
+# Ilustrações (conjunto aquarela-2026): direitos reservados, não fazem parte do código.
+static/ilustracoes/
+
+# Planejamento de negócio e notas para o Claude Project.
+PLANO.md
+docs/claude-project/
+
+# Notas internas de segurança e operação (defesas em detalhe, configuração pendente).
+# O código delas (seguranca.py, limites.py, cakto.py, workflows) continua publicado.
+docs/seguranca.md
+docs/melhorias-2026-09.md

@@ -23,8 +23,23 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 - Nada da védica se apaga: os testes dela continuam verdes em todo PR.
 
 ## Fontes de verdade
-- **Código:** este repositório (`github.com/nicki-arch/padmini`, branch `master`).
-  Cópias de código em outros lugares (ex.: Claude Project) podem estar desatualizadas — não confiar nelas.
+- **Três repositórios (rodada 10.1, 8/out/2026):**
+  | Repositório | Visibilidade | O que tem |
+  |---|---|---|
+  | `nicki-arch/padmini` (este) | **privado** | o desenvolvimento: código, testes, docs internos, histórico (com os textos até 7/out) |
+  | `nicki-arch/padmini-conteudo` | **privado** | os textos de interpretação (ver abaixo) |
+  | `nicki-arch/padmini-codigo` | **público** | **espelho** do código, sem histórico antigo, sem textos: cumpre a AGPL |
+  Trabalhe sempre aqui (branch `master`); o espelho não aceita PR. Cópias de código em outros
+  lugares (ex.: Claude Project) podem estar desatualizadas — não confiar nelas.
+- **Espelho público (AGPL):** a cada push na `master`, `.github/workflows/codigo-publico.yml`
+  faz `git archive HEAD`, roda `scripts/publicar_codigo.py` (tira o que está em
+  `publico-excluir.txt`, põe o `publico/README.md` como README e **trava** se sobrar texto,
+  blog, `base_significacoes.py` ou algo com cara de segredo) e cria no `padmini-codigo` um
+  commit `sync: padmini@<sha>` (sem force-push; nada mudou = sem commit). Secret
+  `CODIGO_PUBLICO_TOKEN` (fine-grained, só o `padmini-codigo`, Contents: Read and write).
+  `publico-excluir.txt` só pode ter documento interno, dado de teste com texto renderizado e
+  material com direitos reservados — **nunca código que roda o site** (há teste). O link
+  "Código-fonte" do rodapé sai de `conteudo/site.yaml` (`codigo_fonte`).
 - **Estado, decisões e pendências:** no Claude Project "Projeto Padmini":
   `claude/LEIA-PRIMEIRO.md` (ponto de entrada), `claude/decisoes.md`, `claude/checklist-de-lancamento.md`.
 - **Produção:** https://padmini.com.br (Render, serviço `srv-dalfcj3l550s73b38jmg`,
@@ -121,12 +136,13 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 7. **Depois de cada deploy:** `python scripts/smoke_producao.py`.
 8. Não gravar CPF nem dados de cartão no banco (vêm no payload da Cakto).
 9. `PADMINI_MODO_ABERTO=1` só em staging, **nunca** em produção.
-10. **O repositório público é o que cumpre a licença AGPL do Swiss Ephemeris** (publicar
+10. **O espelho público `padmini-codigo` é o que cumpre a licença AGPL do Swiss Ephemeris** (publicar
     o código, com o `LICENSE` AGPL-3.0, é a via gratuita, em vez de comprar a licença
     profissional, CHF 700 — revisitar quando houver faturamento). Por isso o conteúdo
     proprietário (textos de interpretação védicos e ocidentais, rascunhos do blog) fica
-    fora dele, no `padmini-conteudo` — ver "Fontes de verdade" —, em vez de o repositório
-    inteiro virar privado. **Nunca recolocar esses arquivos aqui.** Ressalva (não é parecer
+    fora dele, no `padmini-conteudo` — ver "Fontes de verdade". Este repositório ficou privado
+    (7/out) porque o histórico tem os textos; o espelho publica só a árvore atual.
+    **Nunca recolocar esses arquivos aqui** nem tirar a trava do `publicar_codigo.py`. Ressalva (não é parecer
     jurídico): a AGPL talvez alcance conteúdo de que o programa precisa para rodar ("obra
     combinada"); revisar com advogado quando houver faturamento.
 

@@ -128,6 +128,9 @@ A validação de compatibilidade contra o Prokerala (`validacao-compatibilidade.
   [`LICENSE`](LICENSE). O site usa o [Swiss Ephemeris](https://www.astro.com/swisseph/)
   (Astrodienst, via `pyswisseph`) sob a AGPL; por isso o código-fonte do site é
   publicado (link "Código-fonte" no rodapé), em vez de comprar a licença profissional.
+  Este repositório é privado; o código vai, a cada push na `master`, para o espelho público
+  [`nicki-arch/padmini-codigo`](https://github.com/nicki-arch/padmini-codigo)
+  (`.github/workflows/codigo-publico.yml`, sem os textos nem o que está em `publico-excluir.txt`).
 - **Conteúdo editorial: todos os direitos reservados, fora da AGPL.** Os textos de
   interpretação (que não ficam neste repositório: moram no repositório privado
   `padmini-conteudo` e entram só na hora do build), a copy das páginas, as ilustrações

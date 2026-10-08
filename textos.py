@@ -33,6 +33,11 @@ NOME_INDICE = str((yaml.safe_load((PASTA / "ocidental" / "marca.yaml").read_text
                   .get("indice") or "Índice")
 
 
+# Endereço do código-fonte publicado (AGPL), o link "Código-fonte" do rodapé das duas
+# versões: FONTE ÚNICA em conteudo/site.yaml (rodada 10.1).
+CODIGO_FONTE = str((yaml.safe_load((PASTA / "site.yaml").read_text(encoding="utf-8")) or {})["codigo_fonte"])
+
+
 def com_indice(valor):
     """Troca {indice} pelo nome do índice em textos (str, listas e dicionários)."""
     if isinstance(valor, str):

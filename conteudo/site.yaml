@@ -1,0 +1,9 @@
+# Padmini / Valderez Astrologia — configurações do site comuns às duas versões.
+
+# Onde o código-fonte do site está publicado. O site usa o Swiss Ephemeris sob a
+# AGPL-3.0, então quem usa o site precisa ter acesso ao código que roda nele: é o
+# link "Código-fonte" do rodapé (védica e ocidental). Desde a rodada 10.1 (8/out/2026)
+# é o espelho público `padmini-codigo`, atualizado sozinho a cada push na `master`
+# do repositório privado (.github/workflows/codigo-publico.yml). Mudou o endereço?
+# Só esta linha.
+codigo_fonte: https://github.com/nicki-arch/padmini-codigo

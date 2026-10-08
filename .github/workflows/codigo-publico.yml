@@ -1,0 +1,73 @@
+# Espelho público do código (rodada 10.1). O site usa o Swiss Ephemeris sob a AGPL-3.0:
+# o código que roda em padmini.com.br precisa estar disponível para quem usa o site.
+# Este repositório (padmini) é privado — o histórico dele ainda tem os textos até 7/out —,
+# então a cada push na master a árvore atual vai para o repositório PÚBLICO
+# nicki-arch/padmini-codigo, sem o histórico daqui:
+#
+#   1. git archive HEAD (os textos já não estão no repositório; ver conteudo_privado.py);
+#   2. scripts/publicar_codigo.py tira o que está em publico-excluir.txt, põe o README do
+#      espelho (publico/README.md) e TRAVA se sobrar texto, blog, base_significacoes.py ou
+#      algo que pareça segredo;
+#   3. um commit novo "sync: padmini@<sha>" sobre o histórico do próprio espelho (nunca
+#      force-push). Se nada mudou, não cria commit.
+#
+# Precisa do secret CODIGO_PUBLICO_TOKEN: token fine-grained só do padmini-codigo, com
+# Contents: Read and write. Sem ele, o job falha (e diz por quê).
+name: codigo-publico
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# um sync por vez, na ordem dos pushes (o segundo espera o primeiro, não cancela)
+concurrency:
+  group: codigo-publico
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Montar e conferir a árvore pública
+        run: |
+          mkdir -p "$RUNNER_TEMP/arvore"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/arvore"
+          python scripts/publicar_codigo.py "$RUNNER_TEMP/arvore"
+      - name: Publicar no padmini-codigo
+        env:
+          TOKEN: ${{ secrets.CODIGO_PUBLICO_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::Falta o secret CODIGO_PUBLICO_TOKEN (token fine-grained só do nicki-arch/padmini-codigo, Contents: Read and write)."
+            exit 1
+          fi
+          DESTINO="$RUNNER_TEMP/publico"
+          git clone --quiet "https://x-access-token:${TOKEN}@github.com/nicki-arch/padmini-codigo.git" "$DESTINO"
+          cd "$DESTINO"
+          git config user.name "padmini-sync"
+          git config user.email "padmini-sync@users.noreply.github.com"
+          # sempre sobre o main do espelho (não depende do branch padrão do repositório)
+          if git ls-remote --exit-code --heads origin main >/dev/null; then
+            git checkout --quiet -B main origin/main
+          else
+            git checkout --quiet --orphan main   # primeira publicação: repositório vazio
+          fi
+          # o espelho fica igual à árvore conferida (o que saiu daqui sai de lá também)
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$RUNNER_TEMP/arvore/." .
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nada mudou no código publicado: sem commit."
+            exit 0
+          fi
+          git commit --quiet -m "sync: padmini@${GITHUB_SHA}"
+          git push origin HEAD:main
+          echo "Publicado: sync: padmini@${GITHUB_SHA} em https://github.com/nicki-arch/padmini-codigo"

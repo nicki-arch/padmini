@@ -139,5 +139,6 @@ def test_marcador_nunca_vaza(ocidental):
 def test_card_do_casal_usa_a_chave_e_a_marca(ocidental):
     html = cliente.get("/compatibilidade").text
     assert '(NOME_INDICE + " · método próprio").toUpperCase()' in html
-    assert '"valderez-" + _slug' in html and "padmini-" not in html
+    import textos  # o link do rodapé (padmini-codigo) não conta: o que importa é o nome do arquivo do card
+    assert '"valderez-" + _slug' in html and "padmini-" not in html.replace(textos.CODIGO_FONTE, "")
     assert "Young Serif" not in html and "Source Sans" not in html  # o canvas usa as fontes do site

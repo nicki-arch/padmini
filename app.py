@@ -214,6 +214,8 @@ _jinja = jinja2.Environment(
 _jinja.filters["moeda"] = ofertas.moeda
 # Nome do índice da sinastria (ocidental), fonte única em conteudo/ocidental/marca.yaml.
 _jinja.globals["indice"] = textos.NOME_INDICE
+# Link "Código-fonte" do rodapé (AGPL), fonte única em conteudo/site.yaml.
+_jinja.globals["codigo_fonte"] = textos.CODIGO_FONTE
 # Catálogo da ocidental (produtos, estados, interruptor de venda) e as frases de
 # revisão que são verdade hoje (regra de honestidade): conteudo/ocidental/catalogo.yaml
 # e revisao.yaml. Usados pelo menu, rodapé, home, "me avise"...
@@ -740,12 +742,14 @@ def pagina_termos():
 
 
 def _pagina_legal(rota: str) -> Response:
-    """Termos e privacidade. A védica serve os arquivos de sempre, byte a byte; a
-    ocidental monta o template (cores, fontes e a marca vêm da paleta)."""
+    """Termos e privacidade. A védica serve os arquivos de sempre (só o link do código-fonte
+    é trocado); a ocidental monta o template (cores, fontes e a marca vêm da paleta)."""
     versao = sistema.ativo()
     arquivo = sistema.LEGAIS[versao][rota]
     if versao == "vedica":
-        return FileResponse(RAIZ / "static" / arquivo)
+        # o arquivo de sempre; só o link "Código-fonte" sai de conteudo/site.yaml (rodada 10.1)
+        html = (RAIZ / "static" / arquivo).read_text(encoding="utf-8")
+        return Response(html.replace("{{ codigo_fonte }}", textos.CODIGO_FONTE), media_type="text/html; charset=utf-8")
     return _pagina_montada(arquivo, versao, rota.strip("/"))
 
 

@@ -38,7 +38,9 @@ def test_home_ocidental_tem_os_4_produtos_com_preco_do_yaml(versao):
 @pytest.mark.parametrize("rota", ["/termos", "/privacidade"])
 def test_termos_e_privacidade(versao, rota):
     versao("vedica")
-    assert cliente.get(rota).content == (RAIZ / "static" / rota.strip("/")).with_suffix(".html").read_bytes()
+    import textos  # o arquivo de sempre; só o link do código-fonte vem de conteudo/site.yaml (rodada 10.1)
+    arquivo = (RAIZ / "static" / rota.strip("/")).with_suffix(".html").read_text(encoding="utf-8")
+    assert cliente.get(rota).text == arquivo.replace("{{ codigo_fonte }}", textos.CODIGO_FONTE)
     versao("ocidental")
     html = cliente.get(rota).text
     assert "numerologia" in html.lower() and "tarot" in html.lower()

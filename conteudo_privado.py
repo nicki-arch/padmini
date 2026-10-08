@@ -22,6 +22,10 @@ import sys
 from pathlib import Path
 
 PROJETO = Path(__file__).resolve().parent
+# Os caminhos do conteúdo proprietário, relativos à raiz. Nunca versionados neste
+# repositório (.gitignore + testes/test_conteudo_fora_do_repo.py) nem publicados no
+# espelho público (scripts/publicar_codigo.py).
+CAMINHOS = ("base_significacoes.py", "conteudo/ocidental/textos", "conteudo/ocidental/blog")
 VARIAVEL = "PADMINI_CONTEUDO_DIR"
 REPO = "nicki-arch/padmini-conteudo"
 

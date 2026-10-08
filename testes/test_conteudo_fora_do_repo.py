@@ -15,7 +15,8 @@ from pathlib import Path
 import pytest
 
 RAIZ = Path(__file__).resolve().parents[1]
-PRIVADOS = ("base_significacoes.py", "conteudo/ocidental/textos", "conteudo/ocidental/blog")
+sys.path.insert(0, str(RAIZ))
+from conteudo_privado import CAMINHOS as PRIVADOS  # noqa: E402
 SCRIPT = RAIZ / "scripts" / "buscar_conteudo.sh"
 
 
