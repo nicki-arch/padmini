@@ -18,6 +18,7 @@ prompt de casal e o rascunho.
 """
 
 from datetime import date
+import conteudo_privado  # noqa: F401  (acha base_significacoes no repo privado)
 from base_significacoes import (
     NOME_PT, SIGNO_PT, LAGNA, NAKSHATRA, DASHA, GRAHA_DIGNIDADE,
     COMBUSTAO, CAZIMI, YOGAS, DOSHA,

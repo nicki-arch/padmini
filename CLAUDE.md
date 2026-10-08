@@ -39,10 +39,17 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
   `padmini` e `padmini-previa`) e o secret `CONTEUDO_REPO_TOKEN` no GitHub.
   **A Render precisa rodar `bash build.sh`** (Settings → Build Command), não só
   `pip install -r requirements.txt`: o `render.yaml` não é lido, porque os serviços foram
-  criados pelo painel. Estado em 7/out: a prévia já roda o `build.sh`; a produção troca depois
-  que o conteúdo estiver no repo privado. Até a fase 3 da rodada 10 entrar, os arquivos ainda
-  estão também aqui (transição). Se você está numa sessão nova e eles não existem no checkout,
-  é isso — não é regressão. Para editar texto, mexa no `padmini-conteudo`.
+  criados pelo painel. **Falha fechada, em duas travas:** sem o token (ou sem os arquivos no repo
+  privado) o `build.sh` para com mensagem clara; e se o site subir sem os textos mesmo assim, o
+  `app.py` não inicia (`conteudo_privado.exigir()`, a mensagem diz o que falta).
+  Os caminhos ficam no `.gitignore` e `testes/test_conteudo_fora_do_repo.py` falha se algum
+  voltar a ser versionado. **Numa sessão nova o checkout não tem esses arquivos — não é
+  regressão.** Para rodar local: clone o `padmini-conteudo` ao lado e use
+  `PADMINI_CONTEUDO_DIR=../padmini-conteudo` (ou `bash scripts/buscar_conteudo.sh` com a mesma
+  variável, que copia para cá). Para editar texto, mexa no `padmini-conteudo` (PR lá) e faça um
+  novo deploy da Render: o site só muda no próximo build. Revisão da Dona Valderez:
+  `scripts/exportar_revisao.py` / `importar_revisao.py --conteudo ../padmini-conteudo`, passo a
+  passo no README do `padmini-conteudo`.
 - **Licença:** código sob AGPL-3.0 (`LICENSE`); textos, copy, ilustrações e as marcas
   "Valderez Astrologia" e "Padmini" com todos os direitos reservados (seção "Licença" do
   `README.md`). Os textos já estiveram públicos e continuam no histórico do Git (ocidentais
@@ -53,14 +60,15 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 |---|---|
 | `app.py` | FastAPI: páginas, `/api/*`, `/webhook/cakto` |
 | `compute_chart.py` | Cálculo do mapa (Swiss Ephemeris, sideral Lahiri, whole sign) |
-| `detectar_fatos.py`, `montar_texto.py`, `base_significacoes.py` | Fatos do mapa → texto; IA (Claude) só reescreve |
+| `detectar_fatos.py`, `montar_texto.py`, `base_significacoes.py` | Fatos do mapa → texto; IA (Claude) só reescreve. `base_significacoes.py` vem do repo privado |
+| `conteudo_privado.py` + `scripts/buscar_conteudo.sh` | **Onde estão os textos (rodada 10)**: a pasta do conteúdo (`PADMINI_CONTEUDO_DIR` ou a raiz), o que falta e a trava da subida; o script do build/CI que clona o `padmini-conteudo` e copia para os mesmos caminhos |
 | `compatibilidade.py` | Guna Milan / Ashtakoot (36 pontos), doshas |
 | `acesso.py` | Token HMAC que libera o completo (sem token = 402) |
 | `cakto.py` | Webhook: assinatura HMAC `v1=` sobre `{timestamp}.{corpo}`; dados de nascimento vêm no `sck` |
 | `entrega.py` | Link assinado + e-mail (Resend) |
 | `static/afiliado.js` | Monta o link do checkout: dados no `sck`, afiliado/cupom dobrados em `utm_*` |
 | `mapa_ocidental.py` | Motor ocidental: tropical, Placidus (Porfírio nos polos), nodo verdadeiro, aspectos e orbes num lugar só. Validado contra 11 mapas do astro-seek (`testes/dados/referencias_ocidental.json`) |
-| `montar_texto_ocidental.py` + `conteudo/ocidental/textos/` | Mapa → texto (YAML, `revisado: false` em cada texto; `python scripts/revisao_textos.py` conta o que falta revisar) |
+| `montar_texto_ocidental.py` + `conteudo/ocidental/textos/` (repo privado) | Mapa → texto (YAML, `revisado: false` em cada texto; `python scripts/revisao_textos.py` conta o que falta revisar) |
 | `rotas_ocidental.py` + `static/ocidental/` | API `/api/ocidental/*`, páginas e `/live` da versão ocidental; `gerar_pdf_ocidental.py` é o PDF |
 | `revisao.py` + `scripts/exportar_revisao.py` / `importar_revisao.py` | Planilha de revisão da família (xlsx ↔ YAML); regras de tom e tamanho num lugar só. A planilha não vai para o git |
 | `numerologia.py` | Numerologia pitagórica (versão ocidental): regras de Y/W e do Caminho de Vida em `docs/ocidental.md` |

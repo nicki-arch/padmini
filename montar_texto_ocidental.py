@@ -12,17 +12,17 @@ quantos faltam — é a lista de trabalho da família do Pedro
 """
 
 from functools import lru_cache
-from pathlib import Path
 
 import re
 
 import yaml
 
+import conteudo_privado
 import textos
 
 import mapa_ocidental as mo
 
-PASTA = Path(__file__).parent / "conteudo" / "ocidental" / "textos"
+PASTA = conteudo_privado.TEXTOS  # repositório privado (rodada 10); PADMINI_CONTEUDO_DIR troca a pasta
 ARQUIVOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais", "pecas", "sinastria", "numerologia",
             "tarot")
 

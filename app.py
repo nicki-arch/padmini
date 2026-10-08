@@ -29,6 +29,11 @@ from fastapi.exception_handlers import http_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel, Field, ValidationError
 
+# Os textos de interpretação vêm do repositório privado (rodada 10, conteudo_privado.py):
+# sem eles o site NÃO sobe, e o log diz o que falta (segurança falha fechada).
+import conteudo_privado  # noqa: E402
+conteudo_privado.exigir()
+
 from base_significacoes import NOME_PT, SIGNO_PT
 from cidades import BuscaCidades
 from compute_chart import calcular_mapa

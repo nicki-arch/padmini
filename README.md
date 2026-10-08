@@ -89,7 +89,7 @@ O índice de cidades (`data/cidades_index.tsv`) já vem pronto; para refazer, `p
 | `compute_chart.py` | Cálculo do mapa: Lahiri, casas por signo inteiro, nó médio, fuso automático |
 | `detectar_fatos.py` | Regras clássicas: dignidades, combustão, yogas, doshas |
 | `compatibilidade.py` | Motor de compatibilidade (8 kootas, doshas, Mangal, paywall) |
-| `base_significacoes.py` | Textos interpretativos: mapa + kootas/doshas de casal (rascunho, revisar) |
+| `base_significacoes.py` | Textos interpretativos védicos: mapa + kootas/doshas de casal. **Não fica neste repositório:** vem do repositório privado `padmini-conteudo` no build (`scripts/buscar_conteudo.sh`), como `conteudo/ocidental/textos/` e `conteudo/ocidental/blog/` |
 | `montar_texto.py` | Monta os relatórios (mapa e casal) e os prompts para o Claude |
 | `acesso.py` | Gate do completo (token HMAC) |
 | `emitir_token.py` | CLI para emitir token de acesso ao completo |
@@ -106,6 +106,10 @@ O índice de cidades (`data/cidades_index.tsv`) já vem pronto; para refazer, `p
 | `static/og-*.png` | Imagens Open Graph (versionadas no repo) |
 
 ## Testes
+
+Os testes precisam dos textos do repositório privado `padmini-conteudo` (rodada 10): clone-o ao
+lado e use `PADMINI_CONTEUDO_DIR=../padmini-conteudo` (no Windows, `set PADMINI_CONTEUDO_DIR=..\padmini-conteudo`).
+Sem eles, o app não sobe e diz o que falta.
 
 ```
 python -m pytest -q testes               # suíte inteira (roda também no GitHub Actions a cada push)
