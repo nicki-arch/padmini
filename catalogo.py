@@ -8,7 +8,9 @@ em que estado, em que ordem, e se o site vende. Lido de
     oculto    não aparece em lugar nenhum; a rota responde 404
 
 `vendas_abertas()` é o interruptor de venda: com `false`, nenhuma página nem
-e-mail mostra preço, botão de compra ou link da Cakto.
+e-mail mostra preço, botão de compra ou link da Cakto. A única exceção é a prévia
+com PADMINI_VENDAS_TESTE=1 (rodada 11, `pagamento.vendas_teste`): a venda abre só
+naquele serviço, e só em modo de teste da Stripe — o YAML não muda.
 
 Só a ocidental tem catálogo. A védica não pergunta nada aqui: as funções que
 recebem `sistema` respondem como antes para ela (vende, tudo no ar).
@@ -21,6 +23,8 @@ continua lendo, qualquer que seja o estado do produto.
 from pathlib import Path
 
 import yaml
+
+import pagamento
 
 ARQUIVO = Path(__file__).parent / "conteudo" / "ocidental" / "catalogo.yaml"
 ESTADOS = ("ativo", "em_breve", "oculto")
@@ -76,8 +80,12 @@ def dados() -> dict:
 
 
 def vendas_abertas(sistema: str = "ocidental") -> bool:
-    """O interruptor de venda. A védica não tem catálogo: vende como sempre."""
-    return True if sistema != "ocidental" else bool(_dados["vendas_abertas"])
+    """O interruptor de venda. A védica não tem catálogo: vende como sempre.
+    PADMINI_VENDAS_TESTE=1 (só com a Stripe em modo de teste) abre a venda no serviço
+    em que estiver, sem mexer no YAML."""
+    if sistema != "ocidental":
+        return True
+    return bool(_dados["vendas_abertas"]) or pagamento.vendas_teste()
 
 
 def produtos() -> list[dict]:

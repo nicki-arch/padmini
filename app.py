@@ -53,6 +53,7 @@ import limites
 import marketing
 import marca
 import ofertas
+import pagamento
 import paleta
 import seguranca
 import rotas_ocidental
@@ -88,6 +89,12 @@ log = logging.getLogger("padmini.app")
 # no ar um site meio montado.
 SISTEMA_NA_SUBIDA = sistema.ativo()
 log.info("Padmini subindo com PADMINI_SISTEMA=%s", SISTEMA_NA_SUBIDA)
+# Quem cobra (PADMINI_PAGAMENTO, ver pagamento.py) e a venda de teste da prévia
+# (PADMINI_VENDAS_TESTE). Combinação errada — valor desconhecido, venda de teste com a
+# Cakto ou com chave de produção da Stripe — derruba a subida com a explicação.
+PAGAMENTO_NA_SUBIDA, VENDAS_TESTE_NA_SUBIDA = pagamento.validar_na_subida()
+log.info("Padmini subindo com PADMINI_PAGAMENTO=%s%s", PAGAMENTO_NA_SUBIDA,
+         " e VENDA DE TESTE aberta (PADMINI_VENDAS_TESTE=1)" if VENDAS_TESTE_NA_SUBIDA else "")
 
 app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
 # Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy) em toda resposta.
@@ -1319,12 +1326,16 @@ def enviar_lembretes(request: Request):
 def limpar_dados_antigos(request: Request):
     """Chamado 1x por dia pelo GitHub Actions (.github/workflows/tarefas.yml).
     Cumpre a seção 7 da política de privacidade: dados de marketing saem quando a
-    pessoa se descadastra ou após 24 meses sem nenhuma interação (db.limpar_marketing)."""
+    pessoa se descadastra ou após 24 meses sem nenhuma interação (db.limpar_marketing).
+    Rodada 11: e os pedidos pendentes não pagos saem depois de 7 dias (db.limpar_pendentes)."""
     _chave_tarefas_ok(request)
     if not db.ativo():
         return {"ok": True, "apagadas": {}, "nota": "sem banco"}
+    pendentes = db.limpar_pendentes()
     apagadas = db.limpar_marketing()
-    if apagadas is None:
+    if apagadas is not None and pendentes is not None:
+        apagadas["pedidos_pendentes"] = pendentes
+    if apagadas is None or pendentes is None:
         alertas.alertar("Limpeza de dados com falha", "A limpeza diária dos dados de marketing não rodou.",
                         chave="limpeza", intervalo=24 * 3600)
         raise HTTPException(503, "Não deu para limpar agora.")

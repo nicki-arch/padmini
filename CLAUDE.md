@@ -65,6 +65,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `compatibilidade.py` | Guna Milan / Ashtakoot (36 pontos), doshas |
 | `acesso.py` | Token HMAC que libera o completo (sem token = 402) |
 | `cakto.py` | Webhook: assinatura HMAC `v1=` sobre `{timestamp}.{corpo}`; dados de nascimento vêm no `sck` |
+| `pagamento.py` + `pendentes.py` | **Checkout próprio com a Stripe (rodada 11, só ocidental)**: `PADMINI_PAGAMENTO=cakto\|stripe` (padrão cakto; valor errado = não sobe) e `PADMINI_VENDAS_TESTE=1` (abre a venda só naquele serviço; só com stripe + `sk_test_`, senão não sobe). O pedido nasce em `pedidos_pendentes` antes do pagamento (preço do `ofertas.yaml`, nunca do navegador; cupom no servidor); a Stripe recebe só o id opaco e o e-mail. Não pago sai em 7 dias. Ver `docs/stripe.md` |
 | `entrega.py` | Link assinado + e-mail (Resend) |
 | `static/afiliado.js` | Monta o link do checkout: dados no `sck`, afiliado/cupom dobrados em `utm_*` |
 | `mapa_ocidental.py` | Motor ocidental: tropical, Placidus (Porfírio nos polos), nodo verdadeiro, aspectos e orbes num lugar só. Validado contra 11 mapas do astro-seek (`testes/dados/referencias_ocidental.json`) |
