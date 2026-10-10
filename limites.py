@@ -119,7 +119,12 @@ LIVE_FALHAS_GLOBAL = Limite("live_falhas_global", maximo=30, janela=60 * 60)
 MINHAS_LEITURAS = Limite("minhas_leituras", maximo=10, janela=60 * 60)
 MINHAS_LEITURAS_EMAIL = Limite("minhas_leituras_email", maximo=3, janela=60 * 60)
 
-TODOS = (CALCULO, PDF, TEXTO_IA, CIDADES, LISTA, AMOSTRA_EMAIL, LIVE_FALHAS_IP, LIVE_FALHAS_GLOBAL,
+# Checkout próprio (rodada 11): cada POST /api/checkout grava um pedido e cria uma
+# sessão na Stripe; a página de "obrigado" consulta o estado a cada poucos segundos.
+CHECKOUT = Limite("checkout", maximo=10, janela=10 * 60)
+CHECKOUT_ESTADO = Limite("checkout_estado", maximo=240, janela=10 * 60)
+
+TODOS = (CHECKOUT, CHECKOUT_ESTADO, CALCULO, PDF, TEXTO_IA, CIDADES, LISTA, AMOSTRA_EMAIL, LIVE_FALHAS_IP, LIVE_FALHAS_GLOBAL,
          MINHAS_LEITURAS, MINHAS_LEITURAS_EMAIL)
 
 

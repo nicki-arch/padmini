@@ -55,7 +55,43 @@ Só por variável de ambiente, nunca no repositório nem em log. Primeiro só na
 | `padmini-previa` | `STRIPE_PUBLISHABLE_KEY` | `pk_test_…` |
 | `padmini-previa` | `STRIPE_WEBHOOK_SECRET` | `whsec_…` do endpoint abaixo |
 | `padmini-previa` | `DATABASE_URL` | um Postgres (pode ser outro banco que o de produção) |
+| `padmini-previa` | `PADMINI_SITE_URL` | o endereço da prévia (é para lá que a Stripe devolve: `return_url`) |
+
+No painel da Stripe (modo de teste): ativar cartão, Pix, Apple Pay e Google Pay em
+*Settings → Payment methods*; marca e cores em *Settings → Branding*; e **registrar o domínio** da
+prévia (e depois `padmini.com.br`) em *Settings → Payment method domains* — sem isso o Apple Pay
+não aparece no checkout embutido (docs.stripe.com/payments/payment-methods/pmd-registration).
 
 A produção só troca para `stripe` quando o Nicolas decidir abrir a venda.
 
-Fases seguintes (checkout, webhook, privacidade, relatório) completam esta página.
+## O checkout (Fase 2: `rotas_checkout.py`, `stripe_api.py`, `static/ocidental/comprar.js`)
+
+1. **Botão de compra** (`/mapa`, `/compatibilidade`, `/numerologia`, `/tarot`): no modo `stripe` ele
+   leva `data-comprar="<produto>"` e o `comprar.js` manda para `POST /api/checkout` o produto, os
+   dados da leitura, o e-mail, a caixa da sequência e a origem (`ref`, `cupom`, `utm_*`). **Sem preço**
+   e sem dado pessoal na URL (acabou o `sck` no modo stripe). Com a Cakto, o botão é o de sempre.
+2. **`POST /api/checkout`**: valida (422), confere `catalogo.vende(produto)` (404 para `em_breve`,
+   `oculto` ou venda fechada), monta o pendente (preço do catálogo, cupom no servidor), grava (sem
+   banco = 503), cria a Checkout Session e devolve `{"url": "/checkout/{id}"}`. A Stripe recebe:
+   `ui_mode=embedded_page`, `mode=payment`, `line_items[].price_data` (nome do produto + preço, em
+   BRL), `customer_email`, `client_reference_id` e `metadata.pedido` (o id opaco, também no
+   `payment_intent_data.metadata`), `return_url=/obrigado/{id}`, `locale=pt-BR`. Chave de
+   idempotência = o id do pedido. Os meios de pagamento vêm do painel.
+3. **`/checkout/{id}`**: resumo (produto, de quem é a leitura, preço) + o Embedded Checkout
+   (`js.stripe.com/endive/stripe.js`, mesma versão da API do servidor, `2026-09-30.endive`). O
+   `client_secret` vem por `GET /api/checkout/{id}` (só pedido aberto). Pedido pago → "já foi pago";
+   expirado/falho → "expirou, comece de novo".
+4. **`/obrigado/{id}`** (o `return_url`): pergunta `GET /api/checkout/{id}/estado` a cada 3 s (10 s
+   depois de 2 min, até 30 min). **Só o webhook confirma** (Fase 3): enquanto o pedido não está
+   `pago` não há link, mesmo com a sessão da Stripe paga. Sessão `complete` + `unpaid` = "aguardando
+   o Pix"; sessão `open` = "o pagamento não foi concluído".
+5. **Sem a taxa da Cakto** (R$0,99) nas páginas, e a copy diz "pagamento seguro pela Stripe"
+   (`pagamento_stripe` / `resposta_stripe` nos YAML). Sem order bump na sinastria.
+6. **E-mails** (lembrete, boas-vindas, pós-compra): no modo stripe o botão leva à página do produto
+   (`marketing.link_site`), não ao checkout: dado de nascimento não vai em URL.
+7. **Segurança**: a CSP libera a Stripe **só em `/checkout/`** (`seguranca.CSP_STRIPE`, origens de
+   "Checkout" + "Stripe.js" da doc, sem `maps.googleapis.com`), e só lá o `Permissions-Policy` deixa
+   `payment` para a Stripe (Apple Pay / Google Pay no iframe). O Stripe.js não depende do aceite de
+   cookies. Limites: 10 checkouts por IP a cada 10 min; 240 consultas de estado.
+
+Fases seguintes (webhook, privacidade, relatório) completam esta página.

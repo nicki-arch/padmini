@@ -101,7 +101,7 @@
       {%- endif %}
       <ul class="lista-ok">{% for i in t.recebe.itens %}<li>{{ i }}</li>{% endfor %}</ul>
       <a class="bt bt-1 bt-cheio" href="/mapa">{{ t.recebe.botao }}</a>
-      <p class="miudo" style="text-align:center">{{ t.recebe.pagamento if vende_mapa else t.recebe.abre_em_breve }}</p>
+      <p class="miudo" style="text-align:center">{{ (t.recebe.pagamento_stripe if stripe else t.recebe.pagamento) if vende_mapa else t.recebe.abre_em_breve }}</p>
     </div>
   </section>
   {%- endif %}

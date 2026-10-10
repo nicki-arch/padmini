@@ -25,6 +25,7 @@ import acesso
 import catalogo
 import entrega
 import ofertas
+import pagamento
 import paleta
 import sistema as _sistema
 import textos
@@ -65,7 +66,11 @@ PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia":
 
 
 def link_checkout(produto: str, dados: dict | None, campanha: str, sistema: str = "vedica") -> str:
-    """Checkout da Cakto com os dados de nascimento no `sck` e utm de e-mail."""
+    """Checkout da Cakto com os dados de nascimento no `sck` e utm de e-mail.
+    Com o checkout próprio (PADMINI_PAGAMENTO=stripe, ocidental, rodada 11) o link é a
+    página do produto: a compra começa lá, e dado pessoal não vai em URL."""
+    if sistema == "ocidental" and pagamento.stripe():
+        return link_site(produto, campanha)
     base = ofertas.checkout(produto, sistema) if catalogo.vende(produto, sistema) else ""
     if not base:  # oferta sem link, ou venda fechada (catalogo.yaml): a página do produto
         return f"{entrega.SITE_URL}/{PAGINA_DO_PRODUTO.get(produto, 'mapa')}"

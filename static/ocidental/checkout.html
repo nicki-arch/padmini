@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="{{ cores.ground }}">
+{# Checkout próprio (rodada 11): o resumo do pedido (produto, de quem é a leitura, preço
+   calculado no servidor) e o checkout embutido da Stripe (Embedded Checkout). Montada a
+   cada pedido por app._pagina_do_pedido; o nome vem de quem fez o pedido: sempre `| e`.
+   O Stripe.js é carregado só aqui (a CSP desta rota libera a Stripe, seguranca.CSP_STRIPE)
+   e não depende do aceite de cookies: é o pagamento, não um pixel. #}
+<title>Valderez Astrologia — {{ t.checkout.titulo_pagina }}</title>
+<meta name="robots" content="noindex">
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+{%- if pedido.estado == "aberto" %}
+<script src="{{ stripe_js }}"></script>
+{%- endif %}
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+</head>
+<body class="vz">
+{% set atual = "" %}{% include "ocidental/_cabecalho.html" %}
+
+<main id="conteudo">
+  <section class="secao degrade">
+  {%- if pedido.estado == "aberto" %}
+    <div class="checkout">
+      <aside class="cartao checkout-resumo" aria-labelledby="titulo-pedido">
+        <span class="olho">{{ t.checkout.olho }}</span>
+        <h1 class="t3" id="titulo-pedido">{{ pedido.produto | e }}</h1>
+        {%- if pedido.nome %}<p class="apoio">{{ t.checkout.para.replace("{nome}", pedido.nome | e) }}</p>{% endif %}
+        <div class="checkout-linha"><span>{{ t.checkout.total }}</span><span><span class="preco">R${{ pedido.valor }}</span></span></div>
+        <p class="miudo">{{ t.checkout.pagamento_unico }}{% if pedido.cupom %} · {{ t.checkout.cupom.replace("{cupom}", pedido.cupom | upper | e) }}{% endif %}</p>
+        <p class="miudo">{{ t.checkout.formas }}</p>
+        <p class="miudo">{{ t.checkout.seguranca }}</p>
+      </aside>
+      <div class="cartao checkout-stripe">
+        <div id="checkout" aria-live="polite"><p class="carregando">{{ t.checkout.carregando }}</p></div>
+        <p class="form-erro" id="erro" role="alert" hidden>{{ t.checkout.erro }}</p>
+      </div>
+    </div>
+  {%- elif pedido.estado == "pago" %}
+    <div class="obrigado">
+      <span class="chip chip-ok">{{ t.obrigado.confirmado_chip }}</span>
+      <h1 class="t1">{{ t.checkout.pago_titulo }}</h1>
+      <p class="lead">{{ t.checkout.pago_texto }}</p>
+      <a class="bt bt-1" href="/obrigado/{{ pedido.id }}">{{ t.checkout.pago_botao }}</a>
+    </div>
+  {%- else %}
+    <div class="obrigado">
+      <h1 class="t1">{{ t.checkout.expirado_titulo }}</h1>
+      <p class="lead">{{ t.checkout.expirado_texto }}</p>
+      <a class="bt bt-1" href="{{ pedido.rota }}">{{ t.checkout.expirado_botao }}</a>
+    </div>
+  {%- endif %}
+  </section>
+</main>
+
+{% include "ocidental/_rodape.html" %}
+{%- if pedido.estado == "aberto" %}
+<script>
+(async () => {
+  const erro = () => { document.querySelector("#checkout").innerHTML = ""; document.querySelector("#erro").hidden = false; };
+  try {
+    const r = await fetch("/api/checkout/{{ pedido.id }}", { headers: { "Accept": "application/json" } });
+    if (r.status === 409) { location.reload(); return; }  // pago ou expirado enquanto a aba estava aberta
+    const c = await r.json();
+    if (!r.ok || !window.Stripe) throw new Error("checkout");
+    const stripe = Stripe(c.chave_publica);
+    const opcoes = { fetchClientSecret: async () => c.client_secret };
+    // nome atual da doc (docs.stripe.com/checkout/embedded/quickstart); o anterior como reserva
+    const checkout = stripe.createEmbeddedCheckoutPage
+      ? await stripe.createEmbeddedCheckoutPage(opcoes)
+      : await stripe.initEmbeddedCheckout(opcoes);
+    document.querySelector("#checkout").innerHTML = "";
+    checkout.mount("#checkout");
+    if (window.padTrack) padTrack("checkout_aberto", { produto: "{{ pedido.chave }}", sistema: "ocidental" });
+  } catch (e) { erro(); }
+})();
+</script>
+{%- endif %}
+</body>
+</html>

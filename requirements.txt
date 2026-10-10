@@ -9,3 +9,4 @@ psycopg[binary]
 pyyaml
 jinja2
 openpyxl
+stripe==16.0.0

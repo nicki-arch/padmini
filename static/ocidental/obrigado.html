@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="{{ cores.ground }}">
+{# Volta do checkout (return_url da Stripe, rodada 11). O pagamento só conta como
+   confirmado quando o WEBHOOK marca o pedido como pago: a página pergunta o estado a
+   cada poucos segundos (/api/checkout/{id}/estado) e mostra o link da leitura assim que
+   ele chega. Pix gerado e ainda não pago = "aguardando o Pix". #}
+<title>Valderez Astrologia — {{ t.obrigado.titulo_pagina }}</title>
+<meta name="robots" content="noindex">
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+</head>
+<body class="vz">
+{% set atual = "" %}{% include "ocidental/_cabecalho.html" %}
+
+<main id="conteudo">
+  <section class="secao degrade">
+    <div class="obrigado" id="obrigado" aria-live="polite">
+      <span class="chip" id="chip">{{ t.obrigado.esperando_chip }}</span>
+      <h1 class="t1" id="titulo" tabindex="-1">{{ t.obrigado.esperando_titulo }}</h1>
+      <p class="lead" id="texto">{{ t.obrigado.esperando_texto }}</p>
+      <div class="cartao">
+        <p class="apoio">{{ pedido.produto | e }}{% if pedido.nome %} · {{ pedido.nome | e }}{% endif %} · R${{ pedido.valor }}</p>
+        <a class="bt bt-1" id="acao" href="#" hidden></a>
+        <p class="miudo"><a href="/minhas-leituras">{{ t.obrigado.minhas_leituras }}</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+{% include "ocidental/_rodape.html" %}
+<script>
+(() => {
+  const T = {{ t.obrigado | tojson }};
+  const NOME = {{ (pedido.nome.split(" ")[0] if pedido.nome else "") | tojson }};
+  const $ = (s) => document.querySelector(s);
+  const inicio = Date.now();
+  let ultimo = "";
+  function mostrar(estado, chip, titulo, texto, acao, href) {
+    $("#chip").textContent = chip || "";
+    $("#chip").hidden = !chip;
+    $("#chip").className = "chip" + (estado === "pago" ? " chip-ok" : estado === "pix" ? " chip-breve" : "");
+    $("#titulo").textContent = titulo;
+    $("#texto").textContent = texto;
+    const a = $("#acao");
+    a.hidden = !acao; a.textContent = acao || ""; a.href = href || "#";
+    if (estado !== ultimo && ultimo) $("#titulo").focus();
+    ultimo = estado;
+  }
+  async function perguntar() {
+    let c = null;
+    try {
+      const r = await fetch("/api/checkout/{{ pedido.id }}/estado", { headers: { "Accept": "application/json" } });
+      if (r.ok) c = await r.json();
+    } catch (e) {}
+    const demorando = Date.now() - inicio > 120000;
+    if (c && c.estado === "pago" && c.link) {
+      mostrar("pago", T.confirmado_chip, NOME ? T.confirmado_titulo.replace("{nome}", NOME) : T.confirmado_titulo.replace(", {nome}", ""),
+              T.confirmado_texto, T.confirmado_botao, c.link);
+      if (window.padTrack) padTrack("compra_confirmada", { produto: "{{ pedido.chave }}", sistema: "ocidental" });
+      return;
+    }
+    if (c && c.estado === "expirado") return mostrar("fim", "", {{ t.checkout.expirado_titulo | tojson }}, {{ t.checkout.expirado_texto | tojson }}, {{ t.checkout.expirado_botao | tojson }}, "{{ pedido.rota }}");
+    if (c && c.estado === "falhou") return mostrar("fim", "", T.falhou_titulo, T.falhou_texto, {{ t.checkout.expirado_botao | tojson }}, "{{ pedido.rota }}");
+    if (c && c.aguardando_pix) mostrar("pix", T.pix_chip, T.pix_titulo, T.pix_texto);
+    else if (c && c.sessao === "open") mostrar("aberto", "", T.aberto_titulo, T.aberto_texto, T.aberto_botao, "/checkout/{{ pedido.id }}");
+    else mostrar("esperando", T.esperando_chip, T.esperando_titulo, demorando ? T.demorando_texto : T.esperando_texto);
+    // pergunta de novo: rápido no começo, devagar depois (o Pix pode levar minutos)
+    if (Date.now() - inicio < 30 * 60 * 1000) setTimeout(perguntar, demorando ? 10000 : 3000);
+  }
+  perguntar();
+})();
+</script>
+</body>
+</html>

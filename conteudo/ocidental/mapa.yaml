@@ -71,6 +71,8 @@ amostra:
     - PDF no seu e-mail, na hora
   botao_comprar: Desbloquear por
   pagamento: Pix ou cartão · pagamento seguro pela Cakto
+  # com o checkout próprio (PADMINI_PAGAMENTO=stripe, rodada 11)
+  pagamento_stripe: Cartão, Pix, Apple Pay ou Google Pay · pagamento seguro pela Stripe
   email_foi: O resto da sua amostra foi para
   email_reenviar: Reenviar o e-mail
   casal_titulo: É um casal?

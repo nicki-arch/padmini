@@ -1,0 +1,41 @@
+# Valderez Astrologia — copy do checkout próprio (rodada 11): /checkout/{id} e /obrigado/{id}.
+# Preço e nome do produto NÃO ficam aqui: ofertas.yaml (o valor é o do pedido, calculado
+# no servidor). `{nome}` = de quem é a leitura; `{produto}` = o nome do produto.
+
+checkout:
+  titulo_pagina: Pagamento
+  olho: Seu pedido
+  para: "Leitura de {nome}"
+  total: Total
+  pagamento_unico: pagamento único
+  cupom: "Cupom {cupom} aplicado"
+  seguranca: "O pagamento é feito na Stripe, dentro desta página. Os dados do cartão vão direto para ela: não passam pelo nosso servidor."
+  formas: Cartão, Pix, Apple Pay ou Google Pay.
+  carregando: Abrindo o pagamento…
+  erro: "Não conseguimos abrir o pagamento agora. Recarregue a página em instantes."
+  pago_titulo: Este pedido já foi pago
+  pago_texto: "A leitura já está liberada."
+  pago_botao: Ver a minha leitura
+  expirado_titulo: Este pedido expirou
+  expirado_texto: "O tempo para pagar acabou e nada foi cobrado. É só começar de novo."
+  expirado_botao: Começar de novo
+
+obrigado:
+  titulo_pagina: Obrigado
+  confirmado_chip: Pagamento confirmado
+  confirmado_titulo: "Pronto, {nome}: sua leitura está liberada"
+  confirmado_texto: "Mandamos o link também para o seu e-mail. Guarde: é ele que abre a sua leitura."
+  confirmado_botao: Abrir a minha leitura
+  pix_chip: Aguardando o Pix
+  pix_titulo: Assim que o Pix cair, a leitura aparece aqui
+  pix_texto: "Pode pagar com calma pelo app do seu banco. Esta página se atualiza sozinha, e o link também chega no seu e-mail."
+  esperando_chip: Confirmando o pagamento
+  esperando_titulo: Só um instante
+  esperando_texto: "Estamos esperando a confirmação do pagamento. Isso costuma levar poucos segundos."
+  demorando_texto: "Está demorando mais que o normal. Quando o pagamento for confirmado, o link chega no seu e-mail. Se não chegar, use Minhas leituras."
+  aberto_titulo: O pagamento não foi concluído
+  aberto_texto: "Nada foi cobrado. Você pode voltar e tentar de novo."
+  aberto_botao: Voltar ao pagamento
+  falhou_titulo: O pagamento não foi aprovado
+  falhou_texto: "Nada foi cobrado. Você pode começar de novo com outra forma de pagamento."
+  minhas_leituras: Minhas leituras

@@ -180,6 +180,9 @@ CREATE TABLE IF NOT EXISTS pedidos_pendentes (
                       CHECK (estado IN ('aberto', 'pago', 'expirado', 'falhou'))
 );
 CREATE INDEX IF NOT EXISTS pedidos_pendentes_limpeza_idx ON pedidos_pendentes (estado, criado_em);
+-- O client_secret da Checkout Session: é o que monta o checkout na página /checkout/{id}
+-- (inclusive se a pessoa recarregar). Só serve para pagar aquela sessão.
+ALTER TABLE pedidos_pendentes ADD COLUMN IF NOT EXISTS stripe_client_secret TEXT;
 ALTER TABLE pedidos_pendentes ENABLE ROW LEVEL SECURITY;
 
 -- Defesa em profundidade (só existe no Supabase): tira das roles da API
@@ -688,7 +691,8 @@ def leituras_do_email(email: str) -> list[dict]:
 ESTADOS_PENDENTE = ("aberto", "pago", "expirado", "falhou")
 DIAS_PENDENTE = 7
 _COLUNAS_PENDENTE = ("id", "criado_em", "sistema", "itens", "email", "nome", "consentimentos",
-                     "rastreio", "cupom", "valor_centavos", "moeda", "stripe_session_id", "estado")
+                     "rastreio", "cupom", "valor_centavos", "moeda", "stripe_session_id",
+                     "stripe_client_secret", "estado")
 
 
 def criar_pendente(p: dict) -> bool:
@@ -736,14 +740,15 @@ def pendente_da_sessao(stripe_session_id: str) -> dict | None:
     return _pendente_onde("stripe_session_id", stripe_session_id)
 
 
-def ligar_sessao(id_pendente: str, stripe_session_id: str) -> bool:
-    """Guarda o id da Checkout Session criada para este pendente (uma vez só)."""
+def ligar_sessao(id_pendente: str, stripe_session_id: str, client_secret: str | None = None) -> bool:
+    """Guarda a Checkout Session criada para este pendente (uma vez só)."""
     if not ativo():
         return False
     try:
         with _conectar() as c:
-            cur = c.execute("UPDATE pedidos_pendentes SET stripe_session_id = %s, atualizado_em = now() "
-                            "WHERE id = %s AND stripe_session_id IS NULL", (stripe_session_id, id_pendente))
+            cur = c.execute("UPDATE pedidos_pendentes SET stripe_session_id = %s, stripe_client_secret = %s, "
+                            "atualizado_em = now() WHERE id = %s AND stripe_session_id IS NULL",
+                            (stripe_session_id, client_secret, id_pendente))
         return cur.rowcount == 1
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao ligar a sessão ao pedido pendente")

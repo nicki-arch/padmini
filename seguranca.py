@@ -103,17 +103,40 @@ def precisa_google_fonts(request=None) -> bool:
     return bool(token) and acesso.sistema_do_token(token) == "vedica"
 
 
-def politica_csp(fontes_google: bool = True) -> str:
+# Checkout próprio (rodada 11): só a página /checkout/{id} carrega o Stripe.js e o
+# checkout embutido, então só ela libera as origens da Stripe — as que a documentação
+# pede para "Checkout" e "Stripe.js" (docs.stripe.com/security/guide#content-security-policy),
+# sem o maps.googleapis.com (é do Address Element com chave própria do Google, que não
+# usamos). O Stripe.js não depende do aceite de cookies: é o pagamento, não um pixel.
+CSP_STRIPE = {
+    "script": ["https://js.stripe.com", "https://*.js.stripe.com", "https://checkout.stripe.com"],
+    "frame": ["https://js.stripe.com", "https://*.js.stripe.com", "https://hooks.stripe.com",
+              "https://checkout.stripe.com"],
+    "connect": ["https://api.stripe.com", "https://checkout.stripe.com"],
+    "img": ["https://*.stripe.com"],
+}
+# Apple Pay e Google Pay rodam dentro do iframe da Stripe, que precisa da permissão
+# `payment` (nas outras páginas ela continua desligada).
+PAGAMENTO_STRIPE = 'payment=(self "https://js.stripe.com" "https://*.js.stripe.com" "https://checkout.stripe.com")'
+ROTA_CHECKOUT = "/checkout/"
+
+
+def pagina_de_checkout(request=None) -> bool:
+    return request is not None and request.url.path.startswith(ROTA_CHECKOUT)
+
+
+def politica_csp(fontes_google: bool = True, stripe: bool = False) -> str:
     ph = " ".join(origens_posthog())
     gf = GOOGLE_FONTS if fontes_google else {"style": "", "font": ""}
-    frames = _origens_pixels("frame")
+    st = {k: " ".join(v) for k, v in CSP_STRIPE.items()} if stripe else {k: "" for k in CSP_STRIPE}
+    frames = " ".join(o for o in (_origens_pixels("frame"), st["frame"]) if o)
     diretivas = [
         "default-src 'self'",
-        f"script-src 'self' 'unsafe-inline' {ph} {_origens_pixels('script')}",
+        f"script-src 'self' 'unsafe-inline' {ph} {_origens_pixels('script')} {st['script']}",
         f"style-src 'self' 'unsafe-inline' {gf['style']}",
         f"font-src 'self' {gf['font']}",
-        f"img-src 'self' data: blob: {_origens_pixels('img')}",
-        f"connect-src 'self' {ph} {_origens_pixels('connect')}",
+        f"img-src 'self' data: blob: {_origens_pixels('img')} {st['img']}",
+        f"connect-src 'self' {ph} {_origens_pixels('connect')} {st['connect']}",
         "worker-src 'self' blob:",
         *([f"frame-src 'self' {frames}"] if frames else []),
         "object-src 'none'",
@@ -125,13 +148,17 @@ def politica_csp(fontes_google: bool = True) -> str:
 
 
 def cabecalhos(request=None) -> dict[str, str]:
+    checkout = pagina_de_checkout(request)
+    permissoes = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    if checkout:
+        permissoes = permissoes.replace("payment=()", PAGAMENTO_STRIPE)
     return {
-        "Content-Security-Policy": politica_csp(precisa_google_fonts(request)),
+        "Content-Security-Policy": politica_csp(precisa_google_fonts(request), stripe=checkout),
         "Strict-Transport-Security": "max-age=31536000",
         "Referrer-Policy": "strict-origin-when-cross-origin",
         "X-Content-Type-Options": "nosniff",
         "X-Frame-Options": "DENY",
-        "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+        "Permissions-Policy": permissoes,
     }
 
 

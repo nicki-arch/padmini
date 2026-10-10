@@ -85,6 +85,11 @@ def dados_da_leitura(pedido: PedidoCheckout) -> dict:
     tiragem = (pedido.tiragem or "").strip()
     if not tiragem:
         raise PedidoInvalido("Falta a tiragem.")
+    import tarot
+    try:
+        tarot.cartas_da_tiragem(tiragem)  # só tiragem emitida por nós (selo HMAC)
+    except Exception:  # noqa: BLE001  (ValueError ou servidor sem PADMINI_SECRET)
+        raise PedidoInvalido("Tiragem inválida: tire as cartas de novo.")
     return {"tiragem": tiragem}
 
 
@@ -97,7 +102,8 @@ def rastreio(origem: dict) -> dict:
 
 def cupom_valido(produto: str, origem: dict) -> str:
     """O código do cupom, em minúsculas, se ele vale para este produto; senão ''."""
-    codigo = str((origem or {}).get("cupom") or "").strip().lower()
+    origem = origem or {}
+    codigo = str(origem.get("cupom") or origem.get("coupon") or "").strip().lower()
     oferta = ofertas.oferta(produto, SISTEMA)
     if codigo and oferta.get("cupom_percentual") and codigo in oferta.get("cupom_codigos", []):
         return codigo
@@ -134,7 +140,7 @@ def montar(pedido: PedidoCheckout) -> dict:
         raise PedidoInvalido("Produto desconhecido.")
     dados = dados_da_leitura(pedido)
     origem = rastreio(pedido.origem)
-    cupom = cupom_valido(pedido.produto, origem)
+    cupom = cupom_valido(pedido.produto, pedido.origem)
     valor = valor_centavos(pedido.produto, cupom)
     return {
         "id": novo_id(),

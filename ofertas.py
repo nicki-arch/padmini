@@ -95,6 +95,15 @@ def do_sistema(sistema: str = "vedica") -> dict:
     return POR_SISTEMA[sistema]
 
 
+def para_a_tela(sistema: str = "vedica", sem_taxa: bool = False) -> dict:
+    """As ofertas como as páginas recebem. `sem_taxa` (checkout próprio na Stripe, rodada
+    11): sem o "+ R$0,99 de taxa da plataforma", que é da Cakto."""
+    todas = do_sistema(sistema)
+    if not sem_taxa:
+        return todas
+    return {chave: {**o, "taxa_plataforma": None} for chave, o in todas.items()}
+
+
 def oferta(chave: str, sistema: str = "vedica") -> dict:
     return do_sistema(sistema).get(chave, {})
 

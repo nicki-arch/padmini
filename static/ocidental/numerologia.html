@@ -19,6 +19,9 @@
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
+{%- if stripe and catalogo.vende("numerologia") %}
+<script src="/static/ocidental/comprar.js" defer></script>{# checkout próprio (rodada 11) #}
+{%- endif %}
 <script src="/static/ocidental/me-avise.js" defer></script>
 <script src="/static/ocidental/amostra-email.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
@@ -77,7 +80,9 @@
 <script>
 {#- venda fechada (catalogo.yaml) ou produto fora do ar: nada de preço nem link de compra #}
 {%- set vende = catalogo.vende("numerologia") %}
-const LINK_CHECKOUT = "{{ ofertas.numerologia.checkout if vende else '' }}";
+// Checkout próprio (Stripe, rodada 11): o botão chama /api/checkout (comprar.js).
+const PAGAR_NA_STRIPE = {{ "true" if stripe else "false" }};
+const LINK_CHECKOUT = "{{ ('#comprar' if stripe else ofertas.numerologia.checkout) if vende else '' }}";
 const PRECO = "{{ ofertas.numerologia.preco | moeda if vende else '' }}";
 const NOME_OFERTA = {{ ofertas.numerologia.nome | tojson }};
 const TAXA = "{{ ofertas.numerologia.taxa_plataforma | moeda if vende else '' }}";  // ofertas.yaml → taxa_plataforma
@@ -85,6 +90,9 @@ const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let ultimoPedido = null;
 let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
+// checkout próprio (rodada 11): o que o botão manda para /api/checkout (comprar.js). Sem preço.
+window.padCorpoCompra = () => ultimoPedido && ({ produto: "numerologia", nome: ultimoPedido.nome, data: ultimoPedido.data,
+  email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: !!(ultimoContato && ultimoContato.aceita_sequencia) });
 
 $("#data").addEventListener("input", (e) => {
   const d = e.target.value.replace(/\D/g, "").slice(0, 8);
@@ -125,7 +133,7 @@ $("#form").addEventListener("submit", async (e) => {
 });
 
 function desenharAmostra(d) {
-  const cta = LINK_CHECKOUT ? linkCheckout(LINK_CHECKOUT, { produto: "numerologia", ...ultimoPedido }, { email: ultimoContato && ultimoContato.email }) : "";
+  const cta = !LINK_CHECKOUT ? "" : PAGAR_NA_STRIPE ? LINK_CHECKOUT : linkCheckout(LINK_CHECKOUT, { produto: "numerologia", ...ultimoPedido }, { email: ultimoContato && ultimoContato.email });
   const res = $("#resultado");
   res.innerHTML = `<p class="eyebrow">Sua amostra</p><h2 id="titulo-resultado" tabindex="-1">${esc(d.nome)}</h2>${padEmail.aviso(d)}
     <div class="narrow" style="margin:0">${blocoNumero(d.caminho_de_vida)}</div>
@@ -145,7 +153,7 @@ function desenharAmostra(d) {
         <h3 id="oferta-titulo">${esc(NOME_OFERTA)}</h3>
         <p class="price">R$${esc(PRECO)}</p>
         ${TAXA ? `<p class="caption ptaxa">+ R$${esc(TAXA)} de taxa da plataforma</p>` : ""}
-        ${cta ? `<p class="help">Pagamento único. Garantia de 7 dias.</p><a class="button" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'numerologia',sistema:'ocidental'})">Quero a numerologia completa →</a>`
+        ${cta ? `<p class="help">Pagamento único. Garantia de 7 dias.</p><a class="button" href="${esc(cta)}" ${PAGAR_NA_STRIPE ? 'data-comprar="numerologia"' : ""} onclick="window.padTrack&&padTrack('checkout_click',{produto:'numerologia',sistema:'ocidental'})">Quero a numerologia completa →</a>`
               : `<p class="help">O pagamento desta versão ainda está sendo configurado.</p><button type="button" class="button" disabled>Em breve</button>`}
       </aside>
       {%- else %}

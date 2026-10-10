@@ -17,6 +17,9 @@
 {% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/valderez/v2.css">
 <script src="/static/afiliado.js" defer></script>
+{%- if stripe and catalogo.vende("mapa") %}
+<script src="/static/ocidental/comprar.js" defer></script>{# checkout próprio (rodada 11) #}
+{%- endif %}
 <script src="/static/ocidental/amostra-email.js" defer></script>
 <script src="/static/ocidental/me-avise.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
@@ -115,9 +118,11 @@
 {% set nota_rodape %}Mapa pelo zodíaco tropical, casas Placidus. Ferramenta de autoconhecimento: descreve tendências, não é previsão nem substituto de orientação profissional. Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos astronômicos: Swiss Ephemeris.{% endset %}{% include "ocidental/_rodape.html" %}
 
 <script>
+// Checkout próprio (Stripe, rodada 11): o botão chama /api/checkout (comprar.js).
+const PAGAR_NA_STRIPE = {{ "true" if stripe else "false" }};
 {%- if vende %}
 // Link vem de conteudo/ocidental/ofertas.yaml (trocado no servidor). Vazio = oferta ainda não existe na Cakto.
-const LINK_CHECKOUT_INDIVIDUAL = "{{ ofertas.mapa.checkout }}";
+const LINK_CHECKOUT_INDIVIDUAL = "{{ "#comprar" if stripe else ofertas.mapa.checkout }}";
 const PRECO = "{{ ofertas.mapa.preco | moeda }}";
 // taxa que a Cakto soma no checkout (ofertas.yaml → taxa_plataforma); vazio = não mostra a linha
 const TAXA = "{{ ofertas.mapa.taxa_plataforma | moeda }}";
@@ -127,6 +132,9 @@ const TAXA = "{{ ofertas.mapa.taxa_plataforma | moeda }}";
 const LINK_CHECKOUT_INDIVIDUAL = "";
 {%- endif %}
 const TA = {{ t.amostra | tojson }};
+{%- if stripe %}
+TA.pagamento = TA.pagamento_stripe;  // checkout próprio (rodada 11)
+{%- endif %}
 const PASSOS = {{ t.passos | tojson }};
 const SIGNOS = ["aries","touro","gemeos","cancer","leao","virgem","libra","escorpiao","sagitario","capricornio","aquario","peixes"];
 const SIGNO_CURTO = { aries:"Ári", touro:"Tou", gemeos:"Gêm", cancer:"Cân", leao:"Leão", virgem:"Vir", libra:"Lib", escorpiao:"Esc", sagitario:"Sag", capricornio:"Cap", aquario:"Aqu", peixes:"Pei" };
@@ -138,6 +146,10 @@ const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let ultimoPedido = null;
 let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
+// checkout próprio (rodada 11): o que o botão manda para /api/checkout (comprar.js). Sem preço.
+window.padCorpoCompra = () => ultimoPedido && ({ produto: "mapa",
+  pessoa: { nome: ultimoPedido.nome, data: ultimoPedido.data, hora: ultimoPedido.hora, lat: ultimoPedido.lat, lon: ultimoPedido.lon, cidade: ultimoPedido.cidade },
+  email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: !!(ultimoContato && ultimoContato.aceita_sequencia) });
 
 // ---------- máscara de data e hora ----------
 function aplicarMascara(el, tamanhos, separador) {
@@ -286,7 +298,8 @@ function cartaoDimensao(dm, completos) {
   </article>`;
 }
 function desenharAmostra(d) {
-  const cta = LINK_CHECKOUT_INDIVIDUAL ? linkCheckout(LINK_CHECKOUT_INDIVIDUAL, { produto: "mapa", ...ultimoPedido }, { email: ultimoContato && ultimoContato.email }) : "";
+  const cta = !LINK_CHECKOUT_INDIVIDUAL ? "" : PAGAR_NA_STRIPE ? LINK_CHECKOUT_INDIVIDUAL
+    : linkCheckout(LINK_CHECKOUT_INDIVIDUAL, { produto: "mapa", ...ultimoPedido }, { email: ultimoContato && ultimoContato.email });
   const completos = Object.fromEntries((d.amostra.triade || []).filter((i) => i.texto && !d.parcial).map((i) => [i.ponto, i.texto]));
   const ativos = d.dimensoes.filter((x) => x.signo_pt);
   const nomes = ativos.slice(0, 3).map((x) => esc(x.signo_pt));
@@ -316,7 +329,8 @@ function desenharAmostra(d) {
         <div style="display:flex;align-items:baseline;gap:10px"><span class="preco">R${{ ofertas.mapa.preco | moeda }}</span><span class="miudo">${esc(TA.pagamento_unico)}</span></div>
         ${TAXA ? `<p class="miudo">+ R$${esc(TAXA)} de taxa da plataforma</p>` : ""}
         <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
-        ${cta ? `<a class="bt bt-1 bt-cheio" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} R${{ ofertas.mapa.preco | moeda }}</a>
+        ${cta && PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="mapa" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} R${{ ofertas.mapa.preco | moeda }}</a>
+          <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : cta ? `<a class="bt bt-1 bt-cheio" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} R${{ ofertas.mapa.preco | moeda }}</a>
           <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p><button type="button" class="bt bt-1 bt-cheio" disabled>Em breve</button>`}
       {%- else %}
         {% set aviso_produto = catalogo.produto("mapa") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}
