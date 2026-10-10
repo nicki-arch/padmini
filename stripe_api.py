@@ -112,12 +112,13 @@ def sessao(session_id: str) -> dict:
         raise
     except Exception as erro:  # noqa: BLE001
         raise StripeIndisponivel(f"não deu para ler a sessão: {type(erro).__name__}") from erro
-    pi = s.payment_intent
-    return {"id": s.id, "status": s.status, "payment_status": s.payment_status,
-            "amount_total": s.amount_total, "currency": s.currency,
-            "payment_intent": pi if isinstance(pi, str) or pi is None else pi.id,
-            "client_reference_id": s.client_reference_id,
-            "metadata": dict(s.metadata or {})}
+    d = s.to_dict()  # na biblioteca 16, StripeObject não é dict
+    pi = d.get("payment_intent")
+    return {"id": d.get("id"), "status": d.get("status"), "payment_status": d.get("payment_status"),
+            "amount_total": d.get("amount_total"), "currency": d.get("currency"),
+            "payment_intent": pi.get("id") if isinstance(pi, dict) else pi,
+            "client_reference_id": d.get("client_reference_id"),
+            "metadata": dict(d.get("metadata") or {})}
 
 
 class AssinaturaInvalida(ValueError):

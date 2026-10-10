@@ -361,3 +361,26 @@ def test_nada_pessoal_no_log(stripe_falsa, emails, avisos, caplog):
     texto = caplog.text
     for dado in ("ana@teste.com", "Ana Clara", "1990-05-15", "Porto Alegre"):
         assert dado not in texto, dado
+
+
+# ------------------------------------------------------------------ objetos de verdade da biblioteca
+def test_sessao_le_objetos_reais_da_biblioteca(monkeypatch):
+    """Na biblioteca stripe 16, StripeObject não é dict: `dict(s.metadata)` quebrava e o
+    webhook de verdade responderia 500 para sempre. Aqui a sessão é um objeto real."""
+    import stripe
+    from types import SimpleNamespace
+    obj = stripe.checkout.Session.construct_from({
+        "id": "cs_test_9", "object": "checkout.session", "status": "complete", "payment_status": "paid",
+        "amount_total": 3700, "currency": "brl", "payment_intent": "pi_9", "client_reference_id": "pedido9",
+        "metadata": {"pedido": "pedido9"}, "client_secret": "cs_test_9_secret"}, "sk_test_x")
+    falso = SimpleNamespace(v1=SimpleNamespace(checkout=SimpleNamespace(sessions=SimpleNamespace(
+        retrieve=lambda sid, *a, **k: obj, create=lambda *a, **k: obj))))
+    monkeypatch.setattr(stripe_api, "_cliente", lambda: falso)
+    assert stripe_api.sessao("cs_test_9") == {
+        "id": "cs_test_9", "status": "complete", "payment_status": "paid", "amount_total": 3700, "currency": "brl",
+        "payment_intent": "pi_9", "client_reference_id": "pedido9", "metadata": {"pedido": "pedido9"}}
+    stripe_api._cache_estado.clear()
+    assert stripe_api.estado_da_sessao("cs_test_9") == {"status": "complete", "payment_status": "paid"}
+    assert stripe_api.criar_sessao({"id": "pedido9", "email": "a@b.c", "itens": [
+        {"chave": "mapa", "valor_centavos": 3700, "dados": {}}]}, "https://x") == {
+        "id": "cs_test_9", "client_secret": "cs_test_9_secret"}
