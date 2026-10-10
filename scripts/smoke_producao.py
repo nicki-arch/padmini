@@ -106,12 +106,42 @@ def _():
     return st == 200 and b"/api/lista" in corpo and recusa == 422
 
 
+def _pagamento_no_ar() -> str:
+    """Quem cobra na ocidental (rodada 11, /api/config → pagamento): cakto | stripe.
+    Site anterior à rodada 11 (sem o campo) = cakto."""
+    st, corpo = req("/api/config")
+    return (json.loads(corpo).get("pagamento") if st == 200 else "") or "cakto"
+
+
+def _ativo_no_catalogo(rota: str) -> bool:
+    """Na ocidental, a página só tem botão de compra se o produto está `ativo` no
+    catalogo.yaml (em breve = "me avise"). A védica não tem catálogo."""
+    if _versao_no_ar() != "ocidental":
+        return True
+    import yaml
+    catalogo = yaml.safe_load((_raiz() / "conteudo" / "ocidental" / "catalogo.yaml").read_text(encoding="utf-8")) or {}
+    return any(p.get("rota") == rota and p.get("estado") == "ativo" for p in catalogo.get("produtos") or [])
+
+
+def _botoes_de_compra(paginas) -> bool:
+    """Os botões de compra levam ao checkout: o link da Cakto ou, com o checkout próprio
+    da Stripe na ocidental (rodada 11), o botão que chama /api/checkout — e nada da Cakto.
+    Só as páginas de produto ativo (em breve não tem botão)."""
+    paginas = [p for p in paginas if _ativo_no_catalogo(p)]
+    if _versao_no_ar() == "ocidental" and _pagamento_no_ar() == "stripe":
+        if not any("checkout próprio" in a for a in AVISOS):
+            AVISOS.append("checkout próprio (Stripe) no ar: conferido o botão que chama /api/checkout, "
+                          "sem link da Cakto, no lugar do link da Cakto")
+        corpos = [req(p)[1] for p in paginas]
+        return all(b'data-comprar="' in c and b"pay.cakto.com.br" not in c for c in corpos)
+    return all(b"pay.cakto.com.br" in req(p)[1] for p in paginas)
+
+
 @checar("botões de compra apontam para a Cakto")
 def _():
     if _captura_no_ar() or not _vendas_abertas():
         return True
-    return (b"pay.cakto.com.br" in req("/mapa")[1]
-            and b"pay.cakto.com.br" in req("/compatibilidade")[1])
+    return _botoes_de_compra(("/mapa", "/compatibilidade"))
 
 
 @checar("busca de cidades retorna resultados")
@@ -208,7 +238,7 @@ def _versao_no_ar() -> str:
 @checar("página do casal mostra o preço do ofertas.yaml")
 def _():
     import re
-    if _captura_no_ar() or not _vendas_abertas():
+    if _captura_no_ar() or not _vendas_abertas() or not _ativo_no_catalogo("/compatibilidade"):
         return True
     preco = _ofertas_do_yaml(_versao_no_ar())["compat"]["preco"]
     return re.search(rf"relatório completo por <b[^>]*>R\${preco}</b>".encode(), req("/compatibilidade")[1]) is not None
@@ -261,7 +291,7 @@ def _():
 def _():
     if _versao_no_ar() != "ocidental" or _captura_no_ar() or not _vendas_abertas():
         return True  # só vale com a ocidental no ar vendendo (a védica é conferida acima)
-    return all(b"pay.cakto.com.br" in req(p)[1] for p in ("/mapa", "/compatibilidade", "/numerologia", "/tarot"))
+    return _botoes_de_compra(("/mapa", "/compatibilidade", "/numerologia", "/tarot"))
 
 
 # ---------------------------------------------------------------------------
@@ -418,6 +448,29 @@ def _():
     return not falhas
 
 
+# ---------------------------------------------------------------------------
+# Rodada 11: checkout próprio com a Stripe. Só entram na lista com
+# /api/config → pagamento = stripe (com a Cakto, o smoke fica igual).
+# ---------------------------------------------------------------------------
+CHECAGENS_STRIPE = []
+
+
+def _stripe_webhook_sem_assinatura():
+    evento = {"id": "evt_smoke", "type": "checkout.session.completed",
+              "data": {"object": {"id": "cs_smoke", "payment_status": "paid", "metadata": {"pedido": "smoke"}}}}
+    return req("/webhook/stripe", evento)[0] == 401
+
+
+def _stripe_checkout_inexistente():
+    return req("/checkout/" + "smoke" * 5)[0] == 404 and req("/api/checkout/" + "smoke" * 5 + "/estado")[0] == 404
+
+
+CHECAGENS_STRIPE += [
+    ("[stripe] /webhook/stripe recusa evento sem assinatura (401)", _stripe_webhook_sem_assinatura),
+    ("[stripe] pedido que não existe responde 404 (/checkout, /api/checkout)", _stripe_checkout_inexistente),
+]
+
+
 def main():
     # o plano grátis "dorme": a primeira chamada acorda o servidor
     for _ in range(3):
@@ -426,8 +479,12 @@ def main():
                 break
         except Exception:
             time.sleep(5)
+    checagens = list(CHECAGENS)
+    # Rodada 11: só com o checkout próprio no ar (com a Cakto, a lista é a de sempre)
+    if _pagamento_no_ar() == "stripe":
+        checagens += CHECAGENS_STRIPE
     falhas = 0
-    for nome, f in CHECAGENS:
+    for nome, f in checagens:
         try:
             ok = f()
         except Exception as e:  # noqa: BLE001
@@ -436,7 +493,7 @@ def main():
         falhas += not ok
     for aviso in AVISOS:
         print("AVISO", aviso)
-    print(f"\n{len(CHECAGENS) - falhas}/{len(CHECAGENS)} checagens OK em {BASE}")
+    print(f"\n{len(checagens) - falhas}/{len(checagens)} checagens OK em {BASE}")
     sys.exit(1 if falhas else 0)
 
 

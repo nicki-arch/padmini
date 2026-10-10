@@ -136,4 +136,38 @@ o link à mão (com `DATABASE_URL` e `PADMINI_SECRET` do serviço):
 
 e mandar para o e-mail do pedido; ou reembolsar pelo painel.
 
-Fases seguintes (privacidade, relatório) completam esta página.
+## Privacidade, relatório e smoke (Fase 4)
+
+- **`/privacidade` e `/termos`** (só a ocidental; a védica é servida byte a byte e não muda): no modo
+  `stripe`, os trechos de pagamento dizem que a **Stripe** é a operadora (cartão, Pix, Apple Pay,
+  Google Pay), que no **Pix** quem processa é a **Ebanx** (aparece como recebedora no banco), que o
+  cartão é digitado no formulário da Stripe e **não passa pelo nosso servidor**, que a Stripe recebe
+  só e-mail, produto, preço e número do pedido, e que o pedido não pago some em 7 dias. A Cakto fica
+  como "compras anteriores". No modo `cakto`, o texto é o de antes. **Revisar com o advogado** junto
+  com o resto da política quando houver faturamento.
+- **`python scripts/relatorio_vendas.py --mes AAAA-MM [--saida arquivo.csv]`**: CSV por produto
+  (`produto;vendas;bruto;taxa_stripe;reembolsos;contestacoes;liquido`, vírgula decimal, em reais),
+  das *balance transactions* do mês (horário de Brasília) + o produto de cada pagamento em `pedidos`.
+  Precisa de `STRIPE_SECRET_KEY` (uma chave restrita só de leitura basta) e `DATABASE_URL`. Sem dado
+  pessoal. Pagamento sem pedido nosso aparece como `sem_pedido`.
+- **Smoke** (`scripts/smoke_producao.py`): lê `pagamento` do `/api/config`. Com a Cakto, as 29
+  checagens de sempre. Com a Stripe, +2: `/webhook/stripe` recusa POST sem assinatura (401) e pedido
+  que não existe dá 404; e os botões de compra são conferidos pelo `data-comprar` (sem link da Cakto).
+  Produto `em_breve` no catálogo não é cobrado de ter botão.
+
+## Roteiro do teste na prévia (critérios de aceite do brief)
+
+Com as variáveis da tabela acima na `padmini-previa` e o webhook criado no painel:
+
+1. `python scripts/smoke_producao.py https://<prévia>` → 31/31.
+2. **Cartão**: `/mapa` → amostra → "Desbloquear" → `/checkout/{id}` → cartão `4242 4242 4242 4242`,
+   validade futura, CVC qualquer → volta para `/obrigado/{id}` com "Pagamento confirmado" e o botão
+   da leitura; o e-mail chega com o mesmo link.
+3. **Pix**: mesmo caminho, escolher Pix (CPF de teste `000.000.000-00`) → `/obrigado` mostra
+   "Aguardando o Pix" → "Simulate scan" na página de teste da Stripe → autorizar → a página troca
+   sozinha para "Pagamento confirmado" e o e-mail chega.
+4. **Evento repetido**: no painel (*Workbench → Webhooks → o endpoint → Event deliveries*), "Resend"
+   no `checkout.session.completed` → nenhum e-mail a mais.
+5. **Sem assinatura**: `curl -X POST https://<prévia>/webhook/stripe -d '{}'` → 401.
+6. **Metadata**: no painel, abra o pagamento → *Metadata* só tem `pedido` (um código aleatório).
+7. **Produção**: continua `cakto` e venda fechada; o smoke de produção segue 29/29.
