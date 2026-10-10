@@ -835,6 +835,8 @@ def config():
         "amostra_email": bool(os.environ.get("RESEND_API_KEY")),
         # interruptor de venda da ocidental (catalogo.yaml); o smoke usa
         "vendas_abertas": catalogo.vendas_abertas(sistema.ativo()),
+        # quem cobra na ocidental (rodada 11): cakto | stripe; o smoke usa
+        "pagamento": pagamento.modo(),
         # Pixels de anúncio (rodada 6): só com a ocidental no ar, e o navegador só os
         # carrega depois do "Aceitar" (static/ocidental/consentimento.js). Vazio = não carrega.
         **seguranca.pixels(),

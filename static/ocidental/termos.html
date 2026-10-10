@@ -6,7 +6,8 @@
 <meta name="theme-color" content="#FBF6F1">
 {# Rodada 9, Fase C: tela Sistema-Legal do pacote valderez-design-2.0 (abas, índice,
    "Em resumo"). O TEXTO jurídico é o mesmo de antes: quem é o controlador dos dados
-   e a operadora do pagamento (Cakto) não mudam nesta rodada. #}
+   e a operadora do pagamento (Cakto) não mudam nesta rodada.
+   Rodada 11: com o checkout próprio (`stripe`), o pagamento e o reembolso falam da Stripe. #}
 <title>Valderez Astrologia — Termos de Uso</title>
 <meta name="description" content="Termos de uso da Valderez Astrologia.">
 <meta name="robots" content="noindex">
@@ -42,7 +43,7 @@
       </ol>
     </nav>
     <article class="legal-texto">
-  <p class="legal-data">Última atualização: 30 de setembro de 2026. Serviço operado por <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Atendimento: <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
+  <p class="legal-data">Última atualização: {{ "10 de outubro de 2026" if stripe else "30 de setembro de 2026" }}. Serviço operado por <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Atendimento: <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
 
   <p>Estes termos regulam o uso do site Valderez Astrologia (padmini.com.br) e a compra dos nossos produtos digitais. Ao usar o site ou comprar, você concorda com eles.</p>
 
@@ -56,13 +57,13 @@
   <p>O serviço é destinado a maiores de 18 anos. Não é preciso criar conta. Você é responsável pela veracidade dos dados informados; a precisão da leitura depende deles, principalmente da hora de nascimento (no mapa e na sinastria) e do nome completo de registro (na numerologia). Ao informar dados de outra pessoa, você declara ter a autorização dela.</p>
 
   <h2 id="s4">4. Amostra grátis, preços e pagamento</h2>
-  <p>A amostra de cada leitura é gratuita. O relatório completo é pago, com o preço exibido no site e no checkout no momento da compra. Preços promocionais, como o desconto de cupom de afiliado, valem pelo prazo e pelas condições informados na oferta. O pagamento é processado pela plataforma <strong>Cakto</strong>, sujeito também aos termos dela.</p>
+  <p>A amostra de cada leitura é gratuita. O relatório completo é pago, com o preço exibido no site e no checkout no momento da compra. Preços promocionais, como o desconto de cupom de afiliado, valem pelo prazo e pelas condições informados na oferta. {% if stripe %}O pagamento é processado pela <strong>Stripe</strong>, num formulário seguro dentro do site (no Pix, pela <strong>Ebanx</strong>, parceira da Stripe), sujeito também aos termos dela.{% else %}O pagamento é processado pela plataforma <strong>Cakto</strong>, sujeito também aos termos dela.{% endif %}</p>
 
   <h2 id="s5">5. Entrega</h2>
   <p>O relatório completo é um conteúdo digital entregue por e-mail, por meio de um link pessoal, após a confirmação do pagamento — em geral em poucos minutos (no Pix, logo após a compensação). Se não receber, verifique a caixa de spam e fale com o atendimento. O link é pessoal e intransferível: não o compartilhe. No tarot, o link abre exatamente as cartas que você tirou antes de comprar.</p>
 
   <h2 id="s6">6. Arrependimento, garantia e reembolso</h2>
-  <p>Você pode desistir da compra em até <strong>7 (sete) dias</strong> a contar da compra, com devolução integral do valor pago, conforme o art. 49 do Código de Defesa do Consumidor. Para pedir, escreva para <strong>contato@pedrosperbmonteiro.com.br</strong> ou use o canal de reembolso da Cakto. O estorno segue os prazos da forma de pagamento usada.</p>
+  <p>Você pode desistir da compra em até <strong>7 (sete) dias</strong> a contar da compra, com devolução integral do valor pago, conforme o art. 49 do Código de Defesa do Consumidor. Para pedir, escreva para <strong>contato@pedrosperbmonteiro.com.br</strong> {% if stripe %}ou responda ao e-mail de entrega da leitura.{% else %}ou use o canal de reembolso da Cakto.{% endif %} O estorno segue os prazos da forma de pagamento usada.</p>
 
   <h2 id="s7">7. Propriedade intelectual</h2>
   <p>A marca, os textos, o design e o software da Valderez Astrologia são protegidos pela legislação de direitos autorais e de propriedade industrial. O relatório comprado é para uso pessoal: não é permitido revendê-lo, copiá-lo em massa ou redistribuí-lo comercialmente. Os cálculos astronômicos usam a biblioteca Swiss Ephemeris, da Astrodienst, sob a licença AGPL.</p>

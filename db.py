@@ -916,3 +916,14 @@ def comprou_desde(email: str, quando) -> bool:
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao consultar compra")
         return True
+
+
+def produtos_dos_pagamentos_stripe() -> dict:
+    """{PaymentIntent: produto} das compras da Stripe (relatório de vendas). Só ids e
+    produto: nada de dado pessoal."""
+    if not ativo():
+        return {}
+    with _conectar() as c:
+        rows = c.execute("SELECT stripe_pagamento, produto FROM pedidos WHERE origem_pagamento = 'stripe' "
+                         "AND stripe_pagamento IS NOT NULL").fetchall()
+    return {pi: produto for pi, produto in rows}
