@@ -1090,6 +1090,17 @@ def _processar_pedido(evento: dict) -> dict:
     if db.pedido_entregue(cakto_id):
         return {"ok": True, "produto": produto, "duplicado": True}
 
+    return _entregar_leitura(
+        produto, versao, dados, email, cakto_id,
+        lambda link, enviado: db.registrar_pedido(evento, _rotulo_produto(produto, versao), dados, email,
+                                                  link, enviado))
+
+
+def _entregar_leitura(produto: str, versao: str, dados: dict, email: str, referencia: str, registrar) -> dict:
+    """O caminho ÚNICO de entrega de uma compra paga, da Cakto ou da Stripe (rodada 11):
+    emite o token (link do completo), manda o e-mail de entrega (com a venda cruzada),
+    grava o pedido (`registrar(link, enviado)`, cada origem grava os seus ids) e avisa a
+    equipe se o e-mail não saiu."""
     link = entrega.link_completo(produto, dados, versao)
     try:
         extra = marketing.bloco_venda_cruzada(produto, dados, versao)
@@ -1099,10 +1110,10 @@ def _processar_pedido(evento: dict) -> dict:
     enviado = entrega.enviar_email(
         email, ASSUNTO_ENTREGA[versao],
         entrega.email_completo_html(produto, link, dados.get("nome", ""), extra, versao))
-    db.registrar_pedido(evento, _rotulo_produto(produto, versao), dados, email, link, enviado)
+    registrar(link, enviado)
     if not enviado:
         alertas.alertar("E-mail de entrega NÃO saiu — mandar o link à mão",
-                        f"pedido {cakto_id} · {_rotulo_produto(produto, versao)} · "
+                        f"pedido {referencia} · {_rotulo_produto(produto, versao)} · "
                         f"{email or '(sem e-mail)'}\nlink: {link}")
     # se não enviou (Resend não configurado), devolve o link para envio manual
     return {"ok": True, "produto": produto, "email": email or None,
@@ -1148,6 +1159,162 @@ def _alertar_pendente(evento: dict, produto: str, email: str, motivo: str, pd: d
         f"motivo: {motivo}\npedido: {d.get('id')} (ref {d.get('refId')})\nproduto pago: {produto}\n"
         f"e-mail: {email or '(sem e-mail)'}\nsck: {d.get('sck')!r}\n\n"
         "Veja docs/seguranca.md → Pedidos pendentes.")
+
+
+# ---------------------------------------------------------------------------
+# Webhook da Stripe (rodada 11, checkout próprio). Lido antes: docs.stripe.com/webhooks
+# e docs.stripe.com/checkout/fulfillment. Funciona com qualquer PADMINI_PAGAMENTO (como o
+# da Cakto): um pedido feito antes de voltar para a Cakto ainda é entregue.
+#
+#   checkout.session.completed               pago (cartão, carteiras) → entrega;
+#                                            Pix gerado e não pago → espera
+#   checkout.session.async_payment_succeeded o Pix caiu → entrega
+#   checkout.session.async_payment_failed    o Pix falhou → pendente `falhou`
+#   checkout.session.expired                 pendente `expirado` + e-mail de abandono
+#   charge.refunded, charge.dispute.created  registra no pedido e avisa a equipe
+#
+# Segurança falha fechada (regra 4): sem STRIPE_WEBHOOK_SECRET, ou assinatura errada,
+# 401. Idempotente pelo id do evento (eventos_stripe) e pelo pedido (a transição para
+# `pago` acontece uma vez só). Nada de dado pessoal no log: só ids.
+# ---------------------------------------------------------------------------
+EVENTOS_STRIPE = ("checkout.session.completed", "checkout.session.async_payment_succeeded",
+                  "checkout.session.async_payment_failed", "checkout.session.expired",
+                  "charge.refunded", "charge.dispute.created")
+
+
+@app.post("/webhook/stripe")
+async def webhook_stripe(request: Request):
+    corpo = await request.body()
+    try:
+        evento = stripe_api.verificar_evento(corpo, request.headers.get("stripe-signature") or "",
+                                             pagamento.segredo_webhook())
+    except stripe_api.AssinaturaInvalida as erro:
+        log.warning("webhook stripe: recusado (%s)", erro)
+        alertas.alertar("Webhook da Stripe recusado (assinatura inválida)",
+                        "Se foi um pagamento de verdade, o STRIPE_WEBHOOK_SECRET na Render pode estar errado "
+                        "ou faltando. Se não, é alguém testando o endereço.",
+                        chave="webhook_stripe401", intervalo=60 * 60)
+        raise HTTPException(401, "assinatura inválida")
+    tipo, id_evento = str(evento["type"]), str(evento["id"])
+    if tipo not in EVENTOS_STRIPE:
+        return {"ok": True, "ignorado": tipo}
+    # sem banco não há o que entregar (os dados da leitura estão lá): 503 faz a Stripe
+    # reenviar depois (até 3 dias em produção)
+    if not db.saude():
+        log.error("webhook stripe: banco indisponível; evento %s fica para o reenvio", id_evento)
+        raise HTTPException(503, "banco indisponível")
+    try:
+        novo = db.evento_stripe_novo(id_evento, tipo)
+    except Exception:  # noqa: BLE001
+        log.exception("webhook stripe: falha ao reservar o evento %s", id_evento)
+        raise HTTPException(503, "banco indisponível")
+    if not novo:
+        return {"ok": True, "duplicado": True}
+    log.info("webhook stripe: %s %s", tipo, id_evento)
+    try:
+        objeto = (evento.get("data") or {}).get("object") or {}
+        if tipo in ("charge.refunded", "charge.dispute.created"):
+            return _stripe_reembolso_ou_contestacao(tipo, objeto)
+        return _stripe_sessao(tipo, objeto)
+    except Exception:
+        # não perde o evento: a reserva sai e a Stripe reenvia
+        db.esquecer_evento_stripe(id_evento)
+        raise
+
+
+def _stripe_sessao(tipo: str, objeto: dict) -> dict:
+    id_pedido = str((objeto.get("metadata") or {}).get("pedido") or objeto.get("client_reference_id") or "")
+    p = db.pendente(id_pedido) if id_pedido else None
+    if not p or p.get("stripe_session_id") != objeto.get("id"):
+        if tipo in ("checkout.session.completed", "checkout.session.async_payment_succeeded") \
+                and objeto.get("payment_status") == "paid":
+            alertas.alertar("Pagamento na Stripe SEM pedido nosso — conferir e entregar à mão",
+                            f"sessão {objeto.get('id')} · pedido {id_pedido or '(sem id)'} não encontrado.\n"
+                            "Veja docs/stripe.md → Pedido pago sem entrega.")
+        return {"ok": True, "ignorado": "pedido desconhecido"}
+    if tipo == "checkout.session.async_payment_failed":
+        db.marcar_pendente(p["id"], "falhou")
+        return {"ok": True, "pedido": p["id"], "estado": "falhou"}
+    if tipo == "checkout.session.expired":
+        db.marcar_pendente(p["id"], "expirado")
+        return _abandono_stripe(p)
+    return _entregar_stripe(tipo, p)
+
+
+def _entregar_stripe(tipo: str, p: dict) -> dict:
+    """Entrega depois de buscar a sessão ATUAL na Stripe: só com payment_status `paid` e o
+    valor que nós cobramos. Pix gerado e não pago (`unpaid`) espera o
+    async_payment_succeeded."""
+    sessao = stripe_api.sessao(p["stripe_session_id"])  # StripeIndisponivel → 500 → reenvio
+    if sessao["payment_status"] != "paid":
+        return {"ok": True, "pedido": p["id"], "aguardando": sessao["payment_status"]}
+    item = p["itens"][0]
+    produto, versao = item["chave"], p.get("sistema") or "ocidental"
+    if (sessao.get("amount_total") != p["valor_centavos"] or str(sessao.get("currency") or "").lower() != p["moeda"]
+            or produto not in cakto.PRODUTOS):
+        # pago, mas não o que pedimos: não entrega no escuro (como o `sck` divergente da Cakto)
+        alertas.alertar("Pedido PAGO na Stripe com valor diferente — conferir e entregar à mão",
+                        f"pedido {p['id']} · sessão {sessao['id']} · {produto}\n"
+                        f"cobrado {sessao.get('amount_total')} {sessao.get('currency')}, "
+                        f"esperado {p['valor_centavos']} {p['moeda']}")
+        return {"ok": True, "pedido": p["id"], "pendente": "valor diferente do pedido — entregar manualmente"}
+    if db.pedido_stripe_entregue(sessao["id"]):
+        db.marcar_pendente(p["id"], "pago")
+        return {"ok": True, "produto": produto, "duplicado": True}
+    # a transição para `pago` acontece uma vez só: quem a fez entrega
+    if not db.marcar_pendente(p["id"], "pago"):
+        atual = db.pendente(p["id"])
+        if atual and atual["estado"] == "pago":
+            return {"ok": True, "produto": produto, "duplicado": True}
+        raise RuntimeError(f"pedido {p['id']}: não deu para marcar como pago")  # 500 → a Stripe reenvia
+    forma = "pix" if tipo == "checkout.session.async_payment_succeeded" else "cartao"
+    try:
+        return _entregar_leitura(
+            produto, versao, item["dados"], p["email"], sessao["id"],
+            lambda link, enviado: db.registrar_pedido_stripe(sessao, p, _rotulo_produto(produto, versao),
+                                                             item["dados"], link, enviado, tipo, forma))
+    except Exception:
+        db.desfazer_pago(p["id"])  # a Stripe reenvia o evento e a entrega tenta de novo
+        raise
+
+
+def _abandono_stripe(p: dict) -> dict:
+    """A sessão expirou sem pagamento (24 h): o "carrinho abandonado" do modo Stripe. As
+    mesmas regras do da Cakto: um e-mail por pessoa e produto, nunca para quem se
+    descadastrou ou já comprou, só com o produto à venda e na versão que está no ar. O
+    link é a página do produto (dado pessoal não vai em URL)."""
+    produto, versao, email = p["itens"][0]["chave"], p.get("sistema") or "ocidental", p["email"]
+    oferta_id = f"stripe:{produto}"
+    nome = str(p.get("nome") or "").split(" ")[0]
+    if (db.descadastrado(email) or db.abandono_ja_tratado(email, oferta_id)
+            or db.comprou_desde(email, p["criado_em"])):
+        return {"ok": True, "pedido": p["id"], "estado": "expirado", "abandono": "já tratado, comprou ou descadastrado"}
+    if not catalogo.vende(produto, versao) or versao != sistema.ativo():
+        db.registrar_abandono(email, nome, oferta_id, "", False, versao)
+        return {"ok": True, "pedido": p["id"], "estado": "expirado", "email_enviado": False}
+    link = marketing.link_site(produto, "abandono")
+    enviado = entrega.enviar_email(email, marketing.assunto("abandono", produto, versao),
+                                   marketing.email_abandono_html(produto, nome, link, email, versao))
+    db.registrar_abandono(email, nome, oferta_id, "", enviado, versao)
+    return {"ok": True, "pedido": p["id"], "estado": "expirado", "email_enviado": enviado}
+
+
+def _stripe_reembolso_ou_contestacao(tipo: str, objeto: dict) -> dict:
+    pi = objeto.get("payment_intent")
+    pi = pi.get("id") if isinstance(pi, dict) else str(pi or "")
+    if tipo == "charge.refunded":
+        status = "reembolsado" if objeto.get("refunded") else "reembolso_parcial"
+        valor = objeto.get("amount_refunded")
+        titulo = "Reembolso feito na Stripe"
+    else:
+        status, valor = "contestado", objeto.get("amount")
+        titulo = "CONTESTAÇÃO (chargeback) na Stripe — responder no painel"
+    achados = db.marcar_pedido_stripe(pi, status)
+    alertas.alertar(titulo, f"pagamento {pi or '(sem id)'} · valor {valor} centavos · "
+                            f"motivo {objeto.get('reason') or '-'}\n"
+                            f"{'pedido marcado como ' + status if achados else 'pedido NÃO encontrado no banco'}.\n"
+                            "O link da leitura continua abrindo (não há como desfazer a entrega).")
+    return {"ok": True, "pagamento": pi, "status": status, "pedido_encontrado": bool(achados)}
 
 
 # ---------------------------------------------------------------------------
