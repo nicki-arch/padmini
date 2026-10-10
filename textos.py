@@ -21,6 +21,7 @@ from pathlib import Path
 
 import yaml
 
+import pagamento as _pagamento
 import sistema as _sistema
 
 PASTA = Path(__file__).parent / "conteudo"
@@ -89,5 +90,7 @@ def faq(itens: list, vendas: bool) -> list[dict]:
         if (i.get("so_com_venda") and not vendas) or (i.get("so_sem_venda") and vendas):
             continue
         resposta = frase_revisao(i["revisao"]) if i.get("revisao") else i["resposta"]
+        if i.get("resposta_stripe") and _pagamento.stripe():  # checkout próprio (rodada 11)
+            resposta = i["resposta_stripe"]
         saida.append({"pergunta": i["pergunta"], "resposta": resposta})
     return saida

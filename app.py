@@ -56,6 +56,8 @@ import ofertas
 import pagamento
 import paleta
 import seguranca
+import stripe_api
+import rotas_checkout
 import rotas_ocidental
 import sistema
 from nascimento import aviso_de_horario, validar_datetime as _validar_datetime
@@ -149,6 +151,7 @@ async def _erro_interno(request: Request, exc: Exception):
 # Rotas da versão ocidental (/api/ocidental/*): existem sempre, qualquer que seja
 # a versão no ar — um link já entregue precisa abrir depois de uma troca.
 app.include_router(rotas_ocidental.rotas)
+app.include_router(rotas_checkout.rotas)
 busca = BuscaCidades()
 
 
@@ -249,20 +252,33 @@ def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response
     chave = (versao, arquivo) + tuple(sorted((k, str(v.get("chave") if isinstance(v, dict) else v))
                                              for k, v in extra.items()))
     if chave not in _paginas_prontas:
-        _paginas_prontas[chave] = _jinja.get_template(arquivo).render(
-            **extra,
-            # interruptor de venda (catalogo.yaml): False = sem preço, sem botão de compra,
-            # sem link da Cakto. A védica vende sempre.
-            vendas=catalogo.vendas_abertas(versao),
-            t=textos.da_pagina(pagina, versao),
-            ofertas=ofertas.do_sistema(versao),
-            # cores, fontes e a marca da versão (paleta.py / marca.py): as páginas
-            # da ocidental usam; as da védica não (e saem iguais a antes)
-            cores=paleta.tela(versao), fontes=paleta.FONTES[versao], marca=marca,
-            # casais de exemplo calculados pelo motor (só a ocidental chama; calcula uma vez)
-            exemplos=exemplos_ocidental, ld=dados_estruturados, blog=blog, depoimentos=depoimentos,
-        )
+        _paginas_prontas[chave] = _jinja.get_template(arquivo).render(**_contexto(versao, pagina, **extra))
     return Response(_paginas_prontas[chave], media_type="text/html; charset=utf-8")
+
+
+def _contexto(versao: str, pagina: str, **extra) -> dict:
+    """O que toda página recebe (fora as globais do _jinja)."""
+    return dict(
+        **extra,
+        # interruptor de venda (catalogo.yaml): False = sem preço, sem botão de compra,
+        # sem link da Cakto. A védica vende sempre.
+        vendas=catalogo.vendas_abertas(versao),
+        t=textos.da_pagina(pagina, versao),
+        # checkout próprio (rodada 11, só ocidental): o botão chama /api/checkout em vez
+        # de abrir a Cakto, e o preço vem sem a taxa da Cakto
+        stripe=_checkout_stripe(versao),
+        ofertas=ofertas.para_a_tela(versao, sem_taxa=_checkout_stripe(versao)),
+        # cores, fontes e a marca da versão (paleta.py / marca.py): as páginas
+        # da ocidental usam; as da védica não (e saem iguais a antes)
+        cores=paleta.tela(versao), fontes=paleta.FONTES[versao], marca=marca,
+        # casais de exemplo calculados pelo motor (só a ocidental chama; calcula uma vez)
+        exemplos=exemplos_ocidental, ld=dados_estruturados, blog=blog, depoimentos=depoimentos,
+    )
+
+
+def _checkout_stripe(versao: str) -> bool:
+    """A versão vende pelo checkout próprio da Stripe? Só a ocidental, com PADMINI_PAGAMENTO=stripe."""
+    return versao == "ocidental" and pagamento.stripe()
 
 
 def _pagina(rota: str, versao: str | None = None) -> Response:
@@ -450,6 +466,37 @@ def pagina_minhas_leituras():
     if sistema.ativo() != "ocidental":
         raise HTTPException(404, "Página não encontrada.")
     return _pagina_montada("ocidental/minhas-leituras.html", "ocidental", "minhas-leituras")
+
+
+# ---------------------------------------------------------------------------
+# Checkout próprio (rodada 11, Stripe; a API está em rotas_checkout.py). Só existem com
+# PADMINI_PAGAMENTO=stripe. Montadas a cada pedido (não vão para o cache de páginas):
+# mostram o pedido de uma pessoa. O nome vem de quem fez o pedido: o template escapa.
+# ---------------------------------------------------------------------------
+def _resumo_do_pedido(p: dict) -> dict:
+    item = p["itens"][0]
+    prod = catalogo.produto(item["chave"]) or {}
+    return {"id": p["id"], "estado": p["estado"], "chave": item["chave"],
+            "produto": ofertas.oferta(item["chave"], "ocidental").get("nome") or prod.get("nome", ""),
+            "rota": prod.get("rota") or "/mapa", "nome": p.get("nome") or "",
+            "valor": ofertas.moeda(p["valor_centavos"] / 100), "cupom": p.get("cupom")}
+
+
+def _pagina_do_pedido(arquivo: str, id_pedido: str) -> Response:
+    p = rotas_checkout.pedido_ou_404(id_pedido)
+    html = _jinja.get_template(arquivo).render(
+        **_contexto("ocidental", "checkout", pedido=_resumo_do_pedido(p), stripe_js=stripe_api.STRIPE_JS))
+    return Response(html, media_type="text/html; charset=utf-8", headers={"Cache-Control": "no-store"})
+
+
+@app.get("/checkout/{id_pedido}")
+def pagina_checkout(id_pedido: str):
+    return _pagina_do_pedido("ocidental/checkout.html", id_pedido)
+
+
+@app.get("/obrigado/{id_pedido}")
+def pagina_obrigado(id_pedido: str):
+    return _pagina_do_pedido("ocidental/obrigado.html", id_pedido)
 
 
 class PedidoMinhasLeituras(BaseModel):

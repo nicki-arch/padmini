@@ -20,6 +20,9 @@
 <script src="/static/ocidental/movimento.js" defer></script>
 {% include "ocidental/_carta.html" %}
 <script src="/static/afiliado.js" defer></script>
+{%- if stripe and catalogo.vende("tarot") %}
+<script src="/static/ocidental/comprar.js" defer></script>{# checkout próprio (rodada 11) #}
+{%- endif %}
 <script src="/static/ocidental/me-avise.js" defer></script>
 <script src="/static/ocidental/amostra-email.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
@@ -78,7 +81,9 @@
 <script>
 {#- venda fechada (catalogo.yaml) ou produto fora do ar: nada de preço nem link de compra #}
 {%- set vende = catalogo.vende("tarot") %}
-const LINK_CHECKOUT = "{{ ofertas.tarot.checkout if vende else '' }}";
+// Checkout próprio (Stripe, rodada 11): o botão chama /api/checkout (comprar.js).
+const PAGAR_NA_STRIPE = {{ "true" if stripe else "false" }};
+const LINK_CHECKOUT = "{{ ('#comprar' if stripe else ofertas.tarot.checkout) if vende else '' }}";
 const PRECO = "{{ ofertas.tarot.preco | moeda if vende else '' }}";
 const NOME_OFERTA = {{ ofertas.tarot.nome | tojson }};
 const TAXA = "{{ ofertas.tarot.taxa_plataforma | moeda if vende else '' }}";  // ofertas.yaml → taxa_plataforma
@@ -87,6 +92,9 @@ const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const CHAVE_PERGUNTA = "pad_tarot_pergunta";
 let ultimoPedido = null;
 let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
+// checkout próprio (rodada 11): o que o botão manda para /api/checkout (comprar.js). Sem preço.
+window.padCorpoCompra = () => ultimoPedido && ({ produto: "tarot", tiragem: ultimoPedido.tiragem,
+  email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: !!(ultimoContato && ultimoContato.aceita_sequencia) });
 
 function lerPergunta() { try { return localStorage.getItem(CHAVE_PERGUNTA) || ""; } catch { return ""; } }
 function gravarPergunta(p) { try { p ? localStorage.setItem(CHAVE_PERGUNTA, p) : localStorage.removeItem(CHAVE_PERGUNTA); } catch {} }
@@ -136,7 +144,7 @@ $("#form").addEventListener("submit", async (e) => {
 
 function desenharAmostra(d) {
   ultimoPedido = { tiragem: d.tiragem };
-  const cta = LINK_CHECKOUT ? linkCheckout(LINK_CHECKOUT, { produto: "tarot", tiragem: d.tiragem }, { email: ultimoContato && ultimoContato.email }) : "";
+  const cta = !LINK_CHECKOUT ? "" : PAGAR_NA_STRIPE ? LINK_CHECKOUT : linkCheckout(LINK_CHECKOUT, { produto: "tarot", tiragem: d.tiragem }, { email: ultimoContato && ultimoContato.email });
   const res = $("#resultado");
   res.innerHTML = `<p class="eyebrow">Suas cartas</p><h2 id="titulo-resultado" tabindex="-1">A sua tiragem</h2>${perguntaHTML()}${padEmail.aviso(d)}${tiragemHTML(d.cartas)}
     <div class="split section">
@@ -155,7 +163,7 @@ function desenharAmostra(d) {
         <h3 id="oferta-titulo">${esc(NOME_OFERTA)}</h3>
         <p class="price">R$${esc(PRECO)}</p>
         ${TAXA ? `<p class="caption ptaxa">+ R$${esc(TAXA)} de taxa da plataforma</p>` : ""}
-        ${cta ? `<p class="help">Pagamento único. Garantia de 7 dias.</p><a class="button" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'tarot',sistema:'ocidental'})">Quero a leitura completa →</a>`
+        ${cta ? `<p class="help">Pagamento único. Garantia de 7 dias.</p><a class="button" href="${esc(cta)}" ${PAGAR_NA_STRIPE ? 'data-comprar="tarot"' : ""} onclick="window.padTrack&&padTrack('checkout_click',{produto:'tarot',sistema:'ocidental'})">Quero a leitura completa →</a>`
               : `<p class="help">O pagamento desta versão ainda está sendo configurado.</p><button type="button" class="button" disabled>Em breve</button>`}
       </aside>
       {%- else %}

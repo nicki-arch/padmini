@@ -54,6 +54,8 @@ recebe:
     - PDF para guardar, no seu e-mail
   botao: Ver minha amostra grátis
   pagamento: Pix ou cartão · pagamento seguro pela Cakto
+  # com o checkout próprio (PADMINI_PAGAMENTO=stripe, rodada 11)
+  pagamento_stripe: Cartão, Pix, Apple Pay ou Google Pay · pagamento seguro pela Stripe
   abre_em_breve: A leitura completa abre em breve. Comece pela amostra grátis.
 
 quem:
@@ -93,6 +95,10 @@ faq:
     - pergunta: Como pago?
       so_com_venda: true
       resposta: Pix ou cartão de crédito, num pagamento seguro processado pela Cakto.
+      # com o checkout próprio (PADMINI_PAGAMENTO=stripe, rodada 11)
+      resposta_stripe: >-
+        Cartão de crédito, Pix, Apple Pay ou Google Pay, num pagamento seguro
+        processado pela Stripe, aqui mesmo no site.
     - pergunta: Quando abre a leitura completa?
       so_sem_venda: true
       resposta: >-

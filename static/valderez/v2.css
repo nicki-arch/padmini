@@ -388,3 +388,23 @@
   .legal { grid-template-columns: 1fr; gap: 24px; }
   .legal-indice { position: static; background: var(--vz-branco); border: 1px solid var(--vz-linha); border-radius: 18px; padding: 18px; }
 }
+
+/* ---------------------------------------------------------------- Checkout próprio (rodada 11) */
+.checkout { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 48px; align-items: start; }
+.checkout-resumo { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 100px; }
+.checkout-resumo h1 { margin: 0; font-size: clamp(30px, 3.4vw, 42px); }
+.checkout-linha { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; border-top: 1px solid var(--vz-linha); padding-top: 14px; }
+.checkout-linha .preco { font-size: 36px; }
+.checkout-stripe { min-height: 420px; padding: 16px; }
+.checkout-stripe .carregando { color: var(--vz-tinta-3); padding: 24px 8px; }
+.obrigado { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; max-width: 640px; margin: 0 auto; }
+.obrigado .cartao { width: 100%; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.obrigado .chip { align-self: center; }
+@media (max-width: 1099px) {
+  .checkout { grid-template-columns: 1fr; gap: 24px; }
+  .checkout-resumo { position: static; }
+}
+@media (max-width: 767px) {
+  .checkout-stripe { padding: 4px; border-radius: 16px; }
+}
+.obrigado .t1 { font-size: clamp(34px, 4.2vw, 54px); }

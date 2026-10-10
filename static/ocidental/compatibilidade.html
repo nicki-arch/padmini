@@ -19,6 +19,9 @@
 <link rel="stylesheet" href="/static/ocidental/movimento.css">
 <script src="/static/ocidental/movimento.js" defer></script>
 <script src="/static/afiliado.js" defer></script>
+{%- if stripe and catalogo.vende("compat") %}
+<script src="/static/ocidental/comprar.js" defer></script>{# checkout próprio (rodada 11) #}
+{%- endif %}
 <script src="/static/ocidental/me-avise.js" defer></script>
 <script src="/static/ocidental/amostra-email.js" defer></script>
 <meta name="pad-consentimento" content="exigido">
@@ -157,7 +160,10 @@ const CORES = {{ cores | tojson }};
 const SIMBOLO_TRACOS = "{{ marca.tracos_d() }}", SIMBOLO_ASTRO = "{{ marca.astro_d() }}";
 {#- venda fechada (catalogo.yaml) ou sinastria fora do ar: nada de preço nem link de compra #}
 {%- set vende = catalogo.vende("compat") %}
-const LINK_CHECKOUT = "{{ ofertas.compat.checkout if vende else '' }}";
+// Checkout próprio (Stripe, rodada 11): o botão chama /api/checkout
+// (comprar.js), o cupom é aplicado no servidor e não há order bump.
+const PAGAR_NA_STRIPE = {{ "true" if stripe else "false" }};
+const LINK_CHECKOUT = "{{ ('#comprar' if stripe else ofertas.compat.checkout) if vende else '' }}";
 const PRECO = "{{ ofertas.compat.preco | moeda if vende else '' }}";
 const PRECO_CUPOM = "{{ ofertas.compat.preco_cupom | moeda if vende else '' }}";
 // taxa que a Cakto soma no checkout (ofertas.yaml → taxa_plataforma); vazio = não mostra a linha
@@ -170,7 +176,7 @@ const CUPONS = {{ ofertas.compat.cupom_codigos | tojson }};
 // combo e o preço de TABELA da sinastria. O cupom de afiliado desconta só a
 // sinastria, então o acréscimo do combo é o mesmo com ou sem cupom.
 // Vazio enquanto o bump não tiver `checkout` no ofertas.yaml.
-const PRECO_BUMP_MAPAS = "{% if vende and ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.checkout %}R${{ (ofertas.bump_mapas_casal.preco - ofertas.compat.preco) | moeda }}{% endif %}";
+const PRECO_BUMP_MAPAS = "{% if vende and not stripe and ofertas.bump_mapas_casal and ofertas.bump_mapas_casal.checkout %}R${{ (ofertas.bump_mapas_casal.preco - ofertas.compat.preco) | moeda }}{% endif %}";
 // só um cupom que existe na Cakto (lista do ofertas.yaml), em minúsculas
 function cupomDoVisitante() {
   const a = window.padAtribuicao ? padAtribuicao() : {};
@@ -186,6 +192,9 @@ const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let ultimoCasal = null;  // guarda os dois nascimentos para o link do checkout
 let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
+// checkout próprio (rodada 11): o que o botão manda para /api/checkout (comprar.js). Sem preço.
+window.padCorpoCompra = () => ultimoCasal && ({ produto: "compat", a: ultimoCasal.a, b: ultimoCasal.b,
+  email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: !!(ultimoContato && ultimoContato.aceita_sequencia) });
 
 // ---------- máscara ----------
 function aplicarMascara(el, tamanhos, separador) {
@@ -368,10 +377,9 @@ function blocoMetodo(d) {
 function desenharAmostra(d) {
   const cupom = cupomDoVisitante();
   const comCupom = cupom && PRECO_CUPOM;
-  const ctaHref = LINK_CHECKOUT && ultimoCasal
-    ? linkCheckout(LINK_CHECKOUT, { produto: "compat", a: ultimoCasal.a, b: ultimoCasal.b },
-                   { aplicarCupom: !!comCupom, email: ultimoContato && ultimoContato.email })
-    : "";
+  const ctaHref = !(LINK_CHECKOUT && ultimoCasal) ? "" : PAGAR_NA_STRIPE ? LINK_CHECKOUT
+    : linkCheckout(LINK_CHECKOUT, { produto: "compat", a: ultimoCasal.a, b: ultimoCasal.b },
+                   { aplicarCupom: !!comCupom, email: ultimoContato && ultimoContato.email });
   $("#resultado").innerHTML = `
     <p class="eyebrow">Sua amostra</p>
     <h2 id="titulo-resultado" tabindex="-1">${esc(d.nomes.a)} &amp; ${esc(d.nomes.b)}</h2><p class="moldura">${esc(d.indice_texto)}</p>
@@ -401,10 +409,10 @@ function desenharAmostra(d) {
         <p class="price preco">R$${esc(comCupom ? PRECO_CUPOM : PRECO)}${comCupom ? ` <small style="font-size:18px;text-decoration:line-through;color:var(--text-muted)">R$${esc(PRECO)}</small>` : ""}</p>
         ${TAXA ? `<p class="caption ptaxa">+ R$${esc(TAXA)} de taxa da plataforma</p>` : ""}
         ${PRECO_BUMP_MAPAS ? `<p class="help">No checkout, dá para incluir <b>o mapa natal de cada um</b> por mais ${esc(PRECO_BUMP_MAPAS)} — os dois chegam no mesmo e-mail.</p>` : ""}
-        ${comCupom ? `<p class="help">Com o cupom <b>${esc(cupom.toUpperCase())}</b> (${esc(CUPOM_PERCENTUAL)}% de desconto), já aplicado no checkout. Se ele não aparecer aplicado, digite no campo de cupom.</p>` : ""}
+        ${comCupom ? `<p class="help">Com o cupom <b>${esc(cupom.toUpperCase())}</b> (${esc(CUPOM_PERCENTUAL)}% de desconto), ${PAGAR_NA_STRIPE ? "já aplicado no preço." : "já aplicado no checkout. Se ele não aparecer aplicado, digite no campo de cupom."}</p>` : ""}
         ${ctaHref
           ? `<p class="help">Pagamento único. Garantia de 7 dias.</p>
-             <a class="button" href="${esc(ctaHref)}" id="cta-completo" onclick="window.padTrack&&padTrack('checkout_click',{produto:'compat',sistema:'ocidental'})">Quero a sinastria completa →</a>`
+             <a class="button" href="${esc(ctaHref)}" id="cta-completo" ${PAGAR_NA_STRIPE ? 'data-comprar="compat"' : ""} onclick="window.padTrack&&padTrack('checkout_click',{produto:'compat',sistema:'ocidental'})">Quero a sinastria completa →</a>`
           : `<p class="help">O pagamento desta versão ainda está sendo configurado.</p>
              <button type="button" class="button" disabled>Em breve</button>`}
       </aside>
