@@ -28,6 +28,16 @@ services:
         sync: false
       - key: PADMINI_CAKTO_WEBHOOK_SECRET   # verifica a origem do webhook
         sync: false
+      - key: PADMINI_PAGAMENTO  # quem cobra na ocidental: cakto (padrão) ou stripe — ver pagamento.py
+        sync: false
+      - key: PADMINI_VENDAS_TESTE  # 1 = venda de teste só neste serviço (exige stripe + sk_test_)
+        sync: false
+      - key: STRIPE_SECRET_KEY  # chave secreta da Stripe (sk_test_ na prévia)
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY  # chave publicável da Stripe (pk_…)
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET  # segredo do endpoint /webhook/stripe (whsec_…)
+        sync: false
       - key: PADMINI_CAKTO_PROD_MAPA        # id do produto mapa na Cakto
         sync: false
       - key: PADMINI_CAKTO_PROD_COMPAT      # id do produto compat na Cakto

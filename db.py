@@ -16,6 +16,9 @@ O que guardamos (e o que NÃO guardamos):
     consentimentos separados por canal — LGPD — e a origem ref/utm).
   - textos_ia: o texto gerado pela IA para cada mapa, para gerar uma vez só
     (sem isso, cada clique no botão chama a API de novo).
+  - pedidos_pendentes (rodada 11, Stripe): o pedido antes do pagamento, com os dados
+    de cada leitura. Não pago sai em 7 dias. Nenhum dado de cartão passa por aqui
+    (o cartão é digitado no checkout da Stripe, dentro do iframe dela).
 """
 import json
 import logging
@@ -153,19 +156,45 @@ CREATE TABLE IF NOT EXISTS envios_sequencia (
 CREATE UNIQUE INDEX IF NOT EXISTS envios_sequencia_passo_idx ON envios_sequencia (lower(email), sequencia, passo);
 ALTER TABLE envios_sequencia ENABLE ROW LEVEL SECURITY;
 
+-- Rodada 11: checkout próprio (Stripe). O pedido nasce aqui ANTES do pagamento, com
+-- os dados de cada leitura; a Stripe recebe só o `id` opaco (metadata e
+-- client_reference_id) e o e-mail. `itens` = [{chave, dados, valor_centavos}], com a
+-- chave do catálogo e o preço CALCULADO no servidor (pendentes.py), nunca o do
+-- navegador. Não pago (aberto, expirado, falhou) é apagado depois de 7 dias
+-- (db.limpar_pendentes, na tarefa diária de limpeza).
+CREATE TABLE IF NOT EXISTS pedidos_pendentes (
+    id                TEXT PRIMARY KEY,
+    criado_em         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    atualizado_em     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    sistema           TEXT NOT NULL DEFAULT 'ocidental',
+    itens             JSONB NOT NULL,
+    email             TEXT NOT NULL,
+    nome              TEXT,
+    consentimentos    JSONB NOT NULL DEFAULT '{}'::jsonb,
+    rastreio          JSONB NOT NULL DEFAULT '{}'::jsonb,
+    cupom             TEXT,
+    valor_centavos    INTEGER NOT NULL CHECK (valor_centavos > 0),
+    moeda             TEXT NOT NULL DEFAULT 'brl',
+    stripe_session_id TEXT UNIQUE,
+    estado            TEXT NOT NULL DEFAULT 'aberto'
+                      CHECK (estado IN ('aberto', 'pago', 'expirado', 'falhou'))
+);
+CREATE INDEX IF NOT EXISTS pedidos_pendentes_limpeza_idx ON pedidos_pendentes (estado, criado_em);
+ALTER TABLE pedidos_pendentes ENABLE ROW LEVEL SECURITY;
+
 -- Defesa em profundidade (só existe no Supabase): tira das roles da API
 -- pública qualquer permissão nas tabelas, além do RLS.
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
         REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes,
-            amostras_email, abandonos, email_optout FROM anon;
+            amostras_email, abandonos, email_optout, pedidos_pendentes FROM anon;
         REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq,
             amostras_email_id_seq, abandonos_id_seq FROM anon;
     END IF;
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
         REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes,
-            amostras_email, abandonos, email_optout FROM authenticated;
+            amostras_email, abandonos, email_optout, pedidos_pendentes FROM authenticated;
         REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq,
             amostras_email_id_seq, abandonos_id_seq FROM authenticated;
     END IF;
@@ -653,3 +682,103 @@ def leituras_do_email(email: str) -> list[dict]:
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao buscar as leituras de um e-mail")
         return []
+
+
+# ---------------------------------------------------------------- pedidos pendentes (rodada 11)
+ESTADOS_PENDENTE = ("aberto", "pago", "expirado", "falhou")
+DIAS_PENDENTE = 7
+_COLUNAS_PENDENTE = ("id", "criado_em", "sistema", "itens", "email", "nome", "consentimentos",
+                     "rastreio", "cupom", "valor_centavos", "moeda", "stripe_session_id", "estado")
+
+
+def criar_pendente(p: dict) -> bool:
+    """Grava o pedido pendente montado por `pendentes.montar` (preço já calculado no
+    servidor). False sem banco ou com erro: aí o checkout não abre (falha fechada)."""
+    if not ativo():
+        return False
+    try:
+        with _conectar() as c:
+            c.execute(
+                """
+                INSERT INTO pedidos_pendentes (id, sistema, itens, email, nome, consentimentos,
+                    rastreio, cupom, valor_centavos, moeda)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """,
+                (p["id"], p["sistema"], json.dumps(p["itens"], ensure_ascii=False), p["email"],
+                 p.get("nome") or None, json.dumps(p.get("consentimentos") or {}),
+                 json.dumps(p.get("rastreio") or {}, ensure_ascii=False), p.get("cupom") or None,
+                 int(p["valor_centavos"]), p.get("moeda") or "brl"),
+            )
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao criar pedido pendente")
+        return False
+
+
+def _pendente_onde(coluna: str, valor: str) -> dict | None:
+    if not (ativo() and valor):
+        return None
+    try:
+        with _conectar() as c:
+            row = c.execute(f"SELECT {', '.join(_COLUNAS_PENDENTE)} FROM pedidos_pendentes "
+                            f"WHERE {coluna} = %s", (valor,)).fetchone()
+        return dict(zip(_COLUNAS_PENDENTE, row)) if row else None
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao ler pedido pendente")
+        return None
+
+
+def pendente(id_pendente: str) -> dict | None:
+    return _pendente_onde("id", id_pendente)
+
+
+def pendente_da_sessao(stripe_session_id: str) -> dict | None:
+    return _pendente_onde("stripe_session_id", stripe_session_id)
+
+
+def ligar_sessao(id_pendente: str, stripe_session_id: str) -> bool:
+    """Guarda o id da Checkout Session criada para este pendente (uma vez só)."""
+    if not ativo():
+        return False
+    try:
+        with _conectar() as c:
+            cur = c.execute("UPDATE pedidos_pendentes SET stripe_session_id = %s, atualizado_em = now() "
+                            "WHERE id = %s AND stripe_session_id IS NULL", (stripe_session_id, id_pendente))
+        return cur.rowcount == 1
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao ligar a sessão ao pedido pendente")
+        return False
+
+
+def marcar_pendente(id_pendente: str, estado: str) -> bool:
+    """Muda o estado. `pago` é final: nada o tira de lá (um evento atrasado de
+    expiração não desfaz uma compra). True se a linha mudou."""
+    if estado not in ESTADOS_PENDENTE:
+        raise ValueError(f"estado de pendente desconhecido: {estado!r}")
+    if not ativo():
+        return False
+    try:
+        with _conectar() as c:
+            cur = c.execute("UPDATE pedidos_pendentes SET estado = %s, atualizado_em = now() "
+                            "WHERE id = %s AND estado <> 'pago' AND estado <> %s",
+                            (estado, id_pendente, estado))
+        return cur.rowcount == 1
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao marcar pedido pendente")
+        return False
+
+
+def limpar_pendentes(dias: int = DIAS_PENDENTE) -> int | None:
+    """Apaga os pedidos pendentes NÃO pagos com mais de `dias` dias (têm dados de
+    nascimento e e-mail de quem não comprou). Os pagos ficam: a compra em si está em
+    `pedidos`. Devolve quantos saíram; None sem banco ou com erro."""
+    if not ativo():
+        return None
+    try:
+        with _conectar() as c:
+            cur = c.execute("DELETE FROM pedidos_pendentes WHERE estado <> 'pago' "
+                            "AND criado_em < now() - make_interval(days => %s)", (int(dias),))
+        return cur.rowcount
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha na limpeza dos pedidos pendentes")
+        return None

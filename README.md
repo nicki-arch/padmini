@@ -37,6 +37,9 @@ Roda no Render (https://padmini.com.br), ligado ao GitHub: cada `git push` na `m
 | `PADMINI_MODO_ABERTO` | `1` libera o completo sem token. **Só em staging — NUNCA em produção** |
 | `PADMINI_SITE_URL` | Base dos links de entrega (padrão `https://padmini.com.br`) |
 | `PADMINI_CAKTO_WEBHOOK_SECRET` | Verifica a origem do webhook da Cakto |
+| `PADMINI_PAGAMENTO` | Quem cobra na ocidental: `cakto` (padrão) ou `stripe` (checkout próprio, rodada 11). Valor desconhecido = o site não sobe. Ver `docs/stripe.md` |
+| `PADMINI_VENDAS_TESTE` | `1` abre a venda **só neste serviço** (a prévia), sem mexer no catálogo. Só com `PADMINI_PAGAMENTO=stripe` e chave de teste (`sk_test_…`); com chave de produção ou com a Cakto o site não sobe |
+| `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET` | Chaves da Stripe (só com `PADMINI_PAGAMENTO=stripe`). Só aqui, nunca no repositório |
 | `PADMINI_CAKTO_PROD_MAPA` / `_COMPAT` | IDs dos produtos na Cakto (fallback p/ identificar o produto) |
 | `RESEND_API_KEY` | Envio do e-mail de entrega (via Resend). Sem ela, o webhook devolve o link para envio manual |
 | `PADMINI_EMAIL_FROM` | Remetente do e-mail (padrão `Padmini <nao-responda@padmini.com.br>`) |
