@@ -17,6 +17,7 @@ Nada de data, hora, cidade ou nome de quem é a leitura. Os meios de pagamento (
 Pix, Apple Pay, Google Pay) vêm do painel: `payment_method_types` não é fixado aqui.
 """
 
+import json
 import time
 
 import pagamento
@@ -99,3 +100,51 @@ def estado_da_sessao(session_id: str) -> dict:
         _cache_estado.clear()
     _cache_estado[session_id] = (agora, estado)
     return estado
+
+
+def sessao(session_id: str) -> dict:
+    """A Checkout Session como está AGORA na Stripe (o evento do webhook é uma foto e pode
+    estar velho: docs.stripe.com/checkout/fulfillment manda buscar antes de entregar).
+    Só os campos que a entrega usa."""
+    try:
+        s = _cliente().v1.checkout.sessions.retrieve(session_id)
+    except StripeIndisponivel:
+        raise
+    except Exception as erro:  # noqa: BLE001
+        raise StripeIndisponivel(f"não deu para ler a sessão: {type(erro).__name__}") from erro
+    d = s.to_dict()  # na biblioteca 16, StripeObject não é dict
+    pi = d.get("payment_intent")
+    return {"id": d.get("id"), "status": d.get("status"), "payment_status": d.get("payment_status"),
+            "amount_total": d.get("amount_total"), "currency": d.get("currency"),
+            "payment_intent": pi.get("id") if isinstance(pi, dict) else pi,
+            "client_reference_id": d.get("client_reference_id"),
+            "metadata": dict(d.get("metadata") or {})}
+
+
+class AssinaturaInvalida(ValueError):
+    pass
+
+
+TOLERANCIA_ASSINATURA = 300  # segundos, o padrão das bibliotecas da Stripe (anti-replay)
+
+
+def verificar_evento(corpo: bytes, assinatura: str, segredo: str) -> dict:
+    """O evento, se o cabeçalho Stripe-Signature confere com o segredo do endpoint
+    (STRIPE_WEBHOOK_SECRET). Sem segredo, sem cabeçalho ou assinatura errada:
+    AssinaturaInvalida. Verificação da biblioteca oficial (docs.stripe.com/webhooks)."""
+    if not segredo:
+        raise AssinaturaInvalida("STRIPE_WEBHOOK_SECRET não configurado")
+    if not assinatura:
+        raise AssinaturaInvalida("sem Stripe-Signature")
+    import stripe
+    try:
+        stripe.WebhookSignature.verify_header(corpo.decode("utf-8"), assinatura, segredo, TOLERANCIA_ASSINATURA)
+    except Exception as erro:  # noqa: BLE001  (SignatureVerificationError, cabeçalho malformado)
+        raise AssinaturaInvalida(type(erro).__name__) from erro
+    try:
+        evento = json.loads(corpo.decode("utf-8"))
+    except ValueError as erro:
+        raise AssinaturaInvalida("corpo não é JSON") from erro
+    if not isinstance(evento, dict) or not evento.get("id") or not evento.get("type"):
+        raise AssinaturaInvalida("evento sem id ou tipo")
+    return evento

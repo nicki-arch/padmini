@@ -185,19 +185,37 @@ CREATE INDEX IF NOT EXISTS pedidos_pendentes_limpeza_idx ON pedidos_pendentes (e
 ALTER TABLE pedidos_pendentes ADD COLUMN IF NOT EXISTS stripe_client_secret TEXT;
 ALTER TABLE pedidos_pendentes ENABLE ROW LEVEL SECURITY;
 
+-- Rodada 11: de onde veio o pagamento. Linhas antigas (e toda compra da Cakto) ficam
+-- 'cakto'. Na Stripe, `stripe_id` é a Checkout Session (cs_…, idempotência da entrega) e
+-- `stripe_pagamento` o PaymentIntent (pi_…), que liga reembolso e contestação ao pedido.
+ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS origem_pagamento TEXT NOT NULL DEFAULT 'cakto';
+ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS stripe_id TEXT;
+ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS stripe_pagamento TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS pedidos_stripe_id_idx ON pedidos (stripe_id);
+CREATE INDEX IF NOT EXISTS pedidos_stripe_pagamento_idx ON pedidos (stripe_pagamento);
+
+-- Eventos do webhook da Stripe já recebidos (a Stripe pode mandar o mesmo evento mais de
+-- uma vez: docs.stripe.com/webhooks#handle-duplicate-events). Só o id e o tipo.
+CREATE TABLE IF NOT EXISTS eventos_stripe (
+    id          TEXT PRIMARY KEY,
+    tipo        TEXT NOT NULL,
+    recebido_em TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE eventos_stripe ENABLE ROW LEVEL SECURITY;
+
 -- Defesa em profundidade (só existe no Supabase): tira das roles da API
 -- pública qualquer permissão nas tabelas, além do RLS.
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
         REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes,
-            amostras_email, abandonos, email_optout, pedidos_pendentes FROM anon;
+            amostras_email, abandonos, email_optout, pedidos_pendentes, eventos_stripe FROM anon;
         REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq,
             amostras_email_id_seq, abandonos_id_seq FROM anon;
     END IF;
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
         REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes,
-            amostras_email, abandonos, email_optout, pedidos_pendentes FROM authenticated;
+            amostras_email, abandonos, email_optout, pedidos_pendentes, eventos_stripe FROM authenticated;
         REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq,
             amostras_email_id_seq, abandonos_id_seq FROM authenticated;
     END IF;
@@ -776,14 +794,125 @@ def marcar_pendente(id_pendente: str, estado: str) -> bool:
 def limpar_pendentes(dias: int = DIAS_PENDENTE) -> int | None:
     """Apaga os pedidos pendentes NÃO pagos com mais de `dias` dias (têm dados de
     nascimento e e-mail de quem não comprou). Os pagos ficam: a compra em si está em
-    `pedidos`. Devolve quantos saíram; None sem banco ou com erro."""
+    `pedidos`. Também esquece os ids de evento da Stripe com mais de 30 dias.
+    Devolve quantos pendentes saíram; None sem banco ou com erro."""
     if not ativo():
         return None
     try:
         with _conectar() as c:
             cur = c.execute("DELETE FROM pedidos_pendentes WHERE estado <> 'pago' "
                             "AND criado_em < now() - make_interval(days => %s)", (int(dias),))
+            # os ids de evento do webhook só servem enquanto a Stripe pode reenviar (3 dias)
+            c.execute("DELETE FROM eventos_stripe WHERE recebido_em < now() - interval '30 days'")
         return cur.rowcount
     except Exception:  # noqa: BLE001
         log.exception("banco: falha na limpeza dos pedidos pendentes")
         return None
+
+
+def desfazer_pago(id_pendente: str) -> None:
+    """A entrega quebrou depois de marcar `pago` (exceção): volta para `aberto`, para o
+    reenvio do webhook pela Stripe tentar de novo. Só o webhook usa."""
+    if not ativo():
+        return
+    try:
+        with _conectar() as c:
+            c.execute("UPDATE pedidos_pendentes SET estado = 'aberto', atualizado_em = now() WHERE id = %s",
+                      (id_pendente,))
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao desfazer o pago do pedido pendente")
+
+
+# ---------------------------------------------------------------- webhook da Stripe (rodada 11)
+def evento_stripe_novo(id_evento: str, tipo: str) -> bool:
+    """Reserva o evento: True na primeira vez, False se já foi recebido (duplicado).
+    Levanta erro se o banco falhar (o webhook responde 500 e a Stripe reenvia)."""
+    with _conectar() as c:
+        cur = c.execute("INSERT INTO eventos_stripe (id, tipo) VALUES (%s, %s) ON CONFLICT (id) DO NOTHING",
+                        (id_evento, tipo))
+        return cur.rowcount == 1
+
+
+def esquecer_evento_stripe(id_evento: str) -> None:
+    """O tratamento do evento quebrou: apaga a reserva para o reenvio ser tratado."""
+    try:
+        with _conectar() as c:
+            c.execute("DELETE FROM eventos_stripe WHERE id = %s", (id_evento,))
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao esquecer o evento da Stripe")
+
+
+def pedido_stripe_entregue(stripe_id: str) -> str | None:
+    """O link, se esta Checkout Session já foi entregue (e-mail enviado)."""
+    if not (ativo() and stripe_id):
+        return None
+    try:
+        with _conectar() as c:
+            row = c.execute("SELECT link FROM pedidos WHERE stripe_id = %s AND email_enviado",
+                            (stripe_id,)).fetchone()
+        return row[0] if row else None
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao consultar pedido da Stripe")
+        return None
+
+
+def registrar_pedido_stripe(sessao: dict, pendente: dict, produto: str, dados: dict, link: str | None,
+                            email_enviado: bool, evento: str, forma_pagamento: str | None) -> bool:
+    """Grava (ou atualiza) a compra feita na Stripe em `pedidos`, como a da Cakto, com
+    origem 'stripe'. Idempotente pela Checkout Session. Nada de dado de cartão: a sessão
+    nem os traz."""
+    if not ativo():
+        return False
+    item = pendente["itens"][0]
+    try:
+        with _conectar() as c:
+            c.execute(
+                """
+                INSERT INTO pedidos (origem_pagamento, stripe_id, stripe_pagamento, evento, status, produto,
+                    email, nome, dados_nascimento, valor, forma_pagamento, oferta_id, tipo_oferta, rastreio,
+                    link, email_enviado, entregue_em)
+                VALUES ('stripe',%s,%s,%s,'paid',%s,%s,%s,%s,%s,%s,%s,'main',%s,%s,%s, CASE WHEN %s THEN now() END)
+                ON CONFLICT (stripe_id) DO UPDATE SET
+                    link = EXCLUDED.link,
+                    email_enviado = pedidos.email_enviado OR EXCLUDED.email_enviado,
+                    entregue_em = COALESCE(pedidos.entregue_em, EXCLUDED.entregue_em)
+                """,
+                (sessao["id"], sessao.get("payment_intent"), evento, produto, pendente["email"],
+                 pendente.get("nome") or dados.get("nome"), json.dumps(dados, ensure_ascii=False),
+                 _num((sessao.get("amount_total") or 0) / 100), forma_pagamento, f"stripe:{item['chave']}",
+                 json.dumps(pendente.get("rastreio") or {}, ensure_ascii=False), link, email_enviado, email_enviado),
+            )
+        return True
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao registrar pedido da Stripe %s", sessao.get("id"))
+        return False
+
+
+def marcar_pedido_stripe(stripe_pagamento: str, status: str) -> int:
+    """Reembolso ou contestação: muda o `status` do pedido pelo PaymentIntent. Quantas
+    linhas mudaram (0 = pedido não encontrado)."""
+    if not (ativo() and stripe_pagamento):
+        return 0
+    try:
+        with _conectar() as c:
+            cur = c.execute("UPDATE pedidos SET status = %s WHERE stripe_pagamento = %s", (status, stripe_pagamento))
+        return cur.rowcount
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao marcar pedido da Stripe")
+        return 0
+
+
+def comprou_desde(email: str, quando) -> bool:
+    """Este e-mail tem compra registrada desde `quando`? (Abandono da Stripe: a sessão
+    expira 24 h depois de criada, e a pessoa pode ter comprado em outra no meio tempo.)
+    Sem banco ou com erro, True (não arrisca mandar a recuperação para quem comprou)."""
+    if not ativo():
+        return True
+    try:
+        with _conectar() as c:
+            row = c.execute("SELECT 1 FROM pedidos WHERE lower(email) = lower(%s) AND criado_em >= %s LIMIT 1",
+                            (email, quando)).fetchone()
+        return row is not None
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao consultar compra")
+        return True
