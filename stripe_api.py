@@ -107,7 +107,9 @@ def sessao(session_id: str) -> dict:
     estar velho: docs.stripe.com/checkout/fulfillment manda buscar antes de entregar).
     Só os campos que a entrega usa."""
     try:
-        s = _cliente().v1.checkout.sessions.retrieve(session_id)
+        # o PaymentIntent e a cobrança expandidos: é deles que sai o meio de pagamento real
+        s = _cliente().v1.checkout.sessions.retrieve(
+            session_id, params={"expand": ["payment_intent.latest_charge"]})
     except StripeIndisponivel:
         raise
     except Exception as erro:  # noqa: BLE001
@@ -117,8 +119,24 @@ def sessao(session_id: str) -> dict:
     return {"id": d.get("id"), "status": d.get("status"), "payment_status": d.get("payment_status"),
             "amount_total": d.get("amount_total"), "currency": d.get("currency"),
             "payment_intent": pi.get("id") if isinstance(pi, dict) else pi,
+            "meio_pagamento": meio_de_pagamento(pi),
             "client_reference_id": d.get("client_reference_id"),
             "metadata": dict(d.get("metadata") or {})}
+
+
+def meio_de_pagamento(pi) -> str | None:
+    """O meio usado de fato ('pix', 'card', …): o `payment_method_details.type` da cobrança
+    (latest_charge) e, sem ela, o `payment_method_types` do PaymentIntent quando só há um.
+    None se não der para saber (PaymentIntent não expandido)."""
+    if not isinstance(pi, dict):
+        return None
+    cobranca = pi.get("latest_charge")
+    if isinstance(cobranca, dict):
+        tipo = (cobranca.get("payment_method_details") or {}).get("type")
+        if tipo:
+            return str(tipo)
+    tipos = pi.get("payment_method_types") or []
+    return str(tipos[0]) if len(tipos) == 1 else None
 
 
 class AssinaturaInvalida(ValueError):

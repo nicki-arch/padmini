@@ -111,7 +111,7 @@ Lido antes: docs.stripe.com/webhooks e docs.stripe.com/checkout/fulfillment.
 - **Mesmo caminho da Cakto** (`app._entregar_leitura`): link com token, e-mail de entrega (com a venda
   cruzada), grava em `pedidos` e alerta se o e-mail não sair. Em `pedidos`, a compra da Stripe tem
   `origem_pagamento='stripe'`, `stripe_id` (cs_…), `stripe_pagamento` (pi_…), `oferta_id='stripe:<produto>'`,
-  `forma_pagamento` `pix` (pago depois) ou `cartao` (cartão, Apple Pay, Google Pay); as da Cakto
+  `forma_pagamento` do meio real (`payment_method_details.type` da cobrança, rodada 11.1): `pix` ou `cartao` (cartão, Apple Pay, Google Pay); as da Cakto
   ficam `origem_pagamento='cakto'`. O pós-compra e o "Minhas leituras" funcionam igual.
 
 | Evento | O que acontece |
