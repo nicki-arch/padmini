@@ -1269,7 +1269,7 @@ def _entregar_stripe(tipo: str, p: dict) -> dict:
         if atual and atual["estado"] == "pago":
             return {"ok": True, "produto": produto, "duplicado": True}
         raise RuntimeError(f"pedido {p['id']}: não deu para marcar como pago")  # 500 → a Stripe reenvia
-    forma = "pix" if tipo == "checkout.session.async_payment_succeeded" else "cartao"
+    forma = _forma_de_pagamento(sessao.get("meio_pagamento"), tipo)
     try:
         return _entregar_leitura(
             produto, versao, item["dados"], p["email"], sessao["id"],
@@ -1278,6 +1278,16 @@ def _entregar_stripe(tipo: str, p: dict) -> dict:
     except Exception:
         db.desfazer_pago(p["id"])  # a Stripe reenvia o evento e a entrega tenta de novo
         raise
+
+
+def _forma_de_pagamento(meio: str | None, tipo: str) -> str | None:
+    """Como `pedidos.forma_pagamento` registra o meio real da Stripe (rodada 11.1): um Pix
+    autorizado antes do `checkout.session.completed` chega já `paid` e era gravado como
+    cartão. `card` cobre cartão, Apple Pay e Google Pay. Sem o meio (não deu para ler),
+    o palpite antigo: pago depois = Pix."""
+    if meio:
+        return {"pix": "pix", "card": "cartao"}.get(meio, meio)
+    return "pix" if tipo == "checkout.session.async_payment_succeeded" else None
 
 
 def _abandono_stripe(p: dict) -> dict:

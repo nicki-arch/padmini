@@ -90,14 +90,15 @@ def stripe_falsa(monkeypatch):
     return falsa
 
 
-def pedido(stripe_falsa, produto="mapa", pago=True, valor=None, sessao="cs_test_1", **extra) -> dict:
+def pedido(stripe_falsa, produto="mapa", pago=True, valor=None, sessao="cs_test_1", meio="card", **extra) -> dict:
     corpo = {"produto": produto, "pessoa": PESSOA, "email": "ana@teste.com", "origem": {"ref": "PEDRO"}, **extra}
     p = pendentes.montar(pendentes.PedidoCheckout.model_validate(corpo))
     assert db.criar_pendente(p) and db.ligar_sessao(p["id"], sessao, sessao + "_secret")
     stripe_falsa.sessoes[sessao] = {
         "id": sessao, "status": "complete", "payment_status": "paid" if pago else "unpaid",
         "amount_total": p["valor_centavos"] if valor is None else valor, "currency": "brl",
-        "payment_intent": "pi_" + sessao, "client_reference_id": p["id"], "metadata": {"pedido": p["id"]}}
+        "payment_intent": "pi_" + sessao, "meio_pagamento": meio, "client_reference_id": p["id"],
+        "metadata": {"pedido": p["id"]}}
     return p
 
 
@@ -205,7 +206,7 @@ def test_pix_pendente_nao_entrega(stripe_falsa, emails, avisos):
 def test_pix_pago_entrega(stripe_falsa, emails, avisos):
     p = pedido(stripe_falsa, pago=False)
     postar(evento("checkout.session.completed", p, payment_status="unpaid"))
-    stripe_falsa.sessoes["cs_test_1"]["payment_status"] = "paid"  # o Pix caiu
+    stripe_falsa.sessoes["cs_test_1"].update(payment_status="paid", meio_pagamento="pix")  # o Pix caiu
     r = postar(evento("checkout.session.async_payment_succeeded", p, id_evento="evt_2"))
     assert r.status_code == 200 and r.json()["email_enviado"] is True
     assert len(emails) == 1 and db.pendente(p["id"])["estado"] == "pago"
@@ -378,9 +379,59 @@ def test_sessao_le_objetos_reais_da_biblioteca(monkeypatch):
     monkeypatch.setattr(stripe_api, "_cliente", lambda: falso)
     assert stripe_api.sessao("cs_test_9") == {
         "id": "cs_test_9", "status": "complete", "payment_status": "paid", "amount_total": 3700, "currency": "brl",
-        "payment_intent": "pi_9", "client_reference_id": "pedido9", "metadata": {"pedido": "pedido9"}}
+        "payment_intent": "pi_9", "meio_pagamento": None, "client_reference_id": "pedido9",
+        "metadata": {"pedido": "pedido9"}}
     stripe_api._cache_estado.clear()
     assert stripe_api.estado_da_sessao("cs_test_9") == {"status": "complete", "payment_status": "paid"}
     assert stripe_api.criar_sessao({"id": "pedido9", "email": "a@b.c", "itens": [
         {"chave": "mapa", "valor_centavos": 3700, "dados": {}}]}, "https://x") == {
         "id": "cs_test_9", "client_secret": "cs_test_9_secret"}
+
+
+
+# ------------------------------------------------------------------ rodada 11.1: a forma de pagamento real
+def test_pix_pago_na_hora_grava_pix(stripe_falsa, emails, avisos):
+    """Pix autorizado antes do checkout.session.completed: o evento já chega `paid` (sem
+    async_payment_succeeded). Era gravado como 'cartao'; a forma sai do meio real."""
+    p = pedido(stripe_falsa, meio="pix")
+    r = postar(evento("checkout.session.completed", p))
+    assert r.status_code == 200 and r.json()["email_enviado"] is True
+    assert _linhas("SELECT forma_pagamento FROM pedidos") == [("pix",)]
+
+
+@pytest.mark.parametrize("meio,forma", [("card", "cartao"), ("pix", "pix"), ("link", "link")])
+def test_forma_vem_do_meio_real(meio, forma):
+    assert app_mod._forma_de_pagamento(meio, "checkout.session.completed") == forma
+
+
+def test_sem_o_meio_fica_o_palpite_antigo():
+    assert app_mod._forma_de_pagamento(None, "checkout.session.async_payment_succeeded") == "pix"
+    assert app_mod._forma_de_pagamento(None, "checkout.session.completed") is None
+
+
+@pytest.mark.parametrize("pi,meio", [
+    ({"id": "pi_1", "latest_charge": {"id": "ch_1", "payment_method_details": {"type": "pix", "pix": {}}},
+      "payment_method_types": ["card", "pix"]}, "pix"),
+    ({"id": "pi_1", "latest_charge": {"id": "ch_1", "payment_method_details": {
+        "type": "card", "card": {"wallet": {"type": "apple_pay"}}}}}, "card"),
+    ({"id": "pi_1", "latest_charge": None, "payment_method_types": ["pix"]}, "pix"),
+    ({"id": "pi_1", "latest_charge": None, "payment_method_types": ["card", "pix"]}, None),
+])
+def test_meio_lido_do_payment_intent_expandido(monkeypatch, pi, meio):
+    """Com objetos reais da biblioteca e a sessão buscada com o PaymentIntent expandido."""
+    import stripe
+    from types import SimpleNamespace
+    obj = stripe.checkout.Session.construct_from({
+        "id": "cs_test_7", "object": "checkout.session", "status": "complete", "payment_status": "paid",
+        "amount_total": 3700, "currency": "brl", "payment_intent": {"object": "payment_intent", **pi},
+        "client_reference_id": "p7", "metadata": {"pedido": "p7"}}, "sk_test_x")
+    chamadas = []
+
+    def retrieve(sid, params=None, options=None):
+        chamadas.append(params)
+        return obj
+    falso = SimpleNamespace(v1=SimpleNamespace(checkout=SimpleNamespace(sessions=SimpleNamespace(retrieve=retrieve))))
+    monkeypatch.setattr(stripe_api, "_cliente", lambda: falso)
+    s = stripe_api.sessao("cs_test_7")
+    assert s["meio_pagamento"] == meio and s["payment_intent"] == "pi_1"
+    assert chamadas == [{"expand": ["payment_intent.latest_charge"]}]
