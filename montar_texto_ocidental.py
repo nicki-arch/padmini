@@ -83,12 +83,15 @@ def texto_casa(ponto: str, casa: int) -> str:
 
 
 def texto_aspecto(a: str, b: str, tipo: str) -> str:
-    """Texto próprio para os pares de planetas pessoais; nos outros, montado
-    com as peças (tema de cada ponto + dinâmica do aspecto + conselho)."""
-    proprios = base("aspectos_pessoais")
-    for chave in (f"{a}-{b}", f"{b}-{a}"):
-        if chave in proprios and tipo in proprios[chave]:
-            return _t(proprios[chave][tipo])
+    """Texto próprio para Júpiter e Saturno com os pessoais (`aspectos_sociais`, rodada 12)
+    e para os pares de planetas pessoais (`aspectos_pessoais`); nos outros (Urano, Netuno,
+    Plutão, nodo, ângulos), montado com as peças (tema de cada ponto + dinâmica do
+    aspecto + conselho)."""
+    for arquivo in ("aspectos_sociais", "aspectos_pessoais"):
+        proprios = base(arquivo)
+        for chave in (f"{a}-{b}", f"{b}-{a}"):
+            if chave in proprios and tipo in proprios[chave]:
+                return _t(proprios[chave][tipo])
     p = base("pecas")
     tema_a, tema_b = _t(p["temas"].get(a)), _t(p["temas"].get(b))
     return (_t(p["dinamica"][tipo]).format(a=tema_a, b=tema_b) + " " + _t(p["conselho"][tipo])).strip()
