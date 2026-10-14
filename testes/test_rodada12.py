@@ -5,7 +5,7 @@ pelo Nodo Norte; sem hora de nascimento, cada uma mostra o que vale para o dia i
 um aviso. Textos novos no repositório privado (meio_do_ceu, cuspides, nodo_norte,
 regentes, aspectos_sociais), todos `revisado: false` até a Dona Valderez revisar.
 """
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import pytest
 
@@ -200,3 +200,40 @@ def test_selo_so_com_texto_revisado_tambem_nas_novas(monkeypatch):
     m = mo.calcular_mapa_ocidental(datetime(1990, 5, 15, 14, 30), -30.03, -51.23)
     dims = {x["chave"]: x for x in mt.dimensoes_amostra(m)}
     assert all("selo" not in dims[c] for c in NOVAS)  # os textos novos nascem não revisados
+
+
+# ------------------------------------------------------------------ Fase 3: aspectos de Júpiter e Saturno
+def test_saturno_e_jupiter_com_pessoais_tem_texto_proprio():
+    """Saturno em quadratura com a Lua usa o texto de aspectos_sociais (nos dois sentidos
+    do par), não o montado com as peças."""
+    proprio = mt._no("aspectos_sociais", "saturno-lua", "quadratura")["texto"].strip()
+    assert mt.texto_aspecto("saturno", "lua", "quadratura") == proprio
+    assert mt.texto_aspecto("lua", "saturno", "quadratura") == proprio
+    for social in ("jupiter", "saturno"):
+        for pessoal in ("sol", "lua", "mercurio", "venus", "marte"):
+            for tipo in mo.ASPECTOS:
+                assert mt.texto_aspecto(pessoal, social, tipo) == \
+                    mt._no("aspectos_sociais", f"{social}-{pessoal}", tipo)["texto"].strip()
+
+
+def test_urano_netuno_plutao_continuam_montados():
+    p = mt.base("pecas")
+    montado = (mt._t(p["dinamica"]["trigono"]).format(a=mt._t(p["temas"]["urano"]), b=mt._t(p["temas"]["venus"]))
+               + " " + mt._t(p["conselho"]["trigono"])).strip()
+    assert mt.texto_aspecto("urano", "venus", "trigono") == montado
+    assert mt.texto_aspecto("jupiter", "saturno", "quadratura") != ""  # social × social: montado
+    assert "jupiter-saturno" not in mt.base("aspectos_sociais")
+
+
+def test_mapa_com_saturno_quadratura_lua_mostra_o_texto_proprio():
+    for dia in range(0, 4000, 7):  # procura um mapa real com o aspecto
+        m = mo.calcular_mapa_ocidental(datetime(1980, 1, 1, 12, 0) + timedelta(days=dia),
+                                       -23.55, -46.63)
+        asp = [a for a in mt.aspectos_principais(m) if {a["a"], a["b"]} == {"saturno", "lua"}
+               and a["tipo"] == "quadratura"]
+        if asp:
+            break
+    assert asp
+    secoes = mt.montar_secoes(m)
+    proprio = mt._no("aspectos_sociais", "saturno-lua", "quadratura")["texto"].strip()
+    assert proprio in str(secoes)

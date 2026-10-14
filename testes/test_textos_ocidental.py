@@ -18,7 +18,8 @@ import mapa_ocidental as mo  # noqa: E402
 import montar_texto_ocidental as mt  # noqa: E402
 
 from revisao import PROIBIDOS  # noqa: E402  (uma lista só: testes e importação da planilha)
-LONGOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais", "numerologia")
+LONGOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais", "numerologia",
+          "meio_do_ceu", "cuspides", "nodo_norte", "regentes", "aspectos_sociais")  # rodada 12
 
 
 def test_base_completa():
