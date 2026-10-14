@@ -73,9 +73,11 @@ def test_catalogo_de_producao():
         ("mapa", "ativo"), ("compat", "em_breve"), ("numerologia", "em_breve"), ("tarot", "em_breve"),
         ("comunidade", "oculto"), ("cursos", "oculto"), ("astrologia-do-zero", "oculto"), ("consulta", "oculto")]
     dims = {d["nome"]: d["estado"] for d in catalogo.dimensoes_mapa()}
+    # rodada 12: as 10 dimensões no ar (Carreira, Dinheiro, Família e Propósito saíram do "em breve")
     assert [n for n, e in dims.items() if e == "ativo"] == ["Essência", "Emoções", "Como você chega", "Mente",
-                                                           "Amor", "Ação"]
-    assert [n for n, e in dims.items() if e == "em_breve"] == ["Carreira", "Dinheiro", "Família", "Propósito"]
+                                                           "Amor", "Ação", "Carreira", "Dinheiro", "Família",
+                                                           "Propósito"]
+    assert [n for n, e in dims.items() if e == "em_breve"] == []
 
 
 def test_catalogo_invalido_falha_na_subida():

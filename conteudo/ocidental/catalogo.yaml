@@ -31,7 +31,7 @@ produtos:
     rota: /mapa
     estado: ativo
     oferta: mapa
-    resumo: "O céu de quando você nasceu: 6 dimensões, roda e PDF."
+    resumo: "O céu de quando você nasceu: 10 dimensões, roda e PDF."
     vaga: capa-mapa
 
   - chave: compat
@@ -103,13 +103,13 @@ dimensoes_mapa:
      descricao: "O que você valoriza nos afetos."}
   - {chave: acao, nome: Ação, ponto: marte, rotulo: Marte, estado: ativo, vaga: dim-marte,
      descricao: "Sua coragem e como vai atrás do que quer."}
-  - {chave: carreira, nome: Carreira, rotulo: Casa 10 e regente, estado: em_breve, vaga: dim-carreira,
+  - {chave: carreira, nome: Carreira, rotulo: Casa 10 e regente, estado: ativo, vaga: dim-carreira,
      descricao: "Vocação e como você se destaca."}
-  - {chave: dinheiro, nome: Dinheiro, rotulo: Casa 2 e Júpiter, estado: em_breve, vaga: dim-dinheiro,
+  - {chave: dinheiro, nome: Dinheiro, rotulo: Casa 2 e Júpiter, estado: ativo, vaga: dim-dinheiro,
      descricao: "Sua relação com segurança e recursos."}
-  - {chave: familia, nome: Família, rotulo: Casa 4 e Lua, estado: em_breve, vaga: dim-familia,
+  - {chave: familia, nome: Família, rotulo: Casa 4 e Lua, estado: ativo, vaga: dim-familia,
      descricao: "Raízes, casa e herança afetiva."}
-  - {chave: proposito, nome: Propósito, rotulo: Nodo Norte, estado: em_breve, vaga: dim-proposito,
+  - {chave: proposito, nome: Propósito, rotulo: Nodo Norte, estado: ativo, vaga: dim-proposito,
      descricao: "O caminho que pede para crescer."}
 
 # Na amostra, a dimensão em breve diz isto (a tela do pacote 2.0).

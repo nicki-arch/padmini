@@ -29,7 +29,7 @@ dimensoes:
   olho: O que o seu mapa mostra
   titulo: Seu mapa, <em>dimensão</em> por dimensão
   sub: >-
-    Cada dimensão olha para um planeta ou ponto do seu mapa. Novas dimensões
+    Cada dimensão olha para um planeta, um ponto ou uma casa do seu mapa. Novas dimensões
     chegam ao seu mapa completo sem custo extra.
 
 passos:
@@ -48,7 +48,7 @@ recebe:
   olho_caixa: Mapa natal completo
   pagamento_unico: pagamento único
   itens:
-    - As 6 dimensões completas, com o texto de cada posição
+    - As 10 dimensões completas, com o texto de cada posição
     - A roda do seu mapa, casas e aspectos
     - Novas dimensões entram no seu mapa sem custo
     - PDF para guardar, no seu e-mail

@@ -105,6 +105,8 @@ def test_amostra_traz_cada_dimensao_ativa_so_com_o_comeco_do_texto(ocidental):
         if d["estado"] == "em_breve":
             assert item["estado"] == "em_breve" and "trecho" not in item
             continue
+        if d["chave"] in mt.COMPOSTAS:  # rodada 12: testadas em test_rodada12.py
+            continue
         completo = mt.texto_signo(d["ponto"], item["signo"])
         assert item["trecho"] and completo.startswith(item["trecho"]) and len(item["trecho"]) < len(completo)
         assert item["img"].startswith("/static/ilustracoes/") and item["vaga"] == f"signo-{item['signo']}"
