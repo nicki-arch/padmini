@@ -129,8 +129,9 @@ def test_trecho_tem_uma_ou_duas_frases():
 
 
 def test_selo_so_com_texto_revisado(ocidental, monkeypatch):
+    monkeypatch.setattr(mt, "revisado_signo", lambda ponto, signo: False)
     r = cliente.post("/api/ocidental/mapa", json=PESSOA)
-    assert all("selo" not in d for d in r.json()["dimensoes"])  # hoje nada está revisado
+    assert all("selo" not in d for d in r.json()["dimensoes"])  # nada revisado = nenhum selo
     monkeypatch.setattr(mt, "revisado_signo", lambda ponto, signo: ponto == "sol")
     r = cliente.post("/api/ocidental/mapa", json={**PESSOA, "email": "outra@teste.com"})
     com_selo = [d["chave"] for d in r.json()["dimensoes"] if d.get("selo")]

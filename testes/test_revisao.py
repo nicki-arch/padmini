@@ -69,6 +69,7 @@ def test_exportar_tem_todas_as_abas_e_linhas(tmp_path, base_copiada):
 
 def test_ida_e_volta(tmp_path, base_copiada):
     antes = {a: (base_copiada / f"{a}.yaml").read_text(encoding="utf-8") for a in mt.ARQUIVOS}
+    revisados_antes = mt.contagem_de_revisao()["_total"][0]  # a revisão da Dona Valderez avança
     dados_antes = {a: yaml.safe_load(t) for a, t in antes.items()}
     arq = exportar.gerar(tmp_path / "r.xlsx")
     wb = load_workbook(arq)
@@ -124,7 +125,7 @@ def test_ida_e_volta(tmp_path, base_copiada):
         assert all(c in novo for c in comentarios)
     # e o que o site lê depois é o texto novo
     assert mt.texto_signo("venus", "libra").split() == novo_venus.split()
-    assert mt.contagem_de_revisao()["_total"][0] == 3
+    assert mt.contagem_de_revisao()["_total"][0] == revisados_antes + 3
 
 
 def test_id_desconhecido_e_ignorado(tmp_path, base_copiada):
