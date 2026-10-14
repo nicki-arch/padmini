@@ -72,7 +72,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `entrega.py` | Link assinado + e-mail (Resend) |
 | `static/afiliado.js` | Monta o link do checkout: dados no `sck`, afiliado/cupom dobrados em `utm_*` |
 | `mapa_ocidental.py` | Motor ocidental: tropical, Placidus (Porfírio nos polos), nodo verdadeiro, aspectos e orbes num lugar só. Validado contra 11 mapas do astro-seek (`testes/dados/referencias_ocidental.json`) |
-| `montar_texto_ocidental.py` + `conteudo/ocidental/textos/` (repo privado) | Mapa → texto (YAML, `revisado: false` em cada texto; `python scripts/revisao_textos.py` conta o que falta revisar) |
+| `montar_texto_ocidental.py` + `conteudo/ocidental/textos/` (repo privado) | Mapa → texto (YAML, `revisado: false` em cada texto; `python scripts/revisao_textos.py` conta o que falta revisar). **Rodada 12:** as 10 dimensões do mapa ativas; Carreira, Dinheiro, Família e Propósito são compostas (cúspide + planetas na casa + regente; Nodo Norte), com versão sem hora e aviso, e planeta repetido entra só como referência (`mt.dimensao_composta`, tabela em `docs/ocidental.md`). Aspectos: `aspectos_sociais` → `aspectos_pessoais` → peças |
 | `rotas_ocidental.py` + `static/ocidental/` | API `/api/ocidental/*`, páginas e `/live` da versão ocidental; `gerar_pdf_ocidental.py` é o PDF |
 | `revisao.py` + `scripts/exportar_revisao.py` / `importar_revisao.py` | Planilha de revisão da família (xlsx ↔ YAML); regras de tom e tamanho num lugar só. A planilha não vai para o git |
 | `numerologia.py` | Numerologia pitagórica (versão ocidental): regras de Y/W e do Caminho de Vida em `docs/ocidental.md` |
