@@ -34,10 +34,40 @@ casas e Ascendente/MC até 8"; casa de cada planeta e retrogradação iguais.
 
 ## Textos
 
-`conteudo/ocidental/textos/` — ver o `LEIA.md` da pasta. 339 textos, todos com
-`revisado: false`. Os testes conferem tamanho (60–120 palavras), ausência de
+`conteudo/ocidental/textos/` (no repositório privado `padmini-conteudo`) — ver o
+`LEIA.md` da pasta. Cada texto tem `revisado: true|false`; o selo só aparece nos
+revisados (em 14/out/2026: Sol em Áries, Touro, Gêmeos, Câncer e Leão). Os testes conferem tamanho (60–120 palavras), ausência de
 previsão de saúde/morte/dinheiro e que todo aspecto possível entre pessoais
 tem texto.
+
+### As 4 dimensões compostas (rodada 12, 14/out/2026)
+
+Carreira, Dinheiro, Família e Propósito não são um ponto só: juntam cúspide, planetas
+na casa e regente (`mt.dimensao_composta`). Textos em `meio_do_ceu.yaml`,
+`cuspides.yaml` (casa2, casa4), `nodo_norte.yaml` (signos, casas) e `regentes.yaml`
+(casa10, casa2, casa4 × casa onde o regente está; regentes modernos de `mo.REGENTE`).
+
+| Dimensão | Com hora | Sem hora |
+|---|---|---|
+| Carreira | Meio do Céu no signo + planetas na casa 10 + regente da casa 10 | Saturno no signo + aviso `sem_hora_carreira` |
+| Dinheiro | cúspide da casa 2 + planetas na casa 2 + regente + Júpiter no signo e na casa | Júpiter no signo + aviso |
+| Família | cúspide da casa 4 (Fundo do Céu) + planetas na casa 4 + regente + a Lua como referência | a Lua como referência + aviso |
+| Propósito | Nodo Norte no signo e na casa | Nodo Norte no signo + aviso |
+
+- **Sem texto repetido.** Planeta com dimensão própria (Sol, Lua, Mercúrio, Vênus,
+  Marte) ou que uma composta anterior já mostrou entra como **referência**: título,
+  a primeira frase e "Mais em <dimensão>". O resto do mapa ("Os planetas nos signos /
+  nas casas") omite o texto inteiro que uma composta usou.
+- **Amostra:** só o começo do texto principal (`trecho`); os blocos não saem do servidor.
+- **Token:** não muda. Quem comprou antes abre as 10 (o completo mostra o que está ativo no catálogo).
+- **PDF e `/live`:** leem `mt.montar_secoes` (as 4 entram antes dos aspectos); a página
+  do completo usa `montar_secoes(..., dimensoes=False)` porque já as mostra nas dimensões.
+
+### Aspectos (rodada 12, Fase 3)
+
+`texto_aspecto` procura: `aspectos_sociais` (Júpiter e Saturno × Sol, Lua, Mercúrio,
+Vênus, Marte; 50 textos) → `aspectos_pessoais` → montado com as peças (tema + dinâmica
++ conselho). Urano, Netuno, Plutão, Nodo, ângulos e Júpiter × Saturno seguem montados.
 
 ## Sinastria (`sinastria.py`) — Índice Padmini, método próprio
 
