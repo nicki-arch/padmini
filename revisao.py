@@ -41,12 +41,16 @@ MARCADOR = re.compile(r"\{[a-z_]+\}")
 
 PRODUTO = {"planetas_signos": "Mapa natal", "planetas_casas": "Mapa natal", "ascendente": "Mapa natal",
            "aspectos_pessoais": "Mapa natal", "pecas": "Mapa natal", "sinastria": "Sinastria",
-           "numerologia": "Numerologia", "tarot": "Tarot"}
+           "numerologia": "Numerologia", "tarot": "Tarot",
+           # rodada 12: as 4 dimensões novas e os aspectos de Júpiter e Saturno
+           "meio_do_ceu": "Mapa natal", "cuspides": "Mapa natal", "nodo_norte": "Mapa natal",
+           "regentes": "Mapa natal", "aspectos_sociais": "Mapa natal"}
 
 
 def limites(arquivo: str, caminho: tuple) -> tuple[int, int] | None:
     """(mínimo, máximo) de palavras, ou None para peças curtas sem limite."""
-    if arquivo in ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais"):
+    if arquivo in ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais",
+                   "meio_do_ceu", "cuspides", "nodo_norte", "regentes", "aspectos_sociais"):
         return 60, 120
     if arquivo == "sinastria":
         if caminho[0] == "dimensoes" and caminho[-1] in ("alta", "media", "baixa"):
@@ -107,6 +111,20 @@ def onde_aparece(arquivo: str, c: tuple) -> str:
     if arquivo == "aspectos_pessoais":
         a, b = c[0].split("-")
         return f"Mapa natal · {_pt(a)} em {_pt(c[1])} com {_pt(b)}"
+    if arquivo == "aspectos_sociais":
+        a, b = c[0].split("-")
+        return f"Mapa natal · {_pt(a)} em {_pt(c[1])} com {_pt(b)}"
+    if arquivo == "meio_do_ceu":
+        return f"Mapa natal · Carreira: Meio do Céu em {_pt(c[0])}"
+    if arquivo == "cuspides":
+        dimensao = {"casa2": "Dinheiro: casa 2", "casa4": "Família: Fundo do Céu (casa 4)"}.get(c[0], c[0])
+        return f"Mapa natal · {dimensao} em {_pt(c[1])}"
+    if arquivo == "nodo_norte":
+        return (f"Mapa natal · Propósito: Nodo Norte em {_pt(c[1])}" if c[0] == "signos"
+                else f"Mapa natal · Propósito: Nodo Norte na casa {c[1]}")
+    if arquivo == "regentes":
+        dimensao = {"casa10": "Carreira", "casa2": "Dinheiro", "casa4": "Família"}.get(c[0], c[0])
+        return f"Mapa natal · {dimensao}: regente da casa {c[0].removeprefix('casa')} na casa {c[1]}"
     if arquivo == "pecas":
         grupo = {"temas": "tema usado para montar aspectos", "dinamica": "frase de aspecto montado",
                  "conselho": "conselho de aspecto montado", "elemento_dominante": "elemento que mais aparece",

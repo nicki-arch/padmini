@@ -172,7 +172,8 @@ TEXTOS = {
                              "numerologia": "Os outros números do seu nome", "tarot": "O que as suas cartas dizem juntas"},
         "assunto_abandono": "Seu pedido na Valderez Astrologia ficou pela metade",
         "completo_abre": {
-            "mapa": ("a roda do seu mapa, todos os planetas signo a signo (e casa a casa, com a hora de "
+            "mapa": ("as 10 dimensões do seu mapa (da essência ao propósito, com carreira, dinheiro e "
+                     "família), a roda, todos os planetas signo a signo (e casa a casa, com a hora de "
                      "nascimento), os aspectos principais, os elementos e o PDF para guardar"),
             "compat": ("as 8 dimensões com a nota e a leitura de cada uma, os aspectos entre os planetas "
                        "de vocês e os planetas de um nas casas do outro"),

@@ -278,6 +278,8 @@ function cabecalho(d) {
 }
 
 // ---------- amostra por dimensões ----------
+// "Sol em Áries"; nas dimensões compostas (rodada 12), o título vem do servidor ("Meio do Céu em Leão")
+const tituloDim = (x) => x.titulo || `${x.ponto_pt} em ${x.signo_pt}`;
 const icoCadeado = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
 function cartaoDimensao(dm, completos) {
   if (dm.estado === "em_breve") {
@@ -291,7 +293,7 @@ function cartaoDimensao(dm, completos) {
   // se o e-mail não saiu, a amostra veio inteira: Sol, Lua e Ascendente com o texto todo
   const inteiro = completos[dm.ponto];
   const destino = LINK_CHECKOUT_INDIVIDUAL ? "#comprar" : "#me-avise";
-  return `<article class="cartao dim leitura"><div class="topo-dim"><img class="redondo" src="${esc(dm.img)}" alt="" loading="lazy"><div><span class="ponto">${esc(dm.nome)}</span><h3>${esc(dm.ponto_pt)} em ${esc(dm.signo_pt)}</h3></div></div>
+  return `<article class="cartao dim leitura"><div class="topo-dim"><img class="redondo" src="${esc(dm.img)}" alt="" loading="lazy"><div><span class="ponto">${esc(dm.nome)}</span><h3>${esc(tituloDim(dm))}</h3></div></div>
     ${dm.selo ? `<span class="selo">✓ ${esc(dm.selo)}</span>` : ""}
     <p>${esc(inteiro || dm.trecho)}</p>
     ${inteiro ? "" : `<div class="vela"><p class="fumo" aria-hidden="true">${esc(TA.fumo)}</p><div class="tampa"><a class="bt bt-2" href="${destino}">${icoCadeado}${esc(LINK_CHECKOUT_INDIVIDUAL ? TA.desbloquear : TA.avisar)}</a></div></div>`}
@@ -363,14 +365,18 @@ function secaoDimensao(x, i, ativos) {
   const aspectos = (x.aspectos || []).length ? `<h3>Os aspectos ${esc(DO_PONTO[x.ponto] || "")}</h3>
       <p class="apoio">No seu mapa, ${esc(x.ponto_pt)} conversa com ${x.aspectos.length === 1 ? "um ponto" : x.aspectos.length + " pontos"}. Toque em cada um para ler o que ele traz.</p>
       <div class="aspectos-lista">${x.aspectos.map((a) => `<details class="aspecto ${a.tipo}"><summary>${esc(a.titulo.replace(/ \(orbe.*\)$/, ""))} · ${esc(a.orbe)}</summary><p>${esc(a.texto)}</p></details>`).join("")}</div>` : "";
+  // dimensões compostas (rodada 12): aviso sem hora e blocos (planetas na casa, regente, referências)
+  const blocos = (x.blocos || []).map((b) => `<h3>${esc(b.titulo)}</h3><p${b.referencia ? ' class="apoio"' : ""}>${esc(b.texto)}</p>`).join("");
   return `<section class="dimensao" id="dim-${esc(x.chave)}">
-      <span class="ponto">${esc(x.nome)} · ${esc(x.ponto_pt)}</span>
-      <div class="dimensao-topo">${imgs}<h2>${esc(x.ponto_pt)} em ${esc(x.signo_pt)}</h2></div>
+      <span class="ponto">${esc(x.nome)} · ${esc(x.composta ? x.rotulo : x.ponto_pt)}</span>
+      <div class="dimensao-topo">${imgs}<h2>${esc(tituloDim(x))}</h2></div>
       ${x.selo ? `<span class="selo">✓ ${esc(x.selo)}</span>` : ""}
-      <p>${esc(x.texto)}</p>
+      ${x.aviso ? `<p class="aviso">${esc(x.aviso)}</p>` : ""}
+      ${x.texto ? `<p>${esc(x.texto)}</p>` : ""}
       ${x.casa ? `<h3>${esc(x.ponto_pt)} na casa ${x.casa}</h3><p>${esc(x.texto_casa)}</p>` : ""}
+      ${blocos}
       ${aspectos}
-      ${prox ? `<p class="proxima"><a href="#dim-${esc(prox.chave)}">Próxima: ${esc(prox.nome)} · ${esc(prox.ponto_pt)} em ${esc(prox.signo_pt)} ›</a></p>` : ""}
+      ${prox ? `<p class="proxima"><a href="#dim-${esc(prox.chave)}">Próxima: ${esc(prox.nome)} · ${esc(tituloDim(prox))} ›</a></p>` : ""}
     </section>`;
 }
 function desenharResultado(d) {

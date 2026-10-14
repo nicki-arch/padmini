@@ -238,7 +238,7 @@ def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
         # servidor e o resto do mapa (sem repetir o que as dimensões já mostram)
         "dimensoes": dims,
         "roda": roda_mapa.svg(mapa, p.nome.strip()),
-        "resto": mt.montar_secoes(mapa, omitir=na_tela),
+        "resto": mt.montar_secoes(mapa, omitir=na_tela, dimensoes=False),
         "pontos": _pontos(mapa),
         "casas": ({"sistema": mapa["casas"]["sistema"], "aviso": mapa["casas"]["aviso"],
                    "cuspides": mapa["casas"]["cuspides"]} if mapa["casas"] else None),
