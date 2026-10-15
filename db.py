@@ -623,6 +623,34 @@ def candidatos_boas_vindas(limite: int = 200) -> list[dict]:
         return []
 
 
+def candidatos_aniversario(mes_dia: list[str], limite: int = 500) -> list[dict]:
+    """E-mail de aniversário de "O seu ano" (rodada 13): a amostra mais recente (ocidental, com
+    a data de nascimento: mapa ou previsão) de cada e-mail que MARCOU a caixa de marketing,
+    dos últimos 24 meses (a retenção de marketing), sem descadastro, cujo aniversário cai em
+    um dos `mes_dia` ("MM-DD"). Sem a caixa marcada, nunca."""
+    if not ativo() or not mes_dia:
+        return []
+    try:
+        with _conectar() as c:
+            rows = c.execute(
+                """
+                SELECT * FROM (
+                    SELECT DISTINCT ON (lower(a.email)) a.id, lower(a.email), a.produto, a.dados
+                    FROM amostras_email a
+                    WHERE a.aceita_sequencia AND a.sistema = 'ocidental' AND a.produto IN ('mapa', 'previsao')
+                      AND a.criado_em > now() - interval '24 months'
+                    ORDER BY lower(a.email), a.criado_em DESC
+                ) u
+                WHERE NOT EXISTS (SELECT 1 FROM email_optout o WHERE o.email = u.lower)
+                  AND substr(u.dados->>'data', 6, 5) = ANY(%s)
+                LIMIT %s
+                """, (list(mes_dia), limite)).fetchall()
+        return [{"id": r[0], "email": r[1], "produto": r[2], "dados": r[3]} for r in rows]
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao buscar os aniversários")
+        return []
+
+
 def candidatos_pos_compra(limite: int = 200) -> list[dict]:
     """A compra mais recente (ocidental, entregue) de cada e-mail nos últimos 30
     dias, sem descadastro — com o que o e-mail já comprou, quantos passos do

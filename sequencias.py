@@ -28,6 +28,7 @@ sequência no mesmo dia (horário de Brasília); um passo por pessoa por dia.
 import logging
 import os
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 import catalogo
 import db
@@ -60,6 +61,10 @@ def trecho_extra(produto: str, dados: dict) -> tuple[str, str, str]:
     leitura da pessoa que a amostra NÃO trazia."""
     import montar_texto_ocidental as mt
     import rotas_ocidental as ro
+    if produto == "previsao":  # rodada 13: o 2º tema do ano (a amostra trazia só o título)
+        temas = _previsao_da_amostra(dados)["temas"]
+        t = temas[1] if len(temas) > 1 else temas[0]
+        return ("O segundo tema do seu ano", f"{t['titulo']} · {t['periodo']}", t["texto"])
     if produto == "mapa":
         mapa, _ = ro.calcular(ro.PedidoMapaOcidental(**dados))
         venus = mapa["pontos"]["venus"]
@@ -90,10 +95,27 @@ def trecho_extra(produto: str, dados: dict) -> tuple[str, str, str]:
             mt.conjunto_tarot(cartas)[0])
 
 
+def _previsao_da_amostra(dados: dict) -> dict:
+    """O ano da amostra registrada (o mesmo período que ela viu), já montado."""
+    import montar_previsao as mp
+    import rotas_ocidental as ro
+    from datetime import date
+    pessoa = {k: v for k, v in dados.items() if k != "inicio"}
+    prev = ro.calcular_previsao(ro.PedidoMapaOcidental(**pessoa), date.fromisoformat(dados["inicio"] + "-01"))
+    return mp.completo(prev)
+
+
 def partes_do_completo(produto: str, dados: dict) -> list[str]:
     """Passo 2 da boas-vindas: as partes do relatório completo DELA (títulos reais)."""
     import montar_texto_ocidental as mt
     import rotas_ocidental as ro
+    if produto == "previsao":
+        c = _previsao_da_amostra(dados)
+        return ([f"Os três temas do seu ano: {'; '.join(t['titulo'] for t in c['temas'])}",
+                 "Mês a mês, o que começa, o que está no auge e o que termina",
+                 f"Por área da vida: {', '.join(a['nome'] for a in c['areas'])}"]
+                + ([f"{len(c['eclipses'])} eclipses do período, na casa de cada um"] if c["eclipses"] else [])
+                + (["A sua Revolução Solar"] if c["revolucao"] else []) + ["O relatório em PDF"])
     if produto == "mapa":
         mapa, _ = ro.calcular(ro.PedidoMapaOcidental(**dados))
         return [t for t in mt.montar_secoes(mapa) if t not in ("Antes de começar", "Para terminar")] \
@@ -113,9 +135,12 @@ def partes_do_completo(produto: str, dados: dict) -> list[str]:
 
 
 NO_COMPLETO = {"mapa": "no seu mapa natal completo", "compat": "na sinastria completa de vocês",
-               "numerologia": "na sua numerologia completa", "tarot": "na leitura completa das suas cartas"}
+               "numerologia": "na sua numerologia completa", "tarot": "na leitura completa das suas cartas",
+               "previsao": "no seu ano completo"}
 NOME_DO_COMPLETO = {"mapa": "o seu mapa natal completo", "compat": "a sinastria completa de vocês",
-                    "numerologia": "a sua numerologia completa", "tarot": "a leitura completa das suas cartas"}
+                    "numerologia": "a sua numerologia completa", "tarot": "a leitura completa das suas cartas",
+                    "previsao": "o seu ano completo"}
+COM_SEQUENCIA = ESCADA + ("previsao",)  # produtos com texto de boas-vindas
 
 
 # ------------------------------------------------------------------ e-mails
@@ -156,7 +181,8 @@ def email_boas_vindas(passo: int, produto: str, dados: dict, email: str) -> tupl
 
 
 LEITURA_COMPRADA = {"mapa": "o seu mapa natal", "compat": "a sinastria de vocês", "numerologia": "a sua numerologia",
-                    "tarot": "a leitura das suas cartas", "mapas_casal": "os mapas natais de vocês"}
+                    "tarot": "a leitura das suas cartas", "mapas_casal": "os mapas natais de vocês",
+                    "previsao": "o seu ano"}
 
 
 def proxima_da_escada(comprados: list[str]) -> str | None:
@@ -231,6 +257,55 @@ def _enviar(email: str, sequencia: str, passo: int, referencia: int, montar, res
     return "enviado"
 
 
+# ------------------------------------------------------------------ aniversário (rodada 13)
+DIAS_ANTES_DO_ANIVERSARIO = 30
+
+
+def aniversarios_alvo(hoje) -> list[str]:
+    """Os "MM-DD" de quem faz aniversário daqui a 30 dias. Quem nasceu em 29/02, em ano
+    que não é bissexto, entra junto com 1º/03."""
+    alvo = hoje + timedelta(days=DIAS_ANTES_DO_ANIVERSARIO)
+    dias = [alvo.strftime("%m-%d")]
+    if alvo.strftime("%m-%d") == "03-01" and not (alvo.year % 4 == 0 and (alvo.year % 100 or alvo.year % 400 == 0)):
+        dias.append("02-29")
+    return dias
+
+
+def email_aniversario(dados: dict, email: str, aniversario) -> tuple[str, str]:
+    """(assunto, html): "o seu ano astrológico começa em…", com link para a amostra.
+    Sem preço: quem decide é a página (e o e-mail só sai com o produto à venda)."""
+    c = _cor(SISTEMA)
+    nome = _primeiro_nome("previsao", dados)
+    quando = f"{aniversario.day} de {('janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro')[aniversario.month - 1]}"
+    link = marketing.link_site("previsao", "aniversario")
+    corpo = (_ola(nome)
+             + _p(f"O seu ano astrológico começa em <b>{_e(quando)}</b>, no seu aniversário: é quando o Sol volta "
+                  "ao grau em que estava quando você nasceu.")
+             + _p("Que tal olhar com calma para os próximos 12 meses? Em \"O seu ano\" você vê os três temas que "
+                  "mais pesam no período, mês a mês o que começa e o que se encerra, e as janelas que se abrem. "
+                  "Não é previsão de acontecimentos: é o clima do ano, para você escolher o que fazer com ele.")
+             + _botao(link, "Ver os temas do meu ano, de graça →", SISTEMA)
+             + _p(f'<span style="color:{c["suave"]};font-size:13px">Você recebe este e-mail porque pediu, numa '
+                  "amostra, para receber mais sobre a sua leitura. Um por ano, perto do aniversário.</span>"))
+    return "O seu ano astrológico começa em " + quando, _moldura(corpo, _rodape_descadastro(email, SISTEMA), SISTEMA)
+
+
+def rodar_aniversarios(hoje, ja_hoje: set, contagem: dict) -> None:
+    """Desligado até "O seu ano" estar à venda (catalogo.yaml: ativo e vendas abertas)."""
+    if not catalogo.vende("previsao", SISTEMA):
+        return
+    alvo = hoje + timedelta(days=DIAS_ANTES_DO_ANIVERSARIO)
+    for item in db.candidatos_aniversario(aniversarios_alvo(hoje)):
+        if item["email"] in ja_hoje:
+            continue
+        # passo = o ano do aniversário: o índice único garante um por ano, nunca dois
+        r = _enviar(item["email"], "aniversario", alvo.year, item["id"],
+                    lambda i=item: email_aniversario(i["dados"], i["email"], alvo))
+        contagem[r] += 1
+        if r == "enviado":
+            ja_hoje.add(item["email"])
+
+
 def rodar(agora: datetime | None = None) -> dict:
     """Um passo por pessoa por dia, no máximo. Sem banco, não faz nada."""
     agora = agora or datetime.now(timezone.utc)
@@ -257,8 +332,8 @@ def rodar(agora: datetime | None = None) -> dict:
         passo = item["feitos"] + 1
         if passo > 3 or item["recebeu_hoje"] or item["email"] in ja_hoje or item["sistema"] != SISTEMA:
             continue
-        if item["produto"] not in ESCADA:  # produto sem texto de sequência ("O seu ano", rodada 13)
-            continue
+        if item["produto"] not in COM_SEQUENCIA or not catalogo.vende(item["produto"], SISTEMA):
+            continue  # boas-vindas só leva a produto que está à venda ("O seu ano" oculto: nada)
         if not _vencido(item["criado_em"], DIAS_BOAS_VINDAS[passo], agora):
             continue
         r = _enviar(item["email"], "boas_vindas", passo, item["id"],
@@ -266,4 +341,5 @@ def rodar(agora: datetime | None = None) -> dict:
         contagem[r] += 1
         if r == "enviado":
             ja_hoje.add(item["email"])
+    rodar_aniversarios(agora.astimezone(ZoneInfo("America/Sao_Paulo")).date(), ja_hoje, contagem)
     return contagem

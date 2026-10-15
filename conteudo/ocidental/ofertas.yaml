@@ -59,3 +59,10 @@ tarot:
   nome: Tarot — tiragem de 3 cartas
   preco: 19
   checkout: "https://pay.cakto.com.br/hzxu8hh_1141288"
+
+# Rodada 13: "O seu ano", previsão dos próximos 12 meses. SEM PREÇO de propósito: o preço
+# é decisão do Nicolas (a análise de produtos sugere R$47 de lançamento e R$67 de tabela,
+# não decidido). Checkout só pela Stripe (sem link da Cakto). Sem `preco`, o checkout
+# recusa (pendentes.valor_centavos) e um teste impede ligar o produto no catalogo.yaml.
+previsao:
+  nome: O seu ano — previsão dos próximos 12 meses
