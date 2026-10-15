@@ -1,5 +1,6 @@
 pyswisseph==2.10.3.2
 timezonefinder
+numpy  # previsao.py (já vinha com o timezonefinder; agora explícito)
 tzdata
 anthropic
 fastapi

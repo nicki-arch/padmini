@@ -1,0 +1,276 @@
+{
+ "_leia": "Referência da PREVISÃO (rodada 13). Valores COPIADOS de horoscopes.astro-seek.com e mooncalendar.astro-seek.com em 15/out/2026, não calculados por nós. Três mapas de referencias_ocidental.json (sp-1990, rio-1995, lisboa-1985), compra em 15/out/2026 (período 01/10/2026 a 30/09/2027). TRÂNSITOS: para cada data exata do motor, o mapa do astro-seek no instante exato que o motor calculou (UT, local Reykjavik = UTC o ano todo; o céu é geocêntrico, o local não muda os planetas) e a posição que ele mostra para o planeta: se ela está a menos de um dia de movimento do grau-alvo, a data exata deles difere ≤ 1 dia da nossa. ECLIPSES: a lista do astro-seek; nos SOLARES o astro-seek dá a posição da LUA no máximo do eclipse e o motor dá a do Sol (o grau da lua nova), diferença de até ~2'. REVOLUÇÃO SOLAR: calculadora de Revolução Solar do astro-seek, local = nascimento. Teste: testes/test_previsao_referencia.py.",
+ "consultado_em": "2026-10-15",
+ "compra": "2026-10-15",
+ "transitos": [
+  {
+   "mapa": "sp-1990",
+   "planeta": "jupiter",
+   "aspecto": "quadratura",
+   "ponto": "sol",
+   "data_motor": "2026-11-03",
+   "instante_ut": "2026-11-03T11:26",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=3&narozeni_mesic=11&narozeni_rok=2026&narozeni_hodina=11&narozeni_minuta=26&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Leo",
+    "grau": "24°37'01''",
+    "tempo": "conferido antes (Jupiter Leo 24°37'01''); nao raspado de novo"
+   }
+  },
+  {
+   "mapa": "sp-1990",
+   "planeta": "saturno",
+   "aspecto": "conjuncao",
+   "ponto": "venus",
+   "data_motor": "2027-02-28",
+   "instante_ut": "2027-03-01T01:01",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=1&narozeni_mesic=3&narozeni_rok=2027&narozeni_hodina=1&narozeni_minuta=1&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Aries",
+    "grau": "13°04'47''",
+    "tempo": "Local time: 01:01 (GMT) | Universal Time: 01:01 (0:00:0h) | Timezone: Atlantic/Reykjavik - GMT"
+   }
+  },
+  {
+   "mapa": "sp-1990",
+   "planeta": "saturno",
+   "aspecto": "quadratura",
+   "ponto": "saturno",
+   "data_motor": "2027-06-13",
+   "instante_ut": "2027-06-13T19:38",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=13&narozeni_mesic=6&narozeni_rok=2027&narozeni_hodina=19&narozeni_minuta=38&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Aries",
+    "grau": "25°14'43''",
+    "tempo": "extrator devolveu 'Local time: 00:38 on June 13, 2027 (GMT)' (leitura errada do extrator; a URL pede 13/06/2027 19:38 GMT e a posicao bate com o alvo)"
+   }
+  },
+  {
+   "mapa": "sp-1990",
+   "planeta": "jupiter",
+   "aspecto": "sextil",
+   "ponto": "meio_do_ceu",
+   "data_motor": "2027-07-21",
+   "instante_ut": "2027-07-21T21:33",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=21&narozeni_mesic=7&narozeni_rok=2027&narozeni_hodina=21&narozeni_minuta=33&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Leo",
+    "grau": "29°07'37''",
+    "tempo": "Local time: 21:33 - GMT; Universal Time: 21:33 (0:00:0h); Timezone: Atlantic/Reykjavik - GMT"
+   }
+  },
+  {
+   "mapa": "sp-1990",
+   "planeta": "jupiter",
+   "aspecto": "trigono",
+   "ponto": "mercurio",
+   "data_motor": "2027-09-01",
+   "instante_ut": "2027-09-01T15:54",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=1&narozeni_mesic=9&narozeni_rok=2027&narozeni_hodina=15&narozeni_minuta=54&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Virgo",
+    "grau": "7°59'12''",
+    "tempo": "1 September 2027, 15:54 GMT"
+   }
+  },
+  {
+   "mapa": "rio-1995",
+   "planeta": "urano",
+   "aspecto": "conjuncao",
+   "ponto": "meio_do_ceu",
+   "data_motor": "2026-11-22",
+   "instante_ut": "2026-11-22T08:49",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=22&narozeni_mesic=11&narozeni_rok=2026&narozeni_hodina=8&narozeni_minuta=49&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Gemini",
+    "grau": "3°49'31''",
+    "tempo": "Local Time: 08:49 (GMT) | Universal Time: 08:49 (0:00:0h) | Timezone: Atlantic/Reykjavik - GMT"
+   }
+  },
+  {
+   "mapa": "rio-1995",
+   "planeta": "jupiter",
+   "aspecto": "conjuncao",
+   "ponto": "ascendente",
+   "data_motor": "2027-01-29",
+   "instante_ut": "2027-01-29T23:27",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=29&narozeni_mesic=1&narozeni_rok=2027&narozeni_hodina=23&narozeni_minuta=27&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Leo",
+    "grau": "23°36'35''",
+    "tempo": "29 January 2027 - 23:27(GMT) / Universal Time (UT/GMT): 29 January 2027 - 23:27(0:00:0h) [citacao direta, 2a raspagem]"
+   }
+  },
+  {
+   "mapa": "rio-1995",
+   "planeta": "netuno",
+   "aspecto": "trigono",
+   "ponto": "venus",
+   "data_motor": "2027-03-07",
+   "instante_ut": "2027-03-07T15:38",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=7&narozeni_mesic=3&narozeni_rok=2027&narozeni_hodina=15&narozeni_minuta=38&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Aries",
+    "grau": "3°26'07''",
+    "tempo": "Local time: 15:38 (GMT), UT: 15:38 (0:00:0h), Timezone: Atlantic/Reykjavik - GMT"
+   }
+  },
+  {
+   "mapa": "rio-1995",
+   "planeta": "plutao",
+   "aspecto": "conjuncao",
+   "ponto": "mercurio",
+   "data_motor": "2027-03-08",
+   "instante_ut": "2027-03-09T00:35",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=9&narozeni_mesic=3&narozeni_rok=2027&narozeni_hodina=0&narozeni_minuta=35&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Aquarius",
+    "grau": "6°22'07''",
+    "tempo": "9 March 2027, 00:35 GMT"
+   }
+  },
+  {
+   "mapa": "rio-1995",
+   "planeta": "saturno",
+   "aspecto": "quadratura",
+   "ponto": "sol",
+   "data_motor": "2027-04-28",
+   "instante_ut": "2027-04-28T13:20",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=28&narozeni_mesic=4&narozeni_rok=2027&narozeni_hodina=13&narozeni_minuta=20&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Aries",
+    "grau": "20°16'12''",
+    "tempo": "Local time: 28 April 2027, 13:20 (GMT)"
+   }
+  },
+  {
+   "mapa": "lisboa-1985",
+   "planeta": "netuno",
+   "aspecto": "oposicao",
+   "ponto": "meio_do_ceu",
+   "data_motor": "2027-01-21",
+   "instante_ut": "2027-01-21T07:40",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=21&narozeni_mesic=1&narozeni_rok=2027&narozeni_hodina=7&narozeni_minuta=40&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Aries",
+    "grau": "2°03'14''",
+    "tempo": "21 January 2027 - 07:40 (GMT)"
+   }
+  },
+  {
+   "mapa": "lisboa-1985",
+   "planeta": "jupiter",
+   "aspecto": "conjuncao",
+   "ponto": "sol",
+   "data_motor": "2027-02-28",
+   "instante_ut": "2027-02-28T04:11",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=28&narozeni_mesic=2&narozeni_rok=2027&narozeni_hodina=4&narozeni_minuta=11&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Leo",
+    "grau": "19°50'49''",
+    "tempo": "28 February 2027 - 04:11 (GMT)"
+   }
+  },
+  {
+   "mapa": "lisboa-1985",
+   "planeta": "saturno",
+   "aspecto": "trigono",
+   "ponto": "sol",
+   "data_motor": "2027-04-24",
+   "instante_ut": "2027-04-25T02:43",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=25&narozeni_mesic=4&narozeni_rok=2027&narozeni_hodina=2&narozeni_minuta=43&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Aries",
+    "grau": "19°50'48''",
+    "tempo": "25 April 2027 - 02:43 (Local Time) - Atlantic/Reykjavik GMT"
+   }
+  },
+  {
+   "mapa": "lisboa-1985",
+   "planeta": "jupiter",
+   "aspecto": "quadratura",
+   "ponto": "saturno",
+   "data_motor": "2027-06-10",
+   "instante_ut": "2027-06-10T08:50",
+   "fonte": "https://horoscopes.astro-seek.com/calculate-birth-chart-horoscope-online/?input_natal=1&send_calculation=1&narozeni_den=10&narozeni_mesic=6&narozeni_rok=2027&narozeni_hodina=8&narozeni_minuta=50&narozeni_sekunda=00&narozeni_city=Reykjavik%2C+Iceland&narozeni_sirka_stupne=64&narozeni_sirka_minuty=8&narozeni_sirka_smer=0&narozeni_delka_stupne=21&narozeni_delka_minuty=56&narozeni_delka_smer=1&narozeni_timezone_form=auto&narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on&tolerance=1&aya=",
+   "fonte_mostra": {
+    "signo": "Leo",
+    "grau": "21°43'26''",
+    "tempo": "Local time: 08:50 (GMT) | UT: 08:50 | Timezone: Atlantic/Reykjavik"
+   }
+  }
+ ],
+ "eclipses": [
+  {
+   "data": "2027-02-06",
+   "hora_ut": "15:59",
+   "tipo": "solar",
+   "subtipo": "anular",
+   "signo": "Aquarius",
+   "grau": "17°39'",
+   "fonte": "https://mooncalendar.astro-seek.com/annular-solar-eclipse-aquarius-new-moon-day-6-february-2027"
+  },
+  {
+   "data": "2027-02-20",
+   "hora_ut": "23:12",
+   "tipo": "lunar",
+   "subtipo": "penumbral",
+   "signo": "Virgo",
+   "grau": "1°58'",
+   "fonte": "https://mooncalendar.astro-seek.com/penumbral-lunar-eclipse-virgo-full-moon-day-20-february-2027"
+  },
+  {
+   "data": "2027-07-18",
+   "hora_ut": "16:02",
+   "tipo": "lunar",
+   "subtipo": "penumbral",
+   "signo": "Capricorn",
+   "grau": "25°57'",
+   "fonte": "https://mooncalendar.astro-seek.com/penumbral-lunar-eclipse-capricorn-full-moon-day-18-july-2027"
+  },
+  {
+   "data": "2027-08-02",
+   "hora_ut": "10:06",
+   "tipo": "solar",
+   "subtipo": "total",
+   "signo": "Leo",
+   "grau": "9°55'",
+   "fonte": "https://mooncalendar.astro-seek.com/total-solar-eclipse-leo-new-moon-day-2-august-2027"
+  },
+  {
+   "data": "2027-08-17",
+   "hora_ut": "07:13",
+   "tipo": "lunar",
+   "subtipo": "penumbral",
+   "signo": "Aquarius",
+   "grau": "24°04'",
+   "fonte": "https://mooncalendar.astro-seek.com/penumbral-lunar-eclipse-aquarius-full-moon-day-17-august-2027"
+  }
+ ],
+ "revolucao": [
+  {
+   "mapa": "sp-1990",
+   "instante": "15 May 2027 - 13:09 (-03) local; UT 15 May 2027 - 16:09",
+   "ascendente_signo": "Virgo",
+   "casa_do_sol": 9,
+   "fonte": "https://horoscopes.astro-seek.com/calculate-solar-return/?muz_narozeni_den=15&muz_narozeni_mesic=5&muz_narozeni_rok=1990&muz_narozeni_hodina=14&muz_narozeni_minuta=30&muz_narozeni_sekunda=00&muz_narozeni_city=Sao+Paulo%2C+Brazil&muz_narozeni_sirka_stupne=23&muz_narozeni_sirka_minuty=33&muz_narozeni_sirka_smer=1&muz_narozeni_delka_stupne=46&muz_narozeni_delka_minuty=38&muz_narozeni_delka_smer=1&muz_narozeni_timezone_form=auto&muz_narozeni_timezone_dst_form=auto&zena_narozeni_rok=2027&zena_narozeni_city=Sao+Paulo%2C+Brazil&zena_narozeni_sirka_stupne=23&zena_narozeni_sirka_minuty=33&zena_narozeni_sirka_smer=1&zena_narozeni_delka_stupne=46&zena_narozeni_delka_minuty=38&zena_narozeni_delka_smer=1&zena_narozeni_timezone_form=auto&zena_narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on",
+   "metodo": "Instante e Ascendente: calculadora de Revolucao Solar do astro-seek (calculate-solar-return, local da RS = local de nascimento, Placidus). Casa do Sol: tabela de planetas do mapa (birth chart) do instante da RS no local de nascimento, hora local arredondada ao minuto (a tabela 'Planets in birth houses' da pagina de RS da a casa NATAL, nao a da RS); confere com as cuspides da RS na calculadora."
+  },
+  {
+   "mapa": "rio-1995",
+   "instante": "10 Jan 2027 - 15:13 (-03) local; UT 10 Jan 2027 - 18:13",
+   "ascendente_signo": "Gemini",
+   "casa_do_sol": 8,
+   "fonte": "https://horoscopes.astro-seek.com/calculate-solar-return/?muz_narozeni_den=10&muz_narozeni_mesic=1&muz_narozeni_rok=1995&muz_narozeni_hodina=21&muz_narozeni_minuta=40&muz_narozeni_sekunda=00&muz_narozeni_city=Rio+de+Janeiro%2C+Brazil&muz_narozeni_sirka_stupne=22&muz_narozeni_sirka_minuty=54&muz_narozeni_sirka_smer=1&muz_narozeni_delka_stupne=43&muz_narozeni_delka_minuty=12&muz_narozeni_delka_smer=1&muz_narozeni_timezone_form=auto&muz_narozeni_timezone_dst_form=auto&zena_narozeni_rok=2027&zena_narozeni_city=Rio+de+Janeiro%2C+Brazil&zena_narozeni_sirka_stupne=22&zena_narozeni_sirka_minuty=54&zena_narozeni_sirka_smer=1&zena_narozeni_delka_stupne=43&zena_narozeni_delka_minuty=12&zena_narozeni_delka_smer=1&zena_narozeni_timezone_form=auto&zena_narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on",
+   "metodo": "Instante e Ascendente: calculadora de Revolucao Solar do astro-seek (calculate-solar-return, local da RS = local de nascimento, Placidus). Casa do Sol: tabela de planetas do mapa (birth chart) do instante da RS no local de nascimento, hora local arredondada ao minuto (a tabela 'Planets in birth houses' da pagina de RS da a casa NATAL, nao a da RS); confere com as cuspides da RS na calculadora."
+  },
+  {
+   "mapa": "lisboa-1985",
+   "instante": "12 Aug 2027 - 19:45 (WEST, DST) local; UT 12 Aug 2027 - 18:45",
+   "ascendente_signo": "Aquarius",
+   "casa_do_sol": 7,
+   "fonte": "https://horoscopes.astro-seek.com/calculate-solar-return/?muz_narozeni_den=12&muz_narozeni_mesic=8&muz_narozeni_rok=1985&muz_narozeni_hodina=16&muz_narozeni_minuta=20&muz_narozeni_sekunda=00&muz_narozeni_city=Lisbon%2C+Portugal&muz_narozeni_sirka_stupne=38&muz_narozeni_sirka_minuty=43&muz_narozeni_sirka_smer=0&muz_narozeni_delka_stupne=9&muz_narozeni_delka_minuty=8&muz_narozeni_delka_smer=1&muz_narozeni_timezone_form=auto&muz_narozeni_timezone_dst_form=auto&zena_narozeni_rok=2027&zena_narozeni_city=Lisbon%2C+Portugal&zena_narozeni_sirka_stupne=38&zena_narozeni_sirka_minuty=43&zena_narozeni_sirka_smer=0&zena_narozeni_delka_stupne=9&zena_narozeni_delka_minuty=8&zena_narozeni_delka_smer=1&zena_narozeni_timezone_form=auto&zena_narozeni_timezone_dst_form=auto&house_system=placidus&hid_uzel_check=on&true_uzel=on",
+   "metodo": "Instante e Ascendente: calculadora de Revolucao Solar do astro-seek (calculate-solar-return, local da RS = local de nascimento, Placidus). Casa do Sol: tabela de planetas do mapa (birth chart) do instante da RS no local de nascimento, hora local arredondada ao minuto (a tabela 'Planets in birth houses' da pagina de RS da a casa NATAL, nao a da RS); confere com as cuspides da RS na calculadora."
+  }
+ ]
+}
