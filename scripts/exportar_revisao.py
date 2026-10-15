@@ -1,6 +1,10 @@
 """
 Gera a planilha de revisão dos textos da versão ocidental para a família do Pedro.
 
+RESERVA (rodada 12.1): a fonte é a planilha do Google `padmini-revisao-textos`, que o robô
+"sincronizar planilha" do padmini-conteudo lê e atualiza todo dia. Use este script só se o
+robô estiver fora do ar. Não gere planilha nova no dia a dia.
+
     python scripts/exportar_revisao.py                 # cria revisao-textos.xlsx
     python scripts/exportar_revisao.py outro-nome.xlsx
     python scripts/exportar_revisao.py --conteudo ../padmini-conteudo   # textos do repo privado
