@@ -27,7 +27,10 @@ ARQUIVOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoai
             "tarot",
             # rodada 12: as dimensões Carreira, Dinheiro, Família e Propósito e os aspectos
             # próprios de Júpiter e Saturno com os planetas pessoais
-            "meio_do_ceu", "cuspides", "nodo_norte", "regentes", "aspectos_sociais")
+            "meio_do_ceu", "cuspides", "nodo_norte", "regentes", "aspectos_sociais",
+            # rodada 13: "O seu ano", a previsão dos próximos 12 meses (subpasta previsao/)
+            "previsao/transitos", "previsao/casas", "previsao/eclipses", "previsao/revolucao",
+            "previsao/pecas")
 
 # Aspectos só entre planetas lentos são de geração, não da pessoa: ficam fora
 # da lista de "aspectos principais" do completo.
