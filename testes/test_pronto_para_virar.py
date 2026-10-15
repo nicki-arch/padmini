@@ -35,7 +35,7 @@ def test_conta_os_textos_nao_revisados():
     import revisao
     _, por_produto = pronto.textos()
     assert sum(t for _, t in por_produto.values()) == len(revisao.itens())
-    assert set(por_produto) == {"Mapa natal", "Sinastria", "Numerologia", "Tarot"}
+    assert set(por_produto) == {"Mapa natal", "Sinastria", "Numerologia", "Tarot", "Previsão"}  # rodada 13
 
 
 def test_nenhuma_pagina_da_ocidental_fala_da_vedica():

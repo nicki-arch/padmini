@@ -36,6 +36,10 @@ import textos
 PROIBIDOS = ["morte", "morrer", "morrerá", "doença", "doente", "saúde", "câncer de", "cirurgia",
              "diagnóstico", "acidente", "enriquec", "ficar rico", "fortuna", "herança", "loteria",
              "você vai ", "você irá", "com certeza", "destino é", "está condenad"]
+# Previsão (rodada 13): tom ainda mais rigoroso — tema e janela, nunca acontecimento.
+PROIBIDOS_PREVISAO = PROIBIDOS + ["destino", "falência", "demissão", "divórcio", "separação",
+                                  "gravidez", "luto", "perda de", "dívida"]
+PALAVRAS_PREVISAO = re.compile(r"\b(vai|irá|vão|acontecerá)\b", re.I)
 PERIGOSOS = re.compile(r"<\s*script|javascript:|\bon\w+\s*=", re.I)
 MARCADOR = re.compile(r"\{[a-z_]+\}")
 
@@ -44,7 +48,10 @@ PRODUTO = {"planetas_signos": "Mapa natal", "planetas_casas": "Mapa natal", "asc
            "numerologia": "Numerologia", "tarot": "Tarot",
            # rodada 12: as 4 dimensões novas e os aspectos de Júpiter e Saturno
            "meio_do_ceu": "Mapa natal", "cuspides": "Mapa natal", "nodo_norte": "Mapa natal",
-           "regentes": "Mapa natal", "aspectos_sociais": "Mapa natal"}
+           "regentes": "Mapa natal", "aspectos_sociais": "Mapa natal",
+           # rodada 13: "O seu ano" (aba própria na planilha)
+           "previsao/transitos": "Previsão", "previsao/casas": "Previsão", "previsao/eclipses": "Previsão",
+           "previsao/revolucao": "Previsão", "previsao/pecas": "Previsão"}
 
 
 def limites(arquivo: str, caminho: tuple) -> tuple[int, int] | None:
@@ -52,6 +59,10 @@ def limites(arquivo: str, caminho: tuple) -> tuple[int, int] | None:
     if arquivo in ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoais",
                    "meio_do_ceu", "cuspides", "nodo_norte", "regentes", "aspectos_sociais"):
         return 60, 120
+    if arquivo in ("previsao/transitos", "previsao/casas"):
+        return 60, 120
+    if arquivo in ("previsao/eclipses", "previsao/revolucao", "previsao/pecas"):
+        return 40, 80
     if arquivo == "sinastria":
         if caminho[0] == "dimensoes" and caminho[-1] in ("alta", "media", "baixa"):
             return 60, 120
@@ -78,9 +89,13 @@ def problemas(texto: str, arquivo: str, caminho: tuple, original: str = "") -> l
         if not faixa[0] <= n <= faixa[1]:
             erros.append(f"tem {n} palavras; o certo é de {faixa[0]} a {faixa[1]}")
     baixo = t.lower()
-    for p in PROIBIDOS:
+    previsao = arquivo.startswith("previsao/")
+    for p in (PROIBIDOS_PREVISAO if previsao else PROIBIDOS):
         if p in baixo:
             erros.append(f'usa "{p.strip()}" (proibido: previsão/sentença)')
+    if previsao:
+        for m in sorted({m.lower() for m in PALAVRAS_PREVISAO.findall(t)}):
+            erros.append(f'usa "{m}" (soa como previsão de acontecimento)')
     if PERIGOSOS.search(t):
         erros.append("tem código (script) no texto")
     if original and set(MARCADOR.findall(t)) != set(MARCADOR.findall(original)):
@@ -163,7 +178,33 @@ def onde_aparece(arquivo: str, c: tuple) -> str:
                 return f"Tarot · leitura de conjunto: predomina {c[2].capitalize()}"
             return "Tarot · leitura de conjunto: fecho"
         return "Tarot · " + " · ".join(c)
+    if arquivo.startswith("previsao/"):
+        return "Previsão · " + _onde_previsao(arquivo.removeprefix("previsao/"), c)
     return f"{arquivo} · {'/'.join(c)}"
+
+
+GRUPO_PT = {"conjuncao": "em conjunção com", "harmonico": "em sextil ou trígono com",
+            "tenso": "em quadratura ou oposição com"}
+PECA_PT = {"abertura": "abertura do relatório", "como_ler": "como ler as datas",
+           "temas": "introdução dos temas do ano", "linha_do_tempo": "introdução da linha do tempo",
+           "areas": "introdução das áreas", "eclipses": "introdução dos eclipses",
+           "revolucao": "introdução da Revolução Solar", "fechamento": "fechamento",
+           "sem_hora": "aviso: sem hora de nascimento", "retrogradacao": "aviso: retrogradação",
+           "sem_revolucao": "aviso: Revolução Solar sem casas"}
+
+
+def _onde_previsao(arquivo: str, c: tuple) -> str:
+    if arquivo == "transitos":
+        artigo = "a" if c[1] in ("lua", "venus") else "o"
+        return f"{_pt(c[0])} {GRUPO_PT[c[2]]} {artigo} {_pt(c[1])} natal"
+    if arquivo == "casas":
+        return f"{_pt(c[0])} passando pela casa {c[1]}"
+    if arquivo == "eclipses":
+        return f"Eclipse {c[0]} na casa {c[1]}"
+    if arquivo == "revolucao":
+        return (f"Revolução Solar: Ascendente em {_pt(c[1])}" if c[0] == "ascendente"
+                else f"Revolução Solar: Sol na casa {c[1]}")
+    return PECA_PT.get(c[-1], "/".join(c))
 
 
 def itens() -> list[dict]:
