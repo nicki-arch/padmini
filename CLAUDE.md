@@ -47,9 +47,14 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
   regressão.** Para rodar local: clone o `padmini-conteudo` ao lado e use
   `PADMINI_CONTEUDO_DIR=../padmini-conteudo` (ou `bash scripts/buscar_conteudo.sh` com a mesma
   variável, que copia para cá). Para editar texto, mexa no `padmini-conteudo` (PR lá) e faça um
-  novo deploy da Render: o site só muda no próximo build. Revisão da Dona Valderez:
-  `scripts/exportar_revisao.py` / `importar_revisao.py --conteudo ../padmini-conteudo`, passo a
-  passo no README do `padmini-conteudo`.
+  novo deploy da Render: o site só muda no próximo build.
+  **Revisão da Dona Valderez (rodada 12.1): a planilha do Google `padmini-revisao-textos` é a
+  fonte; não gere .xlsx novo.** O robô `sincronizar planilha` do `padmini-conteudo` (todo dia às
+  07:13 e por "Run workflow") grava "aprovado? = sim" nos YAMLs, faz o deploy e acrescenta na
+  planilha as linhas dos textos novos: rodada com texto novo não pede upload de planilha. Ele usa
+  a regra de `revisao.py` / `scripts/importar_revisao.py` daqui (não duplicar). Configuração e
+  recusados: `LEIA-ME.md` do `padmini-conteudo`. `exportar_revisao.py` / `importar_revisao.py
+  --conteudo ../padmini-conteudo` ficam só como reserva sem internet.
 - **Licença:** código sob AGPL-3.0 (`LICENSE`); textos, copy, ilustrações e as marcas
   "Valderez Astrologia" e "Padmini" com todos os direitos reservados (seção "Licença" do
   `README.md`). Os textos já estiveram públicos e continuam no histórico do Git (ocidentais
@@ -74,7 +79,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `mapa_ocidental.py` | Motor ocidental: tropical, Placidus (Porfírio nos polos), nodo verdadeiro, aspectos e orbes num lugar só. Validado contra 11 mapas do astro-seek (`testes/dados/referencias_ocidental.json`) |
 | `montar_texto_ocidental.py` + `conteudo/ocidental/textos/` (repo privado) | Mapa → texto (YAML, `revisado: false` em cada texto; `python scripts/revisao_textos.py` conta o que falta revisar). **Rodada 12:** as 10 dimensões do mapa ativas; Carreira, Dinheiro, Família e Propósito são compostas (cúspide + planetas na casa + regente; Nodo Norte), com versão sem hora e aviso, e planeta repetido entra só como referência (`mt.dimensao_composta`, tabela em `docs/ocidental.md`). Aspectos: `aspectos_sociais` → `aspectos_pessoais` → peças |
 | `rotas_ocidental.py` + `static/ocidental/` | API `/api/ocidental/*`, páginas e `/live` da versão ocidental; `gerar_pdf_ocidental.py` é o PDF |
-| `revisao.py` + `scripts/exportar_revisao.py` / `importar_revisao.py` | Planilha de revisão da família (xlsx ↔ YAML); regras de tom e tamanho num lugar só. A planilha não vai para o git |
+| `revisao.py` + `scripts/exportar_revisao.py` / `importar_revisao.py` | Regras de tom e tamanho da revisão da família, num lugar só. **Desde a rodada 12.1 a fonte é a planilha do Google, sincronizada pelo robô do `padmini-conteudo`**, que importa `revisao` e `importar_revisao.planejar`/`SIM`: mudar a assinatura deles quebra o robô (os testes dele rodam lá). Os scripts xlsx ficam só de reserva; a planilha não vai para o git |
 | `numerologia.py` | Numerologia pitagórica (versão ocidental): regras de Y/W e do Caminho de Vida em `docs/ocidental.md` |
 | `scripts/pronto_para_virar.py` | O que falta para trocar `PADMINI_SISTEMA` para `ocidental` (sai com 1 se houver bloqueio) |
 | `scripts/gerar_og_ocidental.py` | Gera as imagens de compartilhamento `static/og-oc-*.png` da versão ocidental |

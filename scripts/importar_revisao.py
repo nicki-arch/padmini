@@ -1,6 +1,10 @@
 """
 Traz para o site a planilha revisada pela família (gerada por exportar_revisao.py).
 
+RESERVA (rodada 12.1): a fonte é a planilha do Google `padmini-revisao-textos`, que o robô
+"sincronizar planilha" do padmini-conteudo lê e atualiza todo dia. Use este script só se o
+robô estiver fora do ar.
+
     python scripts/importar_revisao.py revisao-textos.xlsx           # só mostra o que mudaria
     python scripts/importar_revisao.py revisao-textos.xlsx --gravar  # grava nos YAMLs
 
