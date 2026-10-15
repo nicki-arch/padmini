@@ -269,6 +269,82 @@ def pdf_ocidental(p: PedidoMapaOcidental, request: Request):
 
 
 # --------------------------------------------------------------------------
+# "O SEU ANO" — previsão dos próximos 12 meses (rodada 13). O mesmo formulário
+# do mapa; o período vai do dia 1º do mês da compra até 12 meses depois. O link
+# pago leva `inicio` (AAAA-MM), que entra na chave do token: o mesmo link abre
+# sempre o mesmo ano comprado. Amostra: os títulos dos 3 temas e o começo do
+# primeiro na tela; o texto do primeiro inteiro por e-mail; o resto é pago.
+# --------------------------------------------------------------------------
+class PedidoPrevisao(PedidoMapaOcidental):
+    inicio: str | None = Field(None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+
+
+def _inicio_da_amostra() -> date:
+    import previsao as pv
+    from datetime import datetime
+    return datetime.now(pv.FUSO_DATAS).date().replace(day=1)
+
+
+def _inicio_do_completo(p: PedidoPrevisao) -> date:
+    if not p.inicio:
+        raise HTTPException(422, "Falta o mês de início da previsão.")
+    return date.fromisoformat(p.inicio + "-01")
+
+
+def chave_da_previsao(p: PedidoPrevisao) -> str:
+    return acesso.chave_previsao(p.data.isoformat(), p.hora, p.lat, p.lon, p.inicio or "")
+
+
+def calcular_previsao(p: PedidoMapaOcidental, inicio: date) -> dict:
+    import previsao as pv
+    mapa, _ = calcular(p)
+    return pv.calcular_previsao(mapa, p.data, p.lat, p.lon, inicio)
+
+
+def tela_previsao(a: dict) -> dict:
+    import montar_previsao as mp
+    return mp.tela(a)
+
+
+@rotas.post("/api/ocidental/previsao")
+def previsao_ocidental(p: PedidoPrevisao, request: Request):
+    import montar_previsao as mp
+    limites.exigir(limites.CALCULO, request)
+    if p.texto_ia:
+        raise HTTPException(422, "O seu ano não tem versão por IA: o texto vem do banco revisado.")
+    if p.nivel == "amostra":
+        if len(p.nome.strip()) < 2:
+            raise HTTPException(422, "Preencha o seu nome.")
+        email = exigir_email(p)
+        prev = calcular_previsao(p, _inicio_da_amostra())
+        a = mp.amostra(prev)
+        cab = {"nivel": "amostra", "sistema": VERSAO, "nome": p.nome.strip(), "cidade": p.cidade,
+               "tem_hora": prev["tem_hora"], "inicio_mes": prev["inicio"].strftime("%Y-%m")}
+        dados = {**_pessoa_para_dados(p), "inicio": prev["inicio"].strftime("%Y-%m")}
+        return entregar_amostra(request, p, email, "previsao", dados, dados["nome"],
+                                {**cab, "amostra": mp.tela(a)}, {**cab, "amostra": a})
+    if not acesso.completo_liberado("previsao", chave_da_previsao(p), p.token, VERSAO):
+        raise HTTPException(402, "O seu ano completo requer pagamento.")
+    prev = calcular_previsao(p, _inicio_do_completo(p))
+    return {"nivel": "completo", "sistema": VERSAO, "nome": p.nome.strip(), "cidade": p.cidade,
+            **mp.completo(prev)}
+
+
+@rotas.post("/api/ocidental/previsao/pdf")
+def previsao_pdf(p: PedidoPrevisao, request: Request):
+    import montar_previsao as mp
+    from gerar_pdf_ocidental import gerar_pdf_previsao
+    limites.exigir(limites.PDF, request)
+    if not acesso.completo_liberado("previsao", chave_da_previsao(p), p.token, VERSAO):
+        raise HTTPException(402, "O PDF de O seu ano requer pagamento.")
+    prev = calcular_previsao(p, _inicio_do_completo(p))
+    conteudo = gerar_pdf_previsao(prev=prev, secoes=mp.secoes(prev), nome=p.nome.strip(), cidade=p.cidade,
+                                  data_nascimento=p.data, hora=p.hora)
+    return Response(conteudo, media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{_arquivo("o-seu-ano", p.nome)}"'})
+
+
+# --------------------------------------------------------------------------
 # Modo live (Pedro): token do completo sem pagamento, com a sessão do /live
 # (mesmo cookie assinado da védica, ver app.py) e registro em live_geracoes.
 # --------------------------------------------------------------------------
@@ -569,7 +645,7 @@ def live_token_tarot(p: PedidoTarot, request: Request):
 # --------------------------------------------------------------------------
 class PedidoAmostraEmailOcidental(BaseModel):
     email: str = Field(..., max_length=160)
-    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot)$")
+    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot|previsao)$")
     pessoa: PessoaOcidental | None = None          # mapa
     a: PessoaOcidental | None = None               # sinastria
     b: PessoaOcidental | None = None
@@ -595,10 +671,12 @@ def dados_da_amostra_email(p: PedidoAmostraEmailOcidental) -> tuple[dict, str]:
     tarot) nunca chega aqui."""
     import numerologia as nu
     import tarot
-    if p.produto == "mapa":
+    if p.produto in ("mapa", "previsao"):
         if not p.pessoa:
             raise HTTPException(422, "Faltam os dados de nascimento.")
         dados = _dados_pessoa(p.pessoa)
+        if p.produto == "previsao":
+            dados["inicio"] = _inicio_da_amostra().strftime("%Y-%m")
         return dados, dados["nome"]
     if p.produto == "compat":
         if not (p.a and p.b):
@@ -632,6 +710,11 @@ def montar_amostra_email(produto: str, dados: dict) -> dict:
     if produto == "mapa":
         mapa, _ = calcular(PedidoMapaOcidental(**dados))
         return mt.montar_amostra(mapa)
+    if produto == "previsao":
+        import montar_previsao as mp
+        inicio = date.fromisoformat(dados["inicio"] + "-01")
+        pessoa = {k: v for k, v in dados.items() if k != "inicio"}
+        return mp.amostra(calcular_previsao(PedidoMapaOcidental(**pessoa), inicio))
     if produto == "compat":
         ma, _ = calcular(PedidoMapaOcidental(**dados["a"]))
         mb, _ = calcular(PedidoMapaOcidental(**dados["b"]))

@@ -84,10 +84,10 @@ def test_nada_de_roxo_na_tinta_da_ocidental():
 
 
 # ------------------------------------------------------------------ páginas
-def test_paginas_da_ocidental_sem_cor_fonte_nem_devanagari_antigos(ocidental):
+def test_paginas_da_ocidental_sem_cor_fonte_nem_devanagari_antigos(ocidental, url_da_pagina):
     rotas = list(sistema.PAGINAS["ocidental"]) + list(sistema.LEGAIS["ocidental"]) + ["/live"]
     for rota in rotas:
-        html = cliente.get(rota).text
+        html = cliente.get(url_da_pagina(rota)).text
         _sem_nada_antigo(html, rota)
         assert "/static/ocidental/tema.css" in html and "/static/valderez/casca.css" in html, rota
     for arquivo in ("tema.css", "_carta.html"):

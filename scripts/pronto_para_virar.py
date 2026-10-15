@@ -75,7 +75,10 @@ def _procurar_vedica() -> list[str]:
     app_mod._paginas_prontas.clear()
     achados = []
     cliente = TestClient(app_mod.app)
+    import catalogo
     rotas = list(sistema.PAGINAS["ocidental"]) + list(sistema.LEGAIS["ocidental"])
+    # produto oculto (ex.: "O seu ano" até ligar) não é página pública: 404 é o certo
+    rotas = [r for r in rotas if (catalogo.por_rota(r) or {}).get("estado") != "oculto"]
     for rota in rotas:
         r = cliente.get(rota)
         if r.status_code != 200:

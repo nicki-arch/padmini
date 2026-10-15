@@ -55,3 +55,18 @@ def _catalogo_vendendo(request):
     yield
     catalogo.usar(original)
     _limpar_paginas()
+
+
+@pytest.fixture
+def url_da_pagina(monkeypatch):
+    """rota → URL para abrir a página como o público, com uma exceção: produto OCULTO no
+    catálogo que já tem página própria ("O seu ano", rodada 13) responde 404 ao público,
+    então os testes de aparência/marca o abrem com a chave de prévia (a página existe e
+    precisa seguir as mesmas regras). A chave vale só durante o teste."""
+    import catalogo
+    monkeypatch.setenv("PADMINI_PREVIA_CHAVE", "previa-dos-testes")
+
+    def url(rota: str) -> str:
+        prod = catalogo.por_rota(rota)
+        return f"{rota}?previa=previa-dos-testes" if prod and prod["estado"] == "oculto" else rota
+    return url
