@@ -406,6 +406,12 @@ function desenharResultado(d) {
           ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="bt bt-2 bt-p">Ler versão escrita por IA</button><span class="miudo" id="status-ia"></span></div>` : ""}
           <div id="texto-relatorio"><h2 class="t3" style="margin-top:12px">O resto do seu mapa</h2>${resto}</div>
         </div>
+        {%- if catalogo.ativo("previsao") %}
+        <div class="cartao bloco" id="cartao-seu-ano" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center">
+          <div><span class="olho">O seu ano</span><h3 style="margin:6px 0">E os próximos 12 meses?</h3>
+            <p class="apoio">Os temas e as janelas do seu ano, a partir deste mesmo mapa: por onde os planetas lentos passam, mês a mês.</p></div>
+          <a class="bt bt-2" href="/seu-ano">Ver os temas do meu ano</a></div>
+        {%- endif %}
         <div class="cartao feedback bloco" id="feedback-mapa"></div>
       </article>
       <aside class="cartao roda-lateral" aria-labelledby="titulo-roda">

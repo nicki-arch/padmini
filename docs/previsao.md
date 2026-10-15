@@ -103,6 +103,34 @@ estados do `/mapa`. A API é `/api/ocidental/previsao` (amostra ou completo) e `
 - **Catálogo:** `previsao`, `oculto` até ligar (404 ao público; a prévia `?previa=` abre só os
   ocultos que já têm página própria). Sem venda: nenhum preço nem botão de compra.
 
+## A venda (Fase 4) — pronta e desligada
+
+- **Catálogo:** `previsao` está `oculto` no `catalogo.yaml` (404, fora do menu, do rodapé e do sitemap).
+- **Preço:** o `ofertas.yaml` tem só o nome, sem `preco`, porque o preço não foi decidido
+  (sugestão do brief: R$47 de lançamento, R$67 cheio). Sem preço, o checkout recusa
+  (`pendentes.valor_centavos` levanta erro), e um teste derruba o CI se alguém ligar o
+  produto no catálogo sem pôr o preço.
+- **Para ligar:** ponha `preco` (e `preco_cheio`, se for o caso) em `ofertas.yaml` → `previsao`
+  e mude o `estado` para `ativo` no `catalogo.yaml`. Nada mais muda.
+- **Checkout:** é o da Stripe, igual ao do mapa (`/api/checkout`, produto `previsao`). O
+  pedido pendente grava `inicio` = mês da compra (fuso de São Paulo); a entrega
+  (`entrega.link_completo`) monta `/seu-ano?…&inicio=AAAA-MM&token=…`, e esse link abre sempre
+  o mesmo ano comprado. A Stripe recebe só o nome do produto, o preço, o e-mail e o id opaco.
+- **Cartão no mapa completo:** quando o produto está `ativo`, o relatório do mapa
+  (`/mapa`) mostra o cartão "O seu ano" (`#cartao-seu-ano`), que leva a `/seu-ano`.
+- **E-mail de aniversário** (`sequencias.rodar_aniversarios`, na tarefa diária
+  `/api/tarefas/sequencias`):
+  - sai 30 dias antes do aniversário, com o assunto "O seu ano astrológico começa em …" e o
+    link da amostra (`/seu-ano`);
+  - só para quem marcou a caixa da sequência (`aceita_sequencia`), na última amostra
+    ocidental (mapa ou previsão) dos últimos 24 meses, sem descadastro; leva o link de
+    descadastro;
+  - um por pessoa por ano (`envios_sequencia`, passo = ano);
+  - quem nasceu em 29/02 recebe junto com quem faz aniversário em 01/03 nos anos que não
+    são bissextos;
+  - **desligado** enquanto `catalogo.vende("previsao")` for falso: nem consulta o banco.
+- A sequência de boas-vindas também não empurra produto que não está à venda.
+
 ## Validação (15/out/2026)
 
 3 mapas de `testes/dados/referencias_ocidental.json`, compra em 15/out/2026 (período 01/10/2026 a

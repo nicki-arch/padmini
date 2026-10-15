@@ -30,7 +30,7 @@ import ofertas
 from rotas_ocidental import EMAIL_RE, ORIGEM_ACEITA, PessoaOcidental
 
 SISTEMA = "ocidental"  # a Stripe vale só para a versão com catálogo (ver pagamento.py)
-PRODUTOS = ("mapa", "compat", "numerologia", "tarot")
+PRODUTOS = ("mapa", "compat", "numerologia", "tarot", "previsao")
 MOEDA = "brl"
 
 
@@ -39,7 +39,7 @@ class PedidoCheckout(BaseModel):
     a mais (preco, valor, amount…) é ignorado."""
     model_config = ConfigDict(extra="ignore")
 
-    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot)$")
+    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot|previsao)$")
     pessoa: PessoaOcidental | None = None             # mapa
     a: PessoaOcidental | None = None                  # sinastria
     b: PessoaOcidental | None = None
@@ -72,6 +72,13 @@ def dados_da_leitura(pedido: PedidoCheckout) -> dict:
         if not pedido.pessoa:
             raise PedidoInvalido("Faltam os dados de nascimento.")
         return _pessoa(pedido.pessoa)
+    if pedido.produto == "previsao":  # rodada 13: o período começa no mês da compra
+        if not pedido.pessoa:
+            raise PedidoInvalido("Faltam os dados de nascimento.")
+        from datetime import datetime
+
+        import previsao
+        return {**_pessoa(pedido.pessoa), "inicio": datetime.now(previsao.FUSO_DATAS).strftime("%Y-%m")}
     if pedido.produto == "compat":
         if not (pedido.a and pedido.b):
             raise PedidoInvalido("Faltam os dados de nascimento das duas pessoas.")
