@@ -56,11 +56,11 @@ def test_privacidade_ocidental_mantem_as_bases_legais_e_fala_da_pergunta(versao)
     assert "140 caracteres" in html and "não armazenada" in html
 
 
-def test_cada_pagina_ocidental_tem_a_sua_og_image(versao):
+def test_cada_pagina_ocidental_tem_a_sua_og_image(versao, url_da_pagina):
     versao("ocidental")
     vistas = {}
     for rota in sistema.PAGINAS["ocidental"]:
-        img = re.search(r'og:image" content="https://padmini\.com\.br/static/([^"]+)"', cliente.get(rota).text)
+        img = re.search(r'og:image" content="https://padmini\.com\.br/static/([^"]+)"', cliente.get(url_da_pagina(rota)).text)
         assert img, rota
         assert img.group(1).startswith("og-oc-") and (RAIZ / "static" / img.group(1)).exists(), rota
         vistas[rota] = img.group(1)

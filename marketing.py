@@ -62,7 +62,8 @@ def empacotar_sck(produto: str, dados: dict) -> str:
     return ""
 
 
-PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia": "numerologia", "tarot": "tarot"}
+PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia": "numerologia", "tarot": "tarot",
+                     "previsao": "seu-ano"}  # rodada 13
 
 
 def link_checkout(produto: str, dados: dict | None, campanha: str, sistema: str = "vedica") -> str:
@@ -167,9 +168,11 @@ TEXTOS = {
     # completo" de static/ocidental/*.html). Nada de prometer além disso.
     "ocidental": {
         "assunto_amostra": {"mapa": "Seu Sol, sua Lua e seu Ascendente", "compat": "A sinastria de vocês",
-                            "numerologia": "O seu Caminho de Vida", "tarot": "As suas 3 cartas"},
+                            "numerologia": "O seu Caminho de Vida", "tarot": "As suas 3 cartas",
+                            "previsao": "Os temas do seu ano"},
         "assunto_lembrete": {"mapa": "O resto do seu mapa natal", "compat": "O resto da sinastria de vocês",
-                             "numerologia": "Os outros números do seu nome", "tarot": "O que as suas cartas dizem juntas"},
+                             "numerologia": "Os outros números do seu nome", "tarot": "O que as suas cartas dizem juntas",
+                             "previsao": "O resto do seu ano"},
         "assunto_abandono": "Seu pedido na Valderez Astrologia ficou pela metade",
         "completo_abre": {
             "mapa": ("as 10 dimensões do seu mapa (da essência ao propósito, com carreira, dinheiro e "
@@ -181,9 +184,13 @@ TEXTOS = {
                             "o seu Ano Pessoal e o PDF"),
             "tarot": ("a leitura de cada carta na sua posição, o que as três dizem juntas e o PDF — "
                       "com exatamente estas cartas"),
+            # rodada 13: o que a página de "O seu ano" mostra de fato
+            "previsao": ("os temas do seu ano, mês a mês o que começa, o que está no auge e o que termina, "
+                         "cada área da vida, os eclipses, a sua Revolução Solar e o PDF"),
         },
         "abandono_titulo": {"mapa": "o seu mapa natal completo", "compat": "a sinastria de vocês",
-                            "numerologia": "a sua numerologia completa", "tarot": "a leitura completa da sua tiragem"},
+                            "numerologia": "a sua numerologia completa", "tarot": "a leitura completa da sua tiragem",
+                            "previsao": "o seu ano completo"},
     },
 }
 
@@ -279,6 +286,18 @@ def _resumo_ocidental(produto: str, amostra: dict) -> str:
                    f'<span style="color:{c["fraco"]}">{mestre}</span>')
                 + _p(f'<span style="color:{c["suave"]}">{_e(cv.get("descricao", ""))}</span>')
                 + _p(_e(cv.get("texto", ""))))
+    if produto == "previsao":
+        # rodada 13: o texto inteiro do 1º tema (a tela só mostra o começo) e os títulos dos outros
+        temas = amostra.get("temas") or []
+        partes = [_p(_e(amostra.get("periodo", "")).capitalize(), "font-size:13px;color:" + c["suave"])]
+        for i, t in enumerate(temas):
+            partes.append(_p(f'{_rotulo("Tema " + str(i + 1) + " do seu ano", c)}<br>'
+                             f'<span style="font-family:{c["fonte_marca"]};font-size:20px">{_e(t.get("titulo"))}</span><br>'
+                             f'<span style="color:{c["fraco"]}">{_e(t.get("periodo"))}</span>'
+                             + (f'<br>{_e(amostra["texto"])}' if i == 0 and amostra.get("texto") else "")))
+        for aviso in amostra.get("avisos") or []:
+            partes.append(_p(f'<span style="color:{c["suave"]};font-size:13px">{_e(aviso)}</span>'))
+        return "".join(partes)
     if produto == "tarot":
         return "".join(
             _p(f'{_rotulo(x.get("posicao_pt", ""), c)}<br>'
@@ -333,6 +352,9 @@ def _gancho_lembrete(produto: str, amostra: dict, sistema: str) -> str:
         cv = (amostra.get("caminho_de_vida") or {}).get("valor")
         return (f"O seu Caminho de Vida é <b>{_e(cv)}</b>. Os outros números do seu nome contam o resto: "
                 f"o completo abre {abre}.")
+    if produto == "previsao":  # rodada 13
+        temas = ", ".join(f"<b>{_e(t.get('titulo'))}</b>" for t in amostra.get("temas") or [])
+        return f"Na sua amostra apareceram os temas do seu ano: {temas}. O completo abre {abre}."
     nomes = ", ".join(f"<b>{_e(x.get('nome'))}</b>" for x in amostra.get("cartas") or [])
     return f"Você tirou {nomes}. O completo traz {abre}."
 

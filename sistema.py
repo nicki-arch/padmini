@@ -68,6 +68,8 @@ PAGINAS = {
         "/tarot": ("ocidental/tarot.html", "tarot"),
         # Todas as leituras (rodada 9): montada do catálogo (conteudo/ocidental/catalogo.yaml)
         "/leituras": ("ocidental/leituras.html", "leituras"),
+        # "O seu ano", previsão dos próximos 12 meses (rodada 13): oculto no catálogo até ligar
+        "/seu-ano": ("ocidental/seu-ano.html", "seu-ano"),
     },
 }
 

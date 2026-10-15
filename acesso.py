@@ -54,6 +54,13 @@ def chave_tarot(tiragem: str) -> str:
     return f"tarot|{tiragem}"
 
 
+def chave_previsao(data: str, hora: str, lat, lon, inicio: str) -> str:
+    """Chave de "O seu ano" (rodada 13): o nascimento + o mês em que o período começa
+    ("AAAA-MM", o mês da compra). O link pago abre sempre o MESMO ano comprado, não
+    um ano novo a cada mês."""
+    return f"ano|{inicio}|" + chave_mapa(data, hora, lat, lon)
+
+
 def emitir_token(produto: str, chave: str, sistema: str = "vedica") -> str:
     """Assina (produto, chave) de uma versão. produto ∈ {'mapa','compat'}. Precisa de PADMINI_SECRET."""
     if not SEGREDO:

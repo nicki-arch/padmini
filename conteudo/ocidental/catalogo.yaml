@@ -34,6 +34,17 @@ produtos:
     resumo: "O céu de quando você nasceu: 10 dimensões, roda e PDF."
     vaga: capa-mapa
 
+  # Rodada 13 (15/out/2026): "O seu ano", a previsão dos próximos 12 meses. OCULTO até o
+  # Nicolas decidir o preço e ligar (a rota responde 404; links com token abrem sempre).
+  # Ligar = trocar o estado para `ativo` (e pôr o preço e o checkout em ofertas.yaml).
+  - chave: previsao
+    nome: O seu ano
+    rota: /seu-ano
+    estado: oculto
+    oferta: previsao
+    resumo: "Os temas e as janelas dos seus próximos 12 meses, a partir do seu mapa natal."
+    vaga: capa-mapa
+
   - chave: compat
     nome: Sinastria do casal
     # A tela do pacote usa /sinastria; a rota que existe (e que já foi compartilhada)

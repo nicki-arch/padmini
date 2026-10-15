@@ -257,6 +257,8 @@ def rodar(agora: datetime | None = None) -> dict:
         passo = item["feitos"] + 1
         if passo > 3 or item["recebeu_hoje"] or item["email"] in ja_hoje or item["sistema"] != SISTEMA:
             continue
+        if item["produto"] not in ESCADA:  # produto sem texto de sequência ("O seu ano", rodada 13)
+            continue
         if not _vencido(item["criado_em"], DIAS_BOAS_VINDAS[passo], agora):
             continue
         r = _enviar(item["email"], "boas_vindas", passo, item["id"],

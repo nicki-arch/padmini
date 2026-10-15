@@ -509,6 +509,35 @@ def gerar_pdf_numerologia(*, rel: dict, nome: str, data_nascimento: date, hoje: 
     return buf.getvalue()
 
 
+def gerar_pdf_previsao(*, prev: dict, secoes: dict, nome: str, cidade: str, data_nascimento: date,
+                       hora: str, hoje: date | None = None) -> bytes:
+    """O seu ano (rodada 13): as seções de montar_previsao.secoes ("## " = subtítulo)."""
+    hoje = hoje or date.today()
+    ini, fim = prev["inicio"], prev["fim"]
+    buf, doc, h, rodape = _capa(
+        "O seu ano", nome,
+        f"De <b>{ini.strftime('%d/%m/%Y')}</b> a <b>{fim.strftime('%d/%m/%Y')}</b> · nascimento em "
+        f"{data_nascimento.strftime('%d/%m/%Y')}{' às ' + escape(hora) if hora else ' (sem hora)'}"
+        f"{', ' + escape(cidade) if cidade else ''} · gerado em {hoje.strftime('%d/%m/%Y')}",
+        [("Temas do ano", str(len(prev["temas"]))), ("Trânsitos", str(len(prev["transitos"]))),
+         ("Eclipses", str(len(prev["eclipses"])))],
+        "Previsão dos próximos 12 meses")
+    for i, (titulo, paragrafos) in enumerate(secoes.items()):
+        if i:
+            h.append(CondPageBreak(60 * mm))
+        h.append(_p(escape(titulo), "h1"))
+        for par in paragrafos:
+            if par.startswith("## "):
+                h.append(CondPageBreak(30 * mm))
+                h.append(_p(escape(par[3:]), "h2"))
+            else:
+                h.append(_p(escape(par)))
+    h.append(_p("<b>Esta leitura é uma ferramenta de autoconhecimento. Descreve temas e janelas do período, "
+                "não acontecimentos, e não substitui orientação profissional.</b>"))
+    doc.build(h, onFirstPage=rodape, onLaterPages=rodape)
+    return buf.getvalue()
+
+
 def gerar_pdf_tarot(*, rel: dict, hoje: date | None = None) -> bytes:
     hoje = hoje or date.today()
     buf, doc, h, rodape = _capa(

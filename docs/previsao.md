@@ -86,6 +86,23 @@ sempre. **A Lua sai também**: sem hora ela é calculada ao meio-dia e pode esta
 e 1° de orbe sobre ela seria chute. Por isso, sem hora, nem trânsito à Lua nem eclipse tocando a
 Lua (o mesmo critério dos aspectos da Lua no mapa natal sem hora).
 
+## A página e o PDF (Fase 3)
+
+`/seu-ano` (`static/ocidental/seu-ano.html`, texto em `conteudo/ocidental/seu-ano.yaml`), mesmos
+estados do `/mapa`. A API é `/api/ocidental/previsao` (amostra ou completo) e `/previsao/pdf`.
+
+- **Período da amostra:** o mês corrente (dia 1º). **Do completo:** `inicio=AAAA-MM` do link pago,
+  que entra na chave do token (`acesso.chave_previsao`): o mesmo link abre sempre o mesmo ano.
+- **Amostra:** os títulos e os períodos dos 3 temas e o começo do texto do primeiro na tela; o texto
+  inteiro do primeiro por e-mail (rodada 6). Os outros textos nunca saem do servidor.
+- **Completo:** os 3 temas; mês a mês (o que começa, o que está no auge e o que termina, com
+  eclipses, ingressos e a Revolução Solar); por área (as dimensões do mapa: o ponto natal tocado →
+  Sol: Essência, Lua: Emoções, Ascendente: Como você chega, Mercúrio: Mente, Vênus: Amor, Marte:
+  Ação, Meio do Céu e Saturno: Carreira, Júpiter: Dinheiro; os ingressos pela casa); eclipses;
+  Revolução Solar. Sem hora: o aviso, e nada que dependa de casa.
+- **Catálogo:** `previsao`, `oculto` até ligar (404 ao público; a prévia `?previa=` abre só os
+  ocultos que já têm página própria). Sem venda: nenhum preço nem botão de compra.
+
 ## Validação (15/out/2026)
 
 3 mapas de `testes/dados/referencias_ocidental.json`, compra em 15/out/2026 (período 01/10/2026 a

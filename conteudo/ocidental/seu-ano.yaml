@@ -1,0 +1,76 @@
+# Valderez Astrologia (versão OCIDENTAL) — texto da página /seu-ano, "O seu ano"
+# (rodada 13): a previsão dos próximos 12 meses a partir do mapa natal. Os estados
+# (formulário → calculando → amostra ou, com token, o completo) são a mesma página
+# (static/ocidental/seu-ano.html). OCULTO no catalogo.yaml até o Nicolas ligar.
+# Os textos de interpretação ficam no repositório privado (textos/previsao/);
+# aqui é só a moldura da página. Tom: tema e janela, nunca acontecimento.
+
+seo:
+  titulo: Valderez Astrologia — O seu ano
+  descricao: >-
+    Os temas e as janelas dos seus próximos 12 meses, a partir do seu mapa natal.
+    Os três temas do ano na hora, de graça.
+  og_titulo: O seu ano — Valderez Astrologia
+  og_descricao: Os temas e as janelas dos seus próximos 12 meses. Amostra grátis.
+
+passos: [Seus dados, Calculando, Sua amostra]
+
+form:
+  olho: O seu ano
+  titulo: Os seus <em>próximos 12 meses</em>
+  lede: >-
+    Com os dados do seu nascimento, olhamos por onde os planetas lentos passam no seu
+    mapa neste período: os temas que pedem atenção e as janelas que se abrem. Não é
+    previsão de acontecimentos; é o clima do ano, para você escolher o que fazer com ele.
+  itens:
+    - {icone: sol, titulo: Os três temas do seu ano, sub: Os trânsitos que mais pesam no período}
+    - {icone: horizonte, titulo: Mês a mês, sub: "O que começa, o que está no auge e o que termina"}
+    - {icone: cadeado, titulo: O resto fica guardado, sub_venda: Você desbloqueia se quiser ir fundo,
+       sub_fechada: O seu ano completo abre em breve}
+  titulo_cartao: Seus dados de nascimento
+  nome: Seu nome
+  nome_ajuda: A leitura é escrita para você, com o seu nome.
+  data: Data
+  hora: Hora
+  sem_hora: Não sei a hora em que nasci
+  hora_ajuda: Use a hora da certidão. Ela define o Ascendente, o Meio do Céu e as casas.
+  cidade: Cidade de nascimento
+  cidade_ajuda: Escolha a cidade na lista para acertarmos o fuso.
+  botao: Ver os temas do meu ano
+  miudo: Usamos seus dados só para calcular e enviar a sua leitura.
+
+calculando:
+  titulo: Calculando o seu ano, a partir de
+  sub: Leva só alguns segundos.
+  etapas:
+    - O seu mapa natal
+    - Júpiter, Saturno, Urano, Netuno e Plutão mês a mês
+    - Eclipses e Revolução Solar
+    - Separando os temas do seu ano
+
+amostra:
+  olho: O seu ano,
+  subtitulo: Os três temas do período
+  tema: Tema
+  # O texto desfocado é ENFEITE (o mesmo em todo cartão): o texto pago nunca vai para o navegador.
+  fumo: >-
+    Enquanto este trânsito dura, ele tende a pedir escolhas mais conscientes; há um
+    momento em que o tema fica mais forte, uma janela que vale aproveitar e um ponto
+    de atenção para os meses em que ele volta.
+  desbloquear: Desbloquear o seu ano
+  avisar: Me avise quando abrir
+  corrigir: Corrigir os dados
+  email_foi: O resto da amostra foi para
+  email_reenviar: Reenviar
+  lateral_olho: O seu ano completo
+  lateral_titulo: Os 12 meses, um a um
+  lateral_itens:
+    - Os três temas do ano, com o texto inteiro
+    - Mês a mês, o que começa, o que está no auge e o que termina
+    - Cada área da vida, da essência à carreira
+    - Os eclipses e a sua Revolução Solar
+    - O relatório em PDF
+  pagamento_unico: pagamento único
+  botao_comprar: Quero o meu ano —
+  pagamento: Cartão ou Pix. O link chega no seu e-mail.
+  pagamento_stripe: Cartão ou Pix, sem sair do site. O link chega no seu e-mail.

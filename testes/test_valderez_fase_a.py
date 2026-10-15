@@ -41,8 +41,8 @@ def ocidental(monkeypatch):
     app_mod._paginas_prontas.clear()
 
 
-def _pagina(rota):
-    r = cliente.get(rota)
+def _pagina(rota, url=lambda r: r):
+    r = cliente.get(url(rota))
     if rota == "/blog" and r.status_code == 404:  # sem artigo revisado o blog não abre
         pytest.skip("blog sem artigo publicado")
     assert r.status_code == 200, rota
@@ -65,8 +65,8 @@ def _recursos(html):
 
 
 @pytest.mark.parametrize("rota", PUBLICAS + ["/live"])
-def test_pagina_publica_so_carrega_recurso_do_proprio_site(rota, ocidental):
-    html = _pagina(rota)
+def test_pagina_publica_so_carrega_recurso_do_proprio_site(rota, ocidental, url_da_pagina):
+    html = _pagina(rota, url_da_pagina)
     for url in _recursos(html):
         assert url.startswith("/") and not url.startswith("//") or url.startswith("data:"), (rota, url)
     assert "fonts.googleapis" not in html and "fonts.gstatic" not in html, rota
@@ -166,18 +166,18 @@ def _sem_excecoes(html):
 
 
 @pytest.mark.parametrize("rota", PUBLICAS)
-def test_padmini_nao_aparece_como_marca(rota, ocidental):
-    html = _pagina(rota)
+def test_padmini_nao_aparece_como_marca(rota, ocidental, url_da_pagina):
+    html = _pagina(rota, url_da_pagina)
     assert "Valderez Astrologia" in html, rota
     achados = re.findall(r".{0,40}\bPadmini\b.{0,40}", _sem_excecoes(html))
     assert achados == [], (rota, achados)
 
 
-def test_textos_legais_trocam_a_marca_mas_nao_o_responsavel(ocidental):
+def test_textos_legais_trocam_a_marca_mas_nao_o_responsavel(ocidental, url_da_pagina):
     """Termos e privacidade (decisão do Nicolas, fase B): onde "Padmini" era nome de
     marca, agora é Valderez Astrologia; o responsável pelos dados e o CNPJ não mudam."""
     for rota in LEGAIS:
-        html = _pagina(rota)
+        html = _pagina(rota, url_da_pagina)
         assert "<title>Valderez Astrologia — " in html and 'class="marca"' in html, rota
         assert "Pedro Sperb Monteiro LTDA" in html and "55.428.936/0001-00" in html, rota
         assert "Valderez Astrologia (padmini.com.br)" in html, rota
@@ -185,8 +185,8 @@ def test_textos_legais_trocam_a_marca_mas_nao_o_responsavel(ocidental):
 
 # ------------------------------------------------------------------ nada do pacote vai ao ar
 @pytest.mark.parametrize("rota", PUBLICAS + ["/live"])
-def test_nada_da_referencia_do_pacote(rota, ocidental):
-    html = _pagina(rota)
+def test_nada_da_referencia_do_pacote(rota, ocidental, url_da_pagina):
+    html = _pagina(rota, url_da_pagina)
     assert "REFERÊNCIA" not in html and "prototype-note" not in html, rota
     assert not re.search(r"\[(Título|Texto|Ação|Nome|Digite|Orientação|Créditos|Privacidade|Termos|Contato)", html), rota
     # o noindex do pacote ("noindex,nofollow", sem espaço). As páginas que já eram fora do
@@ -204,8 +204,8 @@ def test_nenhum_template_tem_a_barra_de_referencia():
 
 # ------------------------------------------------------------------ casca
 @pytest.mark.parametrize("rota", PUBLICAS)
-def test_cabecalho_e_rodape_da_valderez(rota, ocidental):
-    html = _pagina(rota)
+def test_cabecalho_e_rodape_da_valderez(rota, ocidental, url_da_pagina):
+    html = _pagina(rota, url_da_pagina)
     # rodada 9: cabeçalho claro com a roda; rodapé noite com a roda clara
     assert '<header class="cab">' in html and '<footer class="rod">' in html
     assert 'src="/static/valderez/roda.svg" width="48" height="48"' in html

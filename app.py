@@ -306,6 +306,10 @@ def _produto_fechado(request: Request, rota: str) -> dict | None:
     if prod is None or prod["estado"] == "ativo":
         return None
     if prod["estado"] == "oculto":
+        # rodada 13: um produto oculto que JÁ TEM página própria ("O seu ano") abre com a
+        # chave de prévia, para conferir antes de ligar; sem ela, 404 como sempre
+        if _tem_previa(request) and rota in sistema.PAGINAS["ocidental"]:
+            return None
         raise HTTPException(404, "Página não encontrada.")
     return prod
 
@@ -379,6 +383,13 @@ def pagina_tarot(request: Request):
     return _pagina_so_da_ocidental(request, "/tarot")
 
 
+@app.api_route("/seu-ano", methods=["GET", "HEAD"])
+def pagina_seu_ano(request: Request):
+    """O seu ano (rodada 13). Oculto no catálogo = 404 (a não ser com a prévia); link
+    pago (token "oc-") abre sempre."""
+    return _pagina_so_da_ocidental(request, "/seu-ano")
+
+
 @app.api_route("/leituras", methods=["GET", "HEAD"])
 def pagina_leituras(request: Request):
     """Todas as leituras (ocidental): os produtos ativos e em breve do catálogo."""
@@ -400,7 +411,7 @@ def _rota_do_catalogo(rota: str):
 
 
 for _p in catalogo.produtos():
-    if _p["rota"] not in ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras"):
+    if _p["rota"] not in ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras", "/seu-ano"):
         app.api_route(_p["rota"], methods=["GET", "HEAD"])(_rota_do_catalogo(_p["rota"]))
 
 

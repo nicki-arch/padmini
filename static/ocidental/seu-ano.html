@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6F1">
+<title>{{ t.seo.titulo }}</title>
+<meta name="description" content="{{ t.seo.descricao }}">
+<link rel="canonical" href="https://padmini.com.br/seu-ano">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Valderez Astrologia">
+<meta property="og:title" content="{{ t.seo.og_titulo }}">
+<meta property="og:description" content="{{ t.seo.og_descricao }}">
+<meta property="og:image" content="https://padmini.com.br/static/og-oc-mapa.png">
+<meta property="og:url" content="https://padmini.com.br/seu-ano">
+<meta name="twitter:card" content="summary_large_image">
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+<script src="/static/afiliado.js" defer></script>
+{%- if stripe and catalogo.vende("previsao") %}
+<script src="/static/ocidental/comprar.js" defer></script>{# checkout próprio (rodada 11) #}
+{%- endif %}
+<script src="/static/ocidental/amostra-email.js" defer></script>
+<script src="/static/ocidental/me-avise.js" defer></script>
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+{# "O seu ano" — previsão dos próximos 12 meses (rodada 13). Mesmos estados do /mapa:
+   #estado-form → #estado-carregando → #resultado (a amostra: os títulos dos 3 temas e o
+   começo do primeiro; ou, com token, o completo: temas, mês a mês, áreas, eclipses e
+   Revolução Solar). Texto da página: conteudo/ocidental/seu-ano.yaml; textos da leitura:
+   repositório privado (textos/previsao/), montados no servidor (montar_previsao.py).
+   Nada do pago existe na página sem a resposta autorizada da API. Visual: só as classes
+   e os tokens --vz-* do pacote 2.0 (nada de cor nova).
+   API: /api/ocidental/previsao e /api/ocidental/previsao/pdf. #}
+<style>
+  /* O seu ano: duas colunas (o mapa tem três, com a roda) e a linha do tempo */
+  .ano-grade { grid-template-columns: 240px minmax(0, 1fr); }
+  .tema-cartao h3 { margin: 6px 0 2px; }
+  .tema-cartao .quando, .item-ano .quando { font-size: 14px; color: var(--vz-tinta-3); }
+  .mes { border-top: 1px solid var(--vz-linha); padding: 16px 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 16px; }
+  .mes h3 { margin: 0; font-size: 20px; }
+  .mes ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .mes li b { color: var(--vz-vinho); font-weight: 600; margin-right: 6px; }
+  .item-ano { border-top: 1px solid var(--vz-linha); padding-top: 14px; }
+  .item-ano h3 { margin: 0 0 2px; font-size: 20px; }
+  .exatas { font-size: 14px; color: var(--vz-tinta-2); }
+  @media (max-width: 900px) {
+    .ano-grade { grid-template-columns: minmax(0, 1fr); }
+    .mes { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  }
+</style>
+</head>
+<body class="vz">
+{% set atual = "/seu-ano" %}{% include "ocidental/_cabecalho.html" %}
+{%- set vende = catalogo.vende("previsao") %}
+
+<main id="conteudo">
+  <div class="estado" id="estado-form">
+    <section class="mapa-form degrade">
+      <div class="mapa-intro">
+        <ol class="passos-topo" aria-label="Etapas">{% for p in t.passos %}<li{% if loop.first %} aria-current="step"{% endif %}>{{ loop.index }} {{ p }}</li>{% endfor %}</ol>
+        <span class="olho">{{ t.form.olho }}</span>
+        <h1 class="t1">{{ t.form.titulo }}</h1>
+        <p class="lead">{{ t.form.lede }}</p>
+        <ul class="itens-dim">
+          {%- for i in t.form.itens %}
+          <li><span class="ico" aria-hidden="true">{{ icone(i.icone) }}</span>
+            <span><b>{{ i.titulo }}</b><br><span class="miudo">{{ i.get("sub") or (i.sub_venda if vende else i.sub_fechada) }}</span></span></li>
+          {%- endfor %}
+        </ul>
+      </div>
+
+      <form id="form" class="cartao cartao-form form" novalidate aria-labelledby="titulo-form">
+        <h2 id="titulo-form" class="t3">{{ t.form.titulo_cartao }}</h2>
+        <div class="campo">
+          <label for="nome">{{ t.form.nome }}</label>
+          <input id="nome" name="nome" autocomplete="given-name" maxlength="80" required aria-describedby="nome-ajuda">
+          <span class="ajuda" id="nome-ajuda">{{ t.form.nome_ajuda }}</span>
+        </div>
+        <div class="campos-2">
+          <div class="campo">
+            <label for="data">{{ t.form.data }}</label>
+            <input id="data" name="data" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" maxlength="10" required>
+          </div>
+          <div class="campo">
+            <label for="hora">{{ t.form.hora }}</label>
+            <input id="hora" name="hora" type="text" inputmode="numeric" autocomplete="off" placeholder="hh:mm" maxlength="5" aria-describedby="hora-ajuda">
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="sem-hora" name="sem-hora"><span>{{ t.form.sem_hora }}</span></label>
+        <span class="ajuda miudo" id="hora-ajuda">{{ t.form.hora_ajuda }}</span>
+        <div class="campo">
+          <label for="cidade" id="cidade-label">{{ t.form.cidade }}</label>
+          <div class="auto">
+            <input id="cidade" name="cidade" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cidades" autocomplete="off" placeholder="Comece a digitar, ex.: Porto Alegre" required aria-describedby="cidade-status">
+            <ul id="cidades" role="listbox" aria-labelledby="cidade-label" hidden></ul>
+          </div>
+          <span class="ajuda" id="cidade-status" aria-live="polite">{{ t.form.cidade_ajuda }}</span>
+        </div>
+        {% include "ocidental/_campo_email_vz.html" %}
+        <p class="form-erro" id="erro" role="alert" tabindex="-1" hidden></p>
+        <button class="bt bt-1 bt-cheio" id="enviar" type="submit">{{ t.form.botao }}</button>
+        <p class="miudo" style="text-align:center">{{ t.form.miudo }} <a href="/privacidade">Privacidade</a></p>
+      </form>
+    </section>
+  </div>
+
+  <div class="estado degrade" id="estado-carregando" hidden>
+    <section class="calculando" aria-busy="true">
+      <ol class="passos-topo" aria-label="Etapas">{% for p in t.passos %}<li{% if loop.index == 2 %} aria-current="step"{% endif %}>{{ p }}</li>{% endfor %}</ol>
+      <div class="roda-gira" aria-hidden="true">{{ marca.roda(220) }}{{ ilustracao("dim-sol", classe="meio", carregar="eager") }}</div>
+      <h1 class="t3" id="titulo-carregando" tabindex="-1">{{ t.calculando.titulo }} <em id="data-carregando"></em></h1>
+      <p class="apoio" role="status">{{ t.calculando.sub }}</p>
+      <ul class="cartao etapas-calc" id="etapas-calc">
+        {%- for e in t.calculando.etapas %}
+        <li><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/></svg>{{ e }}</li>
+        {%- endfor %}
+      </ul>
+    </section>
+  </div>
+
+  <div class="estado" id="resultado" aria-live="polite" hidden></div>
+</main>
+
+{% set nota_rodape %}Previsão pelo zodíaco tropical, casas Placidus; trânsitos dos planetas lentos com orbe de 1°. Ferramenta de autoconhecimento: descreve temas e janelas do período, não acontecimentos, e não substitui orientação profissional. Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0). Cálculos astronômicos: Swiss Ephemeris.{% endset %}{% include "ocidental/_rodape.html" %}
+
+<script>
+const PAGAR_NA_STRIPE = {{ "true" if stripe else "false" }};
+{%- if vende %}
+const LINK_CHECKOUT = "{{ "#comprar" if stripe else ofertas.previsao.checkout }}";
+{%- else %}
+// Venda fechada ou produto oculto (catalogo.yaml): sem preço, sem link de compra.
+const LINK_CHECKOUT = "";
+{%- endif %}
+const TA = {{ t.amostra | tojson }};
+{%- if stripe %}
+TA.pagamento = TA.pagamento_stripe;
+{%- endif %}
+const PASSOS = {{ t.passos | tojson }};
+
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let ultimoPedido = null;
+let ultimoContato = null;
+window.padCorpoCompra = () => ultimoPedido && ({ produto: "previsao",
+  pessoa: { nome: ultimoPedido.nome, data: ultimoPedido.data, hora: ultimoPedido.hora, lat: ultimoPedido.lat, lon: ultimoPedido.lon, cidade: ultimoPedido.cidade },
+  email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: !!(ultimoContato && ultimoContato.aceita_sequencia) });
+
+// ---------- máscara de data e hora, cidade (iguais às do /mapa) ----------
+function aplicarMascara(el, tamanhos, separador) {
+  el.addEventListener("input", () => {
+    const digitos = el.value.replace(/\D/g, "").slice(0, tamanhos.reduce((a, b) => a + b, 0));
+    let pos = 0;
+    el.value = tamanhos.map((t) => digitos.slice(pos, (pos += t))).filter(Boolean).join(separador);
+  });
+}
+aplicarMascara($("#data"), [2, 2, 4], "/");
+aplicarMascara($("#hora"), [2, 2], ":");
+$("#sem-hora").addEventListener("change", (e) => { $("#hora").disabled = e.target.checked; if (e.target.checked) $("#hora").value = ""; });
+function dataParaISO(brasileira) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(brasileira.trim());
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
+}
+const dataBR = (iso) => iso.split("-").reverse().join("/");
+
+let cidadeEscolhida = null, opcoes = [], ativa = -1, timer;
+const input = $("#cidade"), lista = $("#cidades");
+function fecharLista() { lista.hidden = true; input.setAttribute("aria-expanded", "false"); ativa = -1; input.closest(".auto").style.marginBottom = ""; }
+function desenharLista() {
+  lista.innerHTML = opcoes.map((c, i) => `<li role="option" id="op-${i}" aria-selected="${i === ativa}">${esc(c.rotulo)}</li>`).join("");
+  lista.hidden = opcoes.length === 0;
+  input.setAttribute("aria-expanded", String(!lista.hidden));
+  if (ativa >= 0) input.setAttribute("aria-activedescendant", `op-${ativa}`); else input.removeAttribute("aria-activedescendant");
+  input.closest(".auto").style.marginBottom = lista.hidden ? "" : `${Math.min(lista.scrollHeight, 280) + 4}px`;
+}
+function statusCidade(texto, ok) { const el = $("#cidade-status"); el.textContent = texto; el.classList.toggle("ok", !!ok); input.classList.toggle("escolhida", !!ok); }
+function escolher(i) { cidadeEscolhida = opcoes[i]; input.value = cidadeEscolhida.rotulo; fecharLista(); statusCidade("✓ Cidade escolhida", true); }
+input.addEventListener("input", () => {
+  cidadeEscolhida = null; clearTimeout(timer); statusCidade("");
+  const q = input.value.trim();
+  if (q.length < 2) { opcoes = []; fecharLista(); return; }
+  timer = setTimeout(async () => {
+    try {
+      const r = await fetch(`/api/cidades?q=${encodeURIComponent(q)}`); opcoes = await r.json(); ativa = opcoes.length ? 0 : -1; desenharLista();
+      statusCidade(opcoes.length ? "" : "Nenhuma cidade encontrada. Tente só o começo do nome.");
+    }
+    catch { opcoes = []; fecharLista(); statusCidade("Não deu para buscar agora. Tente de novo em instantes."); }
+  }, 180);
+});
+input.addEventListener("keydown", (e) => {
+  if (lista.hidden) return;
+  if (e.key === "ArrowDown") { ativa = (ativa + 1) % opcoes.length; desenharLista(); e.preventDefault(); }
+  else if (e.key === "ArrowUp") { ativa = (ativa - 1 + opcoes.length) % opcoes.length; desenharLista(); e.preventDefault(); }
+  else if (e.key === "Enter" && ativa >= 0) { escolher(ativa); e.preventDefault(); }
+  else if (e.key === "Escape") fecharLista();
+});
+lista.addEventListener("mousedown", (e) => { const li = e.target.closest("li"); if (li) { e.preventDefault(); escolher(Number(li.id.slice(3))); } });
+input.addEventListener("blur", () => setTimeout(fecharLista, 100));
+
+// ---------- estados da página ----------
+function mostrarEstado(qual) {
+  for (const id of ["estado-form", "estado-carregando", "resultado"]) $("#" + id).hidden = id !== qual;
+}
+function focar(el) { if (!el) return; el.setAttribute("tabindex", "-1"); el.focus({ preventScroll: true }); el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+function mostrarErro(msg, campo) {
+  const el = $("#erro"); el.textContent = msg; el.hidden = !msg;
+  document.querySelectorAll("#form [aria-invalid]").forEach((x) => x.removeAttribute("aria-invalid"));
+  if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
+}
+async function pedir(url, corpo) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+  const c = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Confira os dados informados.");
+  return c;
+}
+let timerEtapas = null;
+function animarEtapas() {
+  const itens = [...document.querySelectorAll("#etapas-calc li")];
+  let i = 0;
+  itens.forEach((li) => li.className = "");
+  const passo = () => { itens.forEach((li, j) => li.className = j < i ? "feito" : j === i ? "agora" : ""); i = Math.min(i + 1, itens.length - 1); };
+  passo(); clearInterval(timerEtapas); timerEtapas = setInterval(passo, 700);
+}
+
+$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  mostrarErro("");
+  const data = dataParaISO($("#data").value);
+  const semHora = $("#sem-hora").checked;
+  const hora = semHora ? "" : $("#hora").value;
+  if ($("#nome").value.trim().length < 2) return mostrarErro("Preencha o seu nome.", $("#nome"));
+  if (!data) return mostrarErro("Preencha a data de nascimento no formato dd/mm/aaaa.", $("#data"));
+  if (!semHora && !/^\d{2}:\d{2}$/.test(hora)) return mostrarErro("Preencha a hora no formato hh:mm — ou marque \"Não sei a hora\".", $("#hora"));
+  if (!cidadeEscolhida) return mostrarErro("Escolha a cidade na lista de sugestões.", $("#cidade"));
+  const contato = padEmail.ler();
+  if (contato.erro) return mostrarErro(contato.erro, $("#email"));
+  const botao = $("#enviar");
+  botao.disabled = true; botao.setAttribute("aria-busy", "true"); botao.textContent = "Calculando…";
+  $("#data-carregando").textContent = $("#data").value;
+  mostrarEstado("estado-carregando"); animarEtapas(); focar($("#titulo-carregando"));
+  try {
+    ultimoPedido = { nome: $("#nome").value.trim(), data, hora, lat: cidadeEscolhida.lat, lon: cidadeEscolhida.lon, cidade: cidadeEscolhida.rotulo };
+    ultimoContato = contato;
+    desenharAmostra(await pedir("/api/ocidental/previsao", { ...ultimoPedido, ...contato, nivel: "amostra" }));
+  } catch (err) {
+    mostrarEstado("estado-form");
+    mostrarErro(err.message || "Não foi possível calcular. Tente de novo.", $("#erro"));
+  } finally {
+    clearInterval(timerEtapas);
+    botao.disabled = false; botao.removeAttribute("aria-busy"); botao.textContent = {{ t.form.botao | tojson }};
+  }
+});
+
+// ---------- amostra: os títulos dos 3 temas e o começo do primeiro ----------
+const icoCadeado = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+function desenharAmostra(d) {
+  const a = d.amostra;
+  const destino = LINK_CHECKOUT ? "#comprar" : "#me-avise";
+  const tampa = `<div class="vela"><p class="fumo" aria-hidden="true">${esc(TA.fumo)}</p><div class="tampa"><a class="bt bt-2" href="${destino}">${icoCadeado}${esc(LINK_CHECKOUT ? TA.desbloquear : TA.avisar)}</a></div></div>`;
+  // se o e-mail não saiu, a amostra veio inteira: o texto do primeiro tema todo
+  const cartoes = a.temas.map((t, i) => `<article class="cartao leitura tema-cartao">
+      <span class="olho">${esc(TA.tema)} ${i + 1}</span><h3>${esc(t.titulo)}</h3><p class="quando">${esc(t.periodo)}</p>
+      ${i === 0 ? `<p>${esc(a.texto || a.trecho)}</p>${a.texto ? "" : tampa}` : tampa}</article>`).join("");
+  const emailOk = d.email && d.email.enviado;
+  const res = $("#resultado");
+  res.innerHTML = `<section class="amostra-topo degrade">
+      <ol class="passos-topo" aria-label="Etapas">${PASSOS.map((p, i) => `<li${i === 2 ? ' aria-current="step"' : ""}>${i + 1} ${esc(p)}</li>`).join("")}</ol>
+      <div class="amostra-topo-linha">
+        <div><span class="olho">${esc(TA.olho)} ${esc(ultimoPedido.nome)}</span><h1 class="t1" id="titulo-resultado" tabindex="-1">${esc(TA.subtitulo)}</h1><p class="apoio">${esc(a.periodo.charAt(0).toUpperCase() + a.periodo.slice(1))}</p></div>
+        ${emailOk ? `<div class="aviso-ok" role="status"><span>${esc(TA.email_foi)} <b>${esc(d.email.para)}</b>. <button type="button" class="bt bt-2 bt-p" id="reenviar-amostra" style="margin-top:8px">${esc(TA.email_reenviar)}</button> <span class="miudo" id="reenvio-status" aria-live="polite"></span></span></div>` : ""}
+      </div>
+      ${(a.avisos || []).map((t) => `<p class="aviso">${esc(t)}</p>`).join("")}
+    </section>
+    <section class="amostra">
+      <div>
+        <p class="lead">${esc(a.abertura)}</p>
+        <div style="display:flex;flex-direction:column;gap:20px">${cartoes}</div>
+        <p style="margin-top:24px"><a href="/seu-ano" id="corrigir">${esc(TA.corrigir)}</a></p>
+      </div>
+      <aside class="cartao lateral" id="comprar">
+      {%- if vende %}
+        <span class="olho">${esc(TA.lateral_olho)}</span>
+        <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>
+        <div style="display:flex;align-items:baseline;gap:10px"><span class="preco">R${{ ofertas.previsao.preco | moeda }}</span><span class="miudo">${esc(TA.pagamento_unico)}</span></div>
+        <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+        ${PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="previsao">${esc(TA.botao_comprar)} R${{ ofertas.previsao.preco | moeda }}</a>
+          <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p>`}
+      {%- else %}
+        <span class="olho">${esc(TA.lateral_olho)}</span>
+        <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>
+        <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+        {%- if catalogo.estado("previsao") != "oculto" %}
+        {% set aviso_produto = catalogo.produto("previsao") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}
+        {%- else %}
+        <p class="miudo" id="me-avise">O seu ano completo ainda não está à venda.</p>
+        {%- endif %}
+      {%- endif %}
+        <div class="assina"><div class="foto arco" aria-hidden="true">{{ marca.roda(28) }}</div><p class="miudo">{{ revisao("assinatura") }}</p></div>
+      </aside>
+    </section>`;
+  mostrarEstado("resultado");
+  if (window.padMeAvise) padMeAvise.preencher(res, { nome: ultimoPedido.nome, email: ultimoContato && ultimoContato.email });
+  $("#corrigir").addEventListener("click", (e) => { e.preventDefault(); mostrarEstado("estado-form"); focar($("#nome")); });
+  padEmail.ligar(() => pedir("/api/ocidental/previsao", { ...ultimoPedido, ...ultimoContato, nivel: "amostra" }));
+  if (window.padTrack) padTrack("amostra_gerada", { produto: "previsao", sistema: "ocidental" });
+  focar($("#titulo-resultado"));
+}
+
+// ---------- o completo (só com a resposta autorizada da API) ----------
+const dataCurta = (iso) => dataBR(iso);
+function itemAno(i) {
+  const quando = i.periodo || (i.datas || []).map(dataCurta).join(", ");
+  const exatas = (i.exatas || []).length ? `<p class="exatas">Exato em ${i.exatas.map(dataCurta).join(", ")}${i.exatas.length > 1 ? " (com a retrogradação, o tema volta)" : ""}</p>` : "";
+  return `<div class="item-ano"><h3>${esc(i.titulo)}</h3><p class="quando">${esc(quando)}</p>${exatas}<p>${esc(i.texto)}</p></div>`;
+}
+function desenharResultado(d) {
+  const meses = d.linha_do_tempo.filter((m) => m.comeca.length || m.auge.length || m.termina.length);
+  const linha = (rotulo, lista) => lista.length ? `<li><b>${rotulo}</b>${lista.map(esc).join("; ")}</li>` : "";
+  const nav = [["sec-temas", "Os temas do ano"], ["sec-meses", "Mês a mês"], ["sec-areas", "Por área da vida"]]
+    .concat(d.eclipses.length ? [["sec-eclipses", "Eclipses"]] : []).concat(d.revolucao ? [["sec-rs", "Revolução Solar"]] : []);
+  const rs = d.revolucao;
+  const res = $("#resultado");
+  res.innerHTML = `<section class="amostra-topo degrade"><div class="amostra-topo-linha">
+      <div><span class="olho">O seu ano completo</span><h1 class="t1" id="titulo-resultado" tabindex="-1">O seu ano${d.nome ? `, <em>${esc(d.nome)}</em>` : ""}</h1>
+        <p class="miudo">${esc(d.periodo.charAt(0).toUpperCase() + d.periodo.slice(1))}</p></div>
+      <div class="acoes"><button type="button" class="bt bt-2" id="botao-pdf">Baixar PDF</button><span class="miudo" id="status-pdf" aria-live="polite"></span></div></div>
+      ${d.avisos.map((t) => `<p class="aviso">${esc(t)}</p>`).join("")}
+    </section>
+    <section class="leitura-grade ano-grade">
+      <nav class="leitura-nav" aria-label="Seções"><span class="olho">O seu ano</span>
+        ${nav.map(([id, t]) => `<a href="#${id}">${esc(t)}</a>`).join("")}
+        ${d.areas.length ? `<span class="olho" style="margin-top:18px">Áreas</span>${d.areas.map((a) => `<a href="#area-${esc(a.chave)}">${esc(a.nome)}</a>`).join("")}` : ""}
+      </nav>
+      <article class="leitura-texto">
+        <section class="dimensao bloco"><p class="lead">${esc(d.abertura)}</p><p class="apoio">${esc(d.como_ler)}</p></section>
+        <section class="dimensao bloco" id="sec-temas"><span class="ponto">Resumo do ano</span><h2>Os temas do seu ano</h2><p class="apoio">${esc(d.intro.temas)}</p>
+          ${d.temas.map(itemAno).join("")}</section>
+        <section class="dimensao bloco" id="sec-meses"><span class="ponto">Linha do tempo</span><h2>Mês a mês</h2><p class="apoio">${esc(d.intro.linha_do_tempo)}</p>
+          ${meses.map((m) => `<div class="mes"><h3>${esc(m.rotulo.charAt(0).toUpperCase() + m.rotulo.slice(1))}</h3><ul>${linha("Começa", m.comeca)}${linha("No auge", m.auge)}${linha("Termina", m.termina)}</ul></div>`).join("")}</section>
+        <section class="dimensao bloco" id="sec-areas"><span class="ponto">Por área da vida</span><h2>Onde o ano mexe</h2><p class="apoio">${esc(d.intro.areas)}</p>
+          ${d.areas.map((a) => `<div id="area-${esc(a.chave)}" style="scroll-margin-top:100px"><h3 class="t3" style="margin-top:18px">${esc(a.nome)}</h3>${a.itens.map(itemAno).join("")}</div>`).join("")}</section>
+        ${d.eclipses.length ? `<section class="dimensao bloco" id="sec-eclipses"><span class="ponto">Eclipses</span><h2>Os eclipses do período</h2><p class="apoio">${esc(d.intro.eclipses)}</p>
+          ${d.eclipses.map((e) => `<div class="item-ano"><h3>${esc(e.titulo)}</h3><p class="quando">${dataCurta(e.data)}${e.casa ? ` · na sua casa ${e.casa}` : ""}${e.toca.length ? ` · toca o seu ${e.toca.map((x) => esc(x.ponto_pt)).join(" e o seu ")}` : ""}</p>${e.texto ? `<p>${esc(e.texto)}</p>` : ""}</div>`).join("")}</section>` : ""}
+        ${rs ? `<section class="dimensao bloco" id="sec-rs"><span class="ponto">Revolução Solar</span><h2>${esc(rs.titulo)}</h2><p class="apoio">${esc(d.intro.revolucao)}</p>
+          ${rs.ascendente ? `<div class="item-ano"><h3>Ascendente da Revolução em ${esc(rs.ascendente_pt)}</h3><p>${esc(rs.texto_ascendente)}</p></div>
+          <div class="item-ano"><h3>O Sol na casa ${rs.casa_do_sol} da Revolução</h3><p>${esc(rs.texto_sol)}</p></div>` : `<p class="aviso">${esc(rs.aviso)}</p>`}</section>` : ""}
+        <section class="dimensao bloco"><p class="lead">${esc(d.fechamento)}</p></section>
+        <div class="cartao feedback bloco" id="feedback-ano"></div>
+      </article>
+    </section>`;
+  mostrarEstado("resultado");
+  if (window.padTrack) padTrack("completo_aberto", { produto: "previsao", sistema: "ocidental" });
+  if (window.padFeedback) padFeedback("#feedback-ano", "previsao");
+  focar($("#titulo-resultado"));
+  $("#botao-pdf").addEventListener("click", baixarPDF);
+}
+
+async function baixarPDF() {
+  const botao = $("#botao-pdf"), status = $("#status-pdf");
+  botao.disabled = true; botao.textContent = "Gerando PDF…";
+  try {
+    const r = await fetch("/api/ocidental/previsao/pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...ultimoPedido, nivel: "completo" }) });
+    if (!r.ok) { let msg = "Não foi possível gerar o PDF. Tente de novo."; try { const c = await r.json(); if (typeof c.detail === "string") msg = c.detail; } catch {} throw new Error(msg); }
+    const blob = await r.blob();
+    const nome = (r.headers.get("Content-Disposition") || "").match(/filename="([^"]+)"/)?.[1] || "o-seu-ano.pdf";
+    const url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    status.textContent = "";
+  } catch (err) { status.textContent = err.message; }
+  finally { botao.disabled = false; botao.textContent = "Baixar PDF"; }
+}
+
+// ---------- entrega do completo por link (pós-pagamento) ----------
+// /seu-ano?data=AAAA-MM-DD&hora=HH:MM&lat=..&lon=..&cidade=..&nome=..&inicio=AAAA-MM&token=oc-...
+(function abrirCompletoPorLink() {
+  const p = new URLSearchParams(location.search);
+  const token = p.get("token"), data = p.get("data"), hora = p.get("hora") || "", inicio = p.get("inicio");
+  const lat = parseFloat(p.get("lat")), lon = parseFloat(p.get("lon"));
+  if (!token || !data || !inicio || isNaN(lat) || isNaN(lon)) return;
+  ultimoPedido = { nome: p.get("nome") || "", data, hora, lat, lon, cidade: p.get("cidade") || "", inicio, token };
+  $("#titulo-carregando").textContent = "Abrindo o seu ano completo";
+  mostrarEstado("estado-carregando"); animarEtapas();
+  pedir("/api/ocidental/previsao", { ...ultimoPedido, nivel: "completo" }).then((d) => { clearInterval(timerEtapas); desenharResultado(d); }).catch((e) => {
+    clearInterval(timerEtapas);
+    $("#resultado").innerHTML = `<section class="erro-topo"><div><span class="chip chip-breve">Link de leitura</span>
+      <h1 class="t2" id="titulo-resultado" tabindex="-1">Este link de leitura <em>não abriu</em></h1>
+      <p class="lead">Ele pode ter sido copiado pela metade. Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a>: chegam no e-mail da compra. (${esc(e.message)})</p>
+      <div class="botoes"><a class="bt bt-1" href="/minhas-leituras">Recuperar meus links</a><a class="bt bt-2" href="mailto:contato@pedrosperbmonteiro.com.br">Falar com a gente</a></div></div></section>`;
+    mostrarEstado("resultado"); focar($("#titulo-resultado"));
+  });
+})();
+</script>
+</body>
+</html>
