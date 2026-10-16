@@ -129,8 +129,10 @@ def test_pdf():
     assert r.status_code == 200 and r.content[:4] == b"%PDF"
 
 
-def test_ia_nao_sai_na_amostra():
-    assert cliente.post("/api/ocidental/numerologia", json={**PEDIDO, "texto_ia": True}).status_code == 402
+def test_texto_ia_e_recusado_com_422():
+    for nivel in ("amostra", "completo"):
+        r = cliente.post("/api/ocidental/numerologia", json={**PEDIDO, "nivel": nivel, "texto_ia": True})
+        assert r.status_code == 422 and "IA não existe mais" in r.json()["detail"]
 
 
 @pytest.fixture

@@ -45,9 +45,13 @@ def test_amostra_sem_hora_avisa_e_nao_tem_ascendente():
     assert any("hora" in a for a in c["amostra"]["avisos"])
 
 
-def test_ia_nao_sai_na_amostra():
-    r = cliente.post("/api/ocidental/mapa", json={**PESSOA, "nivel": "amostra", "texto_ia": True})
-    assert r.status_code == 402
+@pytest.mark.parametrize("nivel", ["amostra", "completo"])
+def test_texto_ia_e_recusado_com_422(nivel):
+    """Rodada 16: o texto por IA saiu da ocidental; quem ainda o pede recebe 422 com o porquê."""
+    r = cliente.post("/api/ocidental/mapa", json={**PESSOA, "nivel": nivel, "texto_ia": True})
+    assert r.status_code == 422 and "IA não existe mais" in r.json()["detail"]
+    r = cliente.post("/api/ocidental/pdf", json={**PESSOA, "nivel": "completo", "texto_ia": True})
+    assert r.status_code == 422
 
 
 # ------------------------------------------------------------------ completo (402)

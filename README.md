@@ -30,7 +30,7 @@ Roda no Render (https://padmini.com.br), ligado ao GitHub: cada `git push` na `m
 
 | Variável | Para quê |
 |---|---|
-| `ANTHROPIC_API_KEY` | Texto por IA (opcional; o botão de IA só aparece se existir) |
+| `ANTHROPIC_API_KEY` | Texto por IA, **só na védica** (opcional; o botão de IA só aparece se existir). A ocidental não tem texto por IA desde a rodada 16 |
 | `PADMINI_MODELO` | Trocar o modelo (padrão `claude-sonnet-5`) |
 | `PADMINI_SISTEMA` | Versão no ar: `vedica` (padrão) ou `ocidental`. Trocar = mudar aqui e salvar |
 | `PADMINI_SECRET` | **Obrigatório em produção** — assina os tokens do completo |

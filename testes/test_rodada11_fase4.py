@@ -52,7 +52,7 @@ def test_privacidade_no_modo_stripe(ocidental, monkeypatch):
     assert "não passam pelo nosso servidor" in html
     assert "nunca os seus dados de nascimento" in html
     assert "apagado em 7 dias" in html
-    assert "10 de outubro de 2026" in html
+    assert "16 de outubro de 2026" in html  # rodada 16: saiu a Anthropic (texto por IA)
     assert "O pagamento acontece na página da Cakto" not in html
     assert "{%" not in html and "{{" not in html
 
@@ -61,7 +61,7 @@ def test_privacidade_com_a_cakto_e_a_de_antes(ocidental):
     html = cliente.get("/privacidade", headers=HTML).text
     assert "<strong>Cakto</strong> — processamento do pagamento e programa de afiliados." in html
     assert "Stripe" not in html and "Ebanx" not in html
-    assert "5 de outubro de 2026" in html
+    assert "16 de outubro de 2026" in html  # rodada 16: saiu a Anthropic (texto por IA)
 
 
 def test_termos_no_modo_stripe(ocidental, monkeypatch):
@@ -162,8 +162,8 @@ def test_relatorio_sem_chave_ou_mes_errado(monkeypatch, capsys):
 
 
 # ------------------------------------------------------------------ smoke
-def test_smoke_com_a_cakto_continua_com_29_checagens():
-    assert len(smoke.CHECAGENS) == 29
+def test_smoke_com_a_cakto_continua_com_30_checagens():
+    assert len(smoke.CHECAGENS) == 30  # rodada 16: + "ocidental sem texto por IA"
     nomes = [n for n, _ in smoke.CHECAGENS_STRIPE]
     assert any("/webhook/stripe" in n for n in nomes)
 
