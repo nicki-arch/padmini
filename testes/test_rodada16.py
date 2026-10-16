@@ -141,3 +141,14 @@ def test_smoke_nao_confere_a_cakto_da_ocidental_com_a_stripe_no_ar(monkeypatch):
     vistas.clear()
     monkeypatch.setattr(smoke, "_pagamento_no_ar", lambda: "cakto")
     assert f() and vistas == ["vedica", "ocidental"]
+
+
+def test_vitrine_dos_emails_abre_com_o_catalogo_de_verdade(ocidental, monkeypatch):
+    """/estilo?previa= é onde o Nicolas aprova os e-mails. Com a sinastria em breve, o
+    pós-compra passo 2 (oferecer a próxima leitura) não sai, e a página dava 500."""
+    import sequencias
+    monkeypatch.setenv("PADMINI_PREVIA_CHAVE", "previa-dos-testes")
+    assert sequencias.email_pos_compra(2, "ocidental:mapa", "Ana", "a@b.co", ["ocidental:mapa"]) is None
+    r = cliente.get("/estilo?previa=previa-dos-testes", headers=HTML)
+    assert r.status_code == 200 and "Pós-compra 1/3" in r.text and "Pós-compra 3/3" in r.text
+    assert "Pós-compra 2/3" not in r.text

@@ -599,7 +599,10 @@ def _emails_de_exemplo_ocidental() -> list[dict]:
             saida.append({"titulo": f"Boas-vindas {passo}/3 (D+{sequencias.DIAS_BOAS_VINDAS[passo]}) · {produto}",
                           "assunto": assunto, "html": html})
     for passo in (1, 2, 3):
-        assunto, html = sequencias.email_pos_compra(passo, "ocidental:mapa", "Ana Souza", email, ["ocidental:mapa"])
+        m = sequencias.email_pos_compra(passo, "ocidental:mapa", "Ana Souza", email, ["ocidental:mapa"])
+        if m is None:  # passo 2 sem a próxima leitura à venda (em breve): esse e-mail não sai
+            continue
+        assunto, html = m
         saida.append({"titulo": f"Pós-compra {passo}/3 (D+{sequencias.DIAS_POS_COMPRA[passo]}) · depois de um mapa natal",
                       "assunto": assunto, "html": html})
     return saida
