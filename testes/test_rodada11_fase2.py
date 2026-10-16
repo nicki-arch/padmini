@@ -143,6 +143,9 @@ def test_sinastria_no_modo_stripe_sem_order_bump(ocidental, modo_stripe):
 
 @pytest.mark.catalogo_real
 def test_venda_fechada_sem_botao_e_api_recusa(ocidental, modo_stripe, stripe_falsa):
+    fechado = copy.deepcopy(catalogo.carregar())  # rodada 16: o YAML abriu; fecha como quem edita
+    fechado["vendas_abertas"] = False
+    catalogo.usar(fechado)
     html = cliente.get("/mapa", headers=HTML).text
     assert "/static/ocidental/comprar.js" not in html and 'data-comprar="' not in html
     assert _comprar().status_code == 404
@@ -209,9 +212,9 @@ def test_preco_adulterado_e_ignorado(banco, modo_stripe, stripe_falsa):
     r = _comprar(preco=1, valor_centavos=1, amount=1, unit_amount=1,
                  line_items=[{"price_data": {"unit_amount": 1}}])
     id_pedido = _id(r)
-    assert db.pendente(id_pedido)["valor_centavos"] == 3700
+    assert db.pendente(id_pedido)["valor_centavos"] == 4700
     params = stripe_falsa.criadas[0]["params"]
-    assert params["line_items"][0]["price_data"]["unit_amount"] == 3700
+    assert params["line_items"][0]["price_data"]["unit_amount"] == 4700
     assert len(params["line_items"]) == 1
 
 
@@ -262,7 +265,7 @@ def test_pagina_do_checkout(banco, modo_stripe, stripe_falsa):
     r = cliente.get(f"/checkout/{id_pedido}", headers=HTML)
     assert r.status_code == 200 and r.headers["cache-control"] == "no-store"
     html = r.text
-    assert "Mapa Natal completo" in html and "R$37" in html
+    assert "Mapa Natal completo" in html and "R$47" in html
     assert "<script>alert(1)</script>" not in html and "&lt;script&gt;alert(1)&lt;/script&gt;" in html
     assert 'src="https://js.stripe.com/endive/stripe.js"' in html
     assert "cs_test_1_secret" not in html  # o client_secret vem por fetch, não no HTML

@@ -2,8 +2,10 @@
 Rodada 9, Fase A: catálogo por estados, venda desligada e "me avise".
 
 Estes testes usam o catálogo DE VERDADE (conteudo/ocidental/catalogo.yaml:
-venda fechada, só o mapa natal ativo) — o conftest abre a venda para os testes
-anteriores, que protegem o "com vendas_abertas: true, tudo como antes".
+só o mapa natal ativo) — o conftest abre a venda para os testes anteriores, que
+protegem o "com vendas_abertas: true, tudo como antes". Desde a rodada 16 (16/out)
+o YAML de produção está com a venda ABERTA; o interruptor continua existindo, e os
+testes de "venda fechada" a fecham com a fixture `fechada`, como quem edita o YAML.
 """
 import copy
 import re
@@ -38,6 +40,12 @@ def ocidental(monkeypatch):
     app_mod._paginas_prontas.clear()
 
 
+@pytest.fixture
+def fechada(ocidental):
+    """O interruptor desligado (vendas_abertas: false), o resto como no YAML."""
+    _mudar(vendas_abertas=False)
+
+
 def _mudar(**estados):
     """Troca estados (e/ou vendas_abertas) no catálogo, como quem edita o YAML."""
     d = copy.deepcopy(catalogo.carregar())
@@ -68,7 +76,7 @@ def _sitemap() -> list[str]:
 
 # ------------------------------------------------------------------ o YAML
 def test_catalogo_de_producao():
-    assert catalogo.vendas_abertas() is False
+    assert catalogo.vendas_abertas() is True  # rodada 16: venda aberta (decisão do Nicolas, 16/out)
     assert [(p["chave"], p["estado"]) for p in catalogo.produtos()] == [
         ("mapa", "ativo"), ("previsao", "oculto"), ("compat", "em_breve"), ("numerologia", "em_breve"), ("tarot", "em_breve"),
         ("comunidade", "oculto"), ("cursos", "oculto"), ("astrologia-do-zero", "oculto"), ("consulta", "oculto")]
@@ -187,14 +195,14 @@ def _sem_venda(html: str, onde: str):
     assert "checkout_click" not in html, onde
 
 
-def test_venda_fechada_sem_preco_nem_cakto_nas_paginas(ocidental):
+def test_venda_fechada_sem_preco_nem_cakto_nas_paginas(fechada):
     for rota in PUBLICAS:
         _sem_venda(cliente.get(rota, headers=HTML).text, rota)
 
 
 def test_venda_fechada_vale_ate_para_produto_ativo(ocidental):
     """Ligar os produtos sem abrir a venda: páginas sem preço, com o "me avise"."""
-    _mudar(compat="ativo", numerologia="ativo", tarot="ativo")
+    _mudar(compat="ativo", numerologia="ativo", tarot="ativo", vendas_abertas=False)
     for rota in PUBLICAS + ("/compatibilidade?token=oc-x",):
         _sem_venda(cliente.get(rota, headers=HTML).text, rota)
     for rota in ("/mapa", "/compatibilidade", "/numerologia", "/tarot"):
@@ -211,7 +219,7 @@ def test_venda_aberta_volta_a_mostrar_preco_e_cakto(ocidental):
     _sem_venda(cliente.get("/compatibilidade").text, "/compatibilidade")
 
 
-def test_amostra_do_mapa_traz_o_me_avise_no_lugar_da_compra(ocidental):
+def test_amostra_do_mapa_traz_o_me_avise_no_lugar_da_compra(fechada):
     html = cliente.get("/mapa").text
     js = html.split("function desenharAmostra", 1)[1].split("\n}\n", 1)[0]
     assert 'data-me-avise="mapa"' in js and "price-card" not in js
@@ -231,8 +239,13 @@ def test_me_avise_tem_nome_email_e_whatsapp_obrigatorios(ocidental):
     assert re.search(r'name="aceita_whatsapp"(?![^>]*(required|checked))', form)
 
 
-def test_config_diz_que_a_venda_esta_fechada(ocidental):
+def test_config_diz_que_a_venda_esta_fechada(fechada):
     assert cliente.get("/api/config").json()["vendas_abertas"] is False
+
+
+def test_config_diz_que_a_venda_esta_aberta(ocidental):
+    """Rodada 16: o YAML de produção abriu a venda (o smoke confere o mesmo no ar)."""
+    assert cliente.get("/api/config").json()["vendas_abertas"] is True
 
 
 # ------------------------------------------------------------------ me avise / lista (API)
@@ -319,7 +332,7 @@ def _emails_ocidental() -> dict:
     return saida
 
 
-def test_venda_fechada_sem_preco_nem_cakto_nos_emails(ocidental):
+def test_venda_fechada_sem_preco_nem_cakto_nos_emails(fechada):
     emails = _emails_ocidental()
     assert len(emails) >= 20
     for nome, html in emails.items():
@@ -335,7 +348,7 @@ def test_venda_aberta_volta_a_vender_nos_emails(ocidental):
     assert "pay.cakto" in html and "R$" in html
 
 
-def test_sequencias_de_venda_ficam_paradas(ocidental, monkeypatch):
+def test_sequencias_de_venda_ficam_paradas(fechada, monkeypatch):
     monkeypatch.setattr(sequencias.db, "ativo", lambda: True)
     monkeypatch.setattr(sequencias.db, "candidatos_pos_compra", lambda: [])
     chamou = []
@@ -344,7 +357,7 @@ def test_sequencias_de_venda_ficam_paradas(ocidental, monkeypatch):
     assert not chamou  # boas-vindas nem é consultada com a venda fechada
 
 
-def test_lembrete_fica_parado(ocidental, monkeypatch):
+def test_lembrete_fica_parado(fechada, monkeypatch):
     monkeypatch.setenv("PADMINI_TAREFAS_CHAVE", "k")
     item = {"id": 1, "produto": "mapa", "dados": PESSOA, "email": "a@b.co", "sistema": "ocidental"}
     monkeypatch.setattr(app_mod.db, "lembretes_pendentes", lambda: [item])
@@ -355,7 +368,7 @@ def test_lembrete_fica_parado(ocidental, monkeypatch):
     assert r["enviados"] == 0 and not enviados and not marcados
 
 
-def test_carrinho_abandonado_nao_manda_email(ocidental, monkeypatch):
+def test_carrinho_abandonado_nao_manda_email(fechada, monkeypatch):
     enviados = []
     monkeypatch.setattr(app_mod.entrega, "enviar_email", lambda *a, **k: enviados.append(a) or True)
     monkeypatch.setattr(app_mod.db, "descadastrado", lambda e: False)
@@ -369,7 +382,7 @@ def test_carrinho_abandonado_nao_manda_email(ocidental, monkeypatch):
 
 
 # ------------------------------------------------------------------ webhook continua
-def test_webhook_da_cakto_entrega_com_a_venda_fechada(ocidental, monkeypatch):
+def test_webhook_da_cakto_entrega_com_a_venda_fechada(fechada, monkeypatch):
     novas = copy.deepcopy(ofertas.POR_SISTEMA["ocidental"])
     novas["mapa"].update(checkout="https://pay.cakto.com.br/ocmapa9_1", codigo="ocmapa9")
     monkeypatch.setitem(ofertas.POR_SISTEMA, "ocidental", novas)

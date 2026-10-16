@@ -16,7 +16,7 @@ import textos  # noqa: E402
 
 
 def test_precos_da_versao_ocidental():
-    assert ofertas.preco("mapa", "ocidental") == "37"
+    assert ofertas.preco("mapa", "ocidental") == "47"  # rodada 16: preço único (era 37)
     assert ofertas.preco("compat", "ocidental") == "127"
     # rodada 3: o cupom da Cakto é em % inteiro (24%) e o preço com cupom é calculado
     assert ofertas.oferta("compat", "ocidental")["preco_cupom"] == 96.52

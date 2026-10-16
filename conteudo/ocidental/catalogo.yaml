@@ -21,8 +21,11 @@
 # INTERRUPTOR DE VENDA (decisão do Nicolas, 5/out). Com `false`: nenhuma página
 # nem e-mail mostra preço, botão de compra ou link da Cakto; o desbloqueio da
 # amostra vira "me avise"; lembrete, carrinho abandonado, boas-vindas e a oferta
-# do pós-compra ficam parados. Com `true`, tudo volta como antes, pela Cakto.
-vendas_abertas: false
+# do pós-compra ficam parados. Com `true`, tudo volta como antes.
+# Aberta em 16/out/2026 (rodada 16, decisão do Nicolas): o mapa natal à venda por R$47,
+# com a revisão da Dona Valderez acontecendo ao mesmo tempo (o selo de revisado continua
+# só nos textos com `revisado: true`).
+vendas_abertas: true
 
 # Na ordem em que aparecem (menu, home, "Todas as leituras").
 produtos:

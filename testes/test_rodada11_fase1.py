@@ -12,6 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import copy
+
 import pytest
 
 import test_app as base  # configura o ambiente e o app  # noqa: F401
@@ -103,7 +105,10 @@ def test_venda_de_teste_valor_desconhecido(monkeypatch):
 
 @pytest.mark.catalogo_real
 def test_venda_de_teste_abre_a_venda_so_com_stripe_de_teste(monkeypatch):
-    assert catalogo.dados()["vendas_abertas"] is False  # o YAML continua fechado
+    # rodada 16: o YAML de produção abriu a venda; aqui ela é fechada como quem edita o YAML
+    fechado = copy.deepcopy(catalogo.carregar())
+    fechado["vendas_abertas"] = False
+    catalogo.usar(fechado)
     assert not catalogo.vendas_abertas() and not catalogo.vende("mapa")
     monkeypatch.setenv("PADMINI_VENDAS_TESTE", "0")
     assert not catalogo.vendas_abertas()
@@ -135,8 +140,8 @@ def _pedido(**extra) -> pendentes.PedidoCheckout:
 
 def test_pendente_tem_preco_do_catalogo_e_dados_da_leitura():
     p = pendentes.montar(_pedido())
-    assert p["valor_centavos"] == 3700  # ofertas.yaml (ocidental): mapa = 37
-    assert p["itens"] == [{"chave": "mapa", "valor_centavos": 3700,
+    assert p["valor_centavos"] == 4700  # ofertas.yaml (ocidental): mapa = 47
+    assert p["itens"] == [{"chave": "mapa", "valor_centavos": 4700,
                            "dados": {"nome": "Ana", "data": "1990-05-15", "hora": "14:30",
                                      "lat": -30.03, "lon": -51.23, "cidade": "Porto Alegre, RS"}}]
     assert p["email"] == "ana@teste.com" and p["nome"] == "Ana" and p["moeda"] == "brl"
@@ -150,14 +155,14 @@ def test_pendente_tem_preco_do_catalogo_e_dados_da_leitura():
 ])
 def test_pendente_nunca_grava_preco_vindo_do_navegador(adulterado):
     p = pendentes.montar(_pedido(**adulterado))
-    assert p["valor_centavos"] == 3700 and p["itens"][0]["valor_centavos"] == 3700
+    assert p["valor_centavos"] == 4700 and p["itens"][0]["valor_centavos"] == 4700
     for chave in adulterado:
         assert chave not in p["itens"][0]["dados"]
 
 
 def test_preco_adulterado_dentro_da_pessoa_e_ignorado():
     p = pendentes.montar(_pedido(pessoa={**PESSOA, "preco": 1, "valor_centavos": 1}))
-    assert p["valor_centavos"] == 3700
+    assert p["valor_centavos"] == 4700
     assert set(p["itens"][0]["dados"]) == {"nome", "data", "hora", "lat", "lon", "cidade"}
 
 
@@ -169,7 +174,7 @@ def test_cupom_aplicado_no_servidor_so_onde_vale():
     sem = pendentes.montar(_pedido(**sinastria, origem={"cupom": "INVENTADO"}))
     assert sem["cupom"] is None and sem["valor_centavos"] == 12700
     mapa = pendentes.montar(_pedido(origem={"cupom": "pedro"}))  # o cupom é só da sinastria
-    assert mapa["cupom"] is None and mapa["valor_centavos"] == 3700
+    assert mapa["cupom"] is None and mapa["valor_centavos"] == 4700
 
 
 def test_pendente_sem_taxa_da_plataforma():
@@ -232,7 +237,7 @@ def test_pendente_no_banco(banco):
     p = pendentes.montar(_pedido(preco=1))
     assert db.criar_pendente(p)
     lido = db.pendente(p["id"])
-    assert lido["estado"] == "aberto" and lido["valor_centavos"] == 3700
+    assert lido["estado"] == "aberto" and lido["valor_centavos"] == 4700
     assert lido["itens"] == p["itens"] and lido["rastreio"] == {"ref": "PEDRO", "utm_source": "tiktok"}
     assert lido["stripe_session_id"] is None
     tudo = _linhas("SELECT row_to_json(pedidos_pendentes)::text FROM pedidos_pendentes")[0][0]
