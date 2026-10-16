@@ -174,7 +174,7 @@ def test_cartao_pago_entrega_uma_vez(stripe_falsa, emails, avisos):
     assert len(linha) == 1
     origem, sid, pi, produto, email, valor, forma, oferta, rastreio, link, enviado, cakto_id = linha[0]
     assert (origem, sid, pi, produto, email, float(valor), forma, oferta) == (
-        "stripe", "cs_test_1", "pi_cs_test_1", "ocidental:mapa", "ana@teste.com", 37.0, "cartao", "stripe:mapa")
+        "stripe", "cs_test_1", "pi_cs_test_1", "ocidental:mapa", "ana@teste.com", 47.0, "cartao", "stripe:mapa")
     assert rastreio == {"ref": "PEDRO"} and enviado is True and cakto_id is None
     assert "/mapa?" in link and "token=oc-" in link
     # a página de "obrigado" mostra o mesmo tipo de link

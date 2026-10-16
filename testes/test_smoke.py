@@ -51,6 +51,7 @@ def test_cakto_fora_do_ar_avisa_sem_reprovar():
 import pytest  # noqa: E402
 
 from test_app import app_mod, cliente  # noqa: E402
+import catalogo  # noqa: E402
 
 SEM_REDE = ("preço do ofertas.yaml bate", "cabeçalhos de segurança")
 
@@ -93,8 +94,9 @@ def test_smoke_passa_no_app_local(versao, monkeypatch):
 @pytest.mark.catalogo_real
 @pytest.mark.parametrize("captura", [True, False])
 def test_smoke_com_o_catalogo_de_verdade(captura, monkeypatch):
-    """Rodada 9: os dois cenários do brief — captura ligada (como hoje) e captura
-    desligada com vendas_abertas: false (o site abre sem vender)."""
+    """Rodada 9: os dois cenários do brief — captura ligada e captura desligada. Desde a
+    rodada 16 o YAML está com a venda aberta: sem captura, as checagens de preço e de
+    botão de compra voltam a valer (e o aviso de "venda fechada" some)."""
     monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
     if captura:
         monkeypatch.setenv("PADMINI_CAPTURA", "1")
@@ -107,7 +109,7 @@ def test_smoke_com_o_catalogo_de_verdade(captura, monkeypatch):
     app_mod._paginas_prontas.clear()
     assert falhas == []
     assert any("captura" in a for a in smoke.AVISOS) == captura
-    assert any("venda fechada" in a for a in smoke.AVISOS) == (not captura)
+    assert any("venda fechada" in a for a in smoke.AVISOS) == (not captura and not catalogo.vendas_abertas())
 
 
 def test_smoke_cobre_os_4_produtos():

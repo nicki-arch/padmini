@@ -442,6 +442,12 @@ def _normalizar(html: str) -> str:
 def _():
     falhas = []
     for versao in ("vedica", "ocidental"):
+        if versao == "ocidental" and _versao_no_ar() == "ocidental" and _pagamento_no_ar() == "stripe":
+            # Rodada 16: com a Stripe no ar, quem cobra é o checkout próprio (preço do
+            # ofertas.yaml, conferido pelos testes); as ofertas da Cakto não são vistas por
+            # ninguém e podem ficar com o preço antigo.
+            AVISOS.append("ocidental com a Stripe: preço não conferido contra a Cakto (quem cobra é a Stripe)")
+            continue
         falhas += [f"[{versao}] {f}" for f in conferir_precos_na_cakto(_ofertas_do_yaml(versao))]
     for f in falhas:
         print("      ", f)

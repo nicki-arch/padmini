@@ -15,10 +15,11 @@
 # Só aqui.
 taxa_plataforma: 0.99
 
-# Preços decididos pelo Nicolas em 26/set/2026 (rodada 2).
+# Preços decididos pelo Nicolas em 26/set/2026 (rodada 2). Mapa natal: R$47, preço
+# único (sem lançamento nem fundador), decidido em 16/out/2026 (rodada 16).
 mapa:
   nome: Mapa Natal completo
-  preco: 37
+  preco: 47
   checkout: "https://pay.cakto.com.br/39vm3n6_1141264"
 
 # `preco` é o de tabela, o que a página mostra por padrão e o que a oferta
@@ -60,9 +61,10 @@ tarot:
   preco: 19
   checkout: "https://pay.cakto.com.br/hzxu8hh_1141288"
 
-# Rodada 13: "O seu ano", previsão dos próximos 12 meses. SEM PREÇO de propósito: o preço
-# é decisão do Nicolas (a análise de produtos sugere R$47 de lançamento e R$67 de tabela,
-# não decidido). Checkout só pela Stripe (sem link da Cakto). Sem `preco`, o checkout
-# recusa (pendentes.valor_centavos) e um teste impede ligar o produto no catalogo.yaml.
+# Rodada 13: "O seu ano", previsão dos próximos 12 meses. Checkout só pela Stripe (sem
+# link da Cakto). Preço decidido pelo Nicolas em 16/out/2026 (rodada 16): R$47. O produto
+# continua `oculto` no catalogo.yaml: ter preço aqui não liga nada (a página responde 404
+# e o checkout recusa produto que o catálogo não vende).
 previsao:
   nome: O seu ano — previsão dos próximos 12 meses
+  preco: 47

@@ -56,10 +56,13 @@ def previsao_ligada(monkeypatch):
 
 # ------------------------------------------------------------------ desligado em produção
 @pytest.mark.catalogo_real
-def test_em_producao_esta_desligado_e_sem_preco():
+def test_em_producao_esta_desligado_com_o_preco_decidido():
+    """Rodada 16: o preço (R$47) foi decidido, mas o produto continua OCULTO: ter preço não
+    liga nada (a venda está aberta e mesmo assim o catálogo não vende "O seu ano")."""
+    assert catalogo.vendas_abertas()
     assert catalogo.estado("previsao") == "oculto" and not catalogo.vende("previsao")
     oferta = ofertas.oferta("previsao", "ocidental")
-    assert oferta and oferta["nome"] and not oferta.get("preco") and not oferta.get("checkout")
+    assert oferta and oferta["nome"] and oferta["preco"] == 47 and not oferta.get("checkout")
 
 
 @pytest.mark.catalogo_real

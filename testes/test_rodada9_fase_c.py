@@ -17,6 +17,7 @@ import entrega
 import mapa_ocidental as mo
 import marketing
 import montar_texto_ocidental as mt
+import ofertas
 import produtos_ocidental
 import roda_mapa
 
@@ -46,6 +47,18 @@ def ocultos_ligados(ocidental):
     for p in d["produtos"]:
         if p["estado"] == "oculto":
             p["estado"] = "em_breve"
+    catalogo.usar(d)
+    app_mod._paginas_prontas.clear()
+    yield
+    catalogo.usar(original)
+
+
+@pytest.fixture
+def venda_fechada(ocidental):
+    """O interruptor desligado (desde a rodada 16 o YAML de produção está com a venda aberta)."""
+    original = catalogo.dados()
+    d = copy.deepcopy(original)
+    d["vendas_abertas"] = False
     catalogo.usar(d)
     app_mod._paginas_prontas.clear()
     yield
@@ -114,7 +127,17 @@ def test_todas_as_leituras_so_ativos_e_em_breve(ocidental):
     html = cliente.get("/leituras").text
     for p in catalogo.produtos():
         assert (f"<h2 class=\"t3\">{p['nome']}</h2>" in html) == (p["estado"] != "oculto"), p["chave"]
-    assert 'id="quem-revisa"' in html and _sem_preco(html)
+    assert 'id="quem-revisa"' in html
+    # rodada 16: com a venda aberta, só o produto que o catálogo vende (o mapa) leva preço,
+    # e o preço vem do ofertas.yaml
+    precos = re.findall(r'<p class="preco"[^>]*>R\$([\d.,]+)</p>', html)
+    assert precos == [ofertas.moeda(ofertas.oferta(p["oferta"], "ocidental")["preco"])
+                      for p in catalogo.produtos() if catalogo.vende(p["chave"])] == ["47"]
+    assert "pay.cakto" not in html and "__CHECKOUT" not in html
+
+
+def test_todas_as_leituras_sem_preco_com_a_venda_fechada(venda_fechada):
+    assert _sem_preco(cliente.get("/leituras").text)
 
 
 # ------------------------------------------------------------------ leitura completa
@@ -198,7 +221,7 @@ def test_email_de_entrega_com_a_marca_nova():
     assert "Padmini" not in html
 
 
-def test_email_da_amostra_sem_venda_nao_oferece_compra():
+def test_email_da_amostra_sem_venda_nao_oferece_compra(venda_fechada):
     assert not catalogo.vendas_abertas()
     html = marketing.email_amostra_html("mapa", {"sol": "touro"}, dict(PESSOA), "ana@teste.com", "Ana", "ocidental")
     assert _sem_preco(html) and "Valderez Astrologia" in html

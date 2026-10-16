@@ -143,8 +143,12 @@ def test_selo_so_com_texto_revisado(ocidental, monkeypatch):
 def test_pagina_do_mapa_tem_os_estados_e_o_me_avise(ocidental):
     html = cliente.get("/mapa").text
     for trecho in ('id="estado-form"', 'id="estado-carregando"', 'id="resultado"', 'class="roda-gira"',
-                   'class="vela"', 'aria-hidden="true">${esc(TA.fumo)}', 'data-me-avise="mapa"'):
+                   'class="vela"', 'aria-hidden="true">${esc(TA.fumo)}'):
         assert trecho in html, trecho
+    # rodada 16: venda aberta no YAML — o "me avise" do mapa some e o preço vem do ofertas.yaml
+    assert ('data-me-avise="mapa"' in html) is not catalogo.vendas_abertas()
+    if catalogo.vendas_abertas():
+        assert "R$47" in html
     assert re.search(r'id="nome"[^>]*required', html)
     assert "/static/ilustracoes/" not in html[:html.index('<form id="form"')].split('id="estado-form"')[1]
 
