@@ -166,21 +166,16 @@ function desenharAmostra(d) {
   focar($("#titulo-resultado"));
 }
 
-let iaDisponivel = false;
-fetch("/api/config").then((r) => r.json()).then((c) => { iaDisponivel = c.texto_ia_disponivel; }).catch(() => {});
-
 function desenharCompleto(d) {
   const res = $("#resultado");
   res.innerHTML = `<p class="eyebrow">Leitura completa</p><h1 id="titulo-resultado" tabindex="-1">${esc(d.nome)}</h1><p class="secondary">Ano Pessoal calculado para ${d.ano_corrente}.</p>
     <div class="acoes"><button type="button" class="button" id="botao-pdf">Baixar a numerologia (PDF)</button><span class="nota" id="status-pdf"></span></div>
     <div class="resumo">${d.numeros.map((x) => `<div><small>${esc(x.nome)}</small><strong>${x.valor ?? "—"}</strong></div>`).join("")}</div>
-    ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="button button--secondary">Ler versão escrita por IA</button><span class="nota" id="status-ia"></span></div>` : ""}
     <div id="texto-relatorio" class="numeros">${d.numeros.map(blocoNumero).join("")}</div>`;
   res.hidden = false;
   focar($("#titulo-resultado"));
   if (window.padTrack) padTrack("completo_aberto", { produto: "numerologia", sistema: "ocidental" });
   $("#botao-pdf").addEventListener("click", baixarPDF);
-  if (iaDisponivel) $("#botao-ia").addEventListener("click", pedirIA);
 }
 async function baixarPDF() {
   const botao = $("#botao-pdf"), status = $("#status-pdf");
@@ -193,17 +188,6 @@ async function baixarPDF() {
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
   } catch (e) { status.textContent = e.message; } finally { botao.disabled = false; }
 }
-async function pedirIA() {
-  const botao = $("#botao-ia"), status = $("#status-ia");
-  botao.disabled = true; status.textContent = "Escrevendo… leva uns 20 segundos.";
-  try {
-    const c = await pedir("/api/ocidental/numerologia", { ...ultimoPedido, nivel: "completo", texto_ia: true });
-    const t = $("#texto-relatorio"); t.className = "article";
-    t.innerHTML = c.texto_ia.split(/\n{2,}/).map((b) => b.startsWith("## ") ? `<h2>${esc(b.slice(3))}</h2>` : `<p>${esc(b)}</p>`).join("");
-    botao.remove(); status.textContent = "Versão escrita por IA a partir dos seus números.";
-  } catch (e) { status.textContent = e.message; botao.disabled = false; }
-}
-
 // entrega por link: /numerologia?nome=...&data=AAAA-MM-DD&token=oc-...
 (function abrirCompletoPorLink() {
   const p = new URLSearchParams(location.search);

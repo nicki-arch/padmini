@@ -161,10 +161,6 @@ def test_pdf():
     assert r.status_code == 200 and r.content[:4] == b"%PDF"
 
 
-def test_ia_nao_sai_na_amostra():
-    assert cliente.post("/api/ocidental/tarot", json={"tiragem": tarot.tirar(), "texto_ia": True}).status_code == 402
-
-
 def test_pergunta_tem_no_maximo_140_caracteres():
     t = tarot.tirar()
     r = cliente.post("/api/ocidental/tarot", json={"tiragem": t, "nivel": "completo", "token": _token(t),
@@ -172,29 +168,25 @@ def test_pergunta_tem_no_maximo_140_caracteres():
     assert r.status_code == 422
 
 
-@pytest.fixture
-def ia_falsa(monkeypatch):
-    import montar_texto
-    chamadas = {"prompts": [], "guardados": []}
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "teste")
-    monkeypatch.setattr(montar_texto, "gerar_com_claude", lambda p: chamadas["prompts"].append(p) or "## Texto\n\nOk.")
-    monkeypatch.setattr(db, "texto_ia", lambda chave: None)
-    monkeypatch.setattr(db, "guardar_texto_ia", lambda *a, **k: chamadas["guardados"].append(a))
-    return chamadas
-
-
-def test_pergunta_vai_so_para_a_ia_e_nao_e_guardada(ia_falsa):
+def test_pergunta_nao_e_usada_nem_guardada(monkeypatch):
+    """Rodada 16: sem texto por IA, a pergunta fica só no navegador. Aba antiga que ainda a
+    manda não quebra (o campo é aceito), mas ela não volta na resposta nem vai ao banco."""
+    guardados = []
+    monkeypatch.setattr(db, "guardar_texto_ia", lambda *a, **k: guardados.append(a))
     t = tarot.tirar()
-    pedido = {"tiragem": t, "nivel": "completo", "token": _token(t), "texto_ia": True}
     pergunta = "O que preciso entender sobre o meu trabalho?"
-    r = cliente.post("/api/ocidental/tarot", json={**pedido, "pergunta": pergunta})
-    assert r.status_code == 200 and r.json()["texto_ia"]
-    assert pergunta in ia_falsa["prompts"][-1]
-    assert ia_falsa["guardados"] == []          # com pergunta: não vai para o cache/banco
-    assert pergunta not in json.dumps(r.json())  # nem volta na resposta
-    cliente.post("/api/ocidental/tarot", json=pedido)
-    assert len(ia_falsa["guardados"]) == 1      # sem pergunta: texto em cache, como os outros produtos
-    assert "PERGUNTA da pessoa (texto dela" not in ia_falsa["prompts"][-1]
+    r = cliente.post("/api/ocidental/tarot", json={"tiragem": t, "nivel": "completo", "token": _token(t),
+                                                   "pergunta": pergunta})
+    assert r.status_code == 200 and "texto_ia" not in r.json()
+    assert pergunta not in json.dumps(r.json()) and guardados == []
+
+
+def test_texto_ia_e_recusado_com_422():
+    t = tarot.tirar()
+    for corpo in ({"tiragem": t, "texto_ia": True},
+                  {"tiragem": t, "nivel": "completo", "token": _token(t), "texto_ia": True, "pergunta": "x"}):
+        r = cliente.post("/api/ocidental/tarot", json=corpo)
+        assert r.status_code == 422 and "IA não existe mais" in r.json()["detail"]
 
 
 # ------------------------------------------------------------------ página

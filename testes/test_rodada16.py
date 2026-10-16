@@ -7,6 +7,7 @@ com a revisão da Dona Valderez em andamento (o selo de revisado continua só no
 DE VERDADE (sem a venda aberta à força do conftest).
 """
 import re
+from pathlib import Path
 
 import pytest
 
@@ -152,3 +153,93 @@ def test_vitrine_dos_emails_abre_com_o_catalogo_de_verdade(ocidental, monkeypatc
     r = cliente.get("/estilo?previa=previa-dos-testes", headers=HTML)
     assert r.status_code == 200 and "Pós-compra 1/3" in r.text and "Pós-compra 3/3" in r.text
     assert "Pós-compra 2/3" not in r.text
+
+
+# =====================================================================================
+# Fase 2: o "texto por IA" saiu da ocidental (decisão do Nicolas, 16/out). A védica fica
+# como estava (a foto de test_sistema.py confere o HTML dela).
+# =====================================================================================
+import sistema  # noqa: E402
+
+
+def _sem_ia(texto: str, onde: str):
+    # "ia" minúsculo é palavra comum ("ia dar problema"); só vale como sigla
+    achado = re.search(r"\bIA\b", texto) or re.search(r"intelig[eê]ncia artificial|anthropic|texto_ia", texto, re.I)
+    assert not achado, (onde, texto[max(0, achado.start() - 80):achado.end() + 80])
+
+
+@pytest.fixture
+def com_chave_da_ia(monkeypatch, ocidental):
+    """Mesmo com a chave da Anthropic configurada no servidor (a védica usa), nada de IA."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "teste")
+    monkeypatch.setenv("PADMINI_PREVIA_CHAVE", "previa-dos-testes")
+
+
+def test_nenhuma_pagina_ocidental_oferece_ia(com_chave_da_ia):
+    previa = "?previa=previa-dos-testes"
+    rotas = [r + (previa if (catalogo.por_rota(r) or {}).get("estado") == "oculto" else "")
+             for r in sistema.PAGINAS["ocidental"]]
+    rotas += list(sistema.LEGAIS["ocidental"]) + [
+        "/live", "/minhas-leituras", "/blog", "/estilo" + previa,
+        "/compatibilidade?token=oc-x", "/numerologia?token=oc-x", "/tarot?token=oc-x"]
+    for rota in rotas:
+        r = cliente.get(rota, headers=HTML)
+        assert r.status_code == 200, rota
+        _sem_ia(r.text, rota)
+
+
+def test_nenhum_arquivo_ocidental_oferece_ia():
+    from test_app import RAIZ
+    for arq in sorted((RAIZ / "static" / "ocidental").glob("*")):
+        if arq.suffix in (".html", ".js"):
+            sem_comentario = re.sub(r"\{#.*?#\}", "", arq.read_text(encoding="utf-8"), flags=re.S)
+            _sem_ia(sem_comentario, arq.name)
+
+
+def test_nenhum_email_ocidental_fala_de_ia(com_chave_da_ia):
+    from test_rodada9_fase_a import _emails_ocidental
+    for nome, html in _emails_ocidental().items():
+        _sem_ia(html, nome)
+
+
+def test_config_da_ocidental_sem_texto_ia(com_chave_da_ia):
+    assert "texto_ia_disponivel" not in cliente.get("/api/config").json()
+
+
+def test_config_da_vedica_continua_igual(monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", "vedica")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "teste")
+    assert cliente.get("/api/config").json()["texto_ia_disponivel"] is True
+    monkeypatch.delenv("ANTHROPIC_API_KEY")
+    assert cliente.get("/api/config").json()["texto_ia_disponivel"] is False
+
+
+@pytest.mark.parametrize("rota,corpo", [
+    ("/api/ocidental/mapa", {"nome": "Ana", "data": "1990-05-15", "hora": "14:30", "lat": -30.03, "lon": -51.23,
+                             "nivel": "completo", "token": "oc-x"}),
+    ("/api/ocidental/pdf", {"nome": "Ana", "data": "1990-05-15", "hora": "14:30", "lat": -30.03, "lon": -51.23,
+                            "nivel": "completo", "token": "oc-x"}),
+    ("/api/ocidental/previsao", {"nome": "Ana", "data": "1990-05-15", "hora": "14:30", "lat": -30.03, "lon": -51.23,
+                                 "nivel": "completo", "token": "oc-x", "inicio": "2026-10"}),
+    ("/api/ocidental/sinastria", {"a": {"nome": "Ana", "data": "1990-05-15", "hora": "14:30", "lat": -30.03, "lon": -51.23},
+                                  "b": {"nome": "Bia", "data": "1991-01-02", "hora": "", "lat": -23.5, "lon": -46.6},
+                                  "nivel": "completo", "token": "oc-x"}),
+    ("/api/ocidental/numerologia", {"nome": "Ana Maria da Silva", "data": "1990-05-15", "nivel": "completo",
+                                    "token": "oc-x"}),
+    ("/api/ocidental/numerologia/pdf", {"nome": "Ana Maria da Silva", "data": "1990-05-15", "nivel": "completo",
+                                        "token": "oc-x"}),
+])
+def test_rotas_antigas_com_texto_ia_respondem_422(com_chave_da_ia, rota, corpo):
+    """Antes do token (sem custo, sem cálculo pago): a resposta diz por que, e nada de 402/503."""
+    r = cliente.post(rota, json={**corpo, "texto_ia": True})
+    assert r.status_code == 422, (rota, r.text)
+    assert r.json()["detail"].startswith("A versão escrita por IA não existe mais")
+
+
+def test_ocidental_nao_chama_a_ia(com_chave_da_ia, monkeypatch):
+    """Nenhuma rota ocidental importa o cliente da IA nem grava no cache de textos por IA."""
+    import rotas_ocidental
+    import montar_texto_ocidental as mt
+    fonte = Path(rotas_ocidental.__file__).read_text(encoding="utf-8")
+    assert "gerar_com_claude" not in fonte and "guardar_texto_ia" not in fonte and "TEXTO_IA" not in fonte
+    assert not [n for n in dir(mt) if "prompt" in n.lower() or "LLM" in n]

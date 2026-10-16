@@ -33,8 +33,8 @@
    bloco data-theme="dark". Preço, taxa e checkout: conteudo/ocidental/ofertas.yaml (tarot);
    textos: conteudo/ocidental/textos/tarot.yaml; API: /api/ocidental/tarot*.
    Cartas só tipográficas (nome, número e um símbolo simples nosso): nenhuma
-   imagem de terceiros. A pergunta fica só neste aparelho (localStorage) e só
-   vai ao servidor no pedido do texto por IA do completo, que não a guarda. #}
+   imagem de terceiros. A pergunta fica só neste aparelho (localStorage) e nunca
+   vai ao servidor (rodada 16: sem texto por IA, ela só aparece de volta na leitura). #}
 </head>
 <body>
 {% set atual = "/tarot" %}{% include "ocidental/_cabecalho.html" %}
@@ -52,7 +52,7 @@
           <div class="field">
             <label for="pergunta">A sua pergunta <span class="opcional">(opcional)</span></label>
             <textarea id="pergunta" name="pergunta" maxlength="140" placeholder="Ex.: o que eu preciso entender sobre o meu trabalho agora?" aria-describedby="pergunta-ajuda"></textarea>
-            <p class="help" id="pergunta-ajuda">Até 140 caracteres. Fica só neste aparelho e só é usada para personalizar o texto da leitura completa — não guardamos a sua pergunta.</p>
+            <p class="help" id="pergunta-ajuda">Até 140 caracteres. Fica só neste aparelho, para você ver a sua pergunta junto das cartas — não guardamos a sua pergunta.</p>
           </div>
           {% include "ocidental/_campo_email.html" %}
           <p class="form-erro" id="erro" role="alert" hidden></p>
@@ -177,9 +177,6 @@ function desenharAmostra(d) {
   focar($("#titulo-resultado"));
 }
 
-let iaDisponivel = false;
-const config = fetch("/api/config").then((r) => r.json()).then((c) => { iaDisponivel = c.texto_ia_disponivel; }).catch(() => {});
-
 function blocoCarta(c) {
   return `<article class="card result-card"><p class="eyebrow">${esc(c.posicao_pt)}</p>
     <h3>${esc(c.nome)}</h3><p class="grau">${esc(c.moldura)}</p><p class="secondary">${esc(c.leitura)}</p></article>`;
@@ -188,14 +185,12 @@ function desenharCompleto(d) {
   const res = $("#resultado");
   res.innerHTML = `<p class="eyebrow">Leitura completa</p><h1 id="titulo-resultado" tabindex="-1">A sua leitura</h1>${perguntaHTML()}${tiragemHTML(d.cartas)}
     <div class="acoes" style="margin-top:32px"><button type="button" class="button" id="botao-pdf">Baixar a leitura (PDF)</button><span class="nota" id="status-pdf"></span></div>
-    ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="button button--secondary">Ler versão escrita por IA${lerPergunta() ? " (com a sua pergunta)" : ""}</button><span class="nota" id="status-ia"></span></div>` : ""}
     <div id="texto-relatorio" class="stack">${d.cartas.map(blocoCarta).join("")}
       <article class="card result-card"><p class="eyebrow">As três juntas</p><h3>Leitura de conjunto</h3>${d.conjunto.map((t) => `<p class="secondary">${esc(t)}</p>`).join("")}</article></div>`;
   res.hidden = false;
   focar($("#titulo-resultado"));
   if (window.padTrack) padTrack("completo_aberto", { produto: "tarot", sistema: "ocidental" });
   $("#botao-pdf").addEventListener("click", baixarPDF);
-  if (iaDisponivel) $("#botao-ia").addEventListener("click", pedirIA);
 }
 async function baixarPDF() {
   const botao = $("#botao-pdf"), status = $("#status-pdf");
@@ -208,17 +203,6 @@ async function baixarPDF() {
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
   } catch (e) { status.textContent = e.message; } finally { botao.disabled = false; }
 }
-async function pedirIA() {
-  const botao = $("#botao-ia"), status = $("#status-ia");
-  botao.disabled = true; status.textContent = "Escrevendo… leva uns 20 segundos.";
-  try {
-    const c = await pedir("/api/ocidental/tarot", { ...ultimoPedido, nivel: "completo", texto_ia: true, pergunta: lerPergunta() });
-    const t = $("#texto-relatorio"); t.className = "article";
-    t.innerHTML = c.texto_ia.split(/\n{2,}/).map((b) => b.startsWith("## ") ? `<h2>${esc(b.slice(3))}</h2>` : `<p>${esc(b)}</p>`).join("");
-    botao.remove(); status.textContent = "Versão escrita por IA a partir das suas cartas.";
-  } catch (e) { status.textContent = e.message; botao.disabled = false; }
-}
-
 // /tarot?t=<tiragem>            → a mesma amostra (recarregar a página não troca as cartas)
 // /tarot?t=<tiragem>&token=oc-… → a leitura completa (link do e-mail)
 (function abrirPorLink() {
@@ -236,7 +220,7 @@ async function pedirIA() {
   const res = $("#resultado");
   res.hidden = false; res.innerHTML = '<div class="card loading" aria-busy="true"><span class="spinner" aria-hidden="true"></span><p role="status">Abrindo a sua tiragem…</p></div>';
   const nivel = token ? "completo" : "amostra";
-  config.then(() => pedir("/api/ocidental/tarot", { ...ultimoPedido, nivel })).then(token ? desenharCompleto : desenharAmostra).catch((e) => {
+  pedir("/api/ocidental/tarot", { ...ultimoPedido, nivel }).then(token ? desenharCompleto : desenharAmostra).catch((e) => {
     res.innerHTML = token
       ? `<p class="notice notice--error" role="alert">Não foi possível abrir a leitura completa: ${esc(e.message)} Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a> ou fale com a gente.</p>`
       : `<p class="notice notice--error" role="alert">Esta tiragem não é válida. Tire as cartas de novo.</p>`;

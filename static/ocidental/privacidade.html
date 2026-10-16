@@ -44,7 +44,7 @@
       </ol>
     </nav>
     <article class="legal-texto">
-  <p class="legal-data">Última atualização: {{ "10 de outubro de 2026" if stripe else "5 de outubro de 2026" }}. Controlador dos dados: <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Encarregado de dados (LGPD): <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
+  <p class="legal-data">Última atualização: 16 de outubro de 2026. Controlador dos dados: <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Encarregado de dados (LGPD): <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
 
   <div class="legal-resumo">
     <p><strong>Em resumo</strong></p>
@@ -63,7 +63,7 @@
   <ul>
     <li><strong>Dados de nascimento</strong> que você informa para gerar as leituras: data, hora e cidade de nascimento, e o seu nome. No produto de casal, também os da outra pessoa.</li>
     <li><strong>Numerologia</strong>: o nome completo de registro e a data de nascimento que você informa.</li>
-    <li><strong>Tarot</strong>: as cartas sorteadas (elas ficam codificadas no próprio link da tiragem). A <strong>pergunta</strong> opcional (até 140 caracteres) fica guardada só no seu navegador e só é enviada ao servidor quando você pede o texto escrito por IA da leitura completa — usada nesse momento e não armazenada por nós.</li>
+    <li><strong>Tarot</strong>: as cartas sorteadas (elas ficam codificadas no próprio link da tiragem). A <strong>pergunta</strong> opcional (até 140 caracteres) fica guardada só no seu navegador e não é enviada para nós.</li>
     {%- if stripe %}
     <li><strong>Dados da compra</strong>: quando você clica em comprar, guardamos o pedido — o e-mail, os dados daquela leitura, o produto, o valor e a origem da venda (indicação de afiliado ou campanha) — antes do pagamento; se o pagamento não for concluído, o pedido é apagado em 7 dias. Da Stripe, que processa o pagamento, recebemos a confirmação, o valor e a forma de pagamento. <strong>Os dados do cartão são digitados no formulário da Stripe, dentro da nossa página, e vão direto para ela: não passam pelo nosso servidor.</strong> Para a Stripe enviamos só o seu e-mail, o produto, o preço e um número de pedido — nunca os seus dados de nascimento. Não recebemos nem guardamos CPF (no Pix, quem pede é a Stripe ou a Ebanx) nem dados de cartão.</li>
     {%- else %}
@@ -101,7 +101,6 @@
     {%- endif %}
     <li><strong>Render</strong> — hospedagem do site.</li>
     <li><strong>Supabase</strong> — banco de dados (pedidos e lista de espera).</li>
-    <li><strong>Anthropic</strong> — geração do texto do relatório por inteligência artificial, quando você pede. Enviamos apenas o conteúdo da leitura (o mapa, os números ou as cartas); na sinastria, também os nomes que você digitou, para o texto falar de vocês dois; no tarot, a sua pergunta, se houver. <strong>Nunca e-mail, telefone ou dados de pagamento.</strong></li>
     <li><strong>Provedor de e-mail</strong> — envio do relatório e dos avisos.</li>
     <li><strong>PostHog</strong> — estatísticas de uso do site, só com o seu consentimento (seção 6).</li>
     <li><strong>Meta, TikTok e Google</strong> — medição de visitas e de anúncios (Pixel da Meta, Pixel do TikTok, Google Analytics e Google Ads), só com o seu consentimento (seção 6). Recebem eventos como “página de produto vista” ou “amostra pedida”, sem dados de nascimento, nome, e-mail ou a pergunta do tarot.</li>
@@ -121,7 +120,7 @@
     <li><strong>Dados de compra</strong>: pelo prazo exigido pela legislação fiscal e de defesa do consumidor (em geral, 5 anos).</li>
     <li><strong>Lista de espera</strong>: até você pedir para sair ou até 24 meses sem nenhuma interação.</li>
     <li><strong>Amostra grátis, e-mails sobre a leitura e recuperação de carrinho</strong> (o e-mail e os dados daquela leitura): até você se descadastrar ou até 24 meses sem nenhuma interação. Uma rotina diária apaga o que passou do prazo.</li>
-    <li><strong>Pergunta do tarot</strong>: não é guardada por nós (nem na amostra por e-mail); o texto por IA gerado com ela também não é guardado.</li>
+    <li><strong>Pergunta do tarot</strong>: não é enviada nem guardada por nós (nem na amostra por e-mail).</li>
   </ul>
 
   <h2 id="s8">8. Segurança</h2>

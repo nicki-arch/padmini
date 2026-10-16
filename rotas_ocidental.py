@@ -9,8 +9,10 @@ pelo PADMINI_SISTEMA ou pelo token do link. Aqui as rotas têm o nome da versão
 de propósito: a resposta depende da página que pediu, nunca da versão no ar —
 uma aba aberta antes da troca de PADMINI_SISTEMA continua funcionando.
 
-Mesmas regras da védica: completo só com token (402 sem), IA só no completo e
-em cache no banco, limite de requisições por IP.
+Mesmas regras da védica: completo só com token (402 sem), limite de requisições
+por IP. Sem texto por IA (rodada 16, decisão do Nicolas de 16/out): o texto vem só
+da base escrita por nós; pedido com `texto_ia: true` (link ou aba antiga) recebe 422
+com a explicação, em vez de ser aceito em silêncio.
 """
 
 import logging
@@ -133,6 +135,17 @@ def tela_tarot(rel: dict) -> dict:
             "parcial": True}
 
 
+# Rodada 16: o "texto por IA" saiu da ocidental. O campo continua no pedido só para
+# recusar com mensagem clara quem ainda o manda (aba aberta antes do deploy, script).
+SEM_IA = ("A versão escrita por IA não existe mais: a leitura usa só os textos da nossa base. "
+          "Envie o pedido sem texto_ia.")
+
+
+def recusar_texto_ia(p) -> None:
+    if getattr(p, "texto_ia", False):
+        raise HTTPException(422, SEM_IA)
+
+
 class PedidoMapaOcidental(ComEmail):
     nome: str = Field("", max_length=80)
     data: date
@@ -180,25 +193,10 @@ def _pontos(mapa: dict) -> list[dict]:
     return lista
 
 
-def _texto_ia(p: PedidoMapaOcidental, chave: str, secoes: dict, request: Request) -> str:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
-    from montar_texto import gerar_com_claude  # o mesmo cliente da védica
-    chave_cache = f"{VERSAO}|{chave}"  # não se mistura com o cache da védica
-    texto = db.texto_ia(chave_cache)
-    if texto is None:
-        limites.exigir(limites.TEXTO_IA, request)
-        texto = gerar_com_claude(mt.montar_prompt(secoes))
-        db.guardar_texto_ia(chave_cache, f"{VERSAO}:mapa", texto,
-                            os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
-    return texto
-
-
 @rotas.post("/api/ocidental/mapa")
 def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
     limites.exigir(limites.CALCULO, request)
-    if p.texto_ia and p.nivel != "completo":
-        raise HTTPException(402, "O texto por IA faz parte do mapa completo.")
+    recusar_texto_ia(p)
     if p.nivel == "amostra" and len(p.nome.strip()) < 2:
         # rodada 9: nome sempre obrigatório no formulário do mapa (o completo com
         # token e o /live continuam aceitando sem nome: links já entregues)
@@ -248,14 +246,14 @@ def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
         "regente_ascendente": mapa["regente_ascendente"],
         "amostra": mt.montar_amostra(mapa),
         "secoes": secoes,
-        "texto_ia": _texto_ia(p, chave, secoes, request) if p.texto_ia else None,
     }
 
 
 @rotas.post("/api/ocidental/pdf")
 def pdf_ocidental(p: PedidoMapaOcidental, request: Request):
-    """Mapa natal completo em PDF. Sem IA (sem custo por download). Requer pagamento."""
+    """Mapa natal completo em PDF. Requer pagamento."""
     limites.exigir(limites.PDF, request)
+    recusar_texto_ia(p)
     if not acesso.completo_liberado("mapa", chave_do_pedido(p), p.token, VERSAO):
         raise HTTPException(402, "O PDF completo requer pagamento.")
     mapa, _ = calcular(p)
@@ -310,8 +308,7 @@ def tela_previsao(a: dict) -> dict:
 def previsao_ocidental(p: PedidoPrevisao, request: Request):
     import montar_previsao as mp
     limites.exigir(limites.CALCULO, request)
-    if p.texto_ia:
-        raise HTTPException(422, "O seu ano não tem versão por IA: o texto vem do banco revisado.")
+    recusar_texto_ia(p)
     if p.nivel == "amostra":
         if len(p.nome.strip()) < 2:
             raise HTTPException(422, "Preencha o seu nome.")
@@ -395,8 +392,7 @@ def sinastria_ocidental(p: PedidoSinastria, request: Request):
     as 8 dimensões, aspectos cruzados e casas — com token."""
     import sinastria as si
     limites.exigir(limites.CALCULO, request)
-    if p.texto_ia and p.nivel != "completo":
-        raise HTTPException(402, "O texto por IA faz parte do relatório completo.")
+    recusar_texto_ia(p)
     email = exigir_email(p) if p.nivel == "amostra" else None
     (ma, aviso_a), (mb, aviso_b) = _calcular_pessoa(p.a), _calcular_pessoa(p.b)
     chave = None
@@ -408,29 +404,17 @@ def sinastria_ocidental(p: PedidoSinastria, request: Request):
     rel = mt.montar_sinastria(si.calcular_sinastria(ma, mb), ma, mb, nome_a, nome_b, p.nivel)
     if p.nivel == "amostra":
         cab = {"nivel": "amostra", "sistema": VERSAO, "nomes": {"a": nome_a, "b": nome_b}, "maximo": 100,
-               "avisos_horario": {"a": aviso_a, "b": aviso_b}, "texto_ia": None}
+               "avisos_horario": {"a": aviso_a, "b": aviso_b}}
         dados = {"a": _pessoa_para_dados(p.a), "b": _pessoa_para_dados(p.b)}
         return entregar_amostra(request, p, email, "compat", dados, dados["a"]["nome"],
                                 {**cab, **tela_sinastria(rel)}, {**cab, **rel})
 
-    texto_ia = None
-    if p.texto_ia:
-        if not os.environ.get("ANTHROPIC_API_KEY"):
-            raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
-        from montar_texto import gerar_com_claude
-        chave_cache = f"{VERSAO}|{chave}"
-        texto_ia = db.texto_ia(chave_cache)
-        if texto_ia is None:
-            limites.exigir(limites.TEXTO_IA, request)
-            texto_ia = gerar_com_claude(mt.montar_prompt_sinastria(rel, nome_a, nome_b))
-            db.guardar_texto_ia(chave_cache, f"{VERSAO}:compat", texto_ia,
-                                os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
     if p.nivel == "completo":
         # a rosa das oito dimensões, desenhada no servidor (o mesmo SVG da home)
         import exemplos_ocidental as ex
         rel["rosa"] = ex.rosa_svg({d["chave"]: d["nota"] for d in rel["dimensoes"]}, rel["ponto_forte"]["chave"])
     return {"nivel": p.nivel, "sistema": VERSAO, "nomes": {"a": nome_a, "b": nome_b},
-            "maximo": 100, **rel, "avisos_horario": {"a": aviso_a, "b": aviso_b}, "texto_ia": texto_ia}
+            "maximo": 100, **rel, "avisos_horario": {"a": aviso_a, "b": aviso_b}}
 
 
 @rotas.post("/api/live/ocidental/token/sinastria")
@@ -472,8 +456,7 @@ def chave_da_numerologia(p: PedidoNumerologia) -> str:
 @rotas.post("/api/ocidental/numerologia")
 def numerologia_ocidental(p: PedidoNumerologia, request: Request):
     limites.exigir(limites.CALCULO, request)
-    if p.texto_ia and p.nivel != "completo":
-        raise HTTPException(402, "O texto por IA faz parte da numerologia completa.")
+    recusar_texto_ia(p)
     email = exigir_email(p) if p.nivel == "amostra" else None
     res = _calcular_numerologia(p)
     base_resp = {"nivel": p.nivel, "sistema": VERSAO, "nome": p.nome.strip(), "data": p.data.isoformat()}
@@ -485,25 +468,13 @@ def numerologia_ocidental(p: PedidoNumerologia, request: Request):
     chave = chave_da_numerologia(p)
     if not acesso.completo_liberado("numerologia", chave, p.token, VERSAO):
         raise HTTPException(402, "A numerologia completa requer pagamento.")
-    rel = mt.montar_numerologia(res, "completo")
-    texto_ia = None
-    if p.texto_ia:
-        if not os.environ.get("ANTHROPIC_API_KEY"):
-            raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
-        from montar_texto import gerar_com_claude
-        chave_cache = f"{VERSAO}|{chave}|{res['ano_corrente']}"  # o Ano Pessoal muda todo ano
-        texto_ia = db.texto_ia(chave_cache)
-        if texto_ia is None:
-            limites.exigir(limites.TEXTO_IA, request)
-            texto_ia = gerar_com_claude(mt.montar_prompt_numerologia(rel))
-            db.guardar_texto_ia(chave_cache, f"{VERSAO}:numerologia", texto_ia,
-                                os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
-    return {**base_resp, **rel, "texto_ia": texto_ia}
+    return {**base_resp, **mt.montar_numerologia(res, "completo")}
 
 
 @rotas.post("/api/ocidental/numerologia/pdf")
 def numerologia_pdf(p: PedidoNumerologia, request: Request):
     limites.exigir(limites.PDF, request)
+    recusar_texto_ia(p)
     if not acesso.completo_liberado("numerologia", chave_da_numerologia(p), p.token, VERSAO):
         raise HTTPException(402, "O PDF completo requer pagamento.")
     from gerar_pdf_ocidental import gerar_pdf_numerologia
@@ -533,9 +504,8 @@ def live_token_numerologia(p: PedidoNumerologia, request: Request):
 # cartas com selo do servidor; o link pago assina esse ID, então o completo
 # mostra exatamente as cartas da amostra.
 #
-# A PERGUNTA (opcional, até 140 caracteres) só entra no prompt da IA do
-# completo: não vai para o banco, nem para o log, nem para o cache — texto
-# com pergunta é gerado na hora e não é guardado.
+# A PERGUNTA (opcional, até 140 caracteres) fica só no navegador: o servidor
+# ainda aceita o campo (abas antigas), mas não o usa nem o guarda.
 # --------------------------------------------------------------------------
 class PedidoTarot(ComEmail):
     tiragem: str = Field(..., min_length=10, max_length=40)
@@ -584,8 +554,7 @@ def tarot_tirar(request: Request, corpo: dict = Body(default={})):
 @rotas.post("/api/ocidental/tarot")
 def tarot_ocidental(p: PedidoTarot, request: Request):
     limites.exigir(limites.CALCULO, request)
-    if p.texto_ia and p.nivel != "completo":
-        raise HTTPException(402, "O texto por IA faz parte da leitura completa.")
+    recusar_texto_ia(p)
     email = exigir_email(p) if p.nivel == "amostra" else None
     cartas = _cartas(p)
     base_resp = {"nivel": p.nivel, "sistema": VERSAO, "tiragem": p.tiragem}
@@ -596,30 +565,13 @@ def tarot_ocidental(p: PedidoTarot, request: Request):
     chave = acesso.chave_tarot(p.tiragem)
     if not acesso.completo_liberado("tarot", chave, p.token, VERSAO):
         raise HTTPException(402, "A leitura completa requer pagamento.")
-    rel = mt.montar_tarot(cartas, "completo")
-    texto_ia = None
-    if p.texto_ia:
-        if not os.environ.get("ANTHROPIC_API_KEY"):
-            raise HTTPException(503, "Texto por IA não está configurado neste servidor.")
-        from montar_texto import gerar_com_claude
-        pergunta = " ".join(p.pergunta.split())
-        if pergunta:  # não vai para o cache: a pergunta não é guardada
-            limites.exigir(limites.TEXTO_IA, request)
-            texto_ia = gerar_com_claude(mt.montar_prompt_tarot(rel, pergunta))
-        else:
-            chave_cache = f"{VERSAO}|{chave}"
-            texto_ia = db.texto_ia(chave_cache)
-            if texto_ia is None:
-                limites.exigir(limites.TEXTO_IA, request)
-                texto_ia = gerar_com_claude(mt.montar_prompt_tarot(rel))
-                db.guardar_texto_ia(chave_cache, f"{VERSAO}:tarot", texto_ia,
-                                    os.environ.get("PADMINI_MODELO", "claude-sonnet-5"))
-    return {**base_resp, **rel, "texto_ia": texto_ia}
+    return {**base_resp, **mt.montar_tarot(cartas, "completo")}
 
 
 @rotas.post("/api/ocidental/tarot/pdf")
 def tarot_pdf(p: PedidoTarot, request: Request):
     limites.exigir(limites.PDF, request)
+    recusar_texto_ia(p)
     if not acesso.completo_liberado("tarot", acesso.chave_tarot(p.tiragem), p.token, VERSAO):
         raise HTTPException(402, "O PDF completo requer pagamento.")
     from gerar_pdf_ocidental import gerar_pdf_tarot

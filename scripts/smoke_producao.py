@@ -186,6 +186,16 @@ def _():
                {"a": PESSOA, "b": PESSOA_B, "nivel": "amostra", "texto_ia": True})[0] == 402
 
 
+@checar("ocidental sem texto por IA: texto_ia=true recusado (422) e fora do /api/config")
+def _():
+    # rodada 16: a rota é da ocidental qualquer que seja a versão no ar (links antigos)
+    recusa = req("/api/ocidental/mapa", {**PESSOA, "nivel": "completo", "texto_ia": True})[0] == 422
+    if _versao_no_ar() != "ocidental":
+        return recusa
+    st, corpo = req("/api/config")
+    return recusa and st == 200 and "texto_ia_disponivel" not in json.loads(corpo)
+
+
 @checar("cabeçalhos de segurança presentes (CSP, HSTS, anti-iframe, Referrer-Policy)")
 def _():
     with urllib.request.urlopen(BASE + "/", timeout=60) as r:

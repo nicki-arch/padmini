@@ -53,7 +53,7 @@ def test_privacidade_ocidental_mantem_as_bases_legais_e_fala_da_pergunta(versao)
     html = cliente.get("/privacidade").text
     for base in ("art. 7º, V", "art. 7º, I", "art. 7º, II", "art. 7º, IX", "art. 33", "art. 18"):
         assert base in html
-    assert "140 caracteres" in html and "não armazenada" in html
+    assert "140 caracteres" in html and "não é enviada para nós" in html  # rodada 16: sem texto por IA
 
 
 def test_cada_pagina_ocidental_tem_a_sua_og_image(versao, url_da_pagina):

@@ -154,9 +154,10 @@ def test_completo_trancado_e_token_de_outra_versao_nao_abre():
     assert len(c["dimensoes"]) == 8 and c["aspectos"] and c["casas"]
 
 
-def test_ia_nao_sai_na_amostra():
-    r = cliente.post("/api/ocidental/sinastria", json={"a": PESSOA, "b": PESSOA_B, "texto_ia": True})
-    assert r.status_code == 402
+def test_texto_ia_e_recusado_com_422():
+    for nivel in ("amostra", "completo"):
+        r = cliente.post("/api/ocidental/sinastria", json={"a": PESSOA, "b": PESSOA_B, "nivel": nivel, "texto_ia": True})
+        assert r.status_code == 422 and "IA não existe mais" in r.json()["detail"]
 
 
 def test_sem_hora_de_um_funciona_e_avisa():

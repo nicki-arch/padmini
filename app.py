@@ -837,9 +837,12 @@ def saude():
 
 @app.get("/api/config")
 def config():
+    # Rodada 16: a ocidental não tem mais texto por IA, então a chave nem aparece com ela
+    # no ar. A védica continua igual (as páginas dela leem `texto_ia_disponivel`).
+    ia = {} if sistema.ativo() == "ocidental" else {"texto_ia_disponivel": bool(os.environ.get("ANTHROPIC_API_KEY"))}
     return {
         "sistema": sistema.ativo(),
-        "texto_ia_disponivel": bool(os.environ.get("ANTHROPIC_API_KEY")),
+        **ia,
         # Métricas de funil (PostHog). Em branco = desligado (nada é carregado).
         "posthog_key": os.environ.get("PADMINI_POSTHOG_KEY", ""),
         "posthog_host": os.environ.get("PADMINI_POSTHOG_HOST", "https://us.i.posthog.com"),

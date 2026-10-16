@@ -253,7 +253,7 @@ $("#form-mapa").addEventListener("submit", async (e) => {
   const base = { nome: $("#m-nome").value.trim(), data, hora, lat: cidadeM.escolhida.lat, lon: cidadeM.escolhida.lon, cidade: cidadeM.escolhida.rotulo };
   try {
     const t = await pedir("/api/live/ocidental/token/mapa", base);
-    const r = await pedir("/api/ocidental/mapa", { ...base, nivel: "completo", token: t.token, texto_ia: false });
+    const r = await pedir("/api/ocidental/mapa", { ...base, nivel: "completo", token: t.token });
     desenharMapa(r);
   } catch (err) { erro("#erro-mapa", err.message); }
   finally { botao.disabled = false; botao.textContent = "Gerar leitura"; }
@@ -304,7 +304,7 @@ $("#form-casal").addEventListener("submit", async (e) => {
   const botao = $("#gerar-casal"); botao.disabled = true; botao.textContent = "Gerando…";
   try {
     const t = await pedir("/api/live/ocidental/token/sinastria", corpo);
-    const r = await pedir("/api/ocidental/sinastria", { ...corpo, nivel: "completo", token: t.token, texto_ia: false });
+    const r = await pedir("/api/ocidental/sinastria", { ...corpo, nivel: "completo", token: t.token });
     desenharCasal(r);
   } catch (err) { erro("#erro-casal", err.message); }
   finally { botao.disabled = false; botao.textContent = "Gerar sinastria"; }

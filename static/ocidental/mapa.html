@@ -403,7 +403,6 @@ function desenharResultado(d) {
       <article class="leitura-texto">
         ${ativos.map((x, i) => secaoDimensao(x, i, ativos)).join("")}
         <div id="relatorio" class="bloco">
-          ${iaDisponivel ? `<div class="ia-barra"><button type="button" id="botao-ia" class="bt bt-2 bt-p">Ler versão escrita por IA</button><span class="miudo" id="status-ia"></span></div>` : ""}
           <div id="texto-relatorio"><h2 class="t3" style="margin-top:12px">O resto do seu mapa</h2>${resto}</div>
         </div>
         {%- if catalogo.ativo("previsao") %}
@@ -428,7 +427,6 @@ function desenharResultado(d) {
   if (window.padFeedback) padFeedback("#feedback-mapa", "mapa");
   focar($("#titulo-resultado"));
   $("#botao-pdf").addEventListener("click", baixarPDF);
-  if (iaDisponivel) $("#botao-ia").addEventListener("click", pedirTextoIA);
 }
 
 async function baixarPDF() {
@@ -445,23 +443,6 @@ async function baixarPDF() {
     status.textContent = original;
   } catch (err) { status.textContent = err.message; }
   finally { botao.disabled = false; botao.textContent = "Baixar PDF"; }
-}
-
-let iaDisponivel = false;
-fetch("/api/config").then((r) => r.json()).then((c) => { iaDisponivel = c.texto_ia_disponivel; }).catch(() => {});
-function markdownSimples(md) {
-  return md.split(/\n{2,}/).map((b) => { const t = b.trim(); if (!t) return ""; if (t === "---") return "<hr>";
-    if (t.startsWith("## ")) return `<h2>${esc(t.slice(3))}</h2>`; if (t.startsWith("# ")) return "";
-    return `<p>${esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>")}</p>`; }).join("");
-}
-async function pedirTextoIA() {
-  const botao = $("#botao-ia"), status = $("#status-ia");
-  botao.disabled = true; status.textContent = "Escrevendo… leva uns 20 segundos.";
-  try {
-    const c = await pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "completo", texto_ia: true });
-    $("#texto-relatorio").innerHTML = markdownSimples(c.texto_ia);
-    botao.remove(); status.textContent = "Versão escrita por IA a partir dos dados do seu mapa.";
-  } catch (err) { status.textContent = err.message; botao.disabled = false; }
 }
 
 // ---------- entrega do completo por link (pós-pagamento) ----------

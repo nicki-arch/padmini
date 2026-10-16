@@ -316,7 +316,7 @@ $("#form").addEventListener("submit", async (e) => {
     const r = await fetch("/api/ocidental/sinastria", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ a: a.pessoa, b: b.pessoa, ...contato, nivel: "amostra", texto_ia: false }),
+      body: JSON.stringify({ a: a.pessoa, b: b.pessoa, ...contato, nivel: "amostra" }),
     });
     const corpo = await r.json();
     if (!r.ok) throw new Error(typeof corpo.detail === "string" ? corpo.detail : "Confira os dados informados.");
@@ -424,7 +424,7 @@ function desenharAmostra(d) {
   res.hidden = false;
   padEmail.ligar(async () => {
     const r = await fetch("/api/ocidental/sinastria", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...ultimoCasal, ...ultimoContato, nivel: "amostra", texto_ia: false }) });
+      body: JSON.stringify({ ...ultimoCasal, ...ultimoContato, nivel: "amostra" }) });
     const c = await r.json();
     if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Não conseguimos reenviar agora.");
     return c;
@@ -486,7 +486,7 @@ function desenharCompleto(d) {
   res.innerHTML = '<div class="card loading" aria-busy="true"><span class="spinner" aria-hidden="true"></span><p role="status">Abrindo a sinastria completa…</p></div>';
   fetch("/api/ocidental/sinastria", {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ a: A, b: B, nivel: "completo", texto_ia: false, token }),
+    body: JSON.stringify({ a: A, b: B, nivel: "completo", token }),
   }).then(async (r) => {
     const c = await r.json();
     if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Link inválido.");
