@@ -131,7 +131,8 @@ A validação de compatibilidade contra o Prokerala (`validacao-compatibilidade.
 - **Código:** GNU Affero General Public License v3.0 (AGPL-3.0), texto completo em
   [`LICENSE`](LICENSE). O site usa o [Swiss Ephemeris](https://www.astro.com/swisseph/)
   (Astrodienst, via `pyswisseph`) sob a AGPL; por isso o código-fonte do site é
-  publicado (link "Código-fonte" no rodapé), em vez de comprar a licença profissional.
+  publicado (na versão ocidental, seção "Software livre" dos Termos, desde a rodada 18;
+  na védica, link "Código-fonte" no rodapé), em vez de comprar a licença profissional.
 - **Conteúdo editorial: todos os direitos reservados, fora da AGPL.** Os textos de
   interpretação (que não ficam neste repositório: moram no repositório privado
   `padmini-conteudo` e entram só na hora do build), a copy das páginas, as ilustrações

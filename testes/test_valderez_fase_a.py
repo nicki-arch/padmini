@@ -214,8 +214,8 @@ def test_cabecalho_e_rodape_da_valderez(rota, ocidental, url_da_pagina):
     assert 'href="#conteudo"' in html and 'id="conteudo"' in html
     assert 'href="/static/valderez/favicon.svg"' in html
     rodape = html[html.index('<footer class="rod"'):]
-    for destino in ("/privacidade", "/termos", "mailto:", "/minhas-leituras", "github.com/nicki-arch/padmini",
-                    'id="preferencias-cookies"'):
+    # rodada 18: o "Código-fonte" saiu do rodapé para os Termos (test_rodada18)
+    for destino in ("/privacidade", "/termos", "mailto:", "/minhas-leituras", 'id="preferencias-cookies"'):
         assert destino in rodape, (rota, destino)
 
 

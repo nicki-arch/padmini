@@ -221,3 +221,47 @@ def test_icones_das_redes_no_traco_do_pacote():
     for nome in ("instagram", "tiktok", "youtube"):
         svg = icones.svg(nome)
         assert 'stroke="currentColor"' in svg and 'stroke-width="1.4"' in svg and 'fill="none"' in svg
+
+
+# ================================================================== Fase 3 — rodapé e Termos
+CODIGO = "github.com/nicki-arch/padmini"
+
+
+@pytest.mark.parametrize("rota", ["/", "/mapa", "/termos", "/privacidade", "/minhas-leituras", "/leituras"])
+def test_rodape_sem_codigo_fonte(ocidental, rota):
+    rod = _rodape(cliente.get(rota, headers=HTML).text)
+    assert CODIGO not in rod and "Código-fonte" not in rod, rota
+
+
+def test_termos_tem_a_secao_de_software_livre(ocidental):
+    html = cliente.get("/termos", headers=HTML).text
+    corpo = html[:html.index('<footer class="rod">')]
+    assert '<h2 id="s13">13. Software livre</h2>' in corpo and 'href="#s13"' in corpo
+    assert ("Os cálculos usam o Swiss Ephemeris, sob a licença AGPL-3.0. O código-fonte deste site está em "
+            f'<a href="https://{CODIGO}" rel="noopener">{CODIGO}</a>.') in corpo
+    assert "Última atualização: 17 de outubro de 2026." in corpo
+
+
+def test_termos_com_a_cakto_tambem_tem_software_livre(ocidental, monkeypatch):
+    monkeypatch.setenv("PADMINI_PAGAMENTO", "cakto")
+    html = cliente.get("/termos", headers=HTML).text
+    assert '<h2 id="s13">13. Software livre</h2>' in html and "17 de outubro de 2026" in html
+
+
+@pytest.mark.parametrize("aberta", [True, False])
+def test_lista_de_espera_no_rodape_so_com_a_venda_fechada(ocidental, aberta):
+    import catalogo
+    dados = dict(catalogo.dados(), vendas_abertas=aberta)
+    catalogo.usar(dados)
+    app_mod._paginas_prontas.clear()
+    rod = _rodape(cliente.get("/mapa", headers=HTML).text)
+    assert ('<a href="/lista">Lista de espera</a>' in rod) is (not aberta)
+
+
+def test_vedica_nao_muda(monkeypatch):
+    """As páginas antigas da védica ficam como estão (a foto inteira é o test_sistema)."""
+    monkeypatch.setenv("PADMINI_SISTEMA", "vedica")
+    app_mod._paginas_prontas.clear()
+    html = cliente.get("/", headers=HTML).text
+    assert "astrologiavalderez" not in html
+    app_mod._paginas_prontas.clear()
