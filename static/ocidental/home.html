@@ -113,6 +113,10 @@
       <h2>{{ t.quem.nome }}</h2>
       <p class="citacao">{{ revisao("quem_revisa") }}</p>
       <p class="sobre">{{ t.quem.sobre }}</p>
+      {#- rodada 18: as redes dela (marca.yaml → redes), links simples, sem embed #}
+      <p class="quem-redes"><span class="quem-redes-t">Acompanhe a Dona Valderez</span>
+        {%- for r in redes %} <a href="{{ r.url }}" rel="noopener">{{ icone(r.icone, 20) }}<span>{{ r.nome }}</span></a>{% endfor %}
+      </p>
     </div>
   </section>
 

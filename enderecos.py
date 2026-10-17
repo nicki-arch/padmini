@@ -22,6 +22,8 @@ from urllib.parse import urlparse
 
 import yaml
 
+import icones
+
 _MARCA = yaml.safe_load((Path(__file__).parent / "conteudo" / "ocidental" / "marca.yaml")
                         .read_text(encoding="utf-8")) or {}
 
@@ -30,6 +32,11 @@ SITE_URL = (os.environ.get("PADMINI_SITE_URL") or _MARCA["site"]).strip().rstrip
 SITE_HOST = urlparse(SITE_URL).netloc or SITE_URL
 CONTATO = str(_MARCA["contato"]).strip()
 REDES: list[dict] = [dict(r) for r in _MARCA.get("redes") or []]
+# rede com ícone que não existe ou endereço sem https quebra na subida, não na página no ar
+for _r in REDES:
+    if _r.get("icone") not in icones.NOMES or not str(_r.get("url", "")).startswith("https://") or not _r.get("nome"):
+        raise ValueError(f"marca.yaml → redes: {_r!r} precisa de nome, url https:// e um ícone de "
+                         f"static/valderez/icones/ ({', '.join(icones.NOMES)})")
 
 # Domínios antigos que passam a só redirecionar (o registro continua: é ele que
 # segura os links antigos e o webhook).

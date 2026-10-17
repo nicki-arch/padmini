@@ -165,3 +165,59 @@ def test_smoke_no_dominio_novo_confere_301_com_caminho_e_query(monkeypatch):
     monkeypatch.setattr(smoke, "_sem_seguir", lambda url, corpo=None, timeout=90: (301, f"https://{NOVO}/"))
     assert not _checagem(smoke, "o antigo redireciona")()
     assert not _checagem(smoke, "/webhook/* no domínio antigo")()
+
+
+# ================================================================== Fase 2 — redes
+REDES = {"Instagram": "https://www.instagram.com/astrologiavalderez/",
+         "TikTok": "https://www.tiktok.com/@astrologiavalderez",
+         "YouTube": "https://www.youtube.com/@astrologiavalderez"}
+
+
+def test_redes_no_marca_yaml():
+    assert {r["nome"]: r["url"] for r in enderecos.REDES} == REDES
+    assert {r["arroba"] for r in enderecos.REDES} == {"@astrologiavalderez"}
+
+
+def _rodape(html):
+    return html[html.index('<footer class="rod">'):]
+
+
+@pytest.mark.parametrize("rota", ["/", "/mapa", "/compatibilidade", "/termos", "/minhas-leituras"])
+def test_redes_no_rodape(ocidental, rota):
+    rod = _rodape(cliente.get(rota, headers=HTML).text)
+    for nome, url in REDES.items():
+        assert f'<a href="{url}" rel="noopener" aria-label="{nome} da Dona Valderez"><svg class="icone"' in rod, (rota, nome)
+    assert 'target="_blank"' not in rod  # mesma aba (no celular, abre o app)
+
+
+def test_redes_no_quem_revisa_da_home(ocidental):
+    html = cliente.get("/", headers=HTML).text
+    quem = html[html.index('id="quem-revisa"'):]
+    quem = quem[:quem.index("</section>")]
+    assert "Acompanhe a Dona Valderez" in quem
+    for nome, url in REDES.items():
+        assert f'<a href="{url}" rel="noopener">' in quem and f"<span>{nome}</span>" in quem
+
+
+def test_redes_sem_embed_nem_script_de_terceiros(ocidental):
+    html = cliente.get("/", headers=HTML).text
+    for dominio in ("instagram.com", "tiktok.com", "youtube.com"):
+        for tag in re.findall(r"<(?:script|iframe|img|link|embed|object)\b[^>]*>", html):
+            assert dominio not in tag, tag
+    csp = cliente.get("/", headers=HTML).headers["content-security-policy"]
+    assert "instagram" not in csp and "youtube" not in csp
+
+
+def test_json_ld_same_as(ocidental):
+    import json
+    html = cliente.get("/", headers=HTML).text
+    bloco = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S).group(1)
+    org = next(g for g in json.loads(bloco)["@graph"] if g["@type"] == "Organization")
+    assert org["sameAs"] == list(REDES.values())
+
+
+def test_icones_das_redes_no_traco_do_pacote():
+    import icones
+    for nome in ("instagram", "tiktok", "youtube"):
+        svg = icones.svg(nome)
+        assert 'stroke="currentColor"' in svg and 'stroke-width="1.4"' in svg and 'fill="none"' in svg

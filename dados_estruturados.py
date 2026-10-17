@@ -28,7 +28,9 @@ def home(t: dict) -> str:
     """O bloco da home ocidental, a partir de conteudo/ocidental/home.yaml."""
     return _script({"@context": "https://schema.org", "@graph": [
         {"@type": "Organization", "@id": f"{SITE}/#org", "name": "Valderez Astrologia", "url": f"{SITE}/",
-         "logo": f"{SITE}/static/og-oc-home.png", "description": _texto(t["seo"]["descricao"])},
+         "logo": f"{SITE}/static/og-oc-home.png", "description": _texto(t["seo"]["descricao"]),
+         # os perfis da Dona Valderez (rodada 18): ajuda o buscador a ligar o site às redes
+         "sameAs": [r["url"] for r in enderecos.REDES]},
         {"@type": "WebSite", "@id": f"{SITE}/#site", "name": "Valderez Astrologia", "url": f"{SITE}/",
          "inLanguage": "pt-BR", "publisher": {"@id": f"{SITE}/#org"}},
         {"@type": "FAQPage", "@id": f"{SITE}/#perguntas", "mainEntity": [

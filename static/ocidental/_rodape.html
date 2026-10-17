@@ -11,6 +11,13 @@
     <div class="rod-marca">
       <a class="marca" href="/" aria-label="Valderez Astrologia, início">{{ marca.roda(48, clara=True) }}<span class="marca-nome"><b>Valderez</b><i>Astrologia</i></span></a>
       <p>{{ revisao("rodape") }}</p>
+      {#- redes da Dona Valderez (rodada 18, marca.yaml → redes): link simples, sem embed,
+          sem script de terceiros; abre na mesma aba (no celular, o app da rede) #}
+      <nav class="rod-redes" aria-label="Redes da Dona Valderez">
+        {%- for r in redes %}
+        <a href="{{ r.url }}" rel="noopener" aria-label="{{ r.nome }} da Dona Valderez">{{ icone(r.icone, 22) }}</a>
+        {%- endfor %}
+      </nav>
     </div>
     <div class="rod-cols">
       <nav aria-label="Leituras">
