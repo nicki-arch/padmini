@@ -7,7 +7,9 @@ página mostra. Nada de nota/avaliação (não temos avaliações públicas).
 import json
 import re
 
-SITE = "https://padmini.com.br"
+import enderecos
+
+SITE = enderecos.SITE_URL  # PADMINI_SITE_URL ou o marca.yaml (rodada 18)
 
 
 def _texto(t: str) -> str:

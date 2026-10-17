@@ -16,10 +16,12 @@ import urllib.parse
 import urllib.request
 
 import acesso
+import enderecos
 import paleta
 import sistema as _sistema
 
-SITE_URL = os.environ.get("PADMINI_SITE_URL", "https://padmini.com.br").rstrip("/")
+# Endereço público do site (rodada 18): PADMINI_SITE_URL ou o `site` de conteudo/ocidental/marca.yaml.
+SITE_URL = enderecos.SITE_URL
 
 
 def link_completo(produto: str, dados: dict, sistema: str = "vedica") -> str:

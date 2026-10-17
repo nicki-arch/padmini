@@ -48,6 +48,7 @@ import dados_estruturados
 import db
 import depoimentos
 import entrega
+import enderecos
 import exemplos_ocidental
 import limites
 import marketing
@@ -99,6 +100,10 @@ log.info("Padmini subindo com PADMINI_PAGAMENTO=%s%s", PAGAMENTO_NA_SUBIDA,
          " e VENDA DE TESTE aberta (PADMINI_VENDAS_TESTE=1)" if VENDAS_TESTE_NA_SUBIDA else "")
 
 app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
+# Domínio antigo → principal com 301 (rodada 18, PADMINI_DOMINIO_PRINCIPAL; sem ela, nada
+# muda). Registrado ANTES dos cabeçalhos de segurança: o último registrado roda por fora,
+# então o 301 também sai com HSTS, CSP etc.
+app.middleware("http")(enderecos.redirecionar_dominio_antigo)
 # Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy) em toda resposta.
 app.middleware("http")(seguranca.cabecalhos_de_seguranca)
 
@@ -244,6 +249,12 @@ _jinja.globals["cursos"] = produtos_ocidental.cursos
 # Ícones de traço (rodada 9.1): o YAML diz `icone: sol`; a roda é só a marca (icones.py).
 import icones  # noqa: E402
 _jinja.globals["icone"] = icones.svg
+# Endereço do site, e-mail de contato e redes (rodada 18): fonte única no marca.yaml,
+# lida pelo enderecos.py. Nada de "padmini.com.br" escrito à mão nos templates ocidentais.
+_jinja.globals["site"] = enderecos.SITE_URL
+_jinja.globals["site_host"] = enderecos.SITE_HOST
+_jinja.globals["contato"] = enderecos.CONTATO
+_jinja.globals["redes"] = enderecos.REDES
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:

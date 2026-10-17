@@ -43,9 +43,9 @@
       </ol>
     </nav>
     <article class="legal-texto">
-  <p class="legal-data">Última atualização: {{ "10 de outubro de 2026" if stripe else "30 de setembro de 2026" }}. Serviço operado por <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Atendimento: <strong>contato@pedrosperbmonteiro.com.br</strong>.</p>
+  <p class="legal-data">Última atualização: {{ "10 de outubro de 2026" if stripe else "30 de setembro de 2026" }}. Serviço operado por <strong>Pedro Sperb Monteiro LTDA</strong>, CNPJ <strong>55.428.936/0001-00</strong>, Porto Alegre/RS. Atendimento: <strong>{{ contato }}</strong>.</p>
 
-  <p>Estes termos regulam o uso do site Valderez Astrologia (padmini.com.br) e a compra dos nossos produtos digitais. Ao usar o site ou comprar, você concorda com eles.</p>
+  <p>Estes termos regulam o uso do site Valderez Astrologia ({{ site_host }}) e a compra dos nossos produtos digitais. Ao usar o site ou comprar, você concorda com eles.</p>
 
   <h2 id="s1">1. O que é a Valderez Astrologia</h2>
   <p>A Valderez Astrologia oferece leituras digitais de <strong>astrologia ocidental</strong> (o mapa natal e a sinastria do casal), de <strong>numerologia pitagórica</strong> e de <strong>tarot</strong> (tiragem de 3 cartas), além de combinações desses produtos. O mapa e a sinastria são calculados a partir dos dados de nascimento informados; a numerologia, a partir do nome completo de registro e da data de nascimento; no tarot, as cartas são sorteadas pelo nosso servidor no momento da tiragem. As leituras têm finalidade de <strong>autoconhecimento e entretenimento</strong>.</p>
@@ -63,7 +63,7 @@
   <p>O relatório completo é um conteúdo digital entregue por e-mail, por meio de um link pessoal, após a confirmação do pagamento — em geral em poucos minutos (no Pix, logo após a compensação). Se não receber, verifique a caixa de spam e fale com o atendimento. O link é pessoal e intransferível: não o compartilhe. No tarot, o link abre exatamente as cartas que você tirou antes de comprar.</p>
 
   <h2 id="s6">6. Arrependimento, garantia e reembolso</h2>
-  <p>Você pode desistir da compra em até <strong>7 (sete) dias</strong> a contar da compra, com devolução integral do valor pago, conforme o art. 49 do Código de Defesa do Consumidor. Para pedir, escreva para <strong>contato@pedrosperbmonteiro.com.br</strong> {% if stripe %}ou responda ao e-mail de entrega da leitura.{% else %}ou use o canal de reembolso da Cakto.{% endif %} O estorno segue os prazos da forma de pagamento usada.</p>
+  <p>Você pode desistir da compra em até <strong>7 (sete) dias</strong> a contar da compra, com devolução integral do valor pago, conforme o art. 49 do Código de Defesa do Consumidor. Para pedir, escreva para <strong>{{ contato }}</strong> {% if stripe %}ou responda ao e-mail de entrega da leitura.{% else %}ou use o canal de reembolso da Cakto.{% endif %} O estorno segue os prazos da forma de pagamento usada.</p>
 
   <h2 id="s7">7. Propriedade intelectual</h2>
   <p>A marca, os textos, o design e o software da Valderez Astrologia são protegidos pela legislação de direitos autorais e de propriedade industrial. O relatório comprado é para uso pessoal: não é permitido revendê-lo, copiá-lo em massa ou redistribuí-lo comercialmente. Os cálculos astronômicos usam a biblioteca Swiss Ephemeris, da Astrodienst, sob a licença AGPL.</p>

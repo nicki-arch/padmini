@@ -30,6 +30,10 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 - **Produção:** https://padmini.com.br (Render, serviço `srv-dalfcj3l550s73b38jmg`,
   deploy automático a cada push na `master`). O endereço `padmini.onrender.com`
   continua respondendo e é usado pelo ping diário, que assim não depende de DNS.
+  **Domínio novo (rodada 18):** `https://valderezastrologia.com.br` passa a ser o principal
+  quando a Render tiver `PADMINI_SITE_URL` e `PADMINI_DOMINIO_PRINCIPAL`; aí o
+  `padmini.com.br` só redireciona (301, com caminho e query), menos `/webhook/*` e `/api/*`
+  (o webhook da Stripe continua nele). Operação e ordem em `docs/dominio.md`.
 - **Conteúdo proprietário fora do repositório público (rodada 10, decisão de 6/out/2026).**
   Os textos de interpretação — `base_significacoes.py` (védica), `conteudo/ocidental/textos/`
   e `conteudo/ocidental/blog/` — passam a morar no repositório PRIVADO
@@ -101,6 +105,7 @@ bloqueia (oferta sem link de checkout, texto não revisado, página falando da v
 | `static/valderez/v2.css` + `conteudo/ocidental/mapa.yaml` | **Visual 2.0 (rodada 9, pacote valderez-design-2.0)**: home, `/mapa` (formulário → calculando → amostra por dimensões), `/lista`, 404/500, em breve, `/leituras` (`<body class="vz">`). Tokens `--vz-*` em `paleta.VZ` (pares de contraste em `PARES_VZ`), fontes Fraunces/Figtree/Noto Sans Symbols 2. Marca = a roda (`static/valderez/roda*.svg`, `marca.roda()`); favicons PNG e og:image da home: `python scripts/gerar_marca.py`. A amostra recebe da API só as 1–2 primeiras frases de cada dimensão (`mt.dimensoes_amostra`); o desfocado é enfeite |
 | `conteudo/ocidental/revisao.yaml` + `textos.frase_revisao` | **Regra de honestidade**: frase sobre a revisão da Dona Valderez com `quando_revisado` / `enquanto_isso`; "revisado" só aparece quando todos os textos tiverem `revisado: true` (teste) |
 | `ofertas.py` + `conteudo/<versão>/ofertas.yaml` | **Preço e link de checkout, fonte única.** O app troca os marcadores (`__PRECO_COMPAT__`, `__CHECKOUT_MAPA__`…) no HTML ao servir, e o `cakto.py` tira daí o código da oferta. Mudou o preço? Só o YAML. Preço na tela sempre por `ofertas.moeda` / `{{ x \| moeda }}` (R$96,52, nunca R$96.52); preço com cupom é calculado de `cupom_percentual`; `taxa_plataforma` (topo do YAML) é a taxa da Cakto mostrada ao lado do preço |
+| `enderecos.py` + `conteudo/ocidental/marca.yaml` | **Endereço do site, e-mail de contato e redes, fonte única (rodada 18)**: `SITE_URL` (`PADMINI_SITE_URL` ou o `site` do YAML) para canonical, `og:*`, sitemap, JSON-LD e e-mails; nos templates `{{ site }}`, `{{ site_host }}`, `{{ contato }}`, `{{ redes }}`. Nunca `padmini.com.br` nem o e-mail escrito à mão em `static/ocidental/` (teste). O 301 do domínio antigo (`PADMINI_DOMINIO_PRINCIPAL`, vazio = desligado) também mora aqui. Ver `docs/dominio.md` |
 | `cidades.py` + `data/cidades_index.tsv` | Autocomplete de cidades (GeoNames) |
 | `gerar_pdf.py` | PDF do completo |
 | `static/live.html` + rotas `/live`, `/api/live/*` | Modo live do Pedro: senha (`PADMINI_LIVE_SENHA`) → cookie assinado de 12h → token do completo sem pagamento, com log em `live_geracoes` |

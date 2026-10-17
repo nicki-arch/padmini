@@ -180,7 +180,8 @@ def test_textos_legais_trocam_a_marca_mas_nao_o_responsavel(ocidental, url_da_pa
         html = _pagina(rota, url_da_pagina)
         assert "<title>Valderez Astrologia — " in html and 'class="marca"' in html, rota
         assert "Pedro Sperb Monteiro LTDA" in html and "55.428.936/0001-00" in html, rota
-        assert "Valderez Astrologia (padmini.com.br)" in html, rota
+        # o domínio vem do enderecos.py (rodada 18): nos testes, PADMINI_SITE_URL = https://padmini.teste
+        assert "Valderez Astrologia (padmini.teste)" in html, rota
 
 
 # ------------------------------------------------------------------ nada do pacote vai ao ar

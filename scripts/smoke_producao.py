@@ -3,6 +3,10 @@ Smoke test contra o site publicado. Rodar depois de CADA deploy.
 
     python scripts/smoke_producao.py                      # padmini.com.br
     python scripts/smoke_producao.py https://padmini.onrender.com
+    python scripts/smoke_producao.py https://valderezastrologia.com.br
+
+Com o BASE num domínio novo (rodada 18), confere também o domínio antigo: 301 com o
+mesmo caminho e a query inteira, e o /webhook/* lá sem redirecionar.
 
 Não compra nada e não precisa de segredo: só confere que o site responde, que a
 busca de cidades funciona, que as amostras saem e que o pago continua trancado.
@@ -13,6 +17,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from urllib.parse import urlparse
 
 # Padrão é o domínio de verdade: é por ele que o cliente chega, então o smoke
 # também confere DNS e certificado, não só o app.
@@ -499,6 +504,53 @@ CHECAGENS_STRIPE += [
     ("[stripe] /webhook/stripe recusa evento sem assinatura (401)", _stripe_webhook_sem_assinatura),
     ("[stripe] pedido que não existe responde 404 (/checkout, /api/checkout)", _stripe_checkout_inexistente),
 ]
+
+
+# ---------------------------------------------------------------------------
+# Rodada 18: domínio novo. Com o BASE fora do domínio antigo (e fora da Render e do
+# localhost), o antigo precisa redirecionar com 301 para o BASE, com caminho e query,
+# e o /webhook/* lá NÃO pode redirecionar (POST não sobrevive a 301; o webhook da
+# Stripe continua apontado para o domínio antigo).
+# ---------------------------------------------------------------------------
+ANTIGO = "https://padmini.com.br"
+
+
+def _dominio_novo_no_ar() -> bool:
+    host = urlparse(BASE).hostname or ""
+    return bool(host) and not (host in ("padmini.com.br", "www.padmini.com.br", "localhost", "127.0.0.1")
+                or host.endswith(".onrender.com"))
+
+
+def _sem_seguir(url, corpo=None, timeout=90):
+    """(status, Location) de `url` (absoluta) SEM seguir o redirecionamento."""
+    dados = json.dumps(corpo).encode() if corpo is not None else None
+    r = urllib.request.Request(url, data=dados, headers={"Content-Type": "application/json"} if dados else {})
+    try:
+        with urllib.request.build_opener(_SemSeguir).open(r, timeout=timeout) as resp:
+            return resp.status, ""
+    except urllib.error.HTTPError as e:
+        return e.code, e.headers.get("Location", "")
+
+
+@checar("[domínio novo] o antigo redireciona com 301, mesmo caminho e query")
+def _():
+    if not _dominio_novo_no_ar():
+        return True
+    ok = True
+    for caminho in ("/mapa?utm_source=tiktok&utm_campaign=smoke", "/compatibilidade?token=smoke&x=1", "/"):
+        for antigo in (ANTIGO, ANTIGO.replace("://", "://www.")):
+            st, onde = _sem_seguir(antigo + caminho)
+            if not (st == 301 and onde == BASE + caminho):
+                print(f"       {antigo}{caminho}: {st} → {onde or '(sem Location)'}")
+                ok = False
+    return ok
+
+
+@checar("[domínio novo] /webhook/* no domínio antigo responde sem redirecionar")
+def _():
+    if not _dominio_novo_no_ar():
+        return True
+    return all(_sem_seguir(f"{ANTIGO}/webhook/{w}", {})[0] not in (301, 302, 307, 308) for w in ("stripe", "cakto"))
 
 
 def main():

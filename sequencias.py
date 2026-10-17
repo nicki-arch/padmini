@@ -32,6 +32,7 @@ from zoneinfo import ZoneInfo
 
 import catalogo
 import db
+import enderecos
 import entrega
 import marketing
 import ofertas
@@ -47,7 +48,7 @@ ESCADA = ("mapa", "compat", "numerologia", "tarot")
 
 def responder_para() -> str:
     """Para onde vão as respostas do pós-compra (o remetente é nao-responda@)."""
-    return os.environ.get("PADMINI_EMAIL_RESPOSTA", "contato@pedrosperbmonteiro.com.br")
+    return os.environ.get("PADMINI_EMAIL_RESPOSTA") or enderecos.CONTATO  # padrão: marca.yaml (rodada 18)
 
 
 def _primeiro_nome(produto: str, dados: dict) -> str:

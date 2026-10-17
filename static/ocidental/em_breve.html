@@ -10,12 +10,12 @@
    Variável: `produto` (entrada de conteudo/ocidental/catalogo.yaml). #}
 <title>Valderez Astrologia — {{ produto.nome }} (em breve)</title>
 <meta name="description" content="{{ produto.resumo }} Em breve na Valderez Astrologia.">
-<link rel="canonical" href="https://padmini.com.br{{ produto.rota }}">
+<link rel="canonical" href="{{ site }}{{ produto.rota }}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{{ produto.nome }} — Valderez Astrologia">
 <meta property="og:description" content="{{ produto.resumo }} Em breve.">
-<meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
+<meta property="og:image" content="{{ site }}/static/og-oc-home.png">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/valderez/v2.css">

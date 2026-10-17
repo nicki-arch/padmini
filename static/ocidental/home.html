@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#FBF6F1">
 <title>{{ t.seo.titulo }}</title>
 <meta name="description" content="{{ t.seo.descricao }}">
-<link rel="canonical" href="https://padmini.com.br/">
+<link rel="canonical" href="{{ site }}/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{{ t.seo.og_titulo }}">
 <meta property="og:description" content="{{ t.seo.og_descricao }}">
-<meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
-<meta property="og:url" content="https://padmini.com.br/">
+<meta property="og:image" content="{{ site }}/static/og-oc-home.png">
+<meta property="og:url" content="{{ site }}/">
 <meta name="twitter:card" content="summary_large_image">
 {{ ld.home(t) }}
 {% include "ocidental/_head_valderez.html" %}
