@@ -52,7 +52,8 @@ def test_precos_decididos():
     assert pendentes.valor_centavos("mapa") == 4700 and pendentes.valor_centavos("previsao") == 4700
     # preço único: nada de "de/por", lançamento ou fundador no YAML do mapa
     mapa = ofertas.oferta("mapa", "ocidental")
-    assert mapa["preco_de"] is None and mapa["preco_cupom"] is None and not mapa["cupom_codigos"]
+    # rodada 16.1: "de R$97" só para mostrar riscado; sem cupom
+    assert mapa["preco_de"] == 97 and mapa["preco_cupom"] is None and not mapa["cupom_codigos"]
 
 
 def test_venda_aberta_so_o_mapa_e_o_seu_ano_continua_oculto():
@@ -77,7 +78,8 @@ def test_amostra_do_mapa_vende_por_47_e_o_me_avise_do_mapa_some(request, pagamen
     assert 'data-me-avise="mapa"' not in html and "A leitura completa abre em breve" not in html
     # o botão da amostra: "Desbloquear por" (mapa.yaml) + o preço do ofertas.yaml
     assert textos.da_pagina("mapa", "ocidental")["amostra"]["botao_comprar"] == "Desbloquear por"
-    assert "${esc(TA.botao_comprar)} R$47</a>" in html and "R$37" not in html
+    assert "${esc(TA.botao_comprar)} " + ofertas.html_preco_de(ofertas.oferta("mapa", "ocidental")) + "R$47</a>" in html
+    assert "R$37" not in html
     if pagamento == "stripe":
         assert 'data-comprar="mapa"' in html and "pay.cakto" not in html
 

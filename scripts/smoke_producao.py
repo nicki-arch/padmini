@@ -254,6 +254,20 @@ def _():
     return re.search(rf"relatório completo por <b[^>]*>R\${preco}</b>".encode(), req("/compatibilidade")[1]) is not None
 
 
+@checar("[ocidental no ar] /mapa mostra o preço do ofertas.yaml (e o \"de\" riscado, se houver)")
+def _():
+    # rodada 16.1: o que se cobra é o `preco`; o `preco_de` (se houver) aparece riscado ao lado
+    if (_versao_no_ar() != "ocidental" or _captura_no_ar() or not _vendas_abertas()
+            or not _ativo_no_catalogo("/mapa")):
+        return True
+    op, mapa = _ofertas_py(), _ofertas_do_yaml("ocidental")["mapa"]
+    corpo = req("/mapa")[1].decode("utf-8", "replace")
+    ok = f"R${op.moeda(mapa['preco'])}" in corpo
+    if mapa.get("preco_de") and mapa["preco_de"] > mapa["preco"]:
+        ok = ok and f'<s class="preco-de"><span class="sr-only">de </span>R${op.moeda(mapa["preco_de"])}</s>' in corpo
+    return ok
+
+
 # ---------------------------------------------------------------------------
 # Versão ocidental. A API dela fica publicada qualquer que seja a versão no ar
 # (links já entregues nunca quebram), então é conferida SEMPRE; as páginas de

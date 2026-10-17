@@ -94,7 +94,7 @@
     <div class="cartao caixa-preco">
       <span class="olho">{{ t.recebe.olho_caixa }}</span>
       {%- if vende_mapa %}
-      <div style="display:flex;align-items:baseline;gap:12px"><span class="preco">R${{ ofertas.mapa.preco | moeda }}</span><span class="miudo">{{ t.recebe.pagamento_unico }}</span></div>
+      <div style="display:flex;align-items:baseline;gap:12px"><span class="preco">{{ preco_de(ofertas.mapa) }}R${{ ofertas.mapa.preco | moeda }}</span><span class="miudo">{{ t.recebe.pagamento_unico }}</span></div>
       {%- if ofertas.mapa.taxa_plataforma %}<p class="miudo">+ R${{ ofertas.mapa.taxa_plataforma | moeda }} de taxa da plataforma</p>{% endif %}
       {%- else %}
       <span class="chip chip-breve">Abre em breve</span>

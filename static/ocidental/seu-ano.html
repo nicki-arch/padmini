@@ -282,9 +282,9 @@ function desenharAmostra(d) {
       {%- if vende %}
         <span class="olho">${esc(TA.lateral_olho)}</span>
         <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>
-        <div style="display:flex;align-items:baseline;gap:10px"><span class="preco">R${{ ofertas.previsao.preco | moeda }}</span><span class="miudo">${esc(TA.pagamento_unico)}</span></div>
+        <div style="display:flex;align-items:baseline;gap:10px"><span class="preco">{{ preco_de(ofertas.previsao) }}R${{ ofertas.previsao.preco | moeda }}</span><span class="miudo">${esc(TA.pagamento_unico)}</span></div>
         <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
-        ${PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="previsao">${esc(TA.botao_comprar)} R${{ ofertas.previsao.preco | moeda }}</a>
+        ${PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="previsao">${esc(TA.botao_comprar)} {{ preco_de(ofertas.previsao) }}R${{ ofertas.previsao.preco | moeda }}</a>
           <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p>`}
       {%- else %}
         <span class="olho">${esc(TA.lateral_olho)}</span>

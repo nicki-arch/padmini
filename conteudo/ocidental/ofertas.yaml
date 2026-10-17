@@ -20,6 +20,11 @@ taxa_plataforma: 0.99
 mapa:
   nome: Mapa Natal completo
   preco: 47
+  # Preço de referência riscado, "de R$97 por R$47" (rodada 16.1, decisão do Nicolas de
+  # 16/out, pergunta 20; o risco do art. 37 do CDC está registrado em decisoes.md). SÓ
+  # aparece na tela (e no texto dos e-mails que já mostram preço): o que se cobra é o
+  # `preco`. Sem prazo, sem "promoção". Tirar a linha = as páginas voltam a mostrar só o preço.
+  preco_de: 97
   checkout: "https://pay.cakto.com.br/39vm3n6_1141264"
 
 # `preco` é o de tabela, o que a página mostra por padrão e o que a oferta
@@ -68,3 +73,4 @@ tarot:
 previsao:
   nome: O seu ano — previsão dos próximos 12 meses
   preco: 47
+  preco_de: 97  # rodada 16.1, como o mapa: só na tela, a Stripe cobra o `preco`

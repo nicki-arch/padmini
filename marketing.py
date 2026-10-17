@@ -310,6 +310,8 @@ def _resumo_ocidental(produto: str, amostra: dict) -> str:
 def email_amostra_html(produto: str, amostra: dict, dados: dict, email: str, nome: str = "",
                        sistema: str = "vedica") -> str:
     preco = ofertas.moeda(ofertas.oferta(produto, sistema).get("preco"))
+    # rodada 16.1: na ocidental, o "de R$97 por R$47" do ofertas.yaml (a védica fica como era)
+    rotulo_preco = ofertas.texto_preco(ofertas.oferta(produto, sistema)) if sistema == "ocidental" else f"R${preco}"
     oque = TEXTOS[sistema]["completo_abre"][produto]
     if not catalogo.vende(produto, sistema):
         # venda fechada (catalogo.yaml): a amostra, sem preço nem botão de compra
@@ -325,7 +327,7 @@ def email_amostra_html(produto: str, amostra: dict, dados: dict, email: str, nom
              + _resumo_amostra(produto, amostra, sistema)
              + _p(f"O relatório completo abre {oque}.", "margin:18px 0 0")
              + _botao(link_checkout(produto, dados, "amostra", sistema),
-                      f"Quero o completo — R${preco} →" if preco else "Quero o completo →", sistema))
+                      f"Quero o completo — {rotulo_preco} →" if preco else "Quero o completo →", sistema))
     return _moldura(corpo, _rodape_descadastro(email, sistema), sistema)
 
 
@@ -471,7 +473,7 @@ def _venda_cruzada_ocidental(produto_comprado: str, dados: dict) -> str:
             titulo, texto = TEXTO_OUTRO_PRODUTO[k]
             linhas.append(f'<p style="margin:10px 0"><a href="{_e(link_site(k, "pos_compra"))}" '
                           f'style="color:{_O["acento"]};font-weight:bold">{titulo} →</a>'
-                          f'<br><span style="color:{_O["suave"]};font-size:13px">{texto} · R${_e(ofertas.moeda(o.get("preco")))}</span></p>')
+                          f'<br><span style="color:{_O["suave"]};font-size:13px">{texto} · {_e(ofertas.texto_preco(o))}</span></p>')
     if not linhas:
         return ""
     return f'<div style="border-top:1px solid {_O["linha"]};margin-top:26px;padding-top:18px">' + "".join(linhas) + "</div>"

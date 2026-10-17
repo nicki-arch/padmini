@@ -130,7 +130,7 @@ def test_todas_as_leituras_so_ativos_e_em_breve(ocidental):
     assert 'id="quem-revisa"' in html
     # rodada 16: com a venda aberta, só o produto que o catálogo vende (o mapa) leva preço,
     # e o preço vem do ofertas.yaml
-    precos = re.findall(r'<p class="preco"[^>]*>R\$([\d.,]+)</p>', html)
+    precos = re.findall(r'<p class="preco"[^>]*>(?:<s class="preco-de">.*?</s>.*?)?R\$([\d.,]+)</p>', html)
     assert precos == [ofertas.moeda(ofertas.oferta(p["oferta"], "ocidental")["preco"])
                       for p in catalogo.produtos() if catalogo.vende(p["chave"])] == ["47"]
     assert "pay.cakto" not in html and "__CHECKOUT" not in html
