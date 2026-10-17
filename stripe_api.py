@@ -12,6 +12,9 @@ O que a Stripe recebe de um pedido, e só isto:
   - o NOME do produto e o PREÇO, em `line_items[].price_data` (do nosso catálogo, nada
     criado no painel da Stripe; nunca o preço vindo do navegador: ver pendentes.py);
   - o id opaco do pedido pendente, em `client_reference_id` e `metadata.pedido`;
+  - o CANAL de onde a pessoa veio (rodada 19): utm_source, utm_medium e utm_campaign, em
+    `metadata`, para cruzar as vendas por rede no painel da Stripe. Só esses três: `ref`,
+    `cupom` e o resto da origem ficam conosco (`pedidos.rastreio`);
   - o e-mail, em `customer_email` (o recibo e o Pix precisam dele).
 Nada de data, hora, cidade ou nome de quem é a leitura. Os meios de pagamento (cartão,
 Pix, Apple Pay, Google Pay) vêm do painel: `payment_method_types` não é fixado aqui.
@@ -39,6 +42,16 @@ def _cliente():
     return stripe.StripeClient(chave, stripe_version=VERSAO_API, max_network_retries=2)
 
 
+CANAL = ("utm_source", "utm_medium", "utm_campaign")
+
+
+def metadata(pendente: dict) -> dict:
+    """O id do pedido e o canal da venda (utm_source/medium/campaign, curtos). Nada pessoal."""
+    rastreio = pendente.get("rastreio") or {}
+    return {"pedido": pendente["id"],
+            **{k: str(rastreio[k])[:80] for k in CANAL if str(rastreio.get(k) or "").strip()}}
+
+
 def parametros_da_sessao(pendente: dict, site: str) -> dict:
     """Os parâmetros da Checkout Session de um pedido pendente. Função à parte para os
     testes conferirem que nenhum dado de nascimento vai para a Stripe."""
@@ -57,8 +70,8 @@ def parametros_da_sessao(pendente: dict, site: str) -> dict:
         "line_items": itens,
         "customer_email": pendente["email"],
         "client_reference_id": pendente["id"],
-        "metadata": {"pedido": pendente["id"]},
-        "payment_intent_data": {"metadata": {"pedido": pendente["id"]}},
+        "metadata": metadata(pendente),
+        "payment_intent_data": {"metadata": metadata(pendente)},
         "return_url": f"{site.rstrip('/')}/obrigado/{pendente['id']}",
         "locale": "pt-BR",
     }

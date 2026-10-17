@@ -1,0 +1,51 @@
+# Valderez Astrologia (versão OCIDENTAL) — a página /links, o link da bio (rodada 19).
+#
+# Destino da bio do TikTok, do Instagram e do YouTube: /links?utm_source=<rede>.
+# Só a COPY mora aqui. Os botões de produto saem do catalogo.yaml (ativo que vende,
+# com o preço do ofertas.yaml; em breve, no máximo 2); as redes e o contato, do
+# marca.yaml; o endereço do site, do enderecos.py. Nenhum preço nem endereço aqui.
+
+seo:
+  titulo: Valderez Astrologia — links
+  descricao: "Faça o seu mapa natal grátis com a Dona Valderez: o começo das 10 dimensões do seu mapa, na hora."
+  og_titulo: Valderez Astrologia
+  og_descricao: "Astrologia para autoconhecimento com a Dona Valderez. Faça o seu mapa natal grátis."
+
+nome: Valderez Astrologia
+linha: Astrologia para autoconhecimento com a Dona Valderez, 40 anos de astrologia.
+
+# o botão principal (a amostra grátis do mapa natal)
+principal:
+  titulo: Faça o seu mapa natal grátis
+  linha: O começo das 10 dimensões do seu mapa, na hora
+# com a lista de espera ligada (PADMINI_CAPTURA=1), o principal vai para /lista
+principal_lista:
+  titulo: Entre na lista de espera
+  linha: Avisamos você assim que abrir
+
+# Cada produto ATIVO que vende: título e o que vem (a chave é a do catalogo.yaml).
+# Produto sem linha aqui usa o nome do catálogo e o resumo dele.
+produtos:
+  mapa:
+    titulo: Mapa natal completo
+    linha: relatório inteiro, roda e PDF
+  previsao:
+    titulo: O seu ano
+    linha: os temas dos seus próximos 12 meses
+  compat:
+    titulo: Sinastria do casal
+    linha: os mapas de vocês dois juntos
+  numerologia:
+    titulo: Numerologia completa
+    linha: os números do seu nome e da sua data
+  tarot:
+    titulo: Tarot
+    linha: três cartas para pensar no agora
+
+em_breve: Em breve
+recuperar: Recuperar minhas leituras
+
+rodape:
+  aviso: Não é previsão nem substitui orientação profissional.
+  contato: Contato
+  privacidade: Privacidade

@@ -316,6 +316,20 @@ def _():
     return req("/numerologia")[0] == esperado and req("/tarot")[0] == esperado
 
 
+@checar("[ocidental no ar] /links responde 200 e repassa a origem aos botões (404 com a védica)")
+def _():
+    # rodada 19: o link da bio. Todo link interno leva utm_source/utm_medium da chegada.
+    import html
+    import re
+    st, corpo = req("/links?utm_source=smoke")
+    if _versao_no_ar() != "ocidental":
+        return st == 404
+    texto = corpo.decode("utf-8", "replace")
+    internos = [html.unescape(h) for h in re.findall(r'href="(/[^"]*)"', texto) if not h.startswith("/static/")]
+    return (st == 200 and len(internos) >= 3
+            and all("utm_source=smoke&utm_medium=bio" in h for h in internos))
+
+
 @checar("[ocidental no ar] botões de compra dos 4 produtos apontam para a Cakto")
 def _():
     if _versao_no_ar() != "ocidental" or _captura_no_ar() or not _vendas_abertas():
