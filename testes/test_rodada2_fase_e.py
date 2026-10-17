@@ -77,8 +77,8 @@ def test_sitemap(versao):
         ["/", "/mapa", "/compatibilidade"]
     versao("ocidental")
     locs = re.findall(r"<loc>[^<]*padmini[^/]*(/[^<]*)</loc>", cliente.get("/sitemap.xml").text)
-    # rodada 9: + "Todas as leituras" (montada do catálogo)
-    assert locs == ["/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras"]
+    # rodada 9: + "Todas as leituras" (montada do catálogo); rodada 19: + o link da bio
+    assert locs == ["/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras", "/links"]
 
 
 # ------------------------------------------------------------------ venda cruzada

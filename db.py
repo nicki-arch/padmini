@@ -955,3 +955,29 @@ def produtos_dos_pagamentos_stripe() -> dict:
         rows = c.execute("SELECT stripe_pagamento, produto FROM pedidos WHERE origem_pagamento = 'stripe' "
                          "AND stripe_pagamento IS NOT NULL").fetchall()
     return {pi: produto for pi, produto in rows}
+
+
+# Relatório de origem (rodada 19, scripts/relatorio_origem.py): por utm_source, quantas
+# amostras, "me avise" e pedidos pagos desde uma data. Só contagens: nem e-mail, nem nome.
+SEM_ORIGEM = "(sem origem)"
+_POR_ORIGEM = {
+    "amostras": "SELECT COALESCE(NULLIF(origem->>'utm_source', ''), %s), count(*) FROM amostras_email "
+                "WHERE criado_em >= %s GROUP BY 1",
+    "me_avise": "SELECT COALESCE(NULLIF(origem->>'utm_source', ''), %s), count(*) FROM leads "
+                "WHERE interesse IS NOT NULL AND atualizado_em >= %s GROUP BY 1",
+    "pedidos_pagos": "SELECT COALESCE(NULLIF(rastreio->>'utm_source', ''), %s), count(*) FROM pedidos "
+                     "WHERE status = 'paid' AND criado_em >= %s GROUP BY 1",
+}
+
+
+def contagem_por_origem(desde) -> dict:
+    """{utm_source: {"amostras": n, "me_avise": n, "pedidos_pagos": n}} desde `desde`
+    (date ou datetime). Sem banco, {}."""
+    if not ativo():
+        return {}
+    saida: dict = {}
+    with _conectar() as c:
+        for coluna, sql in _POR_ORIGEM.items():
+            for fonte, n in c.execute(sql, (SEM_ORIGEM, desde)).fetchall():
+                saida.setdefault(fonte, dict.fromkeys(_POR_ORIGEM, 0))[coluna] = n
+    return saida

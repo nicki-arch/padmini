@@ -162,8 +162,8 @@ def test_relatorio_sem_chave_ou_mes_errado(monkeypatch, capsys):
 
 
 # ------------------------------------------------------------------ smoke
-def test_smoke_com_a_cakto_continua_com_33_checagens():
-    assert len(smoke.CHECAGENS) == 33  # rodada 16: + "sem texto por IA"; 16.1: + preço riscado do /mapa; 18: + 301 e webhook do domínio antigo
+def test_smoke_com_a_cakto_continua_com_34_checagens():
+    assert len(smoke.CHECAGENS) == 34  # rodada 16: + "sem texto por IA"; 16.1: + preço riscado do /mapa; 18: + 301 e webhook do domínio antigo; 19: + /links
     nomes = [n for n, _ in smoke.CHECAGENS_STRIPE]
     assert any("/webhook/stripe" in n for n in nomes)
 

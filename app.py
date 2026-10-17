@@ -55,6 +55,7 @@ import marketing
 import marca
 import ofertas
 import pagamento
+import pagina_links
 import paleta
 import seguranca
 import stripe_api
@@ -492,6 +493,22 @@ def pagina_minhas_leituras():
     return _pagina_montada("ocidental/minhas-leituras.html", "ocidental", "minhas-leituras")
 
 
+@app.api_route("/links", methods=["GET", "HEAD"])
+def pagina_da_bio(request: Request):
+    """O link da bio (rodada 19, só ocidental): a origem (utm_*, ref, cupom) que chegou
+    vai, no HTML, para todos os botões internos (pagina_links.py). Montada a cada pedido
+    (a origem muda o HTML). Não olha a lista de espera: com a captura ligada, abre igual
+    e o botão principal vai para /lista."""
+    if sistema.ativo() != "ocidental":
+        raise HTTPException(404, "Página não encontrada.")
+    t = textos.da_pagina("links", "ocidental")
+    captura = _captura_ligada()
+    html = _jinja.get_template("ocidental/links.html").render(**_contexto(
+        "ocidental", "links", b=pagina_links.botoes(t, captura), foto=pagina_links.foto(),
+        q=pagina_links.sufixo(pagina_links.origem(request.query_params))))
+    return Response(html, media_type="text/html; charset=utf-8")
+
+
 # ---------------------------------------------------------------------------
 # Checkout próprio (rodada 11, Stripe; a API está em rotas_checkout.py). Só existem com
 # PADMINI_PAGAMENTO=stripe. Montadas a cada pedido (não vão para o cache de páginas):
@@ -810,6 +827,8 @@ def sitemap():
         # o catálogo decide: oculto não entra; em_breve entra (a página do "me avise")
         publicas = [r for r in publicas if (catalogo.por_rota(r) or {}).get("estado", "ativo") != "oculto"]
         publicas += [p["rota"] for p in catalogo.visiveis() if p["rota"] not in publicas]
+    if sistema.ativo() == "ocidental":
+        publicas.append("/links")  # o link da bio (rodada 19); o canonical não leva a origem
     if sistema.ativo() == "ocidental" and blog.publicados():
         publicas += ["/blog"] + [f"/blog/{a['slug']}" for a in blog.publicados()]
     caminhos = ["/lista"] if _captura_ligada() else publicas

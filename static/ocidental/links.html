@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6F1">
+<title>{{ t.seo.titulo }}</title>
+<meta name="description" content="{{ t.seo.descricao }}">
+<link rel="canonical" href="{{ site }}/links">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Valderez Astrologia">
+<meta property="og:title" content="{{ t.seo.og_titulo }}">
+<meta property="og:description" content="{{ t.seo.og_descricao }}">
+<meta property="og:image" content="{{ site }}/static/og-oc-home.png">
+<meta property="og:url" content="{{ site }}/links">
+<meta name="twitter:card" content="summary_large_image">
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+<script src="/static/afiliado.js" defer></script>
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+{# /links, o link da bio (rodada 19): uma tela só, feita para o celular, sem menu e
+   sem rodapé grande. Copy: conteudo/ocidental/links.yaml. Botões: catalogo.yaml
+   (pagina_links.botoes). Preço: ofertas.yaml. Redes e contato: marca.yaml. A origem
+   (`q`, montada no servidor por pagina_links.sufixo) vai em TODO link interno. #}
+</head>
+<body class="vz links">
+<main id="conteudo" class="links-col">
+  <div class="foto arco links-foto" aria-hidden="true">
+    {%- if foto %}<img class="links-retrato" src="{{ foto }}" alt="" width="104" height="124">{% else %}{{ marca.roda(64) }}{% endif -%}
+  </div>
+  <h1 class="links-nome">{{ t.nome }}</h1>
+  <p class="links-linha">{{ t.linha }}</p>
+  {%- if redes %}<p class="links-arroba">{{ redes[0].arroba }}</p>{% endif %}
+
+  <nav class="links-botoes" aria-label="Leituras">
+    <a class="links-bt links-bt-1" href="{{ b.principal.rota }}{{ q }}" data-destino="{{ b.principal.destino }}">
+      <b>{{ b.principal.titulo }}</b><span>{{ b.principal.linha }}</span>
+    </a>
+    {%- for p in b.produtos %}
+    <a class="links-bt" href="{{ p.rota }}{{ q }}" data-destino="{{ p.chave }}">
+      <b>{{ p.titulo }}</b>
+      <span>{{ preco_de(ofertas[p.oferta]) }}R${{ ofertas[p.oferta].preco | moeda }} · {{ p.linha }}</span>
+    </a>
+    {%- endfor %}
+    {%- for p in b.em_breve %}
+    <a class="links-bt links-bt-breve" href="{{ p.rota }}{{ q }}" data-destino="{{ p.chave }}">
+      <b>{{ p.titulo }}</b><span class="chip chip-breve">{{ t.em_breve }}</span>
+    </a>
+    {%- endfor %}
+  </nav>
+  <a class="links-recuperar" href="/minhas-leituras{{ q }}" data-destino="minhas_leituras">{{ t.recuperar }}</a>
+
+  {%- if redes %}
+  <nav class="links-redes" aria-label="Redes da Dona Valderez">
+    {%- for r in redes %}
+    <a href="{{ r.url }}" rel="noopener" aria-label="{{ r.nome }} da Dona Valderez" data-destino="rede_{{ r.icone }}">{{ icone(r.icone, 24) }}</a>
+    {%- endfor %}
+  </nav>
+  {%- endif %}
+
+  <footer class="links-rodape">
+    <p>{{ t.rodape.aviso }}</p>
+    <p><a href="mailto:{{ contato }}">{{ t.rodape.contato }}</a> · <a href="/privacidade{{ q }}">{{ t.rodape.privacidade }}</a></p>
+  </footer>
+</main>
+<script>
+  // evento "links_clique" (rodada 19): só o destino, nada pessoal. O padTrack segura o
+  // evento até o aceite de cookies (analytics.js); sem aceite, não sai nada.
+  document.addEventListener("click", function (e) {
+    var a = e.target && e.target.closest ? e.target.closest("a[data-destino]") : null;
+    if (a && window.padTrack) window.padTrack("links_clique", { destino: a.getAttribute("data-destino") });
+  });
+</script>
+</body>
+</html>

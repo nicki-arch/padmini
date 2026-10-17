@@ -141,7 +141,7 @@ def test_menu_home_rodape_e_leituras_vem_do_catalogo(ocidental):
     assert all(f'href="{r}"' in rodape for r in ("/mapa", "/compatibilidade", "/leituras"))
     leituras = cliente.get("/leituras").text
     assert re.findall(r'<h2 class="t3">([^<]+)</h2>', leituras) == ["Mapa natal", "Sinastria do casal", "Numerologia", "Tarot"]
-    assert _sitemap() == ["/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras"]
+    assert _sitemap() == ["/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras", "/links"]
 
 
 def test_trocar_um_estado_no_yaml_muda_o_que_aparece(ocidental):

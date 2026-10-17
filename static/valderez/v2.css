@@ -415,3 +415,28 @@
   .checkout-stripe { padding: 4px; border-radius: 16px; }
 }
 .obrigado .t1 { font-size: clamp(34px, 4.2vw, 54px); }
+
+/* ---------- /links, o link da bio (rodada 19): uma coluna, uma tela no celular ---------- */
+.links-col { max-width: 480px; margin: 0 auto; padding: 24px 16px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.links-foto { width: 96px; height: 116px; flex: none; }
+.links-foto .links-retrato { width: 100%; height: 100%; object-fit: cover; }
+.links-nome { font-size: 30px; line-height: 1.1; margin-top: 14px; }
+.links-linha { font-size: 15px; line-height: 1.45; color: var(--vz-tinta-2); margin-top: 8px; max-width: 34ch; }
+.links-arroba { font-size: 14px; font-weight: 600; color: var(--vz-vinho); margin-top: 4px; }
+.links-botoes { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.vz a.links-bt { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; padding: 9px 18px;
+  border-radius: 16px; background: var(--vz-branco); border: 1px solid var(--vz-linha); color: var(--vz-tinta); text-decoration: none; }
+.vz a.links-bt:hover { border-color: var(--vz-vinho); color: var(--vz-tinta); }
+.links-bt b { font-size: 16px; font-weight: 600; }
+.links-bt span { font-size: 13.5px; color: var(--vz-tinta-2); }
+.links-bt .preco-de { font-size: 1em; color: var(--vz-tinta-3); margin-right: .15em; }
+.vz a.links-bt-1 { min-height: 66px; background: var(--vz-vinho); border-color: var(--vz-vinho); color: var(--vz-branco); box-shadow: 0 10px 24px rgba(140, 63, 85, .25); }
+.vz a.links-bt-1:hover { background: var(--vz-vinho-esc); color: var(--vz-branco); }
+.links-bt-1 b { font-size: 17px; }
+.links-bt-1 span { color: var(--vz-branco); opacity: .9; }
+.vz a.links-bt-breve { flex-direction: row; gap: 10px; min-height: 50px; background: transparent; }
+.links-recuperar { margin-top: 12px; font-size: 14px; min-height: 32px; display: inline-flex; align-items: center; }
+.links-redes { display: flex; gap: 6px; margin-top: 8px; }
+.vz .links-redes a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; color: var(--vz-vinho); }
+.links-rodape { margin-top: 8px; font-size: 12.5px; line-height: 1.6; color: var(--vz-tinta-3); }
+.links-rodape a { color: var(--vz-tinta-2); }
