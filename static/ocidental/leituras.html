@@ -39,7 +39,7 @@
           <h2 class="t3">{{ p.nome }}</h2>
           <p>{{ p.resumo }}</p>
           {%- if catalogo.vende(p.chave) and p.oferta and ofertas[p.oferta] %}
-          <p class="preco" style="font-size:40px">R${{ ofertas[p.oferta].preco | moeda }}</p>
+          <p class="preco" style="font-size:40px">{{ preco_de(ofertas[p.oferta]) }}R${{ ofertas[p.oferta].preco | moeda }}</p>
           {%- endif %}
           {%- if p.estado == "ativo" %}
           <a class="bt bt-1 bt-p" href="{{ p.rota }}">{{ p.botao or tl.botao_ativo }}</a>

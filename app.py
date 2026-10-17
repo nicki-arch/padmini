@@ -222,6 +222,8 @@ _jinja = jinja2.Environment(
 )
 # Preço sempre no formato brasileiro ("R$96,52", nunca "R$96.52"): {{ x | moeda }}.
 _jinja.filters["moeda"] = ofertas.moeda
+# "de R$97" riscado antes do preço (rodada 16.1): {{ preco_de(ofertas.mapa) }}R$...
+_jinja.globals["preco_de"] = ofertas.html_preco_de
 # Nome do índice da sinastria (ocidental), fonte única em conteudo/ocidental/marca.yaml.
 _jinja.globals["indice"] = textos.NOME_INDICE
 # Catálogo da ocidental (produtos, estados, interruptor de venda) e as frases de
@@ -490,7 +492,17 @@ def _resumo_do_pedido(p: dict) -> dict:
     return {"id": p["id"], "estado": p["estado"], "chave": item["chave"],
             "produto": ofertas.oferta(item["chave"], "ocidental").get("nome") or prod.get("nome", ""),
             "rota": prod.get("rota") or "/mapa", "nome": p.get("nome") or "",
-            "valor": ofertas.moeda(p["valor_centavos"] / 100), "cupom": p.get("cupom")}
+            "valor": ofertas.moeda(p["valor_centavos"] / 100), "cupom": p.get("cupom"),
+            "valor_de": _valor_de(item["chave"], p)}
+
+
+def _valor_de(chave: str, p: dict) -> str:
+    """Rodada 16.1: "R$97" riscado ao lado do total, só quando o pedido é o preço de tabela
+    (sem cupom) e a oferta tem `preco_de`. Só mostra: o valor do pedido é o que se cobra."""
+    o = ofertas.oferta(chave, "ocidental")
+    if p.get("cupom") or not o.get("preco") or p["valor_centavos"] != round(o["preco"] * 100):
+        return ""
+    return ofertas.html_preco_de(o)
 
 
 def _pagina_do_pedido(arquivo: str, id_pedido: str) -> Response:

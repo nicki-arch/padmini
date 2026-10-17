@@ -149,7 +149,8 @@ def email_boas_vindas(passo: int, produto: str, dados: dict, email: str) -> tupl
     c = _cor(SISTEMA)
     nome = _primeiro_nome(produto, dados)
     # venda fechada (catalogo.yaml): sem preço (a tarefa nem chega aqui; isto é a segunda trava)
-    preco = ofertas.moeda(ofertas.oferta(produto, SISTEMA).get("preco")) if catalogo.vende(produto, SISTEMA) else ""
+    # rodada 16.1: "de R$97 por R$47" quando o ofertas.yaml tem `preco_de`; senão "R$47"
+    preco = ofertas.texto_preco(ofertas.oferta(produto, SISTEMA)) if catalogo.vende(produto, SISTEMA) else ""
     link = marketing.link_checkout(produto, dados, f"boas_vindas_{passo}", SISTEMA)
     if passo == 1:
         assunto, titulo, texto = trecho_extra(produto, dados)
@@ -167,13 +168,13 @@ def email_boas_vindas(passo: int, produto: str, dados: dict, email: str) -> tupl
         corpo = (_ola(nome)
                  + _p(f"Isto é o que vem {NO_COMPLETO[produto]}, feito com os dados que você já preencheu:")
                  + f'<ul style="margin:0 0 14px;padding-left:20px">{itens}</ul>' + extra
-                 + _botao(link, f"Ver o completo — R${preco} →" if preco else "Ver o completo →", SISTEMA))
+                 + _botao(link, f"Ver o completo — {preco} →" if preco else "Ver o completo →", SISTEMA))
     else:
         assunto = "A sua leitura completa, quando você quiser"
         corpo = (_ola(nome)
                  + _p(f"Último e-mail desta série. Se quiser ir fundo, {NOME_DO_COMPLETO[produto]} está a um clique "
                       "— o link já leva os dados que você preencheu, é só pagar.")
-                 + _botao(link, f"Quero o completo — R${preco} →" if preco else "Quero o completo →", SISTEMA)
+                 + _botao(link, f"Quero o completo — {preco} →" if preco else "Quero o completo →", SISTEMA)
                  + _p(f'<span style="color:{c["suave"]};font-size:13px">Garantia de 7 dias: se não fizer sentido '
                       'para você, devolvemos o valor. E se não for agora, tudo bem: não mandamos mais nada '
                       'desta série.</span>'))

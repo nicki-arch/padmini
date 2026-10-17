@@ -328,11 +328,11 @@ function desenharAmostra(d) {
       {%- if vende %}
         <span class="olho">${esc(TA.lateral_olho)}</span>
         <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>
-        <div style="display:flex;align-items:baseline;gap:10px"><span class="preco">R${{ ofertas.mapa.preco | moeda }}</span><span class="miudo">${esc(TA.pagamento_unico)}</span></div>
+        <div style="display:flex;align-items:baseline;gap:10px"><span class="preco">{{ preco_de(ofertas.mapa) }}R${{ ofertas.mapa.preco | moeda }}</span><span class="miudo">${esc(TA.pagamento_unico)}</span></div>
         ${TAXA ? `<p class="miudo">+ R$${esc(TAXA)} de taxa da plataforma</p>` : ""}
         <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
-        ${cta && PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="mapa" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} R${{ ofertas.mapa.preco | moeda }}</a>
-          <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : cta ? `<a class="bt bt-1 bt-cheio" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} R${{ ofertas.mapa.preco | moeda }}</a>
+        ${cta && PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="mapa" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} {{ preco_de(ofertas.mapa) }}R${{ ofertas.mapa.preco | moeda }}</a>
+          <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : cta ? `<a class="bt bt-1 bt-cheio" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} {{ preco_de(ofertas.mapa) }}R${{ ofertas.mapa.preco | moeda }}</a>
           <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p><button type="button" class="bt bt-1 bt-cheio" disabled>Em breve</button>`}
       {%- else %}
         {% set aviso_produto = catalogo.produto("mapa") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}

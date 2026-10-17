@@ -108,6 +108,32 @@ def oferta(chave: str, sistema: str = "vedica") -> dict:
     return do_sistema(sistema).get(chave, {})
 
 
+# ---------------------------------------------------------------------------
+# Preço de referência riscado, "de R$97 por R$47" (rodada 16.1, decisão do Nicolas de
+# 16/out). Vem só de `preco_de` no ofertas.yaml; sem ele (ou se não for maior que o
+# preço), nada aparece. Só MOSTRA: o que se cobra continua sendo `preco` (a Stripe nunca
+# recebe o `preco_de`). Nada de "promoção" nem prazo: não há prazo.
+# ---------------------------------------------------------------------------
+def tem_preco_de(o: dict) -> bool:
+    de, por = (o or {}).get("preco_de"), (o or {}).get("preco")
+    return bool(de and por and de > por)
+
+
+def html_preco_de(o: dict) -> str:
+    """O "de" riscado, para pôr ANTES do preço: '<s>R$97</s> ' (vazio sem `preco_de`).
+    O leitor de tela ouve "de R$97, por" e em seguida o preço."""
+    if not tem_preco_de(o):
+        return ""
+    return (f'<s class="preco-de"><span class="sr-only">de </span>R${moeda(o["preco_de"])}</s>'
+            '<span class="sr-only">, por</span> ')
+
+
+def texto_preco(o: dict) -> str:
+    """Para texto corrido (botão de e-mail): 'de R$97 por R$47', ou só 'R$47'."""
+    por = f"R${moeda((o or {}).get('preco'))}"
+    return f"de R${moeda(o['preco_de'])} por {por}" if tem_preco_de(o) else por
+
+
 def preco(chave: str, sistema: str = "vedica") -> str:
     """Só o número, do jeito que vai para a tela: 97 → '97'."""
     return str(oferta(chave, sistema).get("preco", ""))

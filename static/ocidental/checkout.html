@@ -31,7 +31,7 @@
         <span class="olho">{{ t.checkout.olho }}</span>
         <h1 class="t3" id="titulo-pedido">{{ pedido.produto | e }}</h1>
         {%- if pedido.nome %}<p class="apoio">{{ t.checkout.para.replace("{nome}", pedido.nome | e) }}</p>{% endif %}
-        <div class="checkout-linha"><span>{{ t.checkout.total }}</span><span><span class="preco">R${{ pedido.valor }}</span></span></div>
+        <div class="checkout-linha"><span>{{ t.checkout.total }}</span><span><span class="preco">{{ pedido.valor_de }}R${{ pedido.valor }}</span></span></div>
         <p class="miudo">{{ t.checkout.pagamento_unico }}{% if pedido.cupom %} · {{ t.checkout.cupom.replace("{cupom}", pedido.cupom | upper | e) }}{% endif %}</p>
         <p class="miudo">{{ t.checkout.formas }}</p>
         <p class="miudo">{{ t.checkout.seguranca }}</p>

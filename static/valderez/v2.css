@@ -140,6 +140,10 @@
 .mockup { width: 100%; height: auto; max-height: 380px; object-fit: contain; }
 .caixa-preco { padding: 36px; display: flex; flex-direction: column; gap: 18px; }
 .preco { font: 400 52px/1 var(--vz-f-titulo); color: var(--vz-tinta); }
+/* Rodada 16.1: o preço de referência riscado ("de R$97 por R$47"), menor e na cor de texto
+   secundária; o preço "por" continua o destaque. Só aparece com `preco_de` no ofertas.yaml. */
+.preco-de { font-size: .45em; color: var(--vz-tinta-3); text-decoration-thickness: 1px; margin-right: .25em; }
+.bt .preco-de { font-size: .9em; color: inherit; opacity: .75; margin-right: .2em; }
 .quem { display: grid; grid-template-columns: 420px minmax(0, 1fr); gap: 80px; align-items: center; }
 .quem .foto-grande { height: 520px; background: linear-gradient(165deg, var(--vz-noite-foto), var(--vz-noite-2)); display: flex; align-items: center; justify-content: center; }
 .quem .foto-grande img { width: 46%; opacity: .9; }
