@@ -266,7 +266,8 @@ def test_artigo_revisado_vai_ao_ar_com_sitemap_e_menu(ocidental, monkeypatch):
     _publicar(monkeypatch, "o-que-e-sinastria")
     r = cliente.get("/blog/o-que-e-sinastria")
     assert r.status_code == 200 and "x-robots-tag" not in r.headers and 'class="faixa-rascunho"' not in r.text
-    assert '<link rel="canonical" href="https://padmini.com.br/blog/o-que-e-sinastria">' in r.text
+    # o domínio vem do enderecos.py (rodada 18): nos testes, PADMINI_SITE_URL = https://padmini.teste
+    assert '<link rel="canonical" href="https://padmini.teste/blog/o-que-e-sinastria">' in r.text
     assert cliente.get("/blog/mapa-natal-nao-e-horoscopo").status_code == 404  # o outro segue rascunho
     lista = cliente.get("/blog").text
     assert "/blog/o-que-e-sinastria" in lista and "/blog/mapa-natal-nao-e-horoscopo" not in lista

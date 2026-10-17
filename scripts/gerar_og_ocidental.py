@@ -9,7 +9,10 @@ cores do tema escuro e as fontes de paleta.py e o símbolo de marca.py.
 Nenhuma imagem de terceiros, nenhum devanágari. Precisa do Playwright com o
 Chromium; as fontes são os TTF de fontes/ (sem rede).
 
-Mudou o texto de alguma? Edite IMAGENS abaixo e rode de novo.
+Mudou o texto de alguma? Edite IMAGENS abaixo e rode de novo. O domínio escrito
+no pé da imagem vem do enderecos.py: depois da troca de domínio (rodada 18),
+rode com PADMINI_SITE_URL=https://valderezastrologia.com.br (ou com o `site` do
+marca.yaml já trocado) e faça o commit das imagens.
 """
 import sys
 from pathlib import Path
@@ -17,6 +20,7 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
+import enderecos  # noqa: E402  (o domínio escrito na imagem: PADMINI_SITE_URL ou o marca.yaml)
 import textos  # noqa: E402  (o nome do índice: conteudo/ocidental/marca.yaml)
 
 IMAGENS = {
@@ -75,7 +79,7 @@ def modelo() -> str:
 <h1>{{titulo}}</h1>
 <div class="desc">{{rodape}}</div>
 <div class="filete"></div>
-<div class="site">padmini.com.br</div>
+<div class="site">{enderecos.SITE_HOST}</div>
 <svg class="ceu" width="460" height="460" viewBox="0 0 460 460" aria-hidden="true">
   <circle cx="230" cy="230" r="230" fill="{v['surface']}"/>
   <g fill="none" stroke="{v['border']}" stroke-width="1"><circle cx="230" cy="230" r="195"/><circle cx="230" cy="230" r="150"/>

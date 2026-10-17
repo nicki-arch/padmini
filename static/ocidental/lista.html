@@ -12,13 +12,13 @@
    No celular, o formulário vem logo depois do título. #}
 <title>{{ t.seo.titulo }}</title>
 <meta name="description" content="{{ revisao("lista_seo") }}">
-<link rel="canonical" href="https://padmini.com.br/lista">
+<link rel="canonical" href="{{ site }}/lista">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{{ t.seo.og_titulo }}">
 <meta property="og:description" content="{{ t.seo.og_descricao }}">
-<meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
-<meta property="og:url" content="https://padmini.com.br/lista">
+<meta property="og:image" content="{{ site }}/static/og-oc-home.png">
+<meta property="og:url" content="{{ site }}/lista">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/valderez/v2.css">

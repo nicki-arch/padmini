@@ -10,6 +10,7 @@ import pytest
 
 from test_app import RAIZ, app_mod, cliente
 
+import enderecos  # noqa: E402
 import entrega  # noqa: E402
 import marketing  # noqa: E402
 import ofertas  # noqa: E402
@@ -60,7 +61,9 @@ def test_cada_pagina_ocidental_tem_a_sua_og_image(versao, url_da_pagina):
     versao("ocidental")
     vistas = {}
     for rota in sistema.PAGINAS["ocidental"]:
-        img = re.search(r'og:image" content="https://padmini\.com\.br/static/([^"]+)"', cliente.get(url_da_pagina(rota)).text)
+        # o domínio vem do enderecos.py (rodada 18)
+        img = re.search(rf'og:image" content="{re.escape(enderecos.SITE_URL)}/static/([^"]+)"',
+                        cliente.get(url_da_pagina(rota)).text)
         assert img, rota
         assert img.group(1).startswith("og-oc-") and (RAIZ / "static" / img.group(1)).exists(), rota
         vistas[rota] = img.group(1)

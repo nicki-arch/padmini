@@ -149,6 +149,9 @@
 .quem .foto-grande img { width: 46%; opacity: .9; }
 .quem-texto { display: flex; flex-direction: column; gap: 22px; }
 .quem-texto .olho { color: var(--vz-rosa); }
+.quem-redes { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin: 0; font-size: 15px; }
+.quem-redes-t { flex-basis: 100%; color: var(--vz-noite-claro); }
+.quem-redes a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: inherit; text-underline-offset: 4px; }
 .quem-texto h2 { font-size: clamp(40px, 4.2vw, 60px); line-height: 1.02; }
 .quem-texto .citacao { font: italic 400 clamp(21px, 1.9vw, 27px)/1.45 var(--vz-f-titulo); color: var(--vz-noite-citacao); }
 .quem-texto .sobre { font-size: 17px; line-height: 1.7; color: var(--vz-noite-claro); max-width: 620px; }

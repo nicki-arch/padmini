@@ -8,3 +8,36 @@
 # O endereço do artigo do blog (/blog/como-ler-o-indice-padmini) NÃO muda com o
 # nome: link já compartilhado não quebra.
 indice: Índice Padmini
+
+# ---------------------------------------------------------------------------
+# Endereços (rodada 18): FONTE ÚNICA do endereço público do site, do e-mail de
+# contato e das redes da Dona Valderez. Quem lê é o enderecos.py; os templates
+# usam {{ site }}, {{ site_host }}, {{ contato }} e {{ redes }}.
+#
+# `site` é só o PADRÃO: a variável PADMINI_SITE_URL, na Render, vence. Por isso a
+# troca de domínio não pede deploy (ver "Operação" no docs/dominio.md). O padrão
+# continua o domínio antigo até o novo estar no ar com certificado, para nenhum
+# canonical apontar para um endereço que ainda não abre.
+site: https://padmini.com.br
+
+# Caixa que responde às pessoas (rodapé, /minhas-leituras, /mapa, /seu-ano, termos,
+# privacidade e o Reply-To das sequências de e-mail). PADMINI_EMAIL_RESPOSTA, na
+# Render, vence só no Reply-To. Trocar só quando a caixa nova existir de verdade.
+contato: contato@pedrosperbmonteiro.com.br
+
+# Redes da Dona Valderez: rodapé, "quem revisa" (home) e o sameAs do JSON-LD.
+# Links simples: sem embed, sem script de terceiros, sem pixel. `icone` é um
+# arquivo de static/valderez/icones/ (icones.py).
+redes:
+  - nome: Instagram
+    icone: instagram
+    arroba: "@astrologiavalderez"
+    url: https://www.instagram.com/astrologiavalderez/
+  - nome: TikTok
+    icone: tiktok
+    arroba: "@astrologiavalderez"
+    url: https://www.tiktok.com/@astrologiavalderez
+  - nome: YouTube
+    icone: youtube
+    arroba: "@astrologiavalderez"
+    url: https://www.youtube.com/@astrologiavalderez

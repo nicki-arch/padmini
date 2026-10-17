@@ -6,11 +6,11 @@
 <meta name="theme-color" content="{{ cores.ground }}">
 <title>{% if artigo %}{{ artigo.titulo }} — Valderez Astrologia{% else %}Blog — Valderez Astrologia{% endif %}</title>
 <meta name="description" content="{% if artigo %}{{ artigo.descricao | e }}{% else %}Textos sobre sinastria, mapa natal, numerologia e tarot — astrologia para autoconhecimento.{% endif %}">
-{% if rascunho %}<meta name="robots" content="noindex, nofollow">{% else %}<link rel="canonical" href="https://padmini.com.br/blog{% if artigo %}/{{ artigo.slug }}{% endif %}">{% endif %}
+{% if rascunho %}<meta name="robots" content="noindex, nofollow">{% else %}<link rel="canonical" href="{{ site }}/blog{% if artigo %}/{{ artigo.slug }}{% endif %}">{% endif %}
 <meta property="og:type" content="{{ 'article' if artigo else 'website' }}">
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{% if artigo %}{{ artigo.titulo | e }}{% else %}Blog — Valderez Astrologia{% endif %}">
-<meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
+<meta property="og:image" content="{{ site }}/static/og-oc-home.png">
 {% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/valderez/componentes.css">
 <script src="/static/afiliado.js" defer></script>

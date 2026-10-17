@@ -6,13 +6,13 @@
 <meta name="theme-color" content="{{ cores.ground }}">
 <title>Valderez Astrologia — Sinastria do casal</title>
 <meta name="description" content="A sinastria de vocês dois: os mapas natais cruzados em 8 dimensões, com o {{ indice }}. Amostra grátis.">
-<link rel="canonical" href="https://padmini.com.br/compatibilidade">
+<link rel="canonical" href="{{ site }}/compatibilidade">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="A sinastria de vocês dois — Valderez Astrologia">
 <meta property="og:description" content="Os dois mapas natais cruzados em 8 dimensões. Amostra grátis para o casal.">
-<meta property="og:image" content="https://padmini.com.br/static/og-oc-compatibilidade.png">
-<meta property="og:url" content="https://padmini.com.br/compatibilidade">
+<meta property="og:image" content="{{ site }}/static/og-oc-compatibilidade.png">
+<meta property="og:url" content="{{ site }}/compatibilidade">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/valderez/componentes.css">
@@ -560,7 +560,7 @@ async function montarCanvasCard(d) {
   x.font = "500 52px " + SERIF; x.fillStyle = C["ink"];
   _wrap(x, "“O ponto mais forte de vocês: " + d.ponto_forte.titulo.toLowerCase() + ".”", PX, y, barW, 70);
   x.font = "400 30px " + SANS; x.fillStyle = C["muted"]; x.fillText("Façam a de vocês, de graça:", PX, H - 150);
-  x.font = "600 52px " + SANS; x.fillStyle = C["blush"]; x.fillText("padmini.com.br", PX, H - 85);
+  x.font = "600 52px " + SANS; x.fillStyle = C["blush"]; x.fillText("{{ site_host }}", PX, H - 85);
   return c;
 }
 
@@ -575,7 +575,7 @@ async function baixarCard(d) {
     const arquivo = new File([blob], nome, { type: "image/png" });
     if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
       try {
-        await navigator.share({ files: [arquivo], text: "A nossa sinastria — façam a de vocês em https://padmini.com.br/?utm_source=card" });
+        await navigator.share({ files: [arquivo], text: "A nossa sinastria — façam a de vocês em {{ site }}/?utm_source=card" });
         if (window.padTrack) padTrack("card_compartilhado", { via: "share" });
         return;
       } catch (e) { if (e && e.name === "AbortError") return; }

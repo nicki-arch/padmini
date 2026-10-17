@@ -13,7 +13,7 @@ Por que existe: o site não mandava nenhum. O que cada um faz aqui:
   - Strict-Transport-Security: o navegador passa a usar sempre HTTPS.
   - Referrer-Policy: os links de entrega carregam o token do relatório pago na
     URL; com esta política, ao sair do site o outro domínio recebe só a origem
-    (https://padmini.com.br/), nunca a URL com o token.
+    (ex.: https://valderezastrologia.com.br/), nunca a URL com o token.
   - X-Content-Type-Options, X-Frame-Options, Permissions-Policy: o básico.
 
 Ao adicionar um serviço externo novo (outro analytics, pixel, CDN…), ele

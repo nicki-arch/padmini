@@ -13,7 +13,7 @@
    não vende enquanto não estiver no ofertas.yaml e ativo. #}
 <title>Valderez Astrologia — {{ produto.nome }}</title>
 <meta name="description" content="{{ produto.resumo }}">
-<link rel="canonical" href="https://padmini.com.br{{ produto.rota }}">
+<link rel="canonical" href="{{ site }}{{ produto.rota }}">
 {%- if tp.rascunho %}
 <meta name="robots" content="noindex">
 {%- endif %}
@@ -21,7 +21,7 @@
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{{ produto.nome }} — Valderez Astrologia">
 <meta property="og:description" content="{{ produto.resumo }}">
-<meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
+<meta property="og:image" content="{{ site }}/static/og-oc-home.png">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/valderez/v2.css">

@@ -35,7 +35,8 @@ Roda no Render (https://padmini.com.br), ligado ao GitHub: cada `git push` na `m
 | `PADMINI_SISTEMA` | Versão no ar: `vedica` (padrão) ou `ocidental`. Trocar = mudar aqui e salvar |
 | `PADMINI_SECRET` | **Obrigatório em produção** — assina os tokens do completo |
 | `PADMINI_MODO_ABERTO` | `1` libera o completo sem token. **Só em staging — NUNCA em produção** |
-| `PADMINI_SITE_URL` | Base dos links de entrega (padrão `https://padmini.com.br`) |
+| `PADMINI_SITE_URL` | Endereço público do site: links de entrega, canonical, `og:*`, sitemap, JSON-LD, e-mails. Sem ela, o `site` de `conteudo/ocidental/marca.yaml` (rodada 18, `enderecos.py`) |
+| `PADMINI_DOMINIO_PRINCIPAL` | Ex.: `valderezastrologia.com.br`. Liga o 301 de `padmini.com.br`, `www.padmini.com.br` e `www.<principal>` para o principal, com caminho e query (nunca `/webhook/*` nem `/api/*`). Vazio = nada redireciona. Ver `docs/dominio.md` |
 | `PADMINI_CAKTO_WEBHOOK_SECRET` | Verifica a origem do webhook da Cakto |
 | `PADMINI_PAGAMENTO` | Quem cobra na ocidental: `cakto` (padrão) ou `stripe` (checkout próprio, rodada 11). Valor desconhecido = o site não sobe. Ver `docs/stripe.md` |
 | `PADMINI_VENDAS_TESTE` | `1` abre a venda **só neste serviço** (a prévia), sem mexer no catálogo. Só com `PADMINI_PAGAMENTO=stripe` e chave de teste (`sk_test_…`); com chave de produção ou com a Cakto o site não sobe |
@@ -130,7 +131,8 @@ A validação de compatibilidade contra o Prokerala (`validacao-compatibilidade.
 - **Código:** GNU Affero General Public License v3.0 (AGPL-3.0), texto completo em
   [`LICENSE`](LICENSE). O site usa o [Swiss Ephemeris](https://www.astro.com/swisseph/)
   (Astrodienst, via `pyswisseph`) sob a AGPL; por isso o código-fonte do site é
-  publicado (link "Código-fonte" no rodapé), em vez de comprar a licença profissional.
+  publicado (na versão ocidental, seção "Software livre" dos Termos, desde a rodada 18;
+  na védica, link "Código-fonte" no rodapé), em vez de comprar a licença profissional.
 - **Conteúdo editorial: todos os direitos reservados, fora da AGPL.** Os textos de
   interpretação (que não ficam neste repositório: moram no repositório privado
   `padmini-conteudo` e entram só na hora do build), a copy das páginas, as ilustrações

@@ -9,6 +9,7 @@ import pytest
 from test_app import RAIZ, app_mod, cliente  # primeiro: define os segredos de teste
 
 import catalogo
+import enderecos
 import ilustracoes
 import montar_texto_ocidental as mt
 import paleta
@@ -169,7 +170,8 @@ def test_paginas_no_visual_2_nao_carregam_nada_de_fora(ocidental, rota):
     for url in re.findall(r'<(?:link|script|img)\b[^>]*?\s(?:href|src)="([^"$]+)"', r.text):
         if "canonical" in url:
             continue
-        assert url.startswith("/") and not url.startswith("//") or url.startswith("https://padmini.com.br"), (rota, url)
+        # o próprio site (canonical) vem do enderecos.py desde a rodada 18
+        assert url.startswith("/") and not url.startswith("//") or url.startswith(enderecos.SITE_URL + "/"), (rota, url)
 
 
 def test_404_e_500_tem_status_certo(ocidental, monkeypatch):

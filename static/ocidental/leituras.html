@@ -10,12 +10,12 @@
 {%- set tl = catalogo.textos().leituras %}
 <title>Valderez Astrologia — {{ tl.titulo }}</title>
 <meta name="description" content="{{ tl.sub }}">
-<link rel="canonical" href="https://padmini.com.br/leituras">
+<link rel="canonical" href="{{ site }}/leituras">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{{ tl.titulo }} — Valderez Astrologia">
 <meta property="og:description" content="{{ tl.sub }}">
-<meta property="og:image" content="https://padmini.com.br/static/og-oc-home.png">
+<meta property="og:image" content="{{ site }}/static/og-oc-home.png">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/valderez/v2.css">

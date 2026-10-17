@@ -74,6 +74,10 @@
 .rod .nota-rodape { flex-basis: 100%; margin: 0; font-size: 13px; color: var(--vz-noite-claro); max-width: 80ch; }
 .rod .rod-in .nota-rodape a { display: inline; min-height: 0; color: var(--vz-noite-titulo); text-decoration: underline; }
 .rod-breve { color: var(--vz-noite-claro); font-size: 12px; }
+/* redes da Dona Valderez (rodada 18): ícones de traço, área de toque de 44px */
+.rod-redes { display: flex; gap: 4px; margin-left: -11px; }
+.rod .rod-in .rod-redes a { min-width: 44px; min-height: 44px; justify-content: center; color: var(--vz-ouro-claro); }
+.rod .rod-in .rod-redes a:hover { color: var(--vz-noite-titulo); }
 
 /* --- aviso de cookies (static/ocidental/consentimento.js): Aceitar e Recusar do mesmo tamanho --- */
 .cookie { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 80; max-width: 440px; padding: 22px;

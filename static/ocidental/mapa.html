@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#FBF6F1">
 <title>{{ t.seo.titulo }}</title>
 <meta name="description" content="{{ t.seo.descricao }}">
-<link rel="canonical" href="https://padmini.com.br/mapa">
+<link rel="canonical" href="{{ site }}/mapa">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Valderez Astrologia">
 <meta property="og:title" content="{{ t.seo.og_titulo }}">
 <meta property="og:description" content="{{ t.seo.og_descricao }}">
-<meta property="og:image" content="https://padmini.com.br/static/og-oc-mapa.png">
-<meta property="og:url" content="https://padmini.com.br/mapa">
+<meta property="og:image" content="{{ site }}/static/og-oc-mapa.png">
+<meta property="og:url" content="{{ site }}/mapa">
 <meta name="twitter:card" content="summary_large_image">
 {% include "ocidental/_head_valderez.html" %}
 <link rel="stylesheet" href="/static/valderez/v2.css">
@@ -463,7 +463,7 @@ async function baixarPDF() {
     $("#resultado").innerHTML = `<section class="erro-topo"><div><span class="chip chip-breve">Link de leitura</span>
       <h1 class="t2" id="titulo-resultado" tabindex="-1">Este link de leitura <em>não abriu</em></h1>
       <p class="lead">Ele pode ter sido copiado pela metade. Se você já pagou, <a href="/minhas-leituras">peça os seus links de novo</a>: chegam no e-mail da compra. (${esc(e.message)})</p>
-      <div class="botoes"><a class="bt bt-1" href="/minhas-leituras">Recuperar meus links</a><a class="bt bt-2" href="mailto:contato@pedrosperbmonteiro.com.br">Falar com a gente</a></div></div></section>`;
+      <div class="botoes"><a class="bt bt-1" href="/minhas-leituras">Recuperar meus links</a><a class="bt bt-2" href="mailto:{{ contato }}">Falar com a gente</a></div></div></section>`;
     mostrarEstado("resultado"); focar($("#titulo-resultado"));
   });
 })();

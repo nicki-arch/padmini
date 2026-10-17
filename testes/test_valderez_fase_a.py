@@ -180,7 +180,8 @@ def test_textos_legais_trocam_a_marca_mas_nao_o_responsavel(ocidental, url_da_pa
         html = _pagina(rota, url_da_pagina)
         assert "<title>Valderez Astrologia — " in html and 'class="marca"' in html, rota
         assert "Pedro Sperb Monteiro LTDA" in html and "55.428.936/0001-00" in html, rota
-        assert "Valderez Astrologia (padmini.com.br)" in html, rota
+        # o domínio vem do enderecos.py (rodada 18): nos testes, PADMINI_SITE_URL = https://padmini.teste
+        assert "Valderez Astrologia (padmini.teste)" in html, rota
 
 
 # ------------------------------------------------------------------ nada do pacote vai ao ar
@@ -213,8 +214,8 @@ def test_cabecalho_e_rodape_da_valderez(rota, ocidental, url_da_pagina):
     assert 'href="#conteudo"' in html and 'id="conteudo"' in html
     assert 'href="/static/valderez/favicon.svg"' in html
     rodape = html[html.index('<footer class="rod"'):]
-    for destino in ("/privacidade", "/termos", "mailto:", "/minhas-leituras", "github.com/nicki-arch/padmini",
-                    'id="preferencias-cookies"'):
+    # rodada 18: o "Código-fonte" saiu do rodapé para os Termos (test_rodada18)
+    for destino in ("/privacidade", "/termos", "mailto:", "/minhas-leituras", 'id="preferencias-cookies"'):
         assert destino in rodape, (rota, destino)
 
 
