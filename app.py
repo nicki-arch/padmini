@@ -504,7 +504,7 @@ def pagina_da_bio(request: Request):
     t = textos.da_pagina("links", "ocidental")
     captura = _captura_ligada()
     html = _jinja.get_template("ocidental/links.html").render(**_contexto(
-        "ocidental", "links", b=pagina_links.botoes(t, captura), foto=pagina_links.foto(),
+        "ocidental", "links", b=pagina_links.botoes(t, captura), vaga_foto=pagina_links.VAGA_FOTO,
         q=pagina_links.sufixo(pagina_links.origem(request.query_params))))
     return Response(html, media_type="text/html; charset=utf-8")
 

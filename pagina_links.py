@@ -17,14 +17,13 @@ from html import escape
 from urllib.parse import urlencode
 
 import catalogo
-import ilustracoes
 from rotas_ocidental import ORIGEM_ACEITA
 
 PADRAO = {"utm_source": "links", "utm_medium": "bio", "utm_campaign": "links"}
 MAX_EM_BREVE = 2
-# A foto da Dona Valderez entra quando a vaga existir no ilustracoes.yaml (com o arquivo);
-# até lá, a roda no arco, como no "quem revisa".
-VAGA_FOTO = "foto-valderez"
+# A foto da Dona Valderez (o rosto, rodada 19.1); sem o arquivo, a roda no arco
+# (marca.retrato), como em todos os outros lugares.
+VAGA_FOTO = "foto-valderez-rosto"
 
 
 def origem(params) -> dict:
@@ -39,10 +38,6 @@ def sufixo(o: dict) -> str:
     ordem = [k for k in ("utm_source", "utm_medium", "utm_campaign") if k in o]
     ordem += [k for k in ORIGEM_ACEITA if k in o and k not in ordem]
     return escape("?" + urlencode([(k, o[k]) for k in ordem])) if ordem else ""
-
-
-def foto() -> str:
-    return ilustracoes.url(VAGA_FOTO) if VAGA_FOTO in ilustracoes.VAGAS else ""
 
 
 def botoes(t: dict, captura: bool) -> dict:

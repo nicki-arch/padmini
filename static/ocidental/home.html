@@ -52,7 +52,7 @@
         {%- endfor %}
       </ul>
       <div class="quem-mini">
-        <div class="foto arco" aria-hidden="true">{{ marca.roda(36) }}</div>
+        <div class="foto arco" aria-hidden="true">{{ marca.retrato("foto-valderez-rosto", 60, 75, carregar="eager", roda_tamanho=36) }}</div>
         <p><b>Dona Valderez</b> {{ revisao("selo_topo") }}<br>40 anos de astrologia</p>
       </div>
     </div>
@@ -107,7 +107,7 @@
   {%- endif %}
 
   <section class="secao secao-noite quem" id="quem-revisa">
-    <div class="arco foto-grande" aria-hidden="true">{{ marca.roda(200, clara=True) }}</div>
+    <div class="arco foto-grande">{{ marca.retrato("foto-valderez", 420, 560, alt="Dona Valderez", roda_tamanho=200, clara=True) }}</div>
     <div class="quem-texto">
       <span class="olho">{{ t.quem.olho }}</span>
       <h2>{{ t.quem.nome }}</h2>

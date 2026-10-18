@@ -168,14 +168,17 @@ def test_smoke_no_dominio_novo_confere_301_com_caminho_e_query(monkeypatch):
 
 
 # ================================================================== Fase 2 — redes
-REDES = {"Instagram": "https://www.instagram.com/astrologiavalderez/",
+TODAS = {"Instagram": "https://www.instagram.com/astrologiavalderez/",
          "TikTok": "https://www.tiktok.com/@astrologiavalderez",
          "YouTube": "https://www.youtube.com/@astrologiavalderez"}
+# rodada 19.1: o Instagram fica com `ativa: false` até o perfil abrir sem login
+REDES = {k: v for k, v in TODAS.items() if k != "Instagram"}
 
 
 def test_redes_no_marca_yaml():
+    assert {r["nome"]: r["url"] for r in enderecos.TODAS_AS_REDES} == TODAS
     assert {r["nome"]: r["url"] for r in enderecos.REDES} == REDES
-    assert {r["arroba"] for r in enderecos.REDES} == {"@astrologiavalderez"}
+    assert {r["arroba"] for r in enderecos.TODAS_AS_REDES} == {"@astrologiavalderez"}
 
 
 def _rodape(html):

@@ -10,9 +10,11 @@ HTML, com a fonte do site). Um desenho só, definido aqui, que vira:
   - traço de reportlab para o PDF (`desenhar_pdf()`).
 A védica continua com o lótus de sempre (preenchido, dois tons, no base.css).
 """
+from html import escape
 from pathlib import Path
 from urllib.parse import quote
 
+import ilustracoes
 import paleta
 
 # ---------------------------------------------------------------------------
@@ -42,6 +44,22 @@ def roda(tamanho: int = 48, clara: bool = False, classe: str = "", rotulo: str =
     escondido = "" if rotulo else ' aria-hidden="true"'
     return (f'<img{cls} src="/static/valderez/{arquivo}" width="{tamanho}" height="{tamanho}" '
             f'alt="{rotulo}"{escondido}>')
+
+
+def retrato(vaga: str, largura: int, altura: int, alt: str = "", carregar: str = "lazy",
+            roda_tamanho: int = 36, clara: bool = False) -> str:
+    """A foto da Dona Valderez no arco (rodada 19.1): a vaga do ilustracoes.yaml
+    (foto-valderez, foto-valderez-rosto) quando tem arquivo; sem arquivo, a roda de
+    sempre, no mesmo lugar e com o mesmo estilo (nunca imagem quebrada). Os templates
+    chamam isto, nunca o arquivo direto. `alt` vazio = decorativa (o nome dela já
+    está escrito ao lado)."""
+    endereco = ilustracoes.url(vaga)
+    if not endereco:
+        return roda(roda_tamanho, clara=clara)
+    escondido = "" if alt else ' aria-hidden="true"'
+    return (f'<img class="foto-real" src="{endereco}" alt="{escape(alt)}"{escondido} data-vaga="{escape(vaga)}" '
+            f'width="{largura}" height="{altura}" loading="{carregar}" decoding="async">')
+
 
 # Grade de 64×64 (y para baixo, como no SVG).
 CIRCULO = (32, 32, 24)       # cx, cy, r — traço com opacidade .65

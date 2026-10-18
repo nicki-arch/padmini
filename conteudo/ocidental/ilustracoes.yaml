@@ -13,8 +13,11 @@
 #
 # `proporcao` é conferida com 2% de folga; `minimo` é o menor tamanho aceito
 # (o do conjunto entregue em 5/out); cada arquivo tem de ter menos de 300 KB.
-# As vagas foto-valderez-* (fotos, não ilustração) ainda não foram fotografadas:
-# o site mostra a roda no lugar.
+# As vagas foto-valderez-* são fotos da Dona Valderez (não ilustração): foto real
+# retocada pelo ChatGPT em 18/out/2026; serão trocadas pelas de um fotógrafo, com os
+# mesmos nomes de vaga. Elas têm `opcional: true`: sem o arquivo, o site mostra a
+# roda no lugar (marca.retrato) e o checar_ilustracoes.py não acusa a falta; com o
+# arquivo, ele confere proporção, mínimo e peso como em qualquer vaga.
 
 conjunto_ativo: aquarela-2026
 conjunto_reserva: aquarela-2026
@@ -39,6 +42,8 @@ vagas:
   dim-proposito: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
   dim-sol: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
   dim-venus: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
+  foto-valderez: {proporcao: [3, 4], minimo: [900, 1200], usada_em: [home, produto, leituras], opcional: true}
+  foto-valderez-rosto: {proporcao: [4, 5], minimo: [560, 700], usada_em: [home, links, mapa, seu-ano, lista], opcional: true}
   fundo-redes-1: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
   fundo-redes-2: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
   fundo-redes-3: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}

@@ -6,7 +6,7 @@ Confere um conjunto de ilustrações antes de ligá-lo (rodada 9):
 
 Para cada vaga de conteudo/ocidental/ilustracoes.yaml: o arquivo existe (WebP),
 a proporção bate (2% de folga), o tamanho não é menor que o `minimo` e o arquivo
-tem menos de 300 KB. Arquivo sobrando na pasta (vaga que não está no manifesto)
+tem menos de 300 KB (vaga `opcional: true` pode faltar). Arquivo sobrando na pasta (vaga que não está no manifesto)
 também é erro. Sai com 1 se algo falhar (o CI roda para o conjunto ativo).
 """
 import sys
@@ -31,6 +31,8 @@ def conferir(conjunto: str) -> list[str]:
     for vaga, spec in ilustracoes.VAGAS.items():
         arq = ilustracoes.arquivo(vaga, conjunto)
         if not arq.exists():
+            if spec.get("opcional"):  # as fotos da Dona Valderez: sem arquivo, a roda (marca.retrato)
+                continue
             erros.append(f"{vaga}: falta o arquivo {arq.name}")
             continue
         if arq.stat().st_size >= PESO_MAXIMO:

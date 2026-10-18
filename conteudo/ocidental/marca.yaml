@@ -28,11 +28,18 @@ contato: contato@pedrosperbmonteiro.com.br
 # Redes da Dona Valderez: rodapé, "quem revisa" (home) e o sameAs do JSON-LD.
 # Links simples: sem embed, sem script de terceiros, sem pixel. `icone` é um
 # arquivo de static/valderez/icones/ (icones.py).
+# `ativa` (rodada 19.1; sem a linha = true): false tira a rede de TODO o site (rodapé,
+# "quem revisa", /links e sameAs) sem apagar o endereço. Use quando o perfil não abrir
+# para quem não está logado, para o site nunca mandar ninguém a uma página de erro.
 redes:
   - nome: Instagram
     icone: instagram
     arroba: "@astrologiavalderez"
     url: https://www.instagram.com/astrologiavalderez/
+    # 18/out/2026: sem login, o Instagram responde "Profile não está disponível" (conta
+    # privada, nome não trocado ou recém-criada; a correção é do Pedro, no app). Volta para
+    # true quando o Nicolas confirmar que o perfil abre sem login.
+    ativa: false
   - nome: TikTok
     icone: tiktok
     arroba: "@astrologiavalderez"
