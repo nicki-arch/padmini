@@ -78,7 +78,7 @@
       </div>
     </div>
     <div class="lista-texto lista-mais">
-      <div class="quem-mini"><div class="foto arco" aria-hidden="true">{{ marca.roda(40) }}</div><p class="citacao"><b>{{ revisao("lista_titulo") }}.</b> {{ revisao("lista_texto") }}</p></div>
+      <div class="quem-mini"><div class="foto arco" aria-hidden="true">{{ marca.retrato("foto-valderez-rosto", 70, 88, roda_tamanho=40) }}</div><p class="citacao"><b>{{ revisao("lista_titulo") }}.</b> {{ revisao("lista_texto") }}</p></div>
       <ul class="selos">{% for b in t.beneficios %}<li><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10.5l3 3 7-7"/></svg>{{ b.selo }}</li>{% endfor %}</ul>
     </div>
 

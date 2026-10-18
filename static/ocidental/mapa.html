@@ -337,7 +337,7 @@ function desenharAmostra(d) {
       {%- else %}
         {% set aviso_produto = catalogo.produto("mapa") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}
       {%- endif %}
-        <div class="assina"><div class="foto arco" aria-hidden="true">{{ marca.roda(28) }}</div><p class="miudo">{{ revisao("assinatura") }}</p></div>
+        <div class="assina"><div class="foto arco" aria-hidden="true">{{ marca.retrato("foto-valderez-rosto", 44, 55, roda_tamanho=28) }}</div><p class="miudo">{{ revisao("assinatura") }}</p></div>
       </aside>
     </section>
     {%- if catalogo.ativo("compat") %}

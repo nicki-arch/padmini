@@ -27,9 +27,7 @@
 </head>
 <body class="vz links">
 <main id="conteudo" class="links-col">
-  <div class="foto arco links-foto" aria-hidden="true">
-    {%- if foto %}<img class="links-retrato" src="{{ foto }}" alt="" width="104" height="124">{% else %}{{ marca.roda(64) }}{% endif -%}
-  </div>
+  <div class="foto arco links-foto" aria-hidden="true">{{ marca.retrato(vaga_foto, 104, 130, carregar="eager", roda_tamanho=64) }}</div>
   <h1 class="links-nome">{{ t.nome }}</h1>
   <p class="links-linha">{{ t.linha }}</p>
   {%- if redes %}<p class="links-arroba">{{ redes[0].arroba }}</p>{% endif %}

@@ -31,12 +31,25 @@ SITE_URL = (os.environ.get("PADMINI_SITE_URL") or _MARCA["site"]).strip().rstrip
 # só o domínio ("padmini.com.br"), para o texto que a pessoa lê (termos, card do casal)
 SITE_HOST = urlparse(SITE_URL).netloc or SITE_URL
 CONTATO = str(_MARCA["contato"]).strip()
-REDES: list[dict] = [dict(r) for r in _MARCA.get("redes") or []]
+# todas as redes do YAML, ligadas ou não (a validação abaixo vale para as duas)
+TODAS_AS_REDES: list[dict] = [dict(r) for r in _MARCA.get("redes") or []]
 # rede com ícone que não existe ou endereço sem https quebra na subida, não na página no ar
-for _r in REDES:
+for _r in TODAS_AS_REDES:
     if _r.get("icone") not in icones.NOMES or not str(_r.get("url", "")).startswith("https://") or not _r.get("nome"):
         raise ValueError(f"marca.yaml → redes: {_r!r} precisa de nome, url https:// e um ícone de "
                          f"static/valderez/icones/ ({', '.join(icones.NOMES)})")
+    if not isinstance(_r.get("ativa", True), bool):
+        raise ValueError(f"marca.yaml → redes: {_r['nome']}: `ativa` é true ou false, não {_r['ativa']!r}")
+
+
+def ativas(redes: list[dict]) -> list[dict]:
+    """Só as redes com `ativa` (sem a chave = ativa)."""
+    return [r for r in redes if r.get("ativa", True)]
+
+
+# Rodada 19.1: só as redes ATIVAS. Rodapé, "quem revisa", /links e o sameAs do JSON-LD
+# leem daqui, então uma rede com `ativa: false` some de todos de uma vez.
+REDES: list[dict] = ativas(TODAS_AS_REDES)
 
 # Domínios antigos que passam a só redirecionar (o registro continua: é ele que
 # segura os links antigos e o webhook).
