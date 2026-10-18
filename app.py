@@ -594,6 +594,152 @@ def pagina_da_bio(request: Request):
 
 
 # ---------------------------------------------------------------------------
+# O /painel (rodada 15): o estado do site numa tela (painel.py + estado_site.py). Só existe
+# com PADMINI_PAINEL_SENHA (16+ caracteres) e a ocidental no ar; sem isso, 404. Formulários
+# simples (funcionam sem JavaScript), todo POST com CSRF, nada em cache, nada de terceiros.
+# ---------------------------------------------------------------------------
+COOKIE_PAINEL_PRE = "pad_painel_pre"  # CSRF do formulário de senha (antes de haver sessão)
+_CURTO_MODO = {"aberto": "o normal", "lista_espera": "todos para /lista", "manutencao": "“Voltamos já”"}
+_SEM_CACHE = {"Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow"}
+
+
+def _painel_ligado() -> None:
+    if not painel.ligado() or sistema.ativo() != "ocidental":
+        raise HTTPException(404, "Página não encontrada.")
+
+
+async def _formulario(request: Request) -> dict:
+    import urllib.parse
+    corpo = (await request.body())[:20_000].decode("utf-8", "replace")
+    return {k: v[0] for k, v in urllib.parse.parse_qs(corpo, keep_blank_values=True).items()}
+
+
+def _cookie_do_painel(resp: Response, nome: str, valor: str, segundos: int) -> None:
+    resp.set_cookie(nome, valor, max_age=segundos, httponly=True, secure=True, samesite="strict", path="/")
+
+
+def _tela_painel(request: Request, quem: str | None, mensagem: dict | None = None, status: int = 200) -> Response:
+    sessao = request.cookies.get(painel.COOKIE, "")
+    pre = None
+    if quem:
+        token = painel.csrf(sessao)
+        ctx = dict(
+            resumo=painel.resumo(), vendas=painel.vendas_decididas(), venda_teste=pagamento.vendas_teste(),
+            produtos=painel.produtos(), paginas=painel.paginas(), estados=list(painel.NOMES_ESTADO.items()),
+            historico=painel.historico(db.historico_config_site(20)),
+            so_para_mim=request.cookies.get(painel.COOKIE_SO_PARA_MIM) == "1",
+            modos=[{"chave": m, "nome": estado_site.NOMES_MODO[m], "atual": m == estado_site.modo(),
+                    "efeito": painel.efeito_do_modo(m),
+                    "curto": _CURTO_MODO.get(m) or ("só a equipe" if estado_site.ambiente() == "producao"
+                                                    else "a prévia inteira")}
+                   for m in estado_site.MODOS])
+    else:
+        import secrets
+        pre = request.cookies.get(COOKIE_PAINEL_PRE) or secrets.token_urlsafe(24)
+        token, ctx = painel.csrf(pre), {}
+    html = _jinja.get_template("ocidental/painel.html").render(
+        quem=quem, quem_opcoes=painel.QUEM, csrf=token, mensagem=mensagem, ambiente=estado_site.ambiente(),
+        site_host=enderecos.SITE_HOST, marca=marca, **ctx)
+    resp = Response(html, status_code=status, media_type="text/html; charset=utf-8", headers=_SEM_CACHE)
+    if pre and request.cookies.get(COOKIE_PAINEL_PRE) != pre:
+        _cookie_do_painel(resp, COOKIE_PAINEL_PRE, pre, 60 * 60)
+    return resp
+
+
+_MENSAGENS_PAINEL = {"1": "Pronto, já está no ar.", "mim": "Pronto: este navegador mudou de modo."}
+
+
+@app.get("/painel")
+def pagina_painel(request: Request):
+    _painel_ligado()
+    quem = painel.quem_da_sessao(request.cookies.get(painel.COOKIE))
+    feito = _MENSAGENS_PAINEL.get(request.query_params.get("feito", "")) if quem else None
+    return _tela_painel(request, quem, {"tipo": "ok", "texto": feito} if feito else None)
+
+
+@app.post("/painel/entrar")
+async def painel_entrar(request: Request):
+    _painel_ligado()
+    form = await _formulario(request)
+    if not painel.csrf_confere(request.cookies.get(COOKIE_PAINEL_PRE), form.get("csrf")):
+        raise HTTPException(403, "Formulário vencido. Recarregue a página do painel.")
+    ip = limites.ip_do_cliente(request)
+    if limites.PAINEL_FALHAS_IP.estourado(ip) or limites.PAINEL_FALHAS_GLOBAL.estourado("todos"):
+        resp = _tela_painel(request, None, {"tipo": "erro", "texto": "Muitas tentativas erradas. Espere 15 minutos."},
+                            status=429)
+        resp.headers["Retry-After"] = "900"
+        return resp
+    if not painel.senha_confere(form.get("senha", "")):
+        limites.PAINEL_FALHAS_IP.registrar(ip)
+        limites.PAINEL_FALHAS_GLOBAL.registrar("todos")
+        log.warning("painel: senha incorreta (ip %s)", ip)
+        return _tela_painel(request, None, {"tipo": "erro", "texto": "Senha incorreta."}, status=401)
+    quem = form.get("quem") if form.get("quem") in painel.QUEM else painel.QUEM[0]
+    valor, _ = painel.emitir_sessao(quem)
+    resp = RedirectResponse("/painel", status_code=303, headers=_SEM_CACHE)
+    _cookie_do_painel(resp, painel.COOKIE, valor, painel.HORAS_SESSAO * 3600)
+    resp.delete_cookie(COOKIE_PAINEL_PRE, path="/")
+    return resp
+
+
+async def _sessao_do_post(request: Request) -> tuple[str, dict]:
+    """Quem está logado e o formulário, com o CSRF conferido (403 sem ele)."""
+    _painel_ligado()
+    form = await _formulario(request)
+    valor = request.cookies.get(painel.COOKIE)
+    quem = painel.quem_da_sessao(valor)
+    if not quem:
+        raise HTTPException(401, "Sessão do painel expirada. Entre de novo.")
+    if not painel.csrf_confere(valor, form.get("csrf")):
+        raise HTTPException(403, "Formulário sem o token de segurança. Recarregue a página do painel.")
+    return quem, form
+
+
+@app.post("/painel/acao")
+async def painel_acao(request: Request, tarefas: BackgroundTasks):
+    quem, form = await _sessao_do_post(request)
+    try:
+        mudancas, frase = painel.mudancas(form.get("acao", ""), form)
+    except painel.Recusa as recusa:
+        return _tela_painel(request, quem, {"tipo": "erro", "texto": str(recusa)}, status=409)
+    if not db.ativo():
+        return _tela_painel(request, quem, {"tipo": "erro", "texto": "Este serviço não tem banco: o painel não "
+                                            "consegue salvar. Nada mudou."}, status=503)
+    try:
+        feitas = db.gravar_config_site(mudancas, quem)
+    except Exception:  # noqa: BLE001
+        log.exception("painel: não gravou %s", mudancas)
+        return _tela_painel(request, quem, {"tipo": "erro", "texto": "Não salvou: o banco não respondeu. Nada "
+                                            "mudou; tente de novo."}, status=503)
+    estado_site.invalidar()
+    if feitas:
+        log.info("painel: %s mudou %s", quem, frase)
+        tarefas.add_task(painel.avisar, quem, frase)
+    return RedirectResponse("/painel?feito=1", status_code=303, headers=_SEM_CACHE)
+
+
+@app.post("/painel/so-para-mim")
+async def painel_so_para_mim(request: Request):
+    await _sessao_do_post(request)
+    form = await _formulario(request)
+    resp = RedirectResponse("/painel?feito=mim", status_code=303, headers=_SEM_CACHE)
+    if form.get("valor") == "ligar":
+        _cookie_do_painel(resp, painel.COOKIE_SO_PARA_MIM, "1", painel.HORAS_SESSAO * 3600)
+    else:
+        resp.delete_cookie(painel.COOKIE_SO_PARA_MIM, path="/")
+    return resp
+
+
+@app.post("/painel/sair")
+async def painel_sair(request: Request):
+    await _sessao_do_post(request)
+    resp = RedirectResponse("/painel", status_code=303, headers=_SEM_CACHE)
+    resp.delete_cookie(painel.COOKIE, path="/")
+    resp.delete_cookie(painel.COOKIE_SO_PARA_MIM, path="/")
+    return resp
+
+
+# ---------------------------------------------------------------------------
 # Checkout próprio (rodada 11, Stripe; a API está em rotas_checkout.py). Só existem com
 # PADMINI_PAGAMENTO=stripe. Montadas a cada pedido (não vão para o cache de páginas):
 # mostram o pedido de uma pessoa. O nome vem de quem fez o pedido: o template escapa.
@@ -893,7 +1039,9 @@ def robots():
     # carregam token na URL — nada disso deve entrar em buscador.
     corpo = ("User-agent: *\n"
              "Disallow: /live\n"
-             "Disallow: /api/\n"
+             # o /painel (rodada 15) só existe na ocidental: a védica fica byte a byte igual
+             + ("Disallow: /painel\n" if sistema.ativo() == "ocidental" else "")
+             + "Disallow: /api/\n"
              "Disallow: /*?token=\n"
              # /static serve os mesmos HTMLs crus, ainda com os marcadores de preço.
              "Disallow: /static/*.html\n"

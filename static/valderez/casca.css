@@ -115,4 +115,4 @@
    topo, em tom de alerta: não pode haver dúvida de que esta tela não é a do público. */
 .faixa-teste { position: sticky; top: 0; z-index: 60; background: var(--vz-vinho-esc); color: var(--vz-branco);
   font-size: 14px; line-height: 1.4; padding: 8px 16px; text-align: center; }
-.faixa-teste a { color: var(--vz-branco); text-decoration: underline; }
+.faixa-teste a, .vz .faixa-teste a { color: var(--vz-branco); text-decoration: underline; }

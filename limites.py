@@ -124,7 +124,12 @@ MINHAS_LEITURAS_EMAIL = Limite("minhas_leituras_email", maximo=3, janela=60 * 60
 CHECKOUT = Limite("checkout", maximo=10, janela=10 * 60)
 CHECKOUT_ESTADO = Limite("checkout_estado", maximo=240, janela=10 * 60)
 
-TODOS = (CHECKOUT, CHECKOUT_ESTADO, CALCULO, PDF, TEXTO_IA, CIDADES, LISTA, AMOSTRA_EMAIL, LIVE_FALHAS_IP, LIVE_FALHAS_GLOBAL,
+# Login do /painel (rodada 15): como o do live, conta só as FALHAS. 5 por IP a cada 15 min
+# (o critério do brief) e 30 no total por hora.
+PAINEL_FALHAS_IP = Limite("painel_falhas_ip", maximo=5, janela=15 * 60)
+PAINEL_FALHAS_GLOBAL = Limite("painel_falhas_global", maximo=30, janela=60 * 60)
+
+TODOS = (PAINEL_FALHAS_IP, PAINEL_FALHAS_GLOBAL, CHECKOUT, CHECKOUT_ESTADO, CALCULO, PDF, TEXTO_IA, CIDADES, LISTA, AMOSTRA_EMAIL, LIVE_FALHAS_IP, LIVE_FALHAS_GLOBAL,
          MINHAS_LEITURAS, MINHAS_LEITURAS_EMAIL)
 
 
