@@ -367,6 +367,32 @@ def live_token_mapa_ocidental(p: PedidoMapaOcidental, request: Request):
     return {"token": acesso.emitir_token("mapa", chave_do_pedido(p), VERSAO)}
 
 
+def live_mostra_previsao() -> bool:
+    """A aba "O seu ano" do /live (rodada 17): só com o produto ATIVO no estado do site
+    (painel → catalogo.yaml), ou no "tudo liberado" (na prévia, para todos; na produção,
+    só no navegador logado no painel). catalogo.estado já pergunta ao estado_site."""
+    import catalogo
+    return catalogo.estado("previsao") == "ativo"
+
+
+@rotas.post("/api/live/ocidental/token/previsao")
+def live_token_previsao(p: PedidoPrevisao, request: Request):
+    """Token do completo de "O seu ano" para o /live, como o das outras abas. Sem `inicio`,
+    o ano começa no mês de hoje (o mesmo da amostra). Produto escondido = 404."""
+    if not acesso.sessao_valida("live", request.cookies.get("pad_live")):
+        raise HTTPException(401, "Sessão do modo live expirada. Entre de novo.")
+    if not live_mostra_previsao():
+        raise HTTPException(404, "O seu ano ainda não está ligado.")
+    if p.hora:
+        validar_datetime(p.data, p.hora)
+    else:
+        validar_data(p.data)
+    inicio = p.inicio or _inicio_da_amostra().strftime("%Y-%m")
+    db.registrar_live(f"{VERSAO}:previsao", p.nome.strip(), p.cidade, f"{p.data.isoformat()} {p.hora}".strip())
+    chave = acesso.chave_previsao(p.data.isoformat(), p.hora, p.lat, p.lon, inicio)
+    return {"token": acesso.emitir_token("previsao", chave, VERSAO), "inicio": inicio}
+
+
 # --------------------------------------------------------------------------
 # SINASTRIA (o casal) — /compatibilidade na versão ocidental
 # --------------------------------------------------------------------------
