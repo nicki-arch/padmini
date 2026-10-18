@@ -348,7 +348,7 @@
 /* Rodada 19.1: a foto da Dona Valderez (marca.retrato) ocupa o arco inteiro, sem a opacidade
    nem o degradê pensados para a roda; o rosto fica acima do centro para o arco nunca cortá-lo
    (nem a 320 px de altura, no celular). Sem o arquivo, sai a roda e valem os estilos dela. */
-.arco > .foto-real, .foto .foto-real, .quem .foto-grande .foto-real { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; opacity: 1; }
+.arco > .foto-real, .foto .foto-real, .quem .foto-grande .foto-real { width: 100%; height: 100%; object-fit: cover; object-position: 50% 10%; opacity: 1; }
 .arco:has(> .foto-real) { background: none; }
 .quem-curto { grid-template-columns: 180px minmax(0, 1fr); gap: 56px; }
 .perguntas-produto { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 64px; align-items: start; }

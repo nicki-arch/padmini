@@ -131,7 +131,7 @@ def test_templates_nunca_apontam_o_arquivo_da_foto():
 def test_css_da_foto_ocupa_o_arco():
     css = (RAIZ / "static" / "valderez" / "v2.css").read_text(encoding="utf-8")
     regra = re.search(r"[^}]*\.foto-real\s*\{([^}]*)\}", css).group(1)
-    for decl in ("width: 100%", "height: 100%", "object-fit: cover", "object-position: 50% 20%", "opacity: 1"):
+    for decl in ("width: 100%", "height: 100%", "object-fit: cover", "object-position: 50% 10%", "opacity: 1"):
         assert decl in regra
 
 
@@ -203,3 +203,11 @@ def test_ativa_precisa_ser_booleano(monkeypatch, tmp_path):
         importlib.reload(enderecos)
     monkeypatch.undo()
     importlib.reload(enderecos)
+
+
+def test_fotos_entregues_no_conjunto_ativo():
+    """As duas fotos de 18/out estão no conjunto ativo, dentro do limite de peso
+    (o checar_ilustracoes confere proporção e mínimo no test_rodada9_fase_b)."""
+    for vaga in FOTOS:
+        arq = ilustracoes.caminho(vaga)
+        assert arq is not None and arq.stat().st_size < 300 * 1024, vaga
