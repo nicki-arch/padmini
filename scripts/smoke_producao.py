@@ -312,6 +312,12 @@ def _():
     ])
 
 
+@checar("[live] token de \"O seu ano\" sem sessão do live é recusado (401/404)")
+def _():
+    # rodada 17: a rota só gera token com a sessão do Pedro (e o produto ligado no painel)
+    return req("/api/live/ocidental/token/previsao", {**PESSOA})[0] in (401, 404)
+
+
 @checar("[ocidental] tiragem de tarot inventada é recusada (422)")
 def _():
     return req("/api/ocidental/tarot", {"tiragem": "AAAAAAAAAAAAAAAA"})[0] == 422

@@ -297,7 +297,11 @@ def email_aniversario(dados: dict, email: str, aniversario) -> tuple[str, str]:
 
 
 def rodar_aniversarios(hoje, ja_hoje: set, contagem: dict) -> None:
-    """Desligado até "O seu ano" estar à venda (catalogo.yaml: ativo e vendas abertas)."""
+    """Desligado até "O seu ano" estar à venda: ativo para o público e venda aberta no ESTADO
+    DO SITE (painel → catalogo.yaml; catalogo.vende pergunta ao estado_site). Liga no próximo
+    ciclo da tarefa diária depois de o Nicolas ligar no /painel, sem deploy (rodada 17).
+    Só com a caixa de marketing que já existe (aceita_sequencia) e sem descadastro
+    (db.candidatos_aniversario); o e-mail tem o link de descadastro."""
     if not catalogo.vende("previsao", SISTEMA):
         return
     alvo = hoje + timedelta(days=DIAS_ANTES_DO_ANIVERSARIO)
