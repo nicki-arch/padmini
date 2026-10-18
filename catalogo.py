@@ -144,7 +144,10 @@ def vende(chave: str, sistema: str = "ocidental") -> bool:
     ativo para o público (o checkout pergunta a mesma coisa)."""
     if sistema != "ocidental":
         return True
-    return vendas_abertas() and estado_publico(chave) == "ativo"
+    # produto sem `oferta` (comunidade, cursos, consulta…) não se vende: nem no "tudo liberado"
+    # da prévia, que liga todos (rodada 15; antes a /links quebrava procurando o preço dele)
+    p = next((x for x in produtos_do_yaml() if x["chave"] == chave), None)
+    return bool(p and p.get("oferta")) and vendas_abertas() and estado_publico(chave) == "ativo"
 
 
 def colunas(quantos: int, maximo: int = 4) -> int:

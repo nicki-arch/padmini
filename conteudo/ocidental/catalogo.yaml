@@ -1,4 +1,9 @@
-# Valderez Astrologia (versão OCIDENTAL) — CATÁLOGO. FONTE ÚNICA do que está no ar.
+# Valderez Astrologia (versão OCIDENTAL) — CATÁLOGO.
+#
+# RODADA 15: o YAML é o PADRÃO; quem manda no ar é o /painel (docs/painel.md). O
+# `estado` de cada produto e o `vendas_abertas` daqui valem só enquanto o painel não
+# salvou outro valor para aquela chave (estado_site.py). Nome, rota, ordem, oferta e as
+# dimensões continuam só aqui.
 #
 # Rodada 9 (5/out/2026). Liberar ou esconder um produto é mudar o `estado` dele
 # aqui (uma linha) e fazer o deploy — sem mexer em HTML. O catálogo diz:

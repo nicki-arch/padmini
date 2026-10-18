@@ -216,6 +216,16 @@ def test_previa_tudo_liberado_para_todo_mundo(previa, monkeypatch):
     assert all(p["estado"] == "ativo" for p in catalogo.produtos())
 
 
+@pytest.mark.parametrize("rota", ["/links", "/leituras", "/", "/comunidade", "/cursos", "/consulta",
+                                  "/cursos/astrologia-do-zero"])
+def test_previa_tudo_liberado_paginas_abrem(previa, monkeypatch, rota):
+    """Bug achado no smoke local: com tudo ativo, a /links tentava mostrar o preço da
+    comunidade (produto sem oferta) e dava 500. Produto sem oferta nunca é vendido."""
+    modo(monkeypatch, "tudo_liberado")
+    assert get(rota).status_code == 200, rota
+    assert not catalogo.vende("comunidade") and not catalogo.vende("cursos")
+
+
 def test_previa_tudo_liberado_publico_paga_para_ler(previa, monkeypatch):
     """Na prévia o teste é a compra de teste (4242, Pix): o completo continua pedindo token."""
     modo(monkeypatch, "tudo_liberado")

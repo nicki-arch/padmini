@@ -1126,8 +1126,15 @@ def config():
         "data_abertura": os.environ.get("PADMINI_DATA_ABERTURA", ""),
         # "receber a amostra por e-mail" só aparece se o envio estiver configurado
         "amostra_email": bool(os.environ.get("RESEND_API_KEY")),
-        # interruptor de venda da ocidental (catalogo.yaml); o smoke usa
+        # interruptor de venda da ocidental (painel → catalogo.yaml); o smoke usa
         "vendas_abertas": catalogo.vendas_abertas(sistema.ativo()),
+        # rodada 15: o modo do site (painel → PADMINI_CAPTURA) e as páginas de produto ativas
+        # PARA O PÚBLICO (oculto nunca aparece aqui). Nunca o estado do cookie de quem pede:
+        # o smoke se ajusta por estes dois campos.
+        "modo_site": estado_site.modo(),
+        "produtos_ativos": ([p["rota"] for p in catalogo.produtos_do_yaml()
+                             if catalogo.estado_publico(p["chave"]) == "ativo"]
+                            if sistema.ativo() == "ocidental" else []),
         # quem cobra na ocidental (rodada 11): cakto | stripe; o smoke usa
         "pagamento": pagamento.modo(),
         # Pixels de anúncio (rodada 6): só com a ocidental no ar, e o navegador só os
