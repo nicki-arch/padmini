@@ -203,19 +203,44 @@ CREATE TABLE IF NOT EXISTS eventos_stripe (
 );
 ALTER TABLE eventos_stripe ENABLE ROW LEVEL SECURITY;
 
+-- Rodada 15: o estado do site decidido no /painel (modo, venda, estado de cada produto,
+-- páginas escondidas). Uma linha por chave; sem linha, vale o padrão do YAML / da
+-- variável (estado_site.py). Cada serviço (produção, prévia) tem o próprio banco, então
+-- os estados são independentes. O histórico guarda toda mudança: o quê, de quê para quê,
+-- quando e quem (o nome digitado no painel, nunca dado de cliente).
+CREATE TABLE IF NOT EXISTS config_site (
+    chave        TEXT PRIMARY KEY,
+    valor        JSONB NOT NULL,
+    alterado_em  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    alterado_por TEXT
+);
+CREATE TABLE IF NOT EXISTS config_site_historico (
+    id           BIGSERIAL PRIMARY KEY,
+    alterado_em  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    chave        TEXT NOT NULL,
+    de           JSONB,
+    para         JSONB,
+    alterado_por TEXT
+);
+CREATE INDEX IF NOT EXISTS config_site_historico_idx ON config_site_historico (alterado_em DESC);
+ALTER TABLE config_site ENABLE ROW LEVEL SECURITY;
+ALTER TABLE config_site_historico ENABLE ROW LEVEL SECURITY;
+
 -- Defesa em profundidade (só existe no Supabase): tira das roles da API
 -- pública qualquer permissão nas tabelas, além do RLS.
 DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
         REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes,
-            amostras_email, abandonos, email_optout, pedidos_pendentes, eventos_stripe FROM anon;
+            amostras_email, abandonos, email_optout, pedidos_pendentes, eventos_stripe,
+            config_site, config_site_historico FROM anon;
         REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq,
             amostras_email_id_seq, abandonos_id_seq FROM anon;
     END IF;
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
         REVOKE ALL ON TABLE pedidos, textos_ia, leads, live_geracoes,
-            amostras_email, abandonos, email_optout, pedidos_pendentes, eventos_stripe FROM authenticated;
+            amostras_email, abandonos, email_optout, pedidos_pendentes, eventos_stripe,
+            config_site, config_site_historico FROM authenticated;
         REVOKE ALL ON SEQUENCE pedidos_id_seq, leads_id_seq, live_geracoes_id_seq,
             amostras_email_id_seq, abandonos_id_seq FROM authenticated;
     END IF;
@@ -981,3 +1006,51 @@ def contagem_por_origem(desde) -> dict:
             for fonte, n in c.execute(sql, (SEM_ORIGEM, desde)).fetchall():
                 saida.setdefault(fonte, dict.fromkeys(_POR_ORIGEM, 0))[coluna] = n
     return saida
+
+
+# ---------------------------------------------------------------- estado do site (rodada 15, /painel)
+# Exceção à regra de ouro, de propósito: `ler_config_site` LEVANTA o erro em vez de devolver
+# vazio. Quem chama (estado_site.py) precisa distinguir "nada salvo" (vale o YAML) de "banco
+# fora do ar" (vale o último estado conhecido); devolver {} na falha faria o site voltar
+# para o YAML no meio de uma "lista de espera".
+def ler_config_site() -> dict:
+    """{chave: valor} do que o painel salvou. Sem banco configurado: {}. Falha: levanta."""
+    if not ativo():
+        return {}
+    with _conectar() as c:
+        return {k: v for k, v in c.execute("SELECT chave, valor FROM config_site").fetchall()}
+
+
+def gravar_config_site(mudancas: dict, quem: str) -> list[tuple]:
+    """Grava as mudanças (chave → valor) numa transação, com uma linha de histórico por
+    chave que mudou de verdade. Devolve [(chave, de, para)] do que mudou. Levanta se falhar:
+    o painel precisa dizer "não salvou", nunca "pronto"."""
+    from psycopg.types.json import Jsonb
+    feitas = []
+    with _conectar() as c, c.transaction():
+        for chave, valor in mudancas.items():
+            row = c.execute("SELECT valor FROM config_site WHERE chave = %s FOR UPDATE", (chave,)).fetchone()
+            de = row[0] if row else None
+            if row and de == valor:
+                continue
+            c.execute("INSERT INTO config_site (chave, valor, alterado_em, alterado_por) VALUES (%s, %s, now(), %s) "
+                      "ON CONFLICT (chave) DO UPDATE SET valor = EXCLUDED.valor, alterado_em = now(), "
+                      "alterado_por = EXCLUDED.alterado_por", (chave, Jsonb(valor), quem))
+            c.execute("INSERT INTO config_site_historico (chave, de, para, alterado_por) VALUES (%s, %s, %s, %s)",
+                      (chave, Jsonb(de) if row else None, Jsonb(valor), quem))
+            feitas.append((chave, de, valor))
+    return feitas
+
+
+def historico_config_site(limite: int = 20) -> list[dict]:
+    """As últimas mudanças do painel, da mais nova para a mais velha. Falha: []."""
+    if not ativo():
+        return []
+    try:
+        with _conectar() as c:
+            rows = c.execute("SELECT alterado_em, chave, de, para, alterado_por FROM config_site_historico "
+                             "ORDER BY alterado_em DESC, id DESC LIMIT %s", (limite,)).fetchall()
+        return [{"quando": r[0], "chave": r[1], "de": r[2], "para": r[3], "quem": r[4]} for r in rows]
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao ler o histórico do painel")
+        return []

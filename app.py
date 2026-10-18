@@ -49,6 +49,7 @@ import db
 import depoimentos
 import entrega
 import enderecos
+import estado_site
 import exemplos_ocidental
 import limites
 import marketing
@@ -56,6 +57,7 @@ import marca
 import ofertas
 import pagamento
 import pagina_links
+import painel
 import paleta
 import seguranca
 import stripe_api
@@ -107,6 +109,18 @@ app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
 app.middleware("http")(enderecos.redirecionar_dominio_antigo)
 # Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy) em toda resposta.
 app.middleware("http")(seguranca.cabecalhos_de_seguranca)
+
+
+@app.middleware("http")
+async def _marcar_painel(request: Request, call_next):
+    """Rodada 15: diz ao estado_site se este navegador está logado no /painel (e se pediu
+    o "tudo liberado só para mim"). Sem o cookie, nada muda para ninguém."""
+    equipe = painel.quem_da_sessao(request.cookies.get(painel.COOKIE)) is not None
+    tokens = estado_site.marcar_pedido(equipe, request.cookies.get(painel.COOKIE_SO_PARA_MIM) == "1")
+    try:
+        return await call_next(request)
+    finally:
+        estado_site.desmarcar(tokens)
 
 
 @app.middleware("http")
@@ -201,18 +215,22 @@ class PedidoCompatibilidade(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Pré-lançamento: com PADMINI_CAPTURA=1 o site fica "trancado" — home, mapa e
-# compatibilidade mandam para a lista de espera (/lista). Continuam abrindo:
+# Lista de espera: o modo "lista_espera" do /painel (rodada 15; sem nada salvo no
+# painel, vale o PADMINI_CAPTURA=1 de antes). O site fica "trancado" — home, mapa e
+# produtos mandam para a lista de espera (/lista). Continuam abrindo:
 #   - links de entrega (têm `token`), para quem já comprou;
 #   - quem tem a chave de prévia (PADMINI_PREVIA_CHAVE): abrir qualquer página
-#     com ?previa=CHAVE grava um cookie e libera o site nesse navegador.
-# Desligar = apagar a variável (ou pôr 0) na Render; não precisa de deploy.
+#     com ?previa=CHAVE grava um cookie e libera o site nesse navegador;
+#   - o navegador logado no /painel.
 # ---------------------------------------------------------------------------
 def _captura_ligada() -> bool:
-    return os.environ.get("PADMINI_CAPTURA") == "1"
+    return estado_site.modo() == "lista_espera"
 
 
 _paginas_prontas: dict[tuple[str, str], str] = {}
+# O estado público do site (estado_site.assinatura) com que as páginas do cache foram
+# montadas: mudou no painel, o cache se esvazia (as páginas mostram venda e produtos).
+_assinatura_do_cache = [""]
 
 # As páginas são templates: o texto vem de `conteudo/<pagina>.yaml` e o preço de
 # `conteudo/<versão>/ofertas.yaml`. Montado no servidor, e não por JavaScript, para o
@@ -256,13 +274,25 @@ _jinja.globals["site"] = enderecos.SITE_URL
 _jinja.globals["site_host"] = enderecos.SITE_HOST
 _jinja.globals["contato"] = enderecos.CONTATO
 _jinja.globals["redes"] = enderecos.REDES
+# Páginas que o /painel pode esconder (rodada 15): o menu, o rodapé e os links perguntam.
+_jinja.globals["pagina_visivel"] = estado_site.pagina_visivel
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:
     """Serve uma página montada de uma versão do site. O resultado fica em
-    memória: os arquivos só mudam em deploy, que reinicia o processo.
+    memória: os arquivos só mudam em deploy, que reinicia o processo, e o estado do
+    site (painel) muda a assinatura, que esvazia o cache.
     `extra` vai para o template (e entra na chave do cache: ex. o produto da
     página "em breve")."""
+    if estado_site.pessoal():
+        # modo teste do navegador logado no painel: monta na hora e NÃO guarda (o público
+        # nunca recebe uma página montada com o cookie de alguém)
+        html = _jinja.get_template(arquivo).render(**_contexto(versao, pagina, **extra))
+        return Response(html, media_type="text/html; charset=utf-8", headers={"Cache-Control": "no-store"})
+    assinatura = estado_site.assinatura()
+    if assinatura != _assinatura_do_cache[0]:
+        _paginas_prontas.clear()
+        _assinatura_do_cache[0] = assinatura
     chave = (versao, arquivo) + tuple(sorted((k, str(v.get("chave") if isinstance(v, dict) else v))
                                              for k, v in extra.items()))
     if chave not in _paginas_prontas:
@@ -345,6 +375,7 @@ def _pagina_ou_lista(request: Request, rota: str):
     previa_url = request.query_params.get("previa", "")
     liberado = (not _captura_ligada()
                 or "token" in request.query_params
+                or estado_site.equipe()
                 or (chave and (request.cookies.get("pad_previa") == chave or previa_url == chave)))
     if not liberado:
         destino = "/lista"
@@ -407,7 +438,7 @@ def pagina_seu_ano(request: Request):
 @app.api_route("/leituras", methods=["GET", "HEAD"])
 def pagina_leituras(request: Request):
     """Todas as leituras (ocidental): os produtos ativos e em breve do catálogo."""
-    if sistema.ativo() != "ocidental":
+    if sistema.ativo() != "ocidental" or not estado_site.pagina_visivel("/leituras"):
         raise HTTPException(404, "Página não encontrada.")
     return _pagina_ou_lista(request, "/leituras")
 
@@ -444,10 +475,11 @@ def _pagina_do_blog(request: Request, artigo: dict | None, artigos: list[dict]) 
 
 
 def _blog_liberado(request: Request):
-    """O blog só existe na ocidental; com a captura ligada, só com a prévia."""
-    if sistema.ativo() != "ocidental":
+    """O blog só existe na ocidental; escondido no painel, 404; com a captura ligada, só
+    com a prévia (ou logado no painel)."""
+    if sistema.ativo() != "ocidental" or not estado_site.pagina_visivel("/blog"):
         raise HTTPException(404, "Página não encontrada.")
-    if _captura_ligada() and not _tem_previa(request):
+    if _captura_ligada() and not (_tem_previa(request) or estado_site.equipe()):
         return RedirectResponse("/lista", status_code=302)
     return None
 
@@ -499,7 +531,7 @@ def pagina_da_bio(request: Request):
     vai, no HTML, para todos os botões internos (pagina_links.py). Montada a cada pedido
     (a origem muda o HTML). Não olha a lista de espera: com a captura ligada, abre igual
     e o botão principal vai para /lista."""
-    if sistema.ativo() != "ocidental":
+    if sistema.ativo() != "ocidental" or not estado_site.pagina_visivel("/links"):
         raise HTTPException(404, "Página não encontrada.")
     t = textos.da_pagina("links", "ocidental")
     captura = _captura_ligada()
@@ -829,7 +861,9 @@ def sitemap():
         publicas += [p["rota"] for p in catalogo.visiveis() if p["rota"] not in publicas]
     if sistema.ativo() == "ocidental":
         publicas.append("/links")  # o link da bio (rodada 19); o canonical não leva a origem
-    if sistema.ativo() == "ocidental" and blog.publicados():
+        # páginas escondidas no painel (rodada 15) saem do sitemap
+        publicas = [r for r in publicas if estado_site.pagina_visivel(r)]
+    if sistema.ativo() == "ocidental" and blog.publicados() and estado_site.pagina_visivel("/blog"):
         publicas += ["/blog"] + [f"/blog/{a['slug']}" for a in blog.publicados()]
     caminhos = ["/lista"] if _captura_ligada() else publicas
     urls = "".join(f"  <url><loc>{entrega.SITE_URL}{c}</loc></url>\n" for c in caminhos)

@@ -28,10 +28,12 @@
         {%- for p in catalogo.visiveis() if p.estado == "ativo" %}
         <a href="{{ p.rota }}"{% if p.rota == atual %} aria-current="page"{% endif %}>{{ p.nome }}{% if p.chave == "mapa" %}<small>amostra grátis</small>{% endif %}</a>
         {%- endfor %}
+        {%- if pagina_visivel("/leituras") %}
         <a href="/leituras"{% if atual == "/leituras" %} aria-current="page"{% endif %}>Todas as leituras</a>
+        {%- endif %}
         <a href="/#quem-revisa">Quem revisa</a>
         <a href="/#perguntas">Perguntas</a>
-        {%- if blog.publicados() %}
+        {%- if blog.publicados() and pagina_visivel("/blog") %}
         <a href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>
         {%- endif %}
         <a href="/minhas-leituras"{% if atual == "/minhas-leituras" %} aria-current="page"{% endif %}>Minhas leituras<small>recuperar links</small></a>
