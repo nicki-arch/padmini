@@ -88,14 +88,17 @@ def test_retrogradacao_vira_um_periodo_so(tres):
 
 
 def test_temas_sao_os_3_de_maior_peso_um_por_par(tres):
+    """Rodada 13; desde a rodada 17 com as regras de duração, planeta e harmônico
+    (test_rodada17_temas.py). Nestes 3 mapas os temas pelo peso já cumpriam as regras."""
     for mid, (_, p) in tres.items():
         temas = p["temas"]
         assert len(temas) == 3, mid
         pares = [(t["planeta"], t["ponto"]) for t in temas]
         assert len(set(pares)) == 3
         assert [t["peso"] for t in temas] == sorted([t["peso"] for t in temas], reverse=True)
-        # nenhum trânsito de par fora dos temas pesa mais que o 3º tema
-        resto = [t for t in p["transitos"] if (t["planeta"], t["ponto"]) not in pares]
+        # nenhum trânsito LONGO de par fora dos temas pesa mais que o 3º tema
+        resto = [t for t in p["transitos"] if (t["planeta"], t["ponto"]) not in pares
+                 and t["dias_no_periodo"] >= pv.DURACAO_MINIMA_TEMA]
         assert all(t["peso"] <= temas[-1]["peso"] for t in resto), mid
 
 
