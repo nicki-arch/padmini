@@ -77,7 +77,8 @@ def _captura_no_ar() -> bool:
     if not (st in (301, 302, 303, 307) and onde.split("?")[0].endswith("/lista")):
         return False
     if not any("captura ligada" in a for a in AVISOS):
-        AVISOS.append("captura ligada (PADMINI_CAPTURA=1): as páginas vão para /lista; botões de compra e "
+        AVISOS.append("captura ligada (lista de espera no painel, ou PADMINI_CAPTURA=1): as páginas vão para "
+                      "/lista; botões de compra e "
                       "preço nas páginas não foram conferidos (voltam sozinhos quando a captura desligar)")
     return True
 
@@ -119,10 +120,16 @@ def _pagamento_no_ar() -> str:
 
 
 def _ativo_no_catalogo(rota: str) -> bool:
-    """Na ocidental, a página só tem botão de compra se o produto está `ativo` no
-    catalogo.yaml (em breve = "me avise"). A védica não tem catálogo."""
+    """Na ocidental, a página só tem botão de compra se o produto está `ativo` para o
+    público (em breve = "me avise"). Desde a rodada 15 quem decide é o /painel: vale o
+    `produtos_ativos` do /api/config; site anterior (sem o campo), o catalogo.yaml.
+    A védica não tem catálogo."""
     if _versao_no_ar() != "ocidental":
         return True
+    st, corpo = req("/api/config")
+    ativos = json.loads(corpo).get("produtos_ativos") if st == 200 else None
+    if isinstance(ativos, list):
+        return rota in ativos
     import yaml
     catalogo = yaml.safe_load((_raiz() / "conteudo" / "ocidental" / "catalogo.yaml").read_text(encoding="utf-8")) or {}
     return any(p.get("rota") == rota and p.get("estado") == "ativo" for p in catalogo.get("produtos") or [])
@@ -348,7 +355,7 @@ PAGINAS_PUBLICAS = ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", 
 
 @checar("[ocidental] produto oculto responde 404 (/comunidade)")
 def _():
-    if _versao_no_ar() != "ocidental":
+    if _versao_no_ar() != "ocidental" or _tudo_liberado_para_todos():
         return True
     return req("/comunidade")[0] == 404
 
@@ -567,17 +574,89 @@ def _():
     return all(_sem_seguir(f"{ANTIGO}/webhook/{w}", {})[0] not in (301, 302, 307, 308) for w in ("stripe", "cakto"))
 
 
+# ---------------------------------------------------------------------------
+# Rodada 15: o /painel e os modos do site (/api/config → modo_site). O smoke se ajusta ao
+# modo, como já faz com vendas_abertas: em "manutenção" confere o 503 e o que continua de
+# pé; em "tudo liberado" na produção confere que o público NÃO vê nada a mais.
+# ---------------------------------------------------------------------------
+def _modo_site() -> str:
+    st, corpo = req("/api/config")
+    modo = json.loads(corpo).get("modo_site") if st == 200 else None
+    return modo or "aberto"  # site anterior à rodada 15: o modo vem da captura (conferida à parte)
+
+
+def _tudo_liberado_para_todos() -> bool:
+    """"Tudo liberado" que vale para o público: só na prévia, e lá tudo sai com noindex."""
+    if _modo_site() != "tudo_liberado":
+        return False
+    with urllib.request.urlopen(BASE + "/", timeout=60) as r:
+        liberado = "noindex" in (r.headers.get("X-Robots-Tag") or "")
+    if liberado and not any("tudo liberado" in a for a in AVISOS):
+        AVISOS.append("tudo liberado para todos (prévia): produtos ocultos abertos de propósito")
+    return liberado
+
+
+@checar("[painel] /painel sem login mostra só o formulário de senha (404 sem a senha)")
+def _():
+    st, corpo = req("/painel")
+    if st == 404:
+        return True
+    texto = corpo.decode("utf-8", "replace")
+    return (st == 200 and 'type="password"' in texto
+            and not any(x in texto for x in ("Modo do site", "Últimas mudanças", "Produtos")))
+
+
+@checar("[painel] ação sem login é recusada (401/403/404)")
+def _():
+    return req("/painel/acao", {"acao": "modo", "valor": "manutencao"})[0] in (401, 403, 404)
+
+
+@checar("[modo teste] o público não vê a faixa nem o link do completo")
+def _():
+    if _tudo_liberado_para_todos():
+        return True
+    corpo = req("/")[1] + req("/mapa")[1]
+    if _modo_site() == "tudo_liberado" and not any("tudo liberado" in a for a in AVISOS):
+        AVISOS.append("tudo liberado na produção: conferido que o público vê o site normal")
+    return b"faixa-teste" not in corpo and b"modo-teste.js" not in corpo
+
+
+def _cheque_manutencao():
+    try:
+        urllib.request.urlopen(BASE + "/", timeout=60)
+        return False
+    except urllib.error.HTTPError as e:
+        return e.code == 503 and e.headers.get("Retry-After") is not None and b"Voltamos" in e.read()
+
+
+CHECAGENS_MANUTENCAO = [
+    ("[manutenção] / responde 503 com Retry-After e \"Voltamos já\"", _cheque_manutencao),
+    ("[manutenção] /api/saude, termos e privacidade respondem 200",
+     lambda: all(req(p)[0] == 200 for p in ("/api/saude", "/termos", "/privacidade"))),
+    ("[manutenção] link com token abre a página (200)", lambda: req("/mapa?token=oc-smoke")[0] == 200),
+    ("[manutenção] webhooks respondem (recusam sem assinatura, sem 503)",
+     lambda: req("/webhook/cakto", {"event": "x"})[0] == 401 and req("/webhook/stripe", {})[0] not in (200, 503)),
+    ("[manutenção] completo continua trancado sem token (402)",
+     lambda: req("/api/ocidental/mapa", {**PESSOA, "nivel": "completo"})[0] == 402),
+]
+
+
 def main():
     # o plano grátis "dorme": a primeira chamada acorda o servidor
     for _ in range(3):
         try:
-            if req("/", timeout=120)[0] == 200:
+            if req("/api/saude", timeout=120)[0] == 200:
                 break
         except Exception:
             time.sleep(5)
-    checagens = list(CHECAGENS)
+    if _modo_site() == "manutencao":
+        # Rodada 15: as páginas respondem 503 de propósito; confere o que continua de pé
+        AVISOS.append("site em MANUTENÇÃO (painel): conferido o 503 e o que continua de pé, não as páginas")
+        checagens = list(CHECAGENS_MANUTENCAO) + [c for c in CHECAGENS if c[0].startswith("[painel]")]
+    else:
+        checagens = list(CHECAGENS)
     # Rodada 11: só com o checkout próprio no ar (com a Cakto, a lista é a de sempre)
-    if _pagamento_no_ar() == "stripe":
+    if _pagamento_no_ar() == "stripe" and _modo_site() != "manutencao":
         checagens += CHECAGENS_STRIPE
     falhas = 0
     for nome, f in checagens:

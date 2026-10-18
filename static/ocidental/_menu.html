@@ -11,7 +11,9 @@
 {%- endif %}
 <a href="/#quem-revisa">Quem revisa</a>
 <a href="/#perguntas">Perguntas</a>
+{%- if pagina_visivel("/leituras") %}
 <a href="/leituras"{% if atual == "/leituras" %} aria-current="page"{% endif %}>Todas as leituras</a>
-{%- if blog.publicados() %}
+{%- endif %}
+{%- if blog.publicados() and pagina_visivel("/blog") %}
 <a href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>
 {%- endif %}

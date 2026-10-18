@@ -26,6 +26,12 @@
    (`q`, montada no servidor por pagina_links.sufixo) vai em TODO link interno. #}
 </head>
 <body class="vz links">
+{%- if modo_teste() %}
+{#- rodada 15: navegador logado no /painel em "tudo liberado". A página com a faixa nunca
+    entra no cache (app._pagina_montada) e o público nunca a vê. #}
+<div class="faixa-teste" role="status"><b>Modo teste:</b> só você está vendo assim. <a href="/painel">Painel</a><span class="faixa-teste-completo" hidden> · <a href="#" id="faixa-teste-link">Abrir a leitura completa</a></span></div>
+<script src="/static/ocidental/modo-teste.js" defer></script>
+{%- endif %}
 <main id="conteudo" class="links-col">
   <div class="foto arco links-foto" aria-hidden="true">{{ marca.retrato(vaga_foto, 104, 130, carregar="eager", roda_tamanho=64) }}</div>
   <h1 class="links-nome">{{ t.nome }}</h1>

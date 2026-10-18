@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FBF6F1">
+{# O /painel (rodada 15): o estado do site numa tela, para o celular primeiro. Montado a
+   cada pedido por app.pagina_painel (nunca vai para o cache), sem PostHog, sem pixel e sem
+   o rodapé (que carrega o aviso de cookies). Todo formulário leva o token CSRF. As
+   confirmações usam confirm() do navegador; a da venda na produção pede ABRIR digitado,
+   e o servidor confere de novo. Nada aqui mostra preço, chave ou dado de cliente. #}
+<title>Painel — Valderez Astrologia</title>
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+</head>
+<body class="vz painel">
+<div class="painel-amb painel-amb-{{ ambiente }}" role="status">
+  {%- if ambiente == "producao" %}<b>PRODUÇÃO</b> · {{ site_host }}{% else %}<b>PRÉVIA</b> · teste{% endif -%}
+</div>
+<main id="conteudo" class="painel-col">
+  <header class="painel-topo">
+    <span class="marca">{{ marca.roda(36) }}<span class="marca-nome"><b>Valderez</b><i>Astrologia</i></span></span>
+    {%- if quem %}
+    <form method="post" action="/painel/sair"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="painel-link" type="submit">Sair ({{ quem }})</button></form>
+    {%- endif %}
+  </header>
+
+  {%- if mensagem %}
+  <p class="painel-msg painel-msg-{{ mensagem.tipo }}" role="{{ 'alert' if mensagem.tipo == 'erro' else 'status' }}">{{ mensagem.texto }}</p>
+  {%- endif %}
+
+  {%- if not quem %}
+  {# ----------------------------------------------------------------- login #}
+  <section class="cartao painel-sec">
+    <h1 class="t3">Painel do site</h1>
+    <form class="painel-login" method="post" action="/painel/entrar">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="campo"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" required></div>
+      <div class="campo"><label for="quem">Quem está mexendo</label>
+        <select id="quem" name="quem">{% for q in quem_opcoes %}<option>{{ q }}</option>{% endfor %}</select></div>
+      <button class="bt bt-1 bt-cheio" type="submit">Entrar</button>
+    </form>
+  </section>
+  {%- else %}
+
+  <p class="painel-resumo">{{ resumo }}</p>
+
+  {# ----------------------------------------------------------------- modo #}
+  <section class="cartao painel-sec" aria-labelledby="t-modo">
+    <h2 id="t-modo" class="painel-t">Modo do site</h2>
+    <div class="painel-grade">
+      {%- for m in modos %}
+      <form method="post" action="/painel/acao" onsubmit="return {{ 'true' if m.atual else 'confirm(this.dataset.confirma)' }}" data-confirma="{{ m.efeito }}">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="acao" value="modo"><input type="hidden" name="valor" value="{{ m.chave }}">
+        <button class="painel-op{% if m.atual %} painel-op-on{% endif %}" type="submit"{% if m.atual %} aria-pressed="true" disabled{% endif %}><b>{{ m.nome }}</b><small>{{ m.curto }}</small></button>
+      </form>
+      {%- endfor %}
+    </div>
+  </section>
+
+  {# ----------------------------------------------------------------- venda #}
+  <section class="cartao painel-sec" aria-labelledby="t-venda">
+    <h2 id="t-venda" class="painel-t">Venda</h2>
+    <p class="painel-linha"><span>Venda {{ "aberta" if vendas else "fechada" }}</span>
+      <span class="chip {{ 'chip-ok' if vendas else 'chip-breve' }}">{{ "ABERTA" if vendas else "FECHADA" }}</span></p>
+    {%- if vendas %}
+    <form method="post" action="/painel/acao" onsubmit="return confirm('A venda vai fechar: nenhuma página mostra preço nem botão de compra. Quem já comprou continua lendo.')">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="acao" value="vendas"><input type="hidden" name="valor" value="fechar">
+      <button class="bt bt-2 bt-cheio" type="submit">Fechar a venda</button>
+    </form>
+    {%- else %}
+    <form method="post" action="/painel/acao" class="painel-abrir">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="acao" value="vendas"><input type="hidden" name="valor" value="abrir">
+      {%- if ambiente == "producao" %}
+      <div class="campo"><label for="confirmacao">Para abrir com cobrança de verdade, digite ABRIR</label>
+        <input id="confirmacao" name="confirmacao" autocomplete="off" autocapitalize="characters" required pattern="ABRIR"></div>
+      {%- endif %}
+      <button class="bt bt-1 bt-cheio" type="submit">Abrir a venda</button>
+    </form>
+    {%- endif %}
+    {%- if venda_teste %}<p class="miudo">PADMINI_VENDAS_TESTE está ligada neste serviço: a venda de teste fica aberta de qualquer jeito.</p>{% endif %}
+  </section>
+
+  {# ----------------------------------------------------------------- produtos #}
+  <section class="cartao painel-sec" aria-labelledby="t-produtos">
+    <h2 id="t-produtos" class="painel-t">Produtos</h2>
+    <ul class="painel-lista">
+      {%- for p in produtos %}
+      <li>
+        <div class="painel-nome"><a href="{{ p.rota }}">{{ p.nome }}</a>
+          {%- for a in p.avisos %} <span class="painel-aviso">{{ a }}</span>{% endfor %}</div>
+        <div class="painel-tres">
+          {%- for chave, nome in estados %}
+          <form method="post" action="/painel/acao" onsubmit="return {{ 'true' if p.estado == chave else 'confirm(this.dataset.confirma)' }}" data-confirma="{{ p.nome }} vai ficar {{ nome }}.">
+            <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="acao" value="produto"><input type="hidden" name="chave" value="{{ p.chave }}"><input type="hidden" name="valor" value="{{ chave }}">
+            <button class="painel-op painel-op-p{% if p.estado == chave %} painel-op-on{% endif %}" type="submit"{% if p.estado == chave %} aria-pressed="true" disabled{% endif %}>{{ nome }}</button>
+          </form>
+          {%- endfor %}
+        </div>
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+
+  {# ----------------------------------------------------------------- páginas #}
+  <section class="cartao painel-sec" aria-labelledby="t-paginas">
+    <h2 id="t-paginas" class="painel-t">Páginas</h2>
+    <ul class="painel-lista">
+      {%- for pg in paginas %}
+      <li class="painel-linha">
+        <span><a href="{{ pg.rota }}">{{ pg.nome }}</a> <span class="miudo">{{ pg.rota }} · {{ "visível" if pg.visivel else "escondida (404)" }}</span></span>
+        <form method="post" action="/painel/acao" onsubmit="return confirm(this.dataset.confirma)" data-confirma="{{ pg.nome }} vai ficar {{ 'escondida: responde 404 e sai do menu, do rodapé e do sitemap' if pg.visivel else 'visível' }}.">
+          <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="acao" value="pagina"><input type="hidden" name="rota" value="{{ pg.rota }}"><input type="hidden" name="valor" value="{{ 'esconder' if pg.visivel else 'mostrar' }}">
+          <button class="painel-op painel-op-p" type="submit">{{ "Esconder" if pg.visivel else "Mostrar" }}</button>
+        </form>
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+
+  {# ----------------------------------------------------------------- só para mim #}
+  <section class="cartao painel-sec" aria-labelledby="t-mim">
+    <h2 id="t-mim" class="painel-t">Tudo liberado só para mim</h2>
+    <p class="miudo">Só este navegador vê os produtos ocultos e em breve e a leitura completa sem pagar, com a faixa “Modo teste”. O público não muda.</p>
+    <form method="post" action="/painel/so-para-mim">
+      <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="valor" value="{{ 'desligar' if so_para_mim else 'ligar' }}">
+      <button class="bt {{ 'bt-2' if so_para_mim else 'bt-1' }} bt-cheio" type="submit">{{ "Desligar o tudo liberado deste navegador" if so_para_mim else "Ver tudo liberado só para mim" }}</button>
+    </form>
+  </section>
+
+  {# ----------------------------------------------------------------- histórico #}
+  <section class="cartao painel-sec" aria-labelledby="t-hist">
+    <h2 id="t-hist" class="painel-t">Últimas mudanças</h2>
+    {%- if historico %}
+    <ol class="painel-hist">
+      {%- for h in historico %}
+      <li><b>{{ h.o_que }}</b>: {{ h.de }} → {{ h.para }} <span class="miudo">· {{ h.quem }} · {{ h.quando }}</span></li>
+      {%- endfor %}
+    </ol>
+    {%- else %}
+    <p class="miudo">Nada mudou pelo painel ainda: vale o catalogo.yaml.</p>
+    {%- endif %}
+  </section>
+
+  <p class="painel-rodape"><a class="bt bt-2 bt-cheio" href="/" target="_blank" rel="noopener">Abrir o site como visitante</a>
+    <span class="miudo">Use uma janela anônima: este navegador está logado no painel.</span></p>
+  {%- endif %}
+</main>
+</body>
+</html>

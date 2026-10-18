@@ -49,6 +49,7 @@ import db
 import depoimentos
 import entrega
 import enderecos
+import estado_site
 import exemplos_ocidental
 import limites
 import marketing
@@ -56,6 +57,7 @@ import marca
 import ofertas
 import pagamento
 import pagina_links
+import painel
 import paleta
 import seguranca
 import stripe_api
@@ -107,6 +109,62 @@ app = FastAPI(title="Padmini", lifespan=_ciclo_de_vida)
 app.middleware("http")(enderecos.redirecionar_dominio_antigo)
 # Cabeçalhos de segurança (CSP, HSTS, anti-iframe, Referrer-Policy) em toda resposta.
 app.middleware("http")(seguranca.cabecalhos_de_seguranca)
+
+
+@app.middleware("http")
+async def _marcar_painel(request: Request, call_next):
+    """Rodada 15: diz ao estado_site se este navegador está logado no /painel (e se pediu
+    o "tudo liberado só para mim"). Sem o cookie, nada muda para ninguém."""
+    equipe = painel.quem_da_sessao(request.cookies.get(painel.COOKIE)) is not None
+    tokens = estado_site.marcar_pedido(equipe, request.cookies.get(painel.COOKIE_SO_PARA_MIM) == "1")
+    try:
+        if not equipe and _fechado_para_manutencao(request):
+            return _pagina_de_manutencao(request)
+        resposta = await call_next(request)
+        # "tudo liberado" (na prévia, ou só para este navegador): nada disso vai para buscador
+        if estado_site.tudo_liberado_global() or estado_site.liberado_para_mim():
+            resposta.headers["X-Robots-Tag"] = "noindex, nofollow"
+        return resposta
+    finally:
+        estado_site.desmarcar(tokens)
+
+
+# Modo "manutenção" (rodada 15): o público recebe "Voltamos já" (503 + Retry-After). Continua
+# de pé o que não pode cair: links com token (e a API que eles chamam), /live, webhooks,
+# termos, privacidade, /painel, /api/saude, o checkout e o "obrigado" de quem já estava
+# pagando, /minhas-leituras e o descadastro. Um pedido NOVO de compra (POST /api/checkout)
+# não abre. O navegador logado no painel vê o site normal.
+_ABRE_NA_MANUTENCAO = ("/api/", "/webhook/", "/static/", "/live", "/painel", "/termos", "/privacidade",
+                       "/checkout/", "/obrigado/", "/minhas-leituras", "/descadastrar", "/robots.txt",
+                       "/sitemap.xml", "/favicon")
+_FECHA_NA_MANUTENCAO = ("/api/checkout",)
+SEGUNDOS_VOLTAMOS_JA = 300
+
+
+def _fechado_para_manutencao(request: Request) -> bool:
+    if estado_site.modo() != "manutencao" or "token" in request.query_params:
+        return False
+    caminho = request.url.path
+    if caminho.startswith(_FECHA_NA_MANUTENCAO):
+        return True
+    return not caminho.startswith(_ABRE_NA_MANUTENCAO)
+
+
+def _pagina_de_manutencao(request: Request) -> Response:
+    cab = {"Retry-After": str(SEGUNDOS_VOLTAMOS_JA), "Cache-Control": "no-store",
+           "X-Robots-Tag": "noindex"}
+    if request.url.path.startswith("/api/") or "text/html" not in request.headers.get("accept", "text/html"):
+        return JSONResponse({"detail": "Estamos em manutenção. Voltamos já."}, status_code=503, headers=cab)
+    if sistema.ativo() == "ocidental":
+        html = _jinja.get_template("ocidental/manutencao.html").render(
+            cores=paleta.tela("ocidental"), marca=marca, contato=enderecos.CONTATO)
+    else:
+        html = ('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="robots" content="noindex">'
+                '<meta name="viewport" content="width=device-width, initial-scale=1"><title>Padmini — voltamos já</title>'
+                '<link rel="stylesheet" href="/static/base.css"></head><body><main style="max-width:520px;margin:12vh auto;'
+                'padding:0 16px"><h1>Voltamos já</h1><p>O site está em manutenção por alguns minutos. Quem já comprou '
+                'continua abrindo a leitura pelo link do e-mail.</p></main></body></html>')
+    return Response(html, status_code=503, media_type="text/html; charset=utf-8", headers=cab)
 
 
 @app.middleware("http")
@@ -201,18 +259,22 @@ class PedidoCompatibilidade(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Pré-lançamento: com PADMINI_CAPTURA=1 o site fica "trancado" — home, mapa e
-# compatibilidade mandam para a lista de espera (/lista). Continuam abrindo:
+# Lista de espera: o modo "lista_espera" do /painel (rodada 15; sem nada salvo no
+# painel, vale o PADMINI_CAPTURA=1 de antes). O site fica "trancado" — home, mapa e
+# produtos mandam para a lista de espera (/lista). Continuam abrindo:
 #   - links de entrega (têm `token`), para quem já comprou;
 #   - quem tem a chave de prévia (PADMINI_PREVIA_CHAVE): abrir qualquer página
-#     com ?previa=CHAVE grava um cookie e libera o site nesse navegador.
-# Desligar = apagar a variável (ou pôr 0) na Render; não precisa de deploy.
+#     com ?previa=CHAVE grava um cookie e libera o site nesse navegador;
+#   - o navegador logado no /painel.
 # ---------------------------------------------------------------------------
 def _captura_ligada() -> bool:
-    return os.environ.get("PADMINI_CAPTURA") == "1"
+    return estado_site.modo() == "lista_espera"
 
 
 _paginas_prontas: dict[tuple[str, str], str] = {}
+# O estado público do site (estado_site.assinatura) com que as páginas do cache foram
+# montadas: mudou no painel, o cache se esvazia (as páginas mostram venda e produtos).
+_assinatura_do_cache = [""]
 
 # As páginas são templates: o texto vem de `conteudo/<pagina>.yaml` e o preço de
 # `conteudo/<versão>/ofertas.yaml`. Montado no servidor, e não por JavaScript, para o
@@ -256,13 +318,28 @@ _jinja.globals["site"] = enderecos.SITE_URL
 _jinja.globals["site_host"] = enderecos.SITE_HOST
 _jinja.globals["contato"] = enderecos.CONTATO
 _jinja.globals["redes"] = enderecos.REDES
+# Páginas que o /painel pode esconder (rodada 15): o menu, o rodapé e os links perguntam.
+_jinja.globals["pagina_visivel"] = estado_site.pagina_visivel
+# A faixa "Modo teste: só você está vendo assim" (navegador logado no painel em "tudo
+# liberado"). Páginas com ela nunca entram no cache (_pagina_montada).
+_jinja.globals["modo_teste"] = estado_site.liberado_para_mim
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:
     """Serve uma página montada de uma versão do site. O resultado fica em
-    memória: os arquivos só mudam em deploy, que reinicia o processo.
+    memória: os arquivos só mudam em deploy, que reinicia o processo, e o estado do
+    site (painel) muda a assinatura, que esvazia o cache.
     `extra` vai para o template (e entra na chave do cache: ex. o produto da
     página "em breve")."""
+    if estado_site.pessoal():
+        # modo teste do navegador logado no painel: monta na hora e NÃO guarda (o público
+        # nunca recebe uma página montada com o cookie de alguém)
+        html = _jinja.get_template(arquivo).render(**_contexto(versao, pagina, **extra))
+        return Response(html, media_type="text/html; charset=utf-8", headers={"Cache-Control": "no-store"})
+    assinatura = estado_site.assinatura()
+    if assinatura != _assinatura_do_cache[0]:
+        _paginas_prontas.clear()
+        _assinatura_do_cache[0] = assinatura
     chave = (versao, arquivo) + tuple(sorted((k, str(v.get("chave") if isinstance(v, dict) else v))
                                              for k, v in extra.items()))
     if chave not in _paginas_prontas:
@@ -345,6 +422,7 @@ def _pagina_ou_lista(request: Request, rota: str):
     previa_url = request.query_params.get("previa", "")
     liberado = (not _captura_ligada()
                 or "token" in request.query_params
+                or estado_site.equipe()
                 or (chave and (request.cookies.get("pad_previa") == chave or previa_url == chave)))
     if not liberado:
         destino = "/lista"
@@ -407,7 +485,7 @@ def pagina_seu_ano(request: Request):
 @app.api_route("/leituras", methods=["GET", "HEAD"])
 def pagina_leituras(request: Request):
     """Todas as leituras (ocidental): os produtos ativos e em breve do catálogo."""
-    if sistema.ativo() != "ocidental":
+    if sistema.ativo() != "ocidental" or not estado_site.pagina_visivel("/leituras"):
         raise HTTPException(404, "Página não encontrada.")
     return _pagina_ou_lista(request, "/leituras")
 
@@ -434,8 +512,13 @@ def _tem_previa(request: Request) -> bool:
     return bool(chave and chave in (request.query_params.get("previa"), request.cookies.get("pad_previa")))
 
 
+def _ve_rascunhos(request: Request) -> bool:
+    """Rascunhos do blog: com a chave de prévia ou em "tudo liberado" (rodada 15)."""
+    return _tem_previa(request) or estado_site.liberado()
+
+
 def _pagina_do_blog(request: Request, artigo: dict | None, artigos: list[dict]) -> Response:
-    previa = _tem_previa(request)
+    previa = _ve_rascunhos(request)
     html = _jinja.get_template("ocidental/blog.html").render(
         artigo=artigo, artigos=artigos, rascunho=previa and (artigo is None or not artigo["revisado"]),
         cores=paleta.tela("ocidental"), fontes=paleta.FONTES["ocidental"], marca=marca, blog=blog)
@@ -444,10 +527,11 @@ def _pagina_do_blog(request: Request, artigo: dict | None, artigos: list[dict]) 
 
 
 def _blog_liberado(request: Request):
-    """O blog só existe na ocidental; com a captura ligada, só com a prévia."""
-    if sistema.ativo() != "ocidental":
+    """O blog só existe na ocidental; escondido no painel, 404; com a captura ligada, só
+    com a prévia (ou logado no painel)."""
+    if sistema.ativo() != "ocidental" or not estado_site.pagina_visivel("/blog"):
         raise HTTPException(404, "Página não encontrada.")
-    if _captura_ligada() and not _tem_previa(request):
+    if _captura_ligada() and not (_tem_previa(request) or estado_site.equipe()):
         return RedirectResponse("/lista", status_code=302)
     return None
 
@@ -459,7 +543,7 @@ def pagina_blog(request: Request):
     desvio = _blog_liberado(request)
     if desvio:
         return desvio
-    artigos = list(blog.todos()) if _tem_previa(request) else blog.publicados()
+    artigos = list(blog.todos()) if _ve_rascunhos(request) else blog.publicados()
     if not artigos:
         raise HTTPException(404, "Página não encontrada.")
     return _pagina_do_blog(request, None, artigos)
@@ -471,7 +555,7 @@ def pagina_artigo(slug: str, request: Request):
     if desvio:
         return desvio
     artigo = blog.artigo(slug)
-    if artigo is None or not (artigo["revisado"] is True or _tem_previa(request)):
+    if artigo is None or not (artigo["revisado"] is True or _ve_rascunhos(request)):
         raise HTTPException(404, "Página não encontrada.")
     return _pagina_do_blog(request, artigo, [])
 
@@ -499,7 +583,7 @@ def pagina_da_bio(request: Request):
     vai, no HTML, para todos os botões internos (pagina_links.py). Montada a cada pedido
     (a origem muda o HTML). Não olha a lista de espera: com a captura ligada, abre igual
     e o botão principal vai para /lista."""
-    if sistema.ativo() != "ocidental":
+    if sistema.ativo() != "ocidental" or not estado_site.pagina_visivel("/links"):
         raise HTTPException(404, "Página não encontrada.")
     t = textos.da_pagina("links", "ocidental")
     captura = _captura_ligada()
@@ -507,6 +591,152 @@ def pagina_da_bio(request: Request):
         "ocidental", "links", b=pagina_links.botoes(t, captura), vaga_foto=pagina_links.VAGA_FOTO,
         q=pagina_links.sufixo(pagina_links.origem(request.query_params))))
     return Response(html, media_type="text/html; charset=utf-8")
+
+
+# ---------------------------------------------------------------------------
+# O /painel (rodada 15): o estado do site numa tela (painel.py + estado_site.py). Só existe
+# com PADMINI_PAINEL_SENHA (16+ caracteres) e a ocidental no ar; sem isso, 404. Formulários
+# simples (funcionam sem JavaScript), todo POST com CSRF, nada em cache, nada de terceiros.
+# ---------------------------------------------------------------------------
+COOKIE_PAINEL_PRE = "pad_painel_pre"  # CSRF do formulário de senha (antes de haver sessão)
+_CURTO_MODO = {"aberto": "o normal", "lista_espera": "todos para /lista", "manutencao": "“Voltamos já”"}
+_SEM_CACHE = {"Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow"}
+
+
+def _painel_ligado() -> None:
+    if not painel.ligado() or sistema.ativo() != "ocidental":
+        raise HTTPException(404, "Página não encontrada.")
+
+
+async def _formulario(request: Request) -> dict:
+    import urllib.parse
+    corpo = (await request.body())[:20_000].decode("utf-8", "replace")
+    return {k: v[0] for k, v in urllib.parse.parse_qs(corpo, keep_blank_values=True).items()}
+
+
+def _cookie_do_painel(resp: Response, nome: str, valor: str, segundos: int) -> None:
+    resp.set_cookie(nome, valor, max_age=segundos, httponly=True, secure=True, samesite="strict", path="/")
+
+
+def _tela_painel(request: Request, quem: str | None, mensagem: dict | None = None, status: int = 200) -> Response:
+    sessao = request.cookies.get(painel.COOKIE, "")
+    pre = None
+    if quem:
+        token = painel.csrf(sessao)
+        ctx = dict(
+            resumo=painel.resumo(), vendas=painel.vendas_decididas(), venda_teste=pagamento.vendas_teste(),
+            produtos=painel.produtos(), paginas=painel.paginas(), estados=list(painel.NOMES_ESTADO.items()),
+            historico=painel.historico(db.historico_config_site(20)),
+            so_para_mim=request.cookies.get(painel.COOKIE_SO_PARA_MIM) == "1",
+            modos=[{"chave": m, "nome": estado_site.NOMES_MODO[m], "atual": m == estado_site.modo(),
+                    "efeito": painel.efeito_do_modo(m),
+                    "curto": _CURTO_MODO.get(m) or ("só a equipe" if estado_site.ambiente() == "producao"
+                                                    else "a prévia inteira")}
+                   for m in estado_site.MODOS])
+    else:
+        import secrets
+        pre = request.cookies.get(COOKIE_PAINEL_PRE) or secrets.token_urlsafe(24)
+        token, ctx = painel.csrf(pre), {}
+    html = _jinja.get_template("ocidental/painel.html").render(
+        quem=quem, quem_opcoes=painel.QUEM, csrf=token, mensagem=mensagem, ambiente=estado_site.ambiente(),
+        site_host=enderecos.SITE_HOST, marca=marca, **ctx)
+    resp = Response(html, status_code=status, media_type="text/html; charset=utf-8", headers=_SEM_CACHE)
+    if pre and request.cookies.get(COOKIE_PAINEL_PRE) != pre:
+        _cookie_do_painel(resp, COOKIE_PAINEL_PRE, pre, 60 * 60)
+    return resp
+
+
+_MENSAGENS_PAINEL = {"1": "Pronto, já está no ar.", "mim": "Pronto: este navegador mudou de modo."}
+
+
+@app.get("/painel")
+def pagina_painel(request: Request):
+    _painel_ligado()
+    quem = painel.quem_da_sessao(request.cookies.get(painel.COOKIE))
+    feito = _MENSAGENS_PAINEL.get(request.query_params.get("feito", "")) if quem else None
+    return _tela_painel(request, quem, {"tipo": "ok", "texto": feito} if feito else None)
+
+
+@app.post("/painel/entrar")
+async def painel_entrar(request: Request):
+    _painel_ligado()
+    form = await _formulario(request)
+    if not painel.csrf_confere(request.cookies.get(COOKIE_PAINEL_PRE), form.get("csrf")):
+        raise HTTPException(403, "Formulário vencido. Recarregue a página do painel.")
+    ip = limites.ip_do_cliente(request)
+    if limites.PAINEL_FALHAS_IP.estourado(ip) or limites.PAINEL_FALHAS_GLOBAL.estourado("todos"):
+        resp = _tela_painel(request, None, {"tipo": "erro", "texto": "Muitas tentativas erradas. Espere 15 minutos."},
+                            status=429)
+        resp.headers["Retry-After"] = "900"
+        return resp
+    if not painel.senha_confere(form.get("senha", "")):
+        limites.PAINEL_FALHAS_IP.registrar(ip)
+        limites.PAINEL_FALHAS_GLOBAL.registrar("todos")
+        log.warning("painel: senha incorreta (ip %s)", ip)
+        return _tela_painel(request, None, {"tipo": "erro", "texto": "Senha incorreta."}, status=401)
+    quem = form.get("quem") if form.get("quem") in painel.QUEM else painel.QUEM[0]
+    valor, _ = painel.emitir_sessao(quem)
+    resp = RedirectResponse("/painel", status_code=303, headers=_SEM_CACHE)
+    _cookie_do_painel(resp, painel.COOKIE, valor, painel.HORAS_SESSAO * 3600)
+    resp.delete_cookie(COOKIE_PAINEL_PRE, path="/")
+    return resp
+
+
+async def _sessao_do_post(request: Request) -> tuple[str, dict]:
+    """Quem está logado e o formulário, com o CSRF conferido (403 sem ele)."""
+    _painel_ligado()
+    form = await _formulario(request)
+    valor = request.cookies.get(painel.COOKIE)
+    quem = painel.quem_da_sessao(valor)
+    if not quem:
+        raise HTTPException(401, "Sessão do painel expirada. Entre de novo.")
+    if not painel.csrf_confere(valor, form.get("csrf")):
+        raise HTTPException(403, "Formulário sem o token de segurança. Recarregue a página do painel.")
+    return quem, form
+
+
+@app.post("/painel/acao")
+async def painel_acao(request: Request, tarefas: BackgroundTasks):
+    quem, form = await _sessao_do_post(request)
+    try:
+        mudancas, frase = painel.mudancas(form.get("acao", ""), form)
+    except painel.Recusa as recusa:
+        return _tela_painel(request, quem, {"tipo": "erro", "texto": str(recusa)}, status=409)
+    if not db.ativo():
+        return _tela_painel(request, quem, {"tipo": "erro", "texto": "Este serviço não tem banco: o painel não "
+                                            "consegue salvar. Nada mudou."}, status=503)
+    try:
+        feitas = db.gravar_config_site(mudancas, quem)
+    except Exception:  # noqa: BLE001
+        log.exception("painel: não gravou %s", mudancas)
+        return _tela_painel(request, quem, {"tipo": "erro", "texto": "Não salvou: o banco não respondeu. Nada "
+                                            "mudou; tente de novo."}, status=503)
+    estado_site.invalidar()
+    if feitas:
+        log.info("painel: %s mudou %s", quem, frase)
+        tarefas.add_task(painel.avisar, quem, frase)
+    return RedirectResponse("/painel?feito=1", status_code=303, headers=_SEM_CACHE)
+
+
+@app.post("/painel/so-para-mim")
+async def painel_so_para_mim(request: Request):
+    await _sessao_do_post(request)
+    form = await _formulario(request)
+    resp = RedirectResponse("/painel?feito=mim", status_code=303, headers=_SEM_CACHE)
+    if form.get("valor") == "ligar":
+        _cookie_do_painel(resp, painel.COOKIE_SO_PARA_MIM, "1", painel.HORAS_SESSAO * 3600)
+    else:
+        resp.delete_cookie(painel.COOKIE_SO_PARA_MIM, path="/")
+    return resp
+
+
+@app.post("/painel/sair")
+async def painel_sair(request: Request):
+    await _sessao_do_post(request)
+    resp = RedirectResponse("/painel", status_code=303, headers=_SEM_CACHE)
+    resp.delete_cookie(painel.COOKIE, path="/")
+    resp.delete_cookie(painel.COOKIE_SO_PARA_MIM, path="/")
+    return resp
 
 
 # ---------------------------------------------------------------------------
@@ -809,7 +1039,9 @@ def robots():
     # carregam token na URL — nada disso deve entrar em buscador.
     corpo = ("User-agent: *\n"
              "Disallow: /live\n"
-             "Disallow: /api/\n"
+             # o /painel (rodada 15) só existe na ocidental: a védica fica byte a byte igual
+             + ("Disallow: /painel\n" if sistema.ativo() == "ocidental" else "")
+             + "Disallow: /api/\n"
              "Disallow: /*?token=\n"
              # /static serve os mesmos HTMLs crus, ainda com os marcadores de preço.
              "Disallow: /static/*.html\n"
@@ -829,7 +1061,9 @@ def sitemap():
         publicas += [p["rota"] for p in catalogo.visiveis() if p["rota"] not in publicas]
     if sistema.ativo() == "ocidental":
         publicas.append("/links")  # o link da bio (rodada 19); o canonical não leva a origem
-    if sistema.ativo() == "ocidental" and blog.publicados():
+        # páginas escondidas no painel (rodada 15) saem do sitemap
+        publicas = [r for r in publicas if estado_site.pagina_visivel(r)]
+    if sistema.ativo() == "ocidental" and blog.publicados() and estado_site.pagina_visivel("/blog"):
         publicas += ["/blog"] + [f"/blog/{a['slug']}" for a in blog.publicados()]
     caminhos = ["/lista"] if _captura_ligada() else publicas
     urls = "".join(f"  <url><loc>{entrega.SITE_URL}{c}</loc></url>\n" for c in caminhos)
@@ -892,8 +1126,15 @@ def config():
         "data_abertura": os.environ.get("PADMINI_DATA_ABERTURA", ""),
         # "receber a amostra por e-mail" só aparece se o envio estiver configurado
         "amostra_email": bool(os.environ.get("RESEND_API_KEY")),
-        # interruptor de venda da ocidental (catalogo.yaml); o smoke usa
+        # interruptor de venda da ocidental (painel → catalogo.yaml); o smoke usa
         "vendas_abertas": catalogo.vendas_abertas(sistema.ativo()),
+        # rodada 15: o modo do site (painel → PADMINI_CAPTURA) e as páginas de produto ativas
+        # PARA O PÚBLICO (oculto nunca aparece aqui). Nunca o estado do cookie de quem pede:
+        # o smoke se ajusta por estes dois campos.
+        "modo_site": estado_site.modo(),
+        "produtos_ativos": ([p["rota"] for p in catalogo.produtos_do_yaml()
+                             if catalogo.estado_publico(p["chave"]) == "ativo"]
+                            if sistema.ativo() == "ocidental" else []),
         # quem cobra na ocidental (rodada 11): cakto | stripe; o smoke usa
         "pagamento": pagamento.modo(),
         # Pixels de anúncio (rodada 6): só com a ocidental no ar, e o navegador só os

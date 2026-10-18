@@ -7,6 +7,12 @@
      sem_menu  true na /lista com a captura ligada: as outras páginas levam de
                volta para a lista, então não há menu (aparece "Abre em breve"). #}
 {%- set _sem_menu = sem_menu is defined and sem_menu %}
+{%- if modo_teste() %}
+{#- rodada 15: navegador logado no /painel em "tudo liberado". A página com a faixa nunca
+    entra no cache (app._pagina_montada) e o público nunca a vê. #}
+<div class="faixa-teste" role="status"><b>Modo teste:</b> só você está vendo assim. <a href="/painel">Painel</a><span class="faixa-teste-completo" hidden> · <a href="#" id="faixa-teste-link">Abrir a leitura completa</a></span></div>
+<script src="/static/ocidental/modo-teste.js" defer></script>
+{%- endif %}
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 <header class="cab">
   <div class="cab-in">
@@ -28,10 +34,12 @@
         {%- for p in catalogo.visiveis() if p.estado == "ativo" %}
         <a href="{{ p.rota }}"{% if p.rota == atual %} aria-current="page"{% endif %}>{{ p.nome }}{% if p.chave == "mapa" %}<small>amostra grátis</small>{% endif %}</a>
         {%- endfor %}
+        {%- if pagina_visivel("/leituras") %}
         <a href="/leituras"{% if atual == "/leituras" %} aria-current="page"{% endif %}>Todas as leituras</a>
+        {%- endif %}
         <a href="/#quem-revisa">Quem revisa</a>
         <a href="/#perguntas">Perguntas</a>
-        {%- if blog.publicados() %}
+        {%- if blog.publicados() and pagina_visivel("/blog") %}
         <a href="/blog"{% if atual == "/blog" %} aria-current="page"{% endif %}>Blog</a>
         {%- endif %}
         <a href="/minhas-leituras"{% if atual == "/minhas-leituras" %} aria-current="page"{% endif %}>Minhas leituras<small>recuperar links</small></a>

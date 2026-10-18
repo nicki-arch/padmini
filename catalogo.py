@@ -3,6 +3,11 @@ Valderez Astrologia (versão ocidental) — o CATÁLOGO: quais produtos estão n
 em que estado, em que ordem, e se o site vende. Lido de
 `conteudo/ocidental/catalogo.yaml` (ver o cabeçalho de lá).
 
+Rodada 15: o YAML é o PADRÃO; quem manda no ar é o /painel. O estado de cada produto
+e o interruptor de venda passam por `estado_site.py` (painel → YAML), que também aplica
+o "tudo liberado". `produtos()`, `visiveis()`, `estado()` e `ativo()` já devolvem o
+estado no ar; o YAML cru fica em `dados()` / `produtos_do_yaml()` (o painel mostra).
+
     ativo     aparece em todo lugar e a página funciona
     em_breve  aparece com "em breve"; a página mostra o "me avise"
     oculto    não aparece em lugar nenhum; a rota responde 404
@@ -24,6 +29,7 @@ from pathlib import Path
 
 import yaml
 
+import estado_site
 import pagamento
 
 ARQUIVO = Path(__file__).parent / "conteudo" / "ocidental" / "catalogo.yaml"
@@ -85,11 +91,17 @@ def vendas_abertas(sistema: str = "ocidental") -> bool:
     em que estiver, sem mexer no YAML."""
     if sistema != "ocidental":
         return True
-    return bool(_dados["vendas_abertas"]) or pagamento.vendas_teste()
+    return estado_site.vendas_abertas(bool(_dados["vendas_abertas"])) or pagamento.vendas_teste()
+
+
+def produtos_do_yaml() -> list[dict]:
+    """Os produtos como estão no catalogo.yaml (o padrão, sem o painel)."""
+    return list(_dados.get("produtos") or [])
 
 
 def produtos() -> list[dict]:
-    return list(_dados.get("produtos") or [])
+    """Os produtos com o estado NO AR (painel → YAML; "tudo liberado" por cima)."""
+    return [dict(p, estado=estado_site.estado_produto(p["chave"], p["estado"])) for p in produtos_do_yaml()]
 
 
 def visiveis() -> list[dict]:
@@ -120,11 +132,22 @@ def interesses() -> tuple[str, ...]:
     return tuple(p["chave"] for p in visiveis())
 
 
+def estado_publico(chave: str) -> str:
+    """O estado que vale para VENDER: o do público, sem o modo teste do navegador logado
+    no painel (que mostra o produto, mas nunca abre uma venda de verdade)."""
+    p = next((x for x in produtos_do_yaml() if x["chave"] == chave), None)
+    return estado_site.estado_produto(chave, p["estado"], publico=True) if p else "oculto"
+
+
 def vende(chave: str, sistema: str = "ocidental") -> bool:
-    """Mostra preço e botão de compra deste produto? Só com a venda aberta e o produto ativo."""
+    """Mostra preço e botão de compra deste produto? Só com a venda aberta e o produto
+    ativo para o público (o checkout pergunta a mesma coisa)."""
     if sistema != "ocidental":
         return True
-    return vendas_abertas() and ativo(chave)
+    # produto sem `oferta` (comunidade, cursos, consulta…) não se vende: nem no "tudo liberado"
+    # da prévia, que liga todos (rodada 15; antes a /links quebrava procurando o preço dele)
+    p = next((x for x in produtos_do_yaml() if x["chave"] == chave), None)
+    return bool(p and p.get("oferta")) and vendas_abertas() and estado_publico(chave) == "ativo"
 
 
 def colunas(quantos: int, maximo: int = 4) -> int:

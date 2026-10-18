@@ -38,7 +38,9 @@
       {%- if catalogo.ativo("mapa") and produto.chave != "mapa" %}
       <p><a href="/mapa">{{ catalogo.textos().em_breve.enquanto_isso }}</a></p>
       {%- endif %}
+      {%- if pagina_visivel("/leituras") %}
       <p><a href="/leituras">Todas as leituras</a></p>
+      {%- endif %}
     </div>
     <div>{% set aviso_produto = produto %}{% include "ocidental/_me_avise.html" %}</div>
   </section>

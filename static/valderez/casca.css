@@ -111,3 +111,8 @@
 @media print { .cab, .rod, .cookie, .skip { display: none; } }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0);
   white-space: nowrap; border: 0; }
+/* Rodada 15: a faixa "Modo teste" (navegador logado no /painel em "tudo liberado"). Fixa no
+   topo, em tom de alerta: não pode haver dúvida de que esta tela não é a do público. */
+.faixa-teste { position: sticky; top: 0; z-index: 60; background: var(--vz-vinho-esc); color: var(--vz-branco);
+  font-size: 14px; line-height: 1.4; padding: 8px 16px; text-align: center; }
+.faixa-teste a, .vz .faixa-teste a { color: var(--vz-branco); text-decoration: underline; }

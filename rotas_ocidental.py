@@ -95,9 +95,19 @@ def entregar_amostra(request: Request, p: ComEmail, email: str, produto: str, da
     # recebe o lembrete de sempre (1 e-mail, dentro do "até 3" que autorizou).
     db.registrar_amostra_email(email, produto, dados, p.aceita_sequencia, origem, VERSAO,
                                aceita_sequencia=p.aceita_sequencia)
-    if enviado:
-        return {**tela, "parcial": True, "email": {"enviado": True, "para": email}}
-    return {**inteira, "email": {"enviado": False, "para": email}}
+    resposta = ({**tela, "parcial": True, "email": {"enviado": True, "para": email}} if enviado
+                else {**inteira, "email": {"enviado": False, "para": email}})
+    import estado_site
+    if estado_site.leitura_liberada():
+        # modo teste do navegador logado no /painel (rodada 15): o link do completo, com token
+        # de verdade, para a faixa "Modo teste" mostrar. O público nunca recebe isto.
+        try:
+            link = entrega.link_completo(produto, dados, VERSAO)
+            # relativo: abre no serviço em que a pessoa está (a prévia não é o SITE_URL)
+            resposta["link_completo"] = link[len(entrega.SITE_URL):] if link.startswith(entrega.SITE_URL) else link
+        except Exception:  # noqa: BLE001
+            log.exception("modo teste: não deu para montar o link do completo de %s", produto)
+    return resposta
 
 
 def _pessoa_para_dados(x) -> dict:

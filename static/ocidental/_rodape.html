@@ -27,7 +27,9 @@
         {%- for p in catalogo.visiveis() %}
         <a href="{{ p.rota }}">{{ p.nome }}{% if p.estado == "em_breve" %}&nbsp;<span class="rod-breve">(em breve)</span>{% endif %}</a>
         {%- endfor %}
+        {%- if pagina_visivel("/leituras") %}
         <a href="/leituras">Todas as leituras</a>
+        {%- endif %}
       </nav>
       <nav aria-label="Ajuda">
         <a href="/minhas-leituras">Minhas leituras</a>
