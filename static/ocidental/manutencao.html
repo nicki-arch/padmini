@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FBF6F1">
+{# Modo "manutenção" do /painel (rodada 15): servida por app._pagina_de_manutencao com
+   HTTP 503 e Retry-After. Sem menu nem rodapé de links: as outras páginas também estão
+   em manutenção. Quem comprou continua lendo pelo link do e-mail (links com token abrem). #}
+<title>Voltamos já — Valderez Astrologia</title>
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+</head>
+<body class="vz">
+<header class="cab">
+  <div class="cab-in">
+    <span class="marca">{{ marca.roda(48) }}<span class="marca-nome"><b>Valderez</b><i>Astrologia</i></span></span>
+    <span class="cab-chip">Voltamos já</span>
+  </div>
+</header>
+<main id="conteudo" class="degrade">
+  <section class="erro-topo">
+    <div>
+      <span class="chip chip-breve">Manutenção</span>
+      <h1 class="t2">Voltamos <em>já</em></h1>
+      <p class="lead">O site está passando por uma arrumação rápida. Volte daqui a alguns minutos.</p>
+      <p>Comprou uma leitura? Ela continua abrindo pelo link do e-mail. Se não achar o e-mail, <a href="/minhas-leituras">peça os seus links de novo</a> ou escreva para <a href="mailto:{{ contato }}">{{ contato }}</a>.</p>
+    </div>
+    {{ ilustracao("dim-proposito", classe="erro-img", carregar="eager") }}
+  </section>
+</main>
+</body>
+</html>

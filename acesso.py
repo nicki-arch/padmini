@@ -104,8 +104,11 @@ def sessao_valida(papel: str, valor: str | None, agora: int | None = None) -> bo
 
 
 def completo_liberado(produto: str, chave: str, token: str | None, sistema: str = "vedica") -> bool:
-    """True se o completo desta versão pode ser servido para este pedido."""
-    if MODO_ABERTO:
+    """True se o completo desta versão pode ser servido para este pedido. Sem token, só
+    no navegador logado no /painel em modo teste (rodada 15, estado_site.leitura_liberada):
+    nunca para o público, em nenhum modo."""
+    import estado_site
+    if MODO_ABERTO or estado_site.leitura_liberada():
         return True
     if not SEGREDO or not token:
         return False

@@ -7,6 +7,12 @@
      sem_menu  true na /lista com a captura ligada: as outras páginas levam de
                volta para a lista, então não há menu (aparece "Abre em breve"). #}
 {%- set _sem_menu = sem_menu is defined and sem_menu %}
+{%- if modo_teste() %}
+{#- rodada 15: navegador logado no /painel em "tudo liberado". A página com a faixa nunca
+    entra no cache (app._pagina_montada) e o público nunca a vê. #}
+<div class="faixa-teste" role="status"><b>Modo teste:</b> só você está vendo assim. <a href="/painel">Painel</a><span class="faixa-teste-completo" hidden> · <a href="#" id="faixa-teste-link">Abrir a leitura completa</a></span></div>
+<script src="/static/ocidental/modo-teste.js" defer></script>
+{%- endif %}
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 <header class="cab">
   <div class="cab-in">

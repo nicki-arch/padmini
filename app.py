@@ -118,9 +118,53 @@ async def _marcar_painel(request: Request, call_next):
     equipe = painel.quem_da_sessao(request.cookies.get(painel.COOKIE)) is not None
     tokens = estado_site.marcar_pedido(equipe, request.cookies.get(painel.COOKIE_SO_PARA_MIM) == "1")
     try:
-        return await call_next(request)
+        if not equipe and _fechado_para_manutencao(request):
+            return _pagina_de_manutencao(request)
+        resposta = await call_next(request)
+        # "tudo liberado" (na prévia, ou só para este navegador): nada disso vai para buscador
+        if estado_site.tudo_liberado_global() or estado_site.liberado_para_mim():
+            resposta.headers["X-Robots-Tag"] = "noindex, nofollow"
+        return resposta
     finally:
         estado_site.desmarcar(tokens)
+
+
+# Modo "manutenção" (rodada 15): o público recebe "Voltamos já" (503 + Retry-After). Continua
+# de pé o que não pode cair: links com token (e a API que eles chamam), /live, webhooks,
+# termos, privacidade, /painel, /api/saude, o checkout e o "obrigado" de quem já estava
+# pagando, /minhas-leituras e o descadastro. Um pedido NOVO de compra (POST /api/checkout)
+# não abre. O navegador logado no painel vê o site normal.
+_ABRE_NA_MANUTENCAO = ("/api/", "/webhook/", "/static/", "/live", "/painel", "/termos", "/privacidade",
+                       "/checkout/", "/obrigado/", "/minhas-leituras", "/descadastrar", "/robots.txt",
+                       "/sitemap.xml", "/favicon")
+_FECHA_NA_MANUTENCAO = ("/api/checkout",)
+SEGUNDOS_VOLTAMOS_JA = 300
+
+
+def _fechado_para_manutencao(request: Request) -> bool:
+    if estado_site.modo() != "manutencao" or "token" in request.query_params:
+        return False
+    caminho = request.url.path
+    if caminho.startswith(_FECHA_NA_MANUTENCAO):
+        return True
+    return not caminho.startswith(_ABRE_NA_MANUTENCAO)
+
+
+def _pagina_de_manutencao(request: Request) -> Response:
+    cab = {"Retry-After": str(SEGUNDOS_VOLTAMOS_JA), "Cache-Control": "no-store",
+           "X-Robots-Tag": "noindex"}
+    if request.url.path.startswith("/api/") or "text/html" not in request.headers.get("accept", "text/html"):
+        return JSONResponse({"detail": "Estamos em manutenção. Voltamos já."}, status_code=503, headers=cab)
+    if sistema.ativo() == "ocidental":
+        html = _jinja.get_template("ocidental/manutencao.html").render(
+            cores=paleta.tela("ocidental"), marca=marca, contato=enderecos.CONTATO)
+    else:
+        html = ('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="robots" content="noindex">'
+                '<meta name="viewport" content="width=device-width, initial-scale=1"><title>Padmini — voltamos já</title>'
+                '<link rel="stylesheet" href="/static/base.css"></head><body><main style="max-width:520px;margin:12vh auto;'
+                'padding:0 16px"><h1>Voltamos já</h1><p>O site está em manutenção por alguns minutos. Quem já comprou '
+                'continua abrindo a leitura pelo link do e-mail.</p></main></body></html>')
+    return Response(html, status_code=503, media_type="text/html; charset=utf-8", headers=cab)
 
 
 @app.middleware("http")
@@ -276,6 +320,9 @@ _jinja.globals["contato"] = enderecos.CONTATO
 _jinja.globals["redes"] = enderecos.REDES
 # Páginas que o /painel pode esconder (rodada 15): o menu, o rodapé e os links perguntam.
 _jinja.globals["pagina_visivel"] = estado_site.pagina_visivel
+# A faixa "Modo teste: só você está vendo assim" (navegador logado no painel em "tudo
+# liberado"). Páginas com ela nunca entram no cache (_pagina_montada).
+_jinja.globals["modo_teste"] = estado_site.liberado_para_mim
 
 
 def _pagina_montada(arquivo: str, versao: str, pagina: str, **extra) -> Response:
@@ -465,8 +512,13 @@ def _tem_previa(request: Request) -> bool:
     return bool(chave and chave in (request.query_params.get("previa"), request.cookies.get("pad_previa")))
 
 
+def _ve_rascunhos(request: Request) -> bool:
+    """Rascunhos do blog: com a chave de prévia ou em "tudo liberado" (rodada 15)."""
+    return _tem_previa(request) or estado_site.liberado()
+
+
 def _pagina_do_blog(request: Request, artigo: dict | None, artigos: list[dict]) -> Response:
-    previa = _tem_previa(request)
+    previa = _ve_rascunhos(request)
     html = _jinja.get_template("ocidental/blog.html").render(
         artigo=artigo, artigos=artigos, rascunho=previa and (artigo is None or not artigo["revisado"]),
         cores=paleta.tela("ocidental"), fontes=paleta.FONTES["ocidental"], marca=marca, blog=blog)
@@ -491,7 +543,7 @@ def pagina_blog(request: Request):
     desvio = _blog_liberado(request)
     if desvio:
         return desvio
-    artigos = list(blog.todos()) if _tem_previa(request) else blog.publicados()
+    artigos = list(blog.todos()) if _ve_rascunhos(request) else blog.publicados()
     if not artigos:
         raise HTTPException(404, "Página não encontrada.")
     return _pagina_do_blog(request, None, artigos)
@@ -503,7 +555,7 @@ def pagina_artigo(slug: str, request: Request):
     if desvio:
         return desvio
     artigo = blog.artigo(slug)
-    if artigo is None or not (artigo["revisado"] is True or _tem_previa(request)):
+    if artigo is None or not (artigo["revisado"] is True or _ve_rascunhos(request)):
         raise HTTPException(404, "Página não encontrada.")
     return _pagina_do_blog(request, artigo, [])
 

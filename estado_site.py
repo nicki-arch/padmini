@@ -184,6 +184,11 @@ def liberado_para_mim() -> bool:
     return _liberado_para_mim.get()
 
 
+def liberado() -> bool:
+    """Este pedido vê "tudo liberado" (a prévia inteira, ou só este navegador)?"""
+    return tudo_liberado_global() or liberado_para_mim()
+
+
 def leitura_liberada() -> bool:
     """A leitura completa sem pagar: só no navegador logado no painel, em modo teste.
     Nunca para o público, em nenhum modo (nem na prévia: lá a compra de teste é o teste)."""
