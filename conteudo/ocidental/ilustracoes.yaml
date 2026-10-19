@@ -43,7 +43,7 @@ vagas:
   dim-sol: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
   dim-venus: {proporcao: [1, 1], minimo: [640, 640], usada_em: [home, amostra, leitura, pdf]}
   foto-valderez: {proporcao: [3, 4], minimo: [900, 1200], usada_em: [home, produto, leituras], opcional: true}
-  foto-valderez-rosto: {proporcao: [4, 5], minimo: [560, 700], usada_em: [home, links, mapa, seu-ano, lista], opcional: true}
+  foto-valderez-rosto: {proporcao: [4, 5], minimo: [560, 700], usada_em: [home, links, mapa, seu-ano, lista, calendario-lunar, pdf], opcional: true}
   fundo-redes-1: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
   fundo-redes-2: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}
   fundo-redes-3: {proporcao: [9, 16], minimo: [941, 1672], usada_em: [redes]}

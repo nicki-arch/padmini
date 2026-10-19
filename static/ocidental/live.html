@@ -8,7 +8,7 @@
 <title>Modo live — Valderez Astrologia</title>
 {# Versão ocidental do modo live (mapa natal, sinastria, numerologia, tarot e, com o
    produto ativo no estado do site ou no "tudo liberado", O seu ano: `live_previsao`,
-   rodada 17). Marca
+   rodada 17, e A sua Lua no ano: `live_calendario`, rodada 14). Marca
    Valderez Astrologia (rodada visual, fase C): tema ESCURO do pacote de ponta a ponta
    (tela de transmissão: muito contraste, pouca decoração), componentes do pacote,
    sem base.css. Os nomes de classe de antes (campo, dica, erro, sub) ganham o visual
@@ -85,6 +85,9 @@
         {%- if live_previsao %}
         <button class="aba" id="aba-ano" role="tab" aria-selected="false">O seu ano</button>
         {%- endif %}
+        {%- if live_calendario %}
+        <button class="aba" id="aba-lua" role="tab" aria-selected="false">A sua Lua no ano</button>
+        {%- endif %}
       </div>
       <button class="aba" id="botao-sair" type="button">Sair</button>
     </div>
@@ -151,6 +154,20 @@
       </div>
       <p class="erro" id="erro-ano" role="alert" hidden></p>
       <button class="acao" id="gerar-ano" type="submit">Gerar O seu ano</button>
+    </form>
+    {%- endif %}
+
+    {%- if live_calendario %}
+    <form id="form-lua" class="card" novalidate hidden>
+      <p class="sub" style="margin:0 0 12px">O calendário lunar dos próximos 12 meses, a partir deste mês. Os horários saem no horário de Brasília.</p>
+      <div class="campos">
+        <div class="campo"><label for="l-nome">Nome</label><input id="l-nome" autocomplete="off"></div>
+        <div class="campo"><label for="l-data">Nascimento</label><input id="l-data" inputmode="numeric" placeholder="dd/mm/aaaa"></div>
+        <div class="campo"><label for="l-hora">Hora <span class="dica">(vazio = não sabe)</span></label><input id="l-hora" inputmode="numeric" placeholder="hh:mm"></div>
+        <div class="campo largo auto"><label for="l-cidade">Cidade de nascimento</label><input id="l-cidade" autocomplete="off" placeholder="Comece a digitar"><ul id="l-cidade-lista" role="listbox" hidden></ul></div>
+      </div>
+      <p class="erro" id="erro-lua" role="alert" hidden></p>
+      <button class="acao" id="gerar-lua" type="submit">Gerar A sua Lua no ano</button>
     </form>
     {%- endif %}
 
@@ -247,7 +264,7 @@ $("#botao-sair").addEventListener("click", async () => {
 });
 
 // ---------- abas ----------
-const ABAS = ["mapa", "casal", "num", "tarot", "ano"];
+const ABAS = ["mapa", "casal", "num", "tarot", "ano", "lua"];
 function aba(qual) {
   ABAS.forEach((a) => {
     const el = document.getElementById(`aba-${a}`);
@@ -445,6 +462,50 @@ function desenharAno(d) {
       ${d.eclipses.length ? `<h3>Eclipses</h3>${d.eclipses.map((e) => `<p><b>${esc(e.titulo)}</b><br>${esc(e.texto || "")}</p>`).join("")}` : ""}
       ${rs ? `<h3>${esc(rs.titulo)}</h3>${rs.ascendente ? `<p><b>Ascendente da Revolução em ${esc(rs.ascendente_pt)}:</b> ${esc(rs.texto_ascendente)}</p><p><b>O Sol na casa ${rs.casa_do_sol}:</b> ${esc(rs.texto_sol)}</p>` : `<p class="aviso">${esc(rs.aviso)}</p>`}` : ""}
       <p>${esc(d.fechamento)}</p></div>`;
+  $("#resultado").hidden = false;
+  $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------- A sua Lua no ano (rodada 14; só existe com o produto ativo no estado do site) ----------
+if ($("#form-lua")) {
+  mascara($("#l-data"), [2, 2, 4], "/"); mascara($("#l-hora"), [2, 2], ":");
+  const cidadeL = ligarCidade("#l-cidade", "#l-cidade-lista");
+  $("#form-lua").addEventListener("submit", async (e) => {
+    e.preventDefault(); erro("#erro-lua", "");
+    const data = dataISO($("#l-data").value), hora = $("#l-hora").value.trim();
+    if (!data) return erro("#erro-lua", "Data no formato dd/mm/aaaa.");
+    if (hora && !/^\d{2}:\d{2}$/.test(hora)) return erro("#erro-lua", "Hora no formato hh:mm (ou deixe vazio).");
+    if (!cidadeL.escolhida) return erro("#erro-lua", "Escolha a cidade na lista.");
+    const botao = $("#gerar-lua"); botao.disabled = true; botao.textContent = "Gerando…";
+    const base = { nome: $("#l-nome").value.trim(), data, hora, lat: cidadeL.escolhida.lat, lon: cidadeL.escolhida.lon, cidade: cidadeL.escolhida.rotulo };
+    try {
+      const t = await pedir("/api/live/ocidental/token/calendario", base);
+      desenharLua(await pedir("/api/ocidental/calendario/completo", { token: t.token }), base.nome, t.link);
+    } catch (err) { erro("#erro-lua", err.message); }
+    finally { botao.disabled = false; botao.textContent = "Gerar A sua Lua no ano"; }
+  });
+}
+function desenharLua(d, nome, link) {
+  // a amostra grátis do site: as luas dos próximos 30 dias, a primeira com o texto; o resto é pago
+  const eventos = d.meses.flatMap((m) => m.eventos);
+  const hoje = new Date().toISOString().slice(0, 10), ate = new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10);
+  const proximos = eventos.filter((e) => e.data >= hoje && e.data < ate && e.tipo !== "mercurio_direto");
+  const linhaEv = (e) => `<p><b>${esc(e.titulo)}</b><br><span class="sub">${esc(e.dia)} às ${esc(e.hora)}${e.casa ? ` · casa ${e.casa}` : ""}</span></p>`;
+  const completoEv = (e) => `${linhaEv(e)}${(e.textos || []).map((t) => `<p>${esc(t)}</p>`).join("")}${e.eclipse && e.eclipse.texto ? `<p><b>${esc(e.eclipse.titulo)}:</b> ${esc(e.eclipse.texto)}</p>` : ""}`;
+  const primeiro = proximos[0];
+  const textoPrimeiro = primeiro ? (primeiro.tipo === "revolucao" && d.revolucao_lunar ? [d.revolucao_lunar.texto] : primeiro.textos || []) : [];
+  $("#resultado").innerHTML = `
+    <h2 class="grande">A sua Lua no ano${nome ? `, ${esc(nome)}` : ""}</h2>
+    <p class="sub">${esc(d.periodo)} · ${esc(d.fuso_nome)}${d.tem_hora ? "" : " · sem hora de nascimento"}</p>
+    ${d.avisos.map((a) => `<p class="aviso">${esc(a)}</p>`).join("")}
+    <p class="faixa gratis">Amostra grátis</p>
+    <div class="destaques">${proximos.map((e) => `<div><span>${esc(e.dia)} · ${esc(e.hora)}</span><b>${esc(e.titulo)}</b></div>`).join("")}</div>
+    <div class="secao">${primeiro ? linhaEv(primeiro) + textoPrimeiro.map((t) => `<p>${esc(t)}</p>`).join("") : `<p>${esc(d.intro.lunacoes)}</p>`}</div>
+    ${DIVISOR}
+    <div class="secao">${d.meses.filter((m) => m.eventos.length).map((m) => `<h3>${esc(m.rotulo)}</h3>${m.eventos.map(completoEv).join("")}`).join("")}
+      ${d.revolucao_lunar ? `<h3>A sua Revolução Lunar (Lua em ${esc(d.revolucao_lunar.signo_pt)})</h3><p>${esc(d.revolucao_lunar.texto)}</p>` : ""}
+      <p>${esc(d.fechamento)}</p>
+      <p class="sub">Link do calendário completo (só o token, sem dados de nascimento): <a href="${esc(link)}" target="_blank" rel="noreferrer">abrir</a></p></div>`;
   $("#resultado").hidden = false;
   $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
 }

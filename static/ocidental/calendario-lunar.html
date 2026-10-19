@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6F1">
+<title>{{ t.seo.titulo }}</title>
+<meta name="description" content="{{ t.seo.descricao }}">
+<link rel="canonical" href="{{ site }}/calendario-lunar">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Valderez Astrologia">
+<meta property="og:title" content="{{ t.seo.og_titulo }}">
+<meta property="og:description" content="{{ t.seo.og_descricao }}">
+<meta property="og:image" content="{{ site }}/static/og-oc-mapa.png">
+<meta property="og:url" content="{{ site }}/calendario-lunar">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="referrer" content="no-referrer">{# o link do completo leva o token: nunca no Referer #}
+{% include "ocidental/_head_valderez.html" %}
+<link rel="stylesheet" href="/static/valderez/v2.css">
+<script src="/static/afiliado.js" defer></script>
+{%- if stripe and catalogo.vende("calendario") %}
+<script src="/static/ocidental/comprar.js" defer></script>{# checkout próprio (rodada 11) #}
+{%- endif %}
+<script src="/static/ocidental/amostra-email.js" defer></script>
+<script src="/static/ocidental/me-avise.js" defer></script>
+<meta name="pad-consentimento" content="exigido">
+<script src="/static/ocidental/consentimento.js" defer></script>
+<script src="/static/analytics.js" defer></script>
+{# "A sua Lua no ano" — calendário lunar personalizado (rodada 14). Mesmos estados do /seu-ano:
+   #estado-form → #estado-carregando → #resultado (a amostra: os próximos 30 dias, o 1º evento
+   com metade do texto; ou, com token, o completo: destaques, mês a mês, Revolução Lunar, PDF e
+   .ics). Texto da página: conteudo/ocidental/calendario-lunar.yaml; textos da leitura:
+   repositório privado (textos/calendario/), montados no servidor (montar_calendario.py).
+   O link pago leva SÓ o token cifrado: nenhum dado de nascimento na URL. Nada do pago existe
+   na página sem a resposta autorizada da API. Visual: só as classes e os tokens --vz-* do
+   pacote 2.0 (nada de cor nova).
+   API: /api/ocidental/calendario, /calendario/completo, /calendario/pdf e
+   /calendario-lunar/agenda.ics. #}
+<style>
+  /* A sua Lua no ano: duas colunas (navegação dos meses + o calendário) */
+  .lua-grade { grid-template-columns: 200px minmax(0, 1fr); }
+  .ev { border-top: 1px solid var(--vz-linha); padding: 16px 0 6px; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+  .ev h3 { margin: 0 0 2px; font-size: 20px; }
+  .ev .quando { font-size: 14px; color: var(--vz-tinta-3); margin: 0 0 8px; }
+  .ev .eclipse { border-left: 3px solid var(--vz-vinho); padding-left: 12px; }
+  .fase { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; color: var(--vz-tinta-1); font-size: 22px; line-height: 1; }
+  .fase svg { width: 26px; height: 26px; }
+  .destaques { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .destaques .cartao h3 { margin: 6px 0 2px; font-size: 20px; }
+  .lista-30 { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .lista-30 li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .lista-30 .quando { font-size: 14px; color: var(--vz-tinta-3); }
+  .datas-rl { columns: 2; font-size: 15px; padding-left: 18px; }
+  .acoes-cal { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .acoes-cal select { min-height: 44px; }
+  @media (max-width: 900px) {
+    .lua-grade { grid-template-columns: minmax(0, 1fr); }
+    .destaques { grid-template-columns: minmax(0, 1fr); }
+    .datas-rl { columns: 1; }
+  }
+</style>
+</head>
+<body class="vz">
+{% set atual = "/calendario-lunar" %}{% include "ocidental/_cabecalho.html" %}
+{%- set vende = catalogo.vende("calendario") %}
+
+<main id="conteudo">
+  <div class="estado" id="estado-form">
+    <section class="mapa-form degrade">
+      <div class="mapa-intro">
+        <ol class="passos-topo" aria-label="Etapas">{% for p in t.passos %}<li{% if loop.first %} aria-current="step"{% endif %}>{{ loop.index }} {{ p }}</li>{% endfor %}</ol>
+        <span class="olho">{{ t.form.olho }}</span>
+        <h1 class="t1">{{ t.form.titulo }}</h1>
+        <p class="lead">{{ t.form.lede }}</p>
+        <ul class="itens-dim">
+          {%- for i in t.form.itens %}
+          <li><span class="ico" aria-hidden="true">{{ icone(i.icone) }}</span>
+            <span><b>{{ i.titulo }}</b><br><span class="miudo">{{ i.get("sub") or (i.sub_venda if vende else i.sub_fechada) }}</span></span></li>
+          {%- endfor %}
+        </ul>
+      </div>
+
+      <form id="form" class="cartao cartao-form form" novalidate aria-labelledby="titulo-form">
+        <h2 id="titulo-form" class="t3">{{ t.form.titulo_cartao }}</h2>
+        <div class="campo">
+          <label for="nome">{{ t.form.nome }}</label>
+          <input id="nome" name="nome" autocomplete="given-name" maxlength="80" required aria-describedby="nome-ajuda">
+          <span class="ajuda" id="nome-ajuda">{{ t.form.nome_ajuda }}</span>
+        </div>
+        <div class="campos-2">
+          <div class="campo">
+            <label for="data">{{ t.form.data }}</label>
+            <input id="data" name="data" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" maxlength="10" required>
+          </div>
+          <div class="campo">
+            <label for="hora">{{ t.form.hora }}</label>
+            <input id="hora" name="hora" type="text" inputmode="numeric" autocomplete="off" placeholder="hh:mm" maxlength="5" aria-describedby="hora-ajuda">
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="sem-hora" name="sem-hora"><span>{{ t.form.sem_hora }}</span></label>
+        <span class="ajuda miudo" id="hora-ajuda">{{ t.form.hora_ajuda }}</span>
+        <div class="campo">
+          <label for="cidade" id="cidade-label">{{ t.form.cidade }}</label>
+          <div class="auto">
+            <input id="cidade" name="cidade" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cidades" autocomplete="off" placeholder="Comece a digitar, ex.: Porto Alegre" required aria-describedby="cidade-status">
+            <ul id="cidades" role="listbox" aria-labelledby="cidade-label" hidden></ul>
+          </div>
+          <span class="ajuda" id="cidade-status" aria-live="polite">{{ t.form.cidade_ajuda }}</span>
+        </div>
+        <div class="campo">
+          <label for="fuso">{{ t.form.fuso }}</label>
+          <select id="fuso" name="fuso" aria-describedby="fuso-ajuda">
+            {%- for f in t.fusos %}<option value="{{ f.valor }}">{{ f.rotulo }}</option>{% endfor %}
+          </select>
+          <span class="ajuda" id="fuso-ajuda">{{ t.form.fuso_ajuda }}</span>
+        </div>
+        {% set sem_caixa_sequencia = true %}{% include "ocidental/_campo_email_vz.html" %}
+        <p class="form-erro" id="erro" role="alert" tabindex="-1" hidden></p>
+        <button class="bt bt-1 bt-cheio" id="enviar" type="submit">{{ t.form.botao }}</button>
+        <p class="miudo" style="text-align:center">{{ t.form.miudo }} <a href="/privacidade">Privacidade</a></p>
+      </form>
+    </section>
+  </div>
+
+  <div class="estado degrade" id="estado-carregando" hidden>
+    <section class="calculando" aria-busy="true">
+      <ol class="passos-topo" aria-label="Etapas">{% for p in t.passos %}<li{% if loop.index == 2 %} aria-current="step"{% endif %}>{{ p }}</li>{% endfor %}</ol>
+      <div class="roda-gira" aria-hidden="true">{{ marca.roda(220) }}{{ ilustracao("dim-lua", classe="meio", carregar="eager") }}</div>
+      <h1 class="t3" id="titulo-carregando" tabindex="-1">{{ t.calculando.titulo }} <em id="data-carregando"></em></h1>
+      <p class="apoio" role="status">{{ t.calculando.sub }}</p>
+      <ul class="cartao etapas-calc" id="etapas-calc">
+        {%- for e in t.calculando.etapas %}
+        <li><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="7"/></svg>{{ e }}</li>
+        {%- endfor %}
+      </ul>
+    </section>
+  </div>
+
+  <div class="estado" id="resultado" aria-live="polite" hidden></div>
+</main>
+
+{% set nota_rodape %}Calendário pelo zodíaco tropical, casas Placidus; luas novas e cheias, eclipses e estações de Mercúrio calculados com o Swiss Ephemeris e conferidos com o timeanddate.com. Ferramenta de autoconhecimento: descreve o clima de cada fase, não acontecimentos, e não substitui orientação profissional. Dados de cidades: <a href="https://www.geonames.org/" rel="noopener">GeoNames</a> (CC BY 4.0).{% endset %}{% include "ocidental/_rodape.html" %}
+
+<script>
+const PAGAR_NA_STRIPE = {{ "true" if stripe else "false" }};
+{%- if vende %}
+const LINK_CHECKOUT = "#comprar";
+{%- else %}
+// Venda fechada, produto oculto ou sem preço (catalogo.yaml): sem preço, sem link de compra.
+const LINK_CHECKOUT = "";
+{%- endif %}
+const TA = {{ t.amostra | tojson }};
+const TC = {{ t.completo | tojson }};
+const FUSOS = {{ t.fusos | tojson }};
+{%- if stripe %}
+TA.pagamento = TA.pagamento_stripe;
+{%- endif %}
+const PASSOS = {{ t.passos | tojson }};
+
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const maiuscula = (s) => String(s || "").charAt(0).toUpperCase() + String(s || "").slice(1);
+let ultimoPedido = null;
+let ultimoContato = null;
+let tokenPago = null;
+window.padCorpoCompra = () => ultimoPedido && ({ produto: "calendario",
+  pessoa: { nome: ultimoPedido.nome, data: ultimoPedido.data, hora: ultimoPedido.hora, lat: ultimoPedido.lat, lon: ultimoPedido.lon, cidade: ultimoPedido.cidade },
+  email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: false });
+
+// ---------- ícone de cada evento (as fases desenhadas, como no PDF) ----------
+function icone(tipo, eclipse) {
+  const anel = eclipse ? `<circle cx="12" cy="12" r="11" fill="none" stroke="var(--vz-vinho)" stroke-width="1.6"/>` : "";
+  const rotulo = { nova: "Lua nova", cheia: "Lua cheia", mercurio: "Mercúrio retrógrado", mercurio_direto: "Mercúrio direto", revolucao: "Revolução Lunar" }[tipo] || "";
+  let desenho;
+  if (tipo === "nova") desenho = `<svg viewBox="0 0 24 24" aria-hidden="true">${anel}<circle cx="12" cy="12" r="8" fill="currentColor"/></svg>`;
+  else if (tipo === "cheia") desenho = `<svg viewBox="0 0 24 24" aria-hidden="true">${anel}<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`;
+  else desenho = `<span aria-hidden="true">${tipo === "revolucao" ? "☽" : "☿"}</span>`;
+  return `<span class="fase" role="img" aria-label="${esc(rotulo)}">${desenho}</span>`;
+}
+
+// ---------- máscara de data e hora, cidade (iguais às do /mapa) ----------
+function aplicarMascara(el, tamanhos, separador) {
+  el.addEventListener("input", () => {
+    const digitos = el.value.replace(/\D/g, "").slice(0, tamanhos.reduce((a, b) => a + b, 0));
+    let pos = 0;
+    el.value = tamanhos.map((t) => digitos.slice(pos, (pos += t))).filter(Boolean).join(separador);
+  });
+}
+aplicarMascara($("#data"), [2, 2, 4], "/");
+aplicarMascara($("#hora"), [2, 2], ":");
+$("#sem-hora").addEventListener("change", (e) => { $("#hora").disabled = e.target.checked; if (e.target.checked) $("#hora").value = ""; });
+function dataParaISO(brasileira) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(brasileira.trim());
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
+}
+
+let cidadeEscolhida = null, opcoes = [], ativa = -1, timer;
+const input = $("#cidade"), lista = $("#cidades");
+function fecharLista() { lista.hidden = true; input.setAttribute("aria-expanded", "false"); ativa = -1; input.closest(".auto").style.marginBottom = ""; }
+function desenharLista() {
+  lista.innerHTML = opcoes.map((c, i) => `<li role="option" id="op-${i}" aria-selected="${i === ativa}">${esc(c.rotulo)}</li>`).join("");
+  lista.hidden = opcoes.length === 0;
+  input.setAttribute("aria-expanded", String(!lista.hidden));
+  if (ativa >= 0) input.setAttribute("aria-activedescendant", `op-${ativa}`); else input.removeAttribute("aria-activedescendant");
+  input.closest(".auto").style.marginBottom = lista.hidden ? "" : `${Math.min(lista.scrollHeight, 280) + 4}px`;
+}
+function statusCidade(texto, ok) { const el = $("#cidade-status"); el.textContent = texto; el.classList.toggle("ok", !!ok); input.classList.toggle("escolhida", !!ok); }
+function escolher(i) { cidadeEscolhida = opcoes[i]; input.value = cidadeEscolhida.rotulo; fecharLista(); statusCidade("✓ Cidade escolhida", true); }
+input.addEventListener("input", () => {
+  cidadeEscolhida = null; clearTimeout(timer); statusCidade("");
+  const q = input.value.trim();
+  if (q.length < 2) { opcoes = []; fecharLista(); return; }
+  timer = setTimeout(async () => {
+    try {
+      const r = await fetch(`/api/cidades?q=${encodeURIComponent(q)}`); opcoes = await r.json(); ativa = opcoes.length ? 0 : -1; desenharLista();
+      statusCidade(opcoes.length ? "" : "Nenhuma cidade encontrada. Tente só o começo do nome.");
+    }
+    catch { opcoes = []; fecharLista(); statusCidade("Não deu para buscar agora. Tente de novo em instantes."); }
+  }, 180);
+});
+input.addEventListener("keydown", (e) => {
+  if (lista.hidden) return;
+  if (e.key === "ArrowDown") { ativa = (ativa + 1) % opcoes.length; desenharLista(); e.preventDefault(); }
+  else if (e.key === "ArrowUp") { ativa = (ativa - 1 + opcoes.length) % opcoes.length; desenharLista(); e.preventDefault(); }
+  else if (e.key === "Enter" && ativa >= 0) { escolher(ativa); e.preventDefault(); }
+  else if (e.key === "Escape") fecharLista();
+});
+lista.addEventListener("mousedown", (e) => { const li = e.target.closest("li"); if (li) { e.preventDefault(); escolher(Number(li.id.slice(3))); } });
+input.addEventListener("blur", () => setTimeout(fecharLista, 100));
+
+// ---------- estados da página ----------
+function mostrarEstado(qual) {
+  for (const id of ["estado-form", "estado-carregando", "resultado"]) $("#" + id).hidden = id !== qual;
+}
+function focar(el) { if (!el) return; el.setAttribute("tabindex", "-1"); el.focus({ preventScroll: true }); el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+function mostrarErro(msg, campo) {
+  const el = $("#erro"); el.textContent = msg; el.hidden = !msg;
+  document.querySelectorAll("#form [aria-invalid]").forEach((x) => x.removeAttribute("aria-invalid"));
+  if (campo) { campo.setAttribute("aria-invalid", "true"); campo.focus(); }
+}
+async function pedir(url, corpo) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+  const c = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof c.detail === "string" ? c.detail : "Confira os dados informados.");
+  return c;
+}
+let timerEtapas = null;
+function animarEtapas() {
+  const itens = [...document.querySelectorAll("#etapas-calc li")];
+  let i = 0;
+  itens.forEach((li) => li.className = "");
+  const passo = () => { itens.forEach((li, j) => li.className = j < i ? "feito" : j === i ? "agora" : ""); i = Math.min(i + 1, itens.length - 1); };
+  passo(); clearInterval(timerEtapas); timerEtapas = setInterval(passo, 700);
+}
+
+$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  mostrarErro("");
+  const data = dataParaISO($("#data").value);
+  const semHora = $("#sem-hora").checked;
+  const hora = semHora ? "" : $("#hora").value;
+  if ($("#nome").value.trim().length < 2) return mostrarErro("Preencha o seu nome.", $("#nome"));
+  if (!data) return mostrarErro("Preencha a data de nascimento no formato dd/mm/aaaa.", $("#data"));
+  if (!semHora && !/^\d{2}:\d{2}$/.test(hora)) return mostrarErro("Preencha a hora no formato hh:mm — ou marque \"Não sei a hora\".", $("#hora"));
+  if (!cidadeEscolhida) return mostrarErro("Escolha a cidade na lista de sugestões.", $("#cidade"));
+  const contato = padEmail.ler();
+  if (contato.erro) return mostrarErro(contato.erro, $("#email"));
+  const botao = $("#enviar");
+  botao.disabled = true; botao.setAttribute("aria-busy", "true"); botao.textContent = "Calculando…";
+  $("#data-carregando").textContent = $("#data").value;
+  mostrarEstado("estado-carregando"); animarEtapas(); focar($("#titulo-carregando"));
+  try {
+    ultimoPedido = { nome: $("#nome").value.trim(), data, hora, lat: cidadeEscolhida.lat, lon: cidadeEscolhida.lon, cidade: cidadeEscolhida.rotulo, fuso: $("#fuso").value };
+    ultimoContato = { ...contato, aceita_sequencia: false };
+    desenharAmostra(await pedir("/api/ocidental/calendario", { ...ultimoPedido, ...ultimoContato }));
+  } catch (err) {
+    mostrarEstado("estado-form");
+    mostrarErro(err.message || "Não foi possível calcular. Tente de novo.", $("#erro"));
+  } finally {
+    clearInterval(timerEtapas);
+    botao.disabled = false; botao.removeAttribute("aria-busy"); botao.textContent = {{ t.form.botao | tojson }};
+  }
+});
+
+// ---------- amostra: os próximos 30 dias; o 1º com metade do texto ----------
+const icoCadeado = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+function desenharAmostra(d) {
+  const a = d.amostra;
+  const destino = LINK_CHECKOUT ? "#comprar" : "#me-avise";
+  const tampa = `<div class="vela"><p class="fumo" aria-hidden="true">${esc(TA.fumo)}</p><div class="tampa"><a class="bt bt-2" href="${destino}">${icoCadeado}${esc(LINK_CHECKOUT ? TA.desbloquear : TA.avisar)}</a></div></div>`;
+  // se o e-mail não saiu, a amostra veio inteira: o texto do 1º evento todo
+  const itens = (a.proximos || []).map((ev, i) => `<li>${icone(ev.tipo)}<div>
+      <h3 class="t3" style="margin:0">${esc(ev.titulo)}</h3><p class="quando">${esc(maiuscula(ev.dia))} às ${esc(ev.hora)}${ev.casa ? ` · na sua casa ${ev.casa}` : ""}</p>
+      ${i === 0 ? `<p>${esc(a.texto || a.trecho)}</p>${a.texto ? "" : tampa}` : ""}</div></li>`).join("");
+  const emailOk = d.email && d.email.enviado;
+  const res = $("#resultado");
+  res.innerHTML = `<section class="amostra-topo degrade">
+      <ol class="passos-topo" aria-label="Etapas">${PASSOS.map((p, i) => `<li${i === 2 ? ' aria-current="step"' : ""}>${i + 1} ${esc(p)}</li>`).join("")}</ol>
+      <div class="amostra-topo-linha">
+        <div><span class="olho">${esc(TA.olho)} ${esc(ultimoPedido.nome)}</span><h1 class="t1" id="titulo-resultado" tabindex="-1">${esc(TA.subtitulo)}</h1><p class="apoio">${esc(a.fuso_nome)}</p></div>
+        ${emailOk ? `<div class="aviso-ok" role="status"><span>${esc(TA.email_foi)} <b>${esc(d.email.para)}</b>. <button type="button" class="bt bt-2 bt-p" id="reenviar-amostra" style="margin-top:8px">${esc(TA.email_reenviar)}</button> <span class="miudo" id="reenvio-status" aria-live="polite"></span></span></div>` : ""}
+      </div>
+      ${(a.avisos || []).map((t) => `<p class="aviso">${esc(t)}</p>`).join("")}
+    </section>
+    <section class="amostra">
+      <div>
+        <p class="lead">${esc(a.abertura)}</p>
+        <article class="cartao leitura">${itens ? `<ul class="lista-30">${itens}</ul>` : `<p>${esc(TA.vazio)}</p>`}</article>
+        <p style="margin-top:24px"><a href="/calendario-lunar" id="corrigir">${esc(TA.corrigir)}</a></p>
+      </div>
+      <aside class="cartao lateral" id="comprar">
+      {%- if vende %}
+        <span class="olho">${esc(TA.lateral_olho)}</span>
+        <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>
+        <div style="display:flex;align-items:baseline;gap:10px"><span class="preco">{{ preco_de(ofertas.calendario) }}R${{ ofertas.calendario.preco | moeda }}</span><span class="miudo">${esc(TA.pagamento_unico)}</span></div>
+        <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+        ${PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="calendario">${esc(TA.botao_comprar)} {{ preco_de(ofertas.calendario) }}R${{ ofertas.calendario.preco | moeda }}</a>
+          <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p>`}
+      {%- else %}
+        <span class="olho">${esc(TA.lateral_olho)}</span>
+        <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>
+        <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+        {%- if catalogo.estado("calendario") != "oculto" %}
+        {% set aviso_produto = catalogo.produto("calendario") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}
+        {%- else %}
+        <p class="miudo" id="me-avise">${esc(TA.nao_vende)}</p>
+        {%- endif %}
+      {%- endif %}
+        <div class="assina"><div class="foto arco" aria-hidden="true">{{ marca.retrato("foto-valderez-rosto", 44, 55, roda_tamanho=28) }}</div><p class="miudo">{{ revisao("assinatura") }}</p></div>
+      </aside>
+    </section>`;
+  mostrarEstado("resultado");
+  if (window.padMeAvise) padMeAvise.preencher(res, { nome: ultimoPedido.nome, email: ultimoContato && ultimoContato.email });
+  $("#corrigir").addEventListener("click", (e) => { e.preventDefault(); mostrarEstado("estado-form"); focar($("#nome")); });
+  padEmail.ligar(() => pedir("/api/ocidental/calendario", { ...ultimoPedido, ...ultimoContato }));
+  if (window.padTrack) padTrack("amostra_gerada", { produto: "calendario", sistema: "ocidental" });
+  focar($("#titulo-resultado"));
+}
+
+// ---------- o completo (só com o token, que a API abre) ----------
+function quando(e) {
+  let q = `${maiuscula(e.dia)} às ${e.hora}`;
+  if (e.periodo) q = `${maiuscula(e.periodo)} · estaciona às ${e.hora} e volta a andar direto às ${e.hora_fim}`;
+  if (e.casa) q += ` · na sua casa ${e.casa}`;
+  if (e.toca && e.toca.length) q += ` · sobre ${e.toca.map((t) => t.do_ponto).join(", ")}`;
+  return q;
+}
+function evento(e) {
+  const textos = (e.textos || []).map((t) => `<p>${esc(t)}</p>`).join("");
+  const ecl = e.eclipse ? `<div class="eclipse"><p><b>${esc(e.eclipse.titulo)}</b>, máximo às ${esc(e.eclipse.hora)}</p>${e.eclipse.texto ? `<p>${esc(e.eclipse.texto)}</p>` : ""}</div>` : "";
+  const rl = e.tipo === "revolucao" ? `<p class="miudo"><a href="#sec-rl">${esc(TC.revolucao)}</a></p>` : "";
+  return `<div class="ev">${icone(e.tipo, !!e.eclipse)}<div><h3>${esc(e.titulo)}</h3><p class="quando">${esc(quando(e))}</p>${textos}${ecl}${rl}</div></div>`;
+}
+function destaque(rotulo, e) {
+  return `<article class="cartao"><span class="olho">${esc(rotulo)}</span>${e ? `<h3>${icone(e.tipo, !!e.eclipse)} ${esc(e.titulo)}</h3><p class="miudo">${esc(quando(e))}</p>` : `<p class="miudo">${esc(TC.sem_proxima)}</p>`}</article>`;
+}
+function desenharResultado(d) {
+  const meses = d.meses.filter((m) => m.eventos.length);
+  const rl = d.revolucao_lunar;
+  const opcoesFuso = FUSOS.map((f) => `<option value="${esc(f.valor)}"${f.valor === d.fuso ? " selected" : ""}>${esc(f.rotulo)}</option>`).join("");
+  const res = $("#resultado");
+  res.innerHTML = `<section class="amostra-topo degrade"><div class="amostra-topo-linha">
+      <div><span class="olho">${esc(TC.olho)}</span><h1 class="t1" id="titulo-resultado" tabindex="-1">${esc(TC.titulo)}</h1>
+        <p class="miudo">${esc(maiuscula(d.periodo))}</p></div>
+      <div class="acoes-cal">
+        <label class="miudo" for="fuso-completo">{{ t.form.fuso }}</label>
+        <select id="fuso-completo">${opcoesFuso}</select>
+        <button type="button" class="bt bt-2" id="botao-pdf">${esc(TC.pdf)}</button>
+        <a class="bt bt-1" id="botao-agenda" href="${esc(d.agenda)}" download="a-sua-lua-no-ano.ics" rel="noreferrer">${esc(TC.agenda)}</a>
+        <span class="miudo" id="status-pdf" aria-live="polite"></span></div></div>
+      <p class="miudo">${esc(TC.agenda_ajuda)}</p>
+      ${d.avisos.map((t) => `<p class="aviso">${esc(t)}</p>`).join("")}
+    </section>
+    <section class="leitura-grade lua-grade">
+      <nav class="leitura-nav" aria-label="Meses"><span class="olho">${esc(TC.meses)}</span>
+        ${meses.map((m) => `<a href="#mes-${esc(m.mes)}">${esc(maiuscula(m.rotulo))}</a>`).join("")}
+        ${rl ? `<a href="#sec-rl" style="margin-top:12px">${esc(TC.revolucao)}</a>` : ""}
+      </nav>
+      <article class="leitura-texto">
+        <section class="dimensao bloco"><p class="lead">${esc(d.abertura)}</p><p class="apoio">${esc(d.como_ler)}</p></section>
+        <section class="dimensao bloco destaques">
+          ${destaque(TC.proxima_lua, d.destaques.proxima_lua)}
+          ${rl ? destaque(TC.proxima_revolucao, d.destaques.proxima_revolucao) : ""}
+        </section>
+        <section class="dimensao bloco"><span class="ponto">Luas, eclipses e Mercúrio</span><h2>Como as fases funcionam</h2>
+          <p class="apoio">${esc(d.intro.lunacoes)}</p><p class="apoio">${esc(d.intro.eclipses)}</p><p class="apoio">${esc(d.intro.mercurio)}</p></section>
+        ${meses.map((m) => `<section class="dimensao bloco" id="mes-${esc(m.mes)}" style="scroll-margin-top:100px"><span class="ponto">${esc(TC.meses)}</span><h2>${esc(maiuscula(m.rotulo))}</h2>${m.eventos.map(evento).join("")}</section>`).join("")}
+        ${rl ? `<section class="dimensao bloco" id="sec-rl" style="scroll-margin-top:100px"><span class="ponto">${esc(TC.revolucao)}</span><h2>A sua Lua em ${esc(rl.signo_pt)}</h2>
+          <p class="apoio">${esc(d.intro.revolucao_lunar)}</p><p>${esc(rl.texto)}</p>
+          <h3 class="t3">${esc(TC.datas_revolucao)}</h3><ul class="datas-rl">${rl.datas.map((x) => `<li>${esc(maiuscula(x.dia))} às ${esc(x.hora)}</li>`).join("")}</ul></section>` : ""}
+        <section class="dimensao bloco"><p class="lead">${esc(d.fechamento)}</p>
+          <div class="assina"><div class="foto arco" aria-hidden="true">{{ marca.retrato("foto-valderez-rosto", 44, 55, roda_tamanho=28) }}</div><p class="miudo">{{ revisao("assinatura") }}</p></div></section>
+        <div class="cartao feedback bloco" id="feedback-calendario"></div>
+      </article>
+    </section>`;
+  mostrarEstado("resultado");
+  if (window.padTrack) padTrack("completo_aberto", { produto: "calendario", sistema: "ocidental" });
+  if (window.padFeedback) padFeedback("#feedback-calendario", "calendario");
+  $("#botao-pdf").addEventListener("click", () => baixarPDF(d.fuso));
+  $("#fuso-completo").addEventListener("change", (e) => abrirCompleto(e.target.value));
+}
+
+async function baixarPDF(fuso) {
+  const botao = $("#botao-pdf"), status = $("#status-pdf");
+  botao.disabled = true; botao.textContent = "Gerando PDF…";
+  try {
+    const r = await fetch("/api/ocidental/calendario/pdf", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: tokenPago, fuso }) });
+    if (!r.ok) { let msg = "Não foi possível gerar o PDF. Tente de novo."; try { const c = await r.json(); if (typeof c.detail === "string") msg = c.detail; } catch {} throw new Error(msg); }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = "a-sua-lua-no-ano.pdf"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    status.textContent = "";
+  } catch (err) { status.textContent = err.message; }
+  finally { botao.disabled = false; botao.textContent = TC.pdf; }
+}
+
+function abrirCompleto(fuso, primeira) {
+  if (primeira) { $("#titulo-carregando").textContent = "Abrindo a sua Lua no ano"; mostrarEstado("estado-carregando"); animarEtapas(); }
+  return pedir("/api/ocidental/calendario/completo", { token: tokenPago, fuso }).then((d) => {
+    clearInterval(timerEtapas); desenharResultado(d);
+    if (primeira) focar($("#titulo-resultado"));
+  }).catch((e) => {
+    clearInterval(timerEtapas);
+    $("#resultado").innerHTML = `<section class="erro-topo"><div><span class="chip chip-breve">Link de leitura</span>
+      <h1 class="t2" id="titulo-resultado" tabindex="-1">${TC.link_falhou_titulo}</h1>
+      <p class="lead">${esc(TC.link_falhou)} (${esc(e.message)})</p>
+      <div class="botoes"><a class="bt bt-1" href="/minhas-leituras">Recuperar meus links</a><a class="bt bt-2" href="mailto:{{ contato }}">Falar com a gente</a></div></div></section>`;
+    mostrarEstado("resultado"); focar($("#titulo-resultado"));
+  });
+}
+
+// ---------- entrega do completo por link (pós-pagamento) ----------
+// /calendario-lunar?token=oc-cal-...  (só o token: os dados de nascimento vão cifrados dentro dele)
+(function abrirCompletoPorLink() {
+  const p = new URLSearchParams(location.search);
+  const token = p.get("token");
+  if (!token) return;
+  tokenPago = token;
+  const fuso = FUSOS.some((f) => f.valor === p.get("fuso")) ? p.get("fuso") : FUSOS[0].valor;
+  abrirCompleto(fuso, true);
+})();
+</script>
+</body>
+</html>

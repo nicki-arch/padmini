@@ -54,6 +54,10 @@ def link_completo(produto: str, dados: dict, sistema: str = "vedica") -> str:
              "cidade": dados.get("cidade", ""), "nome": dados.get("nome", ""), "inicio": dados["inicio"],
              "token": acesso.emitir_token("previsao", chave, sistema)}
         return f"{SITE_URL}/seu-ano?" + urllib.parse.urlencode(q)
+    if produto == "calendario":  # rodada 14: SÓ o token cifrado, nenhum dado de nascimento na URL
+        token = acesso.emitir_token_calendario(dados["data"], dados["hora"], dados["lat"], dados["lon"],
+                                               dados["inicio"])
+        return f"{SITE_URL}/calendario-lunar?" + urllib.parse.urlencode({"token": token})
     if produto == "tarot":
         chave = acesso.chave_tarot(dados["tiragem"])
         q = {"t": dados["tiragem"], "token": acesso.emitir_token(produto, chave, sistema)}
@@ -72,7 +76,7 @@ TITULO_EMAIL = {
     "vedica": {"compat": "seu relatório de compatibilidade", "mapa": "seu mapa completo"},
     "ocidental": {"compat": "a sinastria de vocês", "mapa": "seu mapa natal completo",
                   "numerologia": "a sua numerologia completa", "tarot": "a leitura completa da sua tiragem",
-                  "previsao": "o seu ano completo"},
+                  "previsao": "o seu ano completo", "calendario": "o seu calendário lunar"},
 }
 
 
@@ -91,7 +95,8 @@ def marca_do_email(c: dict, sistema: str) -> str:
 # capas vêm do próprio site (SITE_URL). A védica continua com o HTML de sempre.
 # ---------------------------------------------------------------------------
 CAPA_DO_PRODUTO = {"mapa": "capa-mapa", "compat": "capa-amor", "numerologia": "capa-numerologia",
-                   "tarot": "capa-tarot", "mapas_casal": "capa-mapa", "previsao": "capa-mapa"}
+                   "tarot": "capa-tarot", "mapas_casal": "capa-mapa", "previsao": "capa-mapa",
+                   "calendario": "capa-mapa"}
 
 
 def assinatura(sistema: str) -> str:
@@ -212,7 +217,8 @@ def email_mapas_do_casal_html(links: list, nome: str = "", sistema: str = "vedic
 NOME_LEITURA = {
     "vedica": {"mapa": "Mapa védico", "compat": "Compatibilidade do casal", "mapas_casal": "Mapas védicos do casal"},
     "ocidental": {"mapa": "Mapa natal", "compat": "Sinastria do casal", "numerologia": "Numerologia",
-                  "tarot": "Tarot", "mapas_casal": "Mapas natais do casal", "previsao": "O seu ano"},
+                  "tarot": "Tarot", "mapas_casal": "Mapas natais do casal", "previsao": "O seu ano",
+                  "calendario": "A sua Lua no ano"},
 }
 
 

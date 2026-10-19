@@ -63,7 +63,8 @@ def empacotar_sck(produto: str, dados: dict) -> str:
 
 
 PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia": "numerologia", "tarot": "tarot",
-                     "previsao": "seu-ano"}  # rodada 13
+                     "previsao": "seu-ano",  # rodada 13
+                     "calendario": "calendario-lunar"}  # rodada 14
 
 
 def link_checkout(produto: str, dados: dict | None, campanha: str, sistema: str = "vedica") -> str:
@@ -169,10 +170,10 @@ TEXTOS = {
     "ocidental": {
         "assunto_amostra": {"mapa": "Seu Sol, sua Lua e seu Ascendente", "compat": "A sinastria de vocês",
                             "numerologia": "O seu Caminho de Vida", "tarot": "As suas 3 cartas",
-                            "previsao": "Os temas do seu ano"},
+                            "previsao": "Os temas do seu ano", "calendario": "A sua Lua nos próximos 30 dias"},
         "assunto_lembrete": {"mapa": "O resto do seu mapa natal", "compat": "O resto da sinastria de vocês",
                              "numerologia": "Os outros números do seu nome", "tarot": "O que as suas cartas dizem juntas",
-                             "previsao": "O resto do seu ano"},
+                             "previsao": "O resto do seu ano", "calendario": "O resto do seu ano lunar"},
         "assunto_abandono": "Seu pedido na Valderez Astrologia ficou pela metade",
         "completo_abre": {
             "mapa": ("as 10 dimensões do seu mapa (da essência ao propósito, com carreira, dinheiro e "
@@ -187,10 +188,14 @@ TEXTOS = {
             # rodada 13: o que a página de "O seu ano" mostra de fato
             "previsao": ("os temas do seu ano, mês a mês o que começa, o que está no auge e o que termina, "
                          "cada área da vida, os eclipses, a sua Revolução Solar e o PDF"),
+            # rodada 14: o que a página de "A sua Lua no ano" mostra de fato
+            "calendario": ("as luas novas e cheias dos 12 meses com dia, hora e o texto de cada uma no "
+                           "seu mapa, os eclipses, os períodos de Mercúrio retrógrado, as suas Revoluções "
+                           "Lunares, o PDF e o arquivo para a sua agenda"),
         },
         "abandono_titulo": {"mapa": "o seu mapa natal completo", "compat": "a sinastria de vocês",
                             "numerologia": "a sua numerologia completa", "tarot": "a leitura completa da sua tiragem",
-                            "previsao": "o seu ano completo"},
+                            "previsao": "o seu ano completo", "calendario": "o seu calendário lunar"},
     },
 }
 
@@ -286,6 +291,19 @@ def _resumo_ocidental(produto: str, amostra: dict) -> str:
                    f'<span style="color:{c["fraco"]}">{mestre}</span>')
                 + _p(f'<span style="color:{c["suave"]}">{_e(cv.get("descricao", ""))}</span>')
                 + _p(_e(cv.get("texto", ""))))
+    if produto == "calendario":
+        # rodada 14: os próximos 30 dias; o texto inteiro do 1º evento (a tela só mostra a metade).
+        # Nenhum link com token: o completo é pago.
+        partes = [_p(_e(amostra.get("fuso_nome", "")), "font-size:13px;color:" + c["suave"])]
+        for i, ev in enumerate(amostra.get("proximos") or []):
+            partes.append(_p(f'{_rotulo(ev.get("dia", ""), c)}<br>'
+                             f'<span style="font-family:{c["fonte_marca"]};font-size:20px">'
+                             f'{_e(ev.get("icone"))} {_e(ev.get("titulo"))}</span><br>'
+                             f'<span style="color:{c["fraco"]}">{_e(ev.get("linha"))}</span>'
+                             + (f'<br>{_e(amostra["texto"])}' if i == 0 and amostra.get("texto") else "")))
+        for aviso in amostra.get("avisos") or []:
+            partes.append(_p(f'<span style="color:{c["suave"]};font-size:13px">{_e(aviso)}</span>'))
+        return "".join(partes)
     if produto == "previsao":
         # rodada 13: o texto inteiro do 1º tema (a tela só mostra o começo) e os títulos dos outros
         temas = amostra.get("temas") or []
@@ -354,6 +372,9 @@ def _gancho_lembrete(produto: str, amostra: dict, sistema: str) -> str:
         cv = (amostra.get("caminho_de_vida") or {}).get("valor")
         return (f"O seu Caminho de Vida é <b>{_e(cv)}</b>. Os outros números do seu nome contam o resto: "
                 f"o completo abre {abre}.")
+    if produto == "calendario":  # rodada 14
+        return (f"Na sua amostra apareceram as luas dos próximos 30 dias. O calendário completo abre "
+                f"{abre}.")
     if produto == "previsao":  # rodada 13
         temas = ", ".join(f"<b>{_e(t.get('titulo'))}</b>" for t in amostra.get("temas") or [])
         return f"Na sua amostra apareceram os temas do seu ano: {temas}. O completo abre {abre}."

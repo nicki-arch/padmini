@@ -7,4 +7,6 @@
   <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160" required placeholder="voce@exemplo.com" aria-describedby="email-ajuda">
   <span class="ajuda" id="email-ajuda">Parte da amostra aparece aqui; o resto chega nesse e-mail.</span>
 </div>
+{%- if sem_caixa_sequencia is not defined or not sem_caixa_sequencia %}{# a página do calendário lunar (rodada 14) não tem sequência #}
 <label class="check"><input type="checkbox" id="aceita-sequencia" name="aceita-sequencia"><span>Pode me mandar mais sobre a minha leitura nos próximos dias (até 3 e-mails; dá para sair quando quiser).</span></label>
+{%- endif %}

@@ -482,6 +482,13 @@ def pagina_seu_ano(request: Request):
     return _pagina_so_da_ocidental(request, "/seu-ano")
 
 
+@app.api_route("/calendario-lunar", methods=["GET", "HEAD"])
+def pagina_calendario_lunar(request: Request):
+    """A sua Lua no ano (rodada 14). Oculto no catálogo = 404 (a não ser com a prévia); link
+    pago (token "oc-cal-", só ele na URL) abre sempre."""
+    return _pagina_so_da_ocidental(request, "/calendario-lunar")
+
+
 @app.api_route("/leituras", methods=["GET", "HEAD"])
 def pagina_leituras(request: Request):
     """Todas as leituras (ocidental): os produtos ativos e em breve do catálogo."""
@@ -503,7 +510,8 @@ def _rota_do_catalogo(rota: str):
 
 
 for _p in catalogo.produtos():
-    if _p["rota"] not in ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras", "/seu-ano"):
+    if _p["rota"] not in ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras", "/seu-ano",
+                       "/calendario-lunar"):
         app.api_route(_p["rota"], methods=["GET", "HEAD"])(_rota_do_catalogo(_p["rota"]))
 
 
@@ -965,7 +973,8 @@ def pagina_live():
         return FileResponse(RAIZ / "static" / sistema.LIVE[versao])
     # rodada 17: a aba "O seu ano" só com o produto ativo no estado do site (ou "tudo liberado")
     return _pagina_montada(sistema.LIVE[versao], versao, "live",
-                           live_previsao=rotas_ocidental.live_mostra_previsao())
+                           live_previsao=rotas_ocidental.live_mostra_previsao(),
+                           live_calendario=rotas_ocidental.live_mostra_calendario())
 
 
 @app.get("/api/live/sessao")

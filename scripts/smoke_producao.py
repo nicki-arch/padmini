@@ -318,6 +318,21 @@ def _():
     return req("/api/live/ocidental/token/previsao", {**PESSOA})[0] in (401, 404)
 
 
+@checar("[live] token de \"A sua Lua no ano\" sem sessão do live é recusado (401/404)")
+def _():
+    # rodada 14: como o de "O seu ano": só com a sessão do Pedro e o produto ligado no painel
+    return req("/api/live/ocidental/token/calendario", {**PESSOA})[0] in (401, 404)
+
+
+@checar("[calendário] completo, PDF e agenda com token falso: 402")
+def _():
+    # rodada 14: o token do calendário é cifrado; um inventado não abre nada
+    falso = {"token": "oc-cal-" + "A" * 60}
+    return (req("/api/ocidental/calendario/completo", falso)[0] == 402
+            and req("/api/ocidental/calendario/pdf", falso)[0] == 402
+            and req("/calendario-lunar/agenda.ics?token=" + falso["token"])[0] == 402)
+
+
 @checar("[ocidental] tiragem de tarot inventada é recusada (422)")
 def _():
     return req("/api/ocidental/tarot", {"tiragem": "AAAAAAAAAAAAAAAA"})[0] == 422
