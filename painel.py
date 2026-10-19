@@ -133,11 +133,12 @@ def _revisao_por_produto() -> dict:
         log.exception("painel: não deu para contar os textos sem revisão")
         return {}
     contagem.pop("_total", None)
-    faltam = {"mapa": 0, "compat": 0, "numerologia": 0, "tarot": 0, "previsao": 0}
+    faltam = {"mapa": 0, "compat": 0, "numerologia": 0, "tarot": 0, "previsao": 0, "calendario": 0}
     for arquivo, (revisados, total) in contagem.items():
         dono = {"sinastria": "compat", "numerologia": "numerologia", "tarot": "tarot"}.get(arquivo)
         if dono is None:
-            dono = "previsao" if arquivo.startswith("previsao/") else "mapa"
+            dono = ("previsao" if arquivo.startswith("previsao/")
+                    else "calendario" if arquivo.startswith("calendario/") else "mapa")
         faltam[dono] += total - revisados
     return faltam
 

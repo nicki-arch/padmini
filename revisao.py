@@ -39,6 +39,9 @@ PROIBIDOS = ["morte", "morrer", "morrerá", "doença", "doente", "saúde", "cân
 # Previsão (rodada 13): tom ainda mais rigoroso — tema e janela, nunca acontecimento.
 PROIBIDOS_PREVISAO = PROIBIDOS + ["destino", "falência", "demissão", "divórcio", "separação",
                                   "gravidez", "luto", "perda de", "dívida"]
+# Calendário lunar (rodada 14): o tom da previsão e nada de "dias de sorte" (para dinheiro
+# ou qualquer coisa) nem de cuidado com o corpo.
+PROIBIDOS_CALENDARIO = PROIBIDOS_PREVISAO + ["sorte", "azar", "dieta", "remédio", "jejum"]
 PALAVRAS_PREVISAO = re.compile(r"\b(vai|irá|vão|acontecerá)\b", re.I)
 PERIGOSOS = re.compile(r"<\s*script|javascript:|\bon\w+\s*=", re.I)
 MARCADOR = re.compile(r"\{[a-z_]+\}")
@@ -51,7 +54,11 @@ PRODUTO = {"planetas_signos": "Mapa natal", "planetas_casas": "Mapa natal", "asc
            "regentes": "Mapa natal", "aspectos_sociais": "Mapa natal",
            # rodada 13: "O seu ano" (aba própria na planilha)
            "previsao/transitos": "Previsão", "previsao/casas": "Previsão", "previsao/eclipses": "Previsão",
-           "previsao/revolucao": "Previsão", "previsao/pecas": "Previsão"}
+           "previsao/revolucao": "Previsão", "previsao/pecas": "Previsão",
+           # rodada 14: "A sua Lua no ano" (aba própria na planilha)
+           "calendario/lunacoes_casas": "Calendário lunar", "calendario/lunacoes_signos": "Calendário lunar",
+           "calendario/lunacoes_pontos": "Calendário lunar", "calendario/revolucao_lunar": "Calendário lunar",
+           "calendario/mercurio": "Calendário lunar", "calendario/pecas": "Calendário lunar"}
 
 
 def limites(arquivo: str, caminho: tuple) -> tuple[int, int] | None:
@@ -62,6 +69,8 @@ def limites(arquivo: str, caminho: tuple) -> tuple[int, int] | None:
     if arquivo in ("previsao/transitos", "previsao/casas"):
         return 60, 120
     if arquivo in ("previsao/eclipses", "previsao/revolucao", "previsao/pecas"):
+        return 40, 80
+    if arquivo.startswith("calendario/"):
         return 40, 80
     if arquivo == "sinastria":
         if caminho[0] == "dimensoes" and caminho[-1] in ("alta", "media", "baixa"):
@@ -89,8 +98,10 @@ def problemas(texto: str, arquivo: str, caminho: tuple, original: str = "") -> l
         if not faixa[0] <= n <= faixa[1]:
             erros.append(f"tem {n} palavras; o certo é de {faixa[0]} a {faixa[1]}")
     baixo = t.lower()
-    previsao = arquivo.startswith("previsao/")
-    for p in (PROIBIDOS_PREVISAO if previsao else PROIBIDOS):
+    previsao = arquivo.startswith(("previsao/", "calendario/"))
+    proibidos = (PROIBIDOS_CALENDARIO if arquivo.startswith("calendario/")
+                 else PROIBIDOS_PREVISAO if previsao else PROIBIDOS)
+    for p in proibidos:
         if p in baixo:
             erros.append(f'usa "{p.strip()}" (proibido: previsão/sentença)')
     if previsao:
@@ -180,6 +191,8 @@ def onde_aparece(arquivo: str, c: tuple) -> str:
         return "Tarot · " + " · ".join(c)
     if arquivo.startswith("previsao/"):
         return "Previsão · " + _onde_previsao(arquivo.removeprefix("previsao/"), c)
+    if arquivo.startswith("calendario/"):
+        return "Calendário lunar · " + _onde_calendario(arquivo.removeprefix("calendario/"), c)
     return f"{arquivo} · {'/'.join(c)}"
 
 
@@ -205,6 +218,31 @@ def _onde_previsao(arquivo: str, c: tuple) -> str:
         return (f"Revolução Solar: Ascendente em {_pt(c[1])}" if c[0] == "ascendente"
                 else f"Revolução Solar: Sol na casa {c[1]}")
     return PECA_PT.get(c[-1], "/".join(c))
+
+
+FASE_PT = {"nova": "Lua nova", "cheia": "Lua cheia"}
+PECA_CALENDARIO_PT = {"abertura": "abertura do calendário", "como_ler": "como ler as datas",
+                      "lunacoes": "introdução das luas novas e cheias", "eclipses": "introdução dos eclipses",
+                      "mercurio": "introdução de Mercúrio retrógrado",
+                      "mercurio_geral": "Mercúrio retrógrado sem hora de nascimento",
+                      "revolucao_lunar": "introdução da Revolução Lunar", "fechamento": "fechamento",
+                      "sem_hora": "aviso: sem hora de nascimento",
+                      "sem_revolucao_lunar": "aviso: sem Revolução Lunar (sem hora)"}
+
+
+def _onde_calendario(arquivo: str, c: tuple) -> str:
+    if arquivo == "lunacoes_casas":
+        return f"{FASE_PT[c[0]]} na casa {c[1]}"
+    if arquivo == "lunacoes_signos":
+        return f"{FASE_PT[c[0]]} em {_pt(c[1])}"
+    if arquivo == "lunacoes_pontos":
+        artigo = "a" if c[1] in ("lua", "venus") else "o"
+        return f"{FASE_PT[c[0]]} sobre {artigo} {_pt(c[1])} natal"
+    if arquivo == "revolucao_lunar":
+        return f"Revolução Lunar, Lua natal em {_pt(c[0])}"
+    if arquivo == "mercurio":
+        return f"Mercúrio retrógrado na casa {c[0]}"
+    return PECA_CALENDARIO_PT.get(c[-1], "/".join(c))
 
 
 def itens() -> list[dict]:

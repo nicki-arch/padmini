@@ -29,7 +29,10 @@ ARQUIVOS = ("planetas_signos", "planetas_casas", "ascendente", "aspectos_pessoai
             "meio_do_ceu", "cuspides", "nodo_norte", "regentes", "aspectos_sociais",
             # rodada 13: "O seu ano", a previsão dos próximos 12 meses (subpasta previsao/)
             "previsao/transitos", "previsao/casas", "previsao/eclipses", "previsao/revolucao",
-            "previsao/pecas")
+            "previsao/pecas",
+            # rodada 14: "A sua Lua no ano", o calendário lunar (subpasta calendario/)
+            "calendario/lunacoes_casas", "calendario/lunacoes_signos", "calendario/lunacoes_pontos",
+            "calendario/revolucao_lunar", "calendario/mercurio", "calendario/pecas")
 
 # Aspectos só entre planetas lentos são de geração, não da pessoa: ficam fora
 # da lista de "aspectos principais" do completo.
