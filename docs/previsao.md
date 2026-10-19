@@ -78,6 +78,28 @@ depende do grau exato do Sol natal).
 Os 3 maiores (`N_TEMAS`) são os temas, **um por par planeta × ponto** (Saturno em quadratura e
 depois em oposição ao Sol é um assunto só).
 
+**Regras do resumo (rodada 17, decisão do Nicolas de 16/out/2026),** em `previsao.temas`:
+
+| Regra | Parâmetro | Por quê |
+|---|---|---|
+| Só vira tema o trânsito com **45 dias ou mais dentro do período** | `DURACAO_MINIMA_TEMA = 45` | Na amostra da Ana fictícia (14/05/1994, 15:40, Porto Alegre) o 3º tema durava 16 dias (16/mar a 1/abr/2027). Os mais curtos continuam no mês a mês e nas áreas |
+| **Um planeta no máximo 2 vezes** nos 3 temas | `VEZES_POR_PLANETA = 2` | Na mesma amostra os 3 temas eram de Saturno |
+| **Pelo menos um harmônico** (sextil, trígono ou conjunção com Júpiter) | `previsao.harmonico` | Os 3 eram tensos. Se nenhum escolhido pelo peso é harmônico e existe um harmônico que passa nas duas regras acima, ele entra no lugar do tema de menor peso. Se não existe (ex.: `sp-1990`, cujos harmônicos duram 9 e 10 dias), os 3 ficam como estão |
+
+Cada tema leva `motivo`: `peso` (escolhido pelo peso) ou `harmonico` (entrou pela regra do
+harmônico). Num ano sem trânsito longo que chegue, pode sair **menos de 3 temas**: a amostra e
+os e-mails aceitam isso (a boas-vindas usa o mapa natal no lugar do 2º tema). As regras só
+escolhem; não mudam peso nem data de nenhum trânsito.
+
+Antes e depois (compra em 15/out/2026, período de out/2026 a set/2027):
+
+| Mapa | Antes | Depois |
+|---|---|---|
+| Ana fictícia | Saturno □ MC (133 d) · Saturno □ Lua (118 d) · Saturno ☍ Asc (**16 d**) | Saturno □ MC · Saturno □ Lua · **Júpiter ✶ Vênus (252 d, harmônico)** |
+| `sp-1990` | Júpiter □ Sol · Saturno ☌ Vênus · Plutão □ Mercúrio | igual (nenhum harmônico com 45+ dias) |
+| `rio-1995` | Plutão △ MC · Plutão ☌ Mercúrio · Urano ☌ MC | igual (já tinha harmônico) |
+| `lisboa-1985` | Netuno □ Lua · Netuno ☍ MC · Júpiter ☌ Sol | igual (Júpiter ☌ conta como harmônico) |
+
 ## Sem hora de nascimento
 
 Sem Ascendente, Meio do Céu, casas, ingressos, casa dos eclipses e Ascendente/casa da Revolução
@@ -105,13 +127,14 @@ estados do `/mapa`. A API é `/api/ocidental/previsao` (amostra ou completo) e `
 
 ## A venda (Fase 4) — pronta e desligada
 
-- **Catálogo:** `previsao` está `oculto` no `catalogo.yaml` (404, fora do menu, do rodapé e do sitemap).
-- **Preço:** o `ofertas.yaml` tem só o nome, sem `preco`, porque o preço não foi decidido
-  (sugestão do brief: R$47 de lançamento, R$67 cheio). Sem preço, o checkout recusa
-  (`pendentes.valor_centavos` levanta erro), e um teste derruba o CI se alguém ligar o
-  produto no catálogo sem pôr o preço.
-- **Para ligar:** ponha `preco` (e `preco_cheio`, se for o caso) em `ofertas.yaml` → `previsao`
-  e mude o `estado` para `ativo` no `catalogo.yaml`. Nada mais muda.
+- **Estado:** `previsao` está `oculto` no `catalogo.yaml` (404, fora do menu, do rodapé e do
+  sitemap). Desde a rodada 15 o YAML é só o padrão: **quem liga é o `/painel`** (Produtos →
+  O seu ano → Ativo), sem deploy. Nada desta seção lê o YAML direto: tudo pergunta ao
+  `estado_site` (via `catalogo.estado` / `catalogo.vende`).
+- **Preço:** R$47, com o "de R$97" riscado (`ofertas.yaml`, rodada 16). Sem preço o checkout
+  recusa, e o painel não deixa ligar com a venda aberta (`painel.tem_preco`).
+- **Para ligar:** no `/painel`, "O seu ano" → Ativo. Liga junto: a página, o botão na `/links`,
+  o cartão no `/mapa`, a aba do `/live` e o e-mail de aniversário (no próximo ciclo da tarefa).
 - **Checkout:** é o da Stripe, igual ao do mapa (`/api/checkout`, produto `previsao`). O
   pedido pendente grava `inicio` = mês da compra (fuso de São Paulo); a entrega
   (`entrega.link_completo`) monta `/seu-ano?…&inicio=AAAA-MM&token=…`, e esse link abre sempre
@@ -128,8 +151,22 @@ estados do `/mapa`. A API é `/api/ocidental/previsao` (amostra ou completo) e `
   - um por pessoa por ano (`envios_sequencia`, passo = ano);
   - quem nasceu em 29/02 recebe junto com quem faz aniversário em 01/03 nos anos que não
     são bissextos;
-  - **desligado** enquanto `catalogo.vende("previsao")` for falso: nem consulta o banco.
+  - **desligado** enquanto `catalogo.vende("previsao")` for falso (produto não ativo para o
+    público ou venda fechada, no estado do site): nem consulta o banco. Rodada 17: ligar no
+    painel liga o e-mail no próximo ciclo, sem deploy; o "tudo liberado só para mim" do
+    painel não liga (a tarefa não tem cookie). Na prévia em "tudo liberado" o produto conta
+    como ativo, então a tarefa diária de lá enviaria aos contatos do banco da prévia.
 - A sequência de boas-vindas também não empurra produto que não está à venda.
+
+## No /live (rodada 17)
+
+Aba "O seu ano" no `/live` do Pedro, igual às outras: os dados, a amostra (títulos dos temas e o
+texto do primeiro), a linha "Fim da amostra grátis — daqui para baixo é o relatório pago" e o
+completo. Token por `POST /api/live/ocidental/token/previsao` (mesma sessão `pad_live`, mesmo
+registro em `live_geracoes`; o ano começa no mês de hoje). A aba e a rota só existem com o
+produto ativo no estado do site ou no "tudo liberado" (prévia: todos; produção: só o navegador
+logado no painel); escondido, a rota responde 404. As outras abas (mapa, sinastria, numerologia,
+tarot) ficam sempre no `/live`, qualquer que seja o estado do produto.
 
 ## Validação (15/out/2026)
 

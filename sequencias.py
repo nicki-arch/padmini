@@ -64,8 +64,12 @@ def trecho_extra(produto: str, dados: dict) -> tuple[str, str, str]:
     import rotas_ocidental as ro
     if produto == "previsao":  # rodada 13: o 2º tema do ano (a amostra trazia só o título)
         temas = _previsao_da_amostra(dados)["temas"]
-        t = temas[1] if len(temas) > 1 else temas[0]
-        return ("O segundo tema do seu ano", f"{t['titulo']} · {t['periodo']}", t["texto"])
+        if temas:
+            t = temas[1] if len(temas) > 1 else temas[0]
+            return ("O segundo tema do seu ano", f"{t['titulo']} · {t['periodo']}", t["texto"])
+        # rodada 17: um ano sem trânsito longo (45+ dias) pode não ter tema nenhum; aí o
+        # trecho é o do mapa natal da mesma pessoa
+        produto, dados = "mapa", {k: v for k, v in dados.items() if k != "inicio"}
     if produto == "mapa":
         mapa, _ = ro.calcular(ro.PedidoMapaOcidental(**dados))
         venus = mapa["pontos"]["venus"]
@@ -293,7 +297,11 @@ def email_aniversario(dados: dict, email: str, aniversario) -> tuple[str, str]:
 
 
 def rodar_aniversarios(hoje, ja_hoje: set, contagem: dict) -> None:
-    """Desligado até "O seu ano" estar à venda (catalogo.yaml: ativo e vendas abertas)."""
+    """Desligado até "O seu ano" estar à venda: ativo para o público e venda aberta no ESTADO
+    DO SITE (painel → catalogo.yaml; catalogo.vende pergunta ao estado_site). Liga no próximo
+    ciclo da tarefa diária depois de o Nicolas ligar no /painel, sem deploy (rodada 17).
+    Só com a caixa de marketing que já existe (aceita_sequencia) e sem descadastro
+    (db.candidatos_aniversario); o e-mail tem o link de descadastro."""
     if not catalogo.vende("previsao", SISTEMA):
         return
     alvo = hoje + timedelta(days=DIAS_ANTES_DO_ANIVERSARIO)

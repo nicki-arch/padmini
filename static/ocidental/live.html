@@ -6,7 +6,9 @@
 <meta name="theme-color" content="{{ cores.ground }}">
 <meta name="robots" content="noindex, nofollow">
 <title>Modo live — Valderez Astrologia</title>
-{# Versão ocidental do modo live (mapa natal, sinastria, numerologia, tarot). Marca
+{# Versão ocidental do modo live (mapa natal, sinastria, numerologia, tarot e, com o
+   produto ativo no estado do site ou no "tudo liberado", O seu ano: `live_previsao`,
+   rodada 17). Marca
    Valderez Astrologia (rodada visual, fase C): tema ESCURO do pacote de ponta a ponta
    (tela de transmissão: muito contraste, pouca decoração), componentes do pacote,
    sem base.css. Os nomes de classe de antes (campo, dica, erro, sub) ganham o visual
@@ -80,6 +82,9 @@
         <button class="aba" id="aba-casal" role="tab" aria-selected="false">Sinastria</button>
         <button class="aba" id="aba-num" role="tab" aria-selected="false">Numerologia</button>
         <button class="aba" id="aba-tarot" role="tab" aria-selected="false">Tarot</button>
+        {%- if live_previsao %}
+        <button class="aba" id="aba-ano" role="tab" aria-selected="false">O seu ano</button>
+        {%- endif %}
       </div>
       <button class="aba" id="botao-sair" type="button">Sair</button>
     </div>
@@ -134,6 +139,20 @@
       <p class="erro" id="erro-tarot" role="alert" hidden></p>
       <button class="acao" id="gerar-tarot" type="submit">Tirar 3 cartas</button>
     </form>
+
+    {%- if live_previsao %}
+    <form id="form-ano" class="card" novalidate hidden>
+      <p class="sub" style="margin:0 0 12px">Os próximos 12 meses, a partir deste mês.</p>
+      <div class="campos">
+        <div class="campo"><label for="y-nome">Nome</label><input id="y-nome" autocomplete="off"></div>
+        <div class="campo"><label for="y-data">Nascimento</label><input id="y-data" inputmode="numeric" placeholder="dd/mm/aaaa"></div>
+        <div class="campo"><label for="y-hora">Hora <span class="dica">(vazio = não sabe)</span></label><input id="y-hora" inputmode="numeric" placeholder="hh:mm"></div>
+        <div class="campo largo auto"><label for="y-cidade">Cidade de nascimento</label><input id="y-cidade" autocomplete="off" placeholder="Comece a digitar"><ul id="y-cidade-lista" role="listbox" hidden></ul></div>
+      </div>
+      <p class="erro" id="erro-ano" role="alert" hidden></p>
+      <button class="acao" id="gerar-ano" type="submit">Gerar O seu ano</button>
+    </form>
+    {%- endif %}
 
     <section id="resultado" aria-live="polite" hidden></section>
   </section>
@@ -228,7 +247,7 @@ $("#botao-sair").addEventListener("click", async () => {
 });
 
 // ---------- abas ----------
-const ABAS = ["mapa", "casal", "num", "tarot"];
+const ABAS = ["mapa", "casal", "num", "tarot", "ano"];
 function aba(qual) {
   ABAS.forEach((a) => {
     const el = document.getElementById(`aba-${a}`);
@@ -382,6 +401,50 @@ function desenharTarot(d) {
     ${DIVISOR}
     <div class="secao">${d.cartas.map((c) => `<h3>${esc(c.posicao_pt)}: ${esc(c.nome)}</h3><p>${esc(c.moldura)}</p><p>${esc(c.leitura)}</p>`).join("")}
       <h3>Leitura de conjunto</h3>${d.conjunto.map((t) => `<p>${esc(t)}</p>`).join("")}</div>`;
+  $("#resultado").hidden = false;
+  $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ---------- O seu ano (rodada 17; só existe com o produto ativo no estado do site) ----------
+if ($("#form-ano")) {
+  mascara($("#y-data"), [2, 2, 4], "/"); mascara($("#y-hora"), [2, 2], ":");
+  const cidadeY = ligarCidade("#y-cidade", "#y-cidade-lista");
+  $("#form-ano").addEventListener("submit", async (e) => {
+    e.preventDefault(); erro("#erro-ano", "");
+    const data = dataISO($("#y-data").value), hora = $("#y-hora").value.trim();
+    if (!data) return erro("#erro-ano", "Data no formato dd/mm/aaaa.");
+    if (hora && !/^\d{2}:\d{2}$/.test(hora)) return erro("#erro-ano", "Hora no formato hh:mm (ou deixe vazio).");
+    if (!cidadeY.escolhida) return erro("#erro-ano", "Escolha a cidade na lista.");
+    const botao = $("#gerar-ano"); botao.disabled = true; botao.textContent = "Gerando…";
+    const base = { nome: $("#y-nome").value.trim(), data, hora, lat: cidadeY.escolhida.lat, lon: cidadeY.escolhida.lon, cidade: cidadeY.escolhida.rotulo };
+    try {
+      const t = await pedir("/api/live/ocidental/token/previsao", base);
+      desenharAno(await pedir("/api/ocidental/previsao", { ...base, inicio: t.inicio, nivel: "completo", token: t.token }));
+    } catch (err) { erro("#erro-ano", err.message); }
+    finally { botao.disabled = false; botao.textContent = "Gerar O seu ano"; }
+  });
+}
+function desenharAno(d) {
+  // a amostra grátis do site: os títulos dos temas e o texto do primeiro; o resto é pago
+  const [primeiro, ...outros] = d.temas;
+  const tema = (t) => `<h3>${esc(t.titulo)}</h3><p class="sub">${esc(t.periodo)}</p><p>${esc(t.texto)}</p>`;
+  const meses = d.linha_do_tempo.filter((m) => m.comeca.length || m.auge.length || m.termina.length);
+  const linha = (rotulo, lista) => lista.length ? `<p><b>${rotulo}:</b> ${lista.map(esc).join("; ")}</p>` : "";
+  const rs = d.revolucao;
+  $("#resultado").innerHTML = `
+    <h2 class="grande">O seu ano${d.nome ? `, ${esc(d.nome)}` : ""}</h2>
+    <p class="sub">${esc(d.periodo)}${d.tem_hora ? "" : " · sem hora de nascimento"}</p>
+    ${d.avisos.map((a) => `<p class="aviso">${esc(a)}</p>`).join("")}
+    <p class="faixa gratis">Amostra grátis</p>
+    <div class="destaques">${d.temas.map((t) => `<div><span>${esc(t.periodo)}</span><b>${esc(t.titulo)}</b></div>`).join("")}</div>
+    <div class="secao">${primeiro ? tema(primeiro) : `<p>${esc(d.intro.temas)}</p>`}</div>
+    ${DIVISOR}
+    <div class="secao">${outros.map(tema).join("")}
+      <h3>Mês a mês</h3>${meses.map((m) => `<h4>${esc(m.rotulo)}</h4>${linha("Começa", m.comeca)}${linha("No auge", m.auge)}${linha("Termina", m.termina)}`).join("")}
+      <h3>Por área da vida</h3>${d.areas.map((a) => `<h4>${esc(a.nome)}</h4>${a.itens.map((i) => `<p><b>${esc(i.titulo)}</b> · ${esc(i.periodo || "")}<br>${esc(i.texto)}</p>`).join("")}`).join("")}
+      ${d.eclipses.length ? `<h3>Eclipses</h3>${d.eclipses.map((e) => `<p><b>${esc(e.titulo)}</b><br>${esc(e.texto || "")}</p>`).join("")}` : ""}
+      ${rs ? `<h3>${esc(rs.titulo)}</h3>${rs.ascendente ? `<p><b>Ascendente da Revolução em ${esc(rs.ascendente_pt)}:</b> ${esc(rs.texto_ascendente)}</p><p><b>O Sol na casa ${rs.casa_do_sol}:</b> ${esc(rs.texto_sol)}</p>` : `<p class="aviso">${esc(rs.aviso)}</p>`}` : ""}
+      <p>${esc(d.fechamento)}</p></div>`;
   $("#resultado").hidden = false;
   $("#resultado").scrollIntoView({ behavior: "smooth", block: "start" });
 }

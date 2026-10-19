@@ -19,7 +19,8 @@ Tudo sobre o mesmo Swiss Ephemeris do mapa (`mapa_ocidental`, tropical, Moshier)
   4. REVOLUÇÃO SOLAR do aniversário que cai no período, calculada para o LOCAL DE
      NASCIMENTO: o Ascendente dela e a casa (da própria Revolução) onde cai o Sol.
   5. PESOS de cada trânsito (planeta, ponto, aspecto, duração): os 3 maiores são
-     "os temas do seu ano". Os pesos ficam aqui e em docs/previsao.md.
+     "os temas do seu ano", com as regras da rodada 17 (45 dias no mínimo, um harmônico
+     garantido, um planeta no máximo 2 vezes). Pesos e regras aqui e em docs/previsao.md.
 
 As datas saem no fuso de Brasília (FUSO_DATAS): o produto é brasileiro e um
 trânsito lento não muda de data por causa de 3 horas, mas o eclipse e a Revolução
@@ -64,6 +65,10 @@ PESO_ASPECTO = {"conjuncao": 1.5, "oposicao": 1.5, "quadratura": 1.2, "trigono":
 FORA_DO_PERIODO = 0.75   # trânsito sem nenhuma data exata dentro do período (só começa
                          # ou só termina nele) pesa menos que um que culmina no ano
 N_TEMAS = 3
+# Rodada 17 (decisão do Nicolas de 16/out): regras do resumo, além do peso.
+DURACAO_MINIMA_TEMA = 45  # dias DENTRO do período para virar tema; os mais curtos ficam no
+                          # mês a mês e nas áreas (achado do Cowork: um tema de 16 dias)
+VEZES_POR_PLANETA = 2     # um planeta aparece no máximo 2 vezes nos 3 temas
 
 _F = swe.FLG_MOSEPH | swe.FLG_SPEED
 
@@ -218,19 +223,40 @@ def peso(t: dict) -> float:
                  * PESO_ASPECTO[t["aspecto"]] * duracao * culmina, 3)
 
 
+def harmonico(t: dict) -> bool:
+    """Sextil, trígono ou conjunção com Júpiter: o lado "a favor" do ano."""
+    return t["grupo"] == "harmonico" or (t["aspecto"] == "conjuncao" and t["planeta"] == "jupiter")
+
+
+def _cabe(t: dict, escolhidos: list[dict]) -> bool:
+    """Um por par planeta × ponto (Saturno em quadratura e depois em oposição ao Sol é o
+    mesmo assunto no ano) e cada planeta no máximo VEZES_POR_PLANETA vezes."""
+    if (t["planeta"], t["ponto"]) in {(e["planeta"], e["ponto"]) for e in escolhidos}:
+        return False
+    return sum(e["planeta"] == t["planeta"] for e in escolhidos) < VEZES_POR_PLANETA
+
+
 def temas(lista: list[dict], n: int = N_TEMAS) -> list[dict]:
-    """Os n trânsitos de maior peso (um por par planeta × ponto: Saturno em quadratura
-    e depois em oposição ao Sol é o mesmo assunto no ano)."""
-    vistos, out = set(), []
-    for t in sorted(lista, key=lambda t: (-t["peso"], t["entra"])):
-        par = (t["planeta"], t["ponto"])
-        if par in vistos:
-            continue
-        vistos.add(par)
-        out.append(t)
-        if len(out) == n:
-            break
-    return out
+    """Os temas do ano (rodada 17), cada um com o `motivo` da escolha:
+      1. só entram trânsitos com DURACAO_MINIMA_TEMA dias ou mais dentro do período;
+      2. pelo peso, um por par planeta × ponto e cada planeta no máximo VEZES_POR_PLANETA vezes;
+      3. se nenhum dos escolhidos é harmônico e existe um harmônico que passa pelas regras
+         1 e 2, ele entra no lugar do tema de menor peso.
+    Pode sair menos de n temas, se o período não tiver trânsitos longos que cheguem."""
+    candidatos = sorted((t for t in lista if t["dias_no_periodo"] >= DURACAO_MINIMA_TEMA),
+                        key=lambda t: (-t["peso"], t["entra"]))
+    escolhidos = []
+    for t in candidatos:
+        if _cabe(t, escolhidos):
+            escolhidos.append({**t, "motivo": "peso"})
+            if len(escolhidos) == n:
+                break
+    if not any(harmonico(t) for t in escolhidos):
+        base = escolhidos[:n - 1] if len(escolhidos) == n else escolhidos
+        harmonico_ = next((t for t in candidatos if harmonico(t) and _cabe(t, base)), None)
+        if harmonico_:
+            escolhidos = base + [{**harmonico_, "motivo": "harmonico"}]
+    return sorted(escolhidos, key=lambda t: (-t["peso"], t["entra"]))
 
 
 # --------------------------------------------------------------------------
