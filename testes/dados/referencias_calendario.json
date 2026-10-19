@@ -1,0 +1,149 @@
+{
+ "_leia": "Referência do CALENDÁRIO LUNAR (rodada 14). Valores COPIADOS, não calculados por nós, em 19/out/2026. LUNAÇÕES: timeanddate.com, fases da Lua em UTC (HH:MM, o site corta os segundos), 2026 e 2027. ECLIPSES: o máximo de cada eclipse (UTC, com segundos) na página de cada um no timeanddate.com; o de 18/jul/2027 (penumbral, magnitude 0,001) o timeanddate chama de 'quase eclipse' e não tem página: o catálogo da NASA e os calendários astrológicos o listam, e o motor também (como O seu ano). REVOLUÇÃO LUNAR: calculadora de retornos do astro-seek (o astro.com exige conta), hora local do nascimento (America/Sao_Paulo, sem horário de verão em 2027), mapas sp-1990 e rio-1995 de referencias_ocidental.json. Tolerância do critério: 2 minutos. Teste: testes/test_calendario_lunar.py.",
+ "consultado_em": "2026-10-19",
+ "fontes": {
+  "lunacoes": [
+   "https://www.timeanddate.com/moon/phases/timezone/utc?year=2026",
+   "https://www.timeanddate.com/moon/phases/timezone/utc?year=2027"
+  ],
+  "eclipses": "https://www.timeanddate.com/eclipse/list.html?starty=2026 (e a página de cada eclipse)",
+  "revolucao_lunar": "https://horoscopes.astro-seek.com/calculate-planet-revolutions-returns/ (planeta_navrat=luna, revoluce_narozeni_rok=2027)"
+ },
+ "lunacoes_utc": {
+  "nova": [
+   "2026-01-18T19:52",
+   "2026-02-17T12:01",
+   "2026-03-19T01:23",
+   "2026-04-17T11:51",
+   "2026-05-16T20:01",
+   "2026-06-15T02:54",
+   "2026-07-14T09:43",
+   "2026-08-12T17:36",
+   "2026-09-11T03:27",
+   "2026-10-10T15:50",
+   "2026-11-09T07:02",
+   "2026-12-09T00:51",
+   "2027-01-07T20:24",
+   "2027-02-06T15:56",
+   "2027-03-08T09:29",
+   "2027-04-06T23:51",
+   "2027-05-06T10:58",
+   "2027-06-04T19:40",
+   "2027-07-04T03:02",
+   "2027-08-02T10:05",
+   "2027-08-31T17:41",
+   "2027-09-30T02:36",
+   "2027-10-29T13:36",
+   "2027-11-28T03:24",
+   "2027-12-27T20:12"
+  ],
+  "cheia": [
+   "2026-01-03T10:02",
+   "2026-02-01T22:09",
+   "2026-03-03T11:37",
+   "2026-04-02T02:11",
+   "2026-05-01T17:23",
+   "2026-05-31T08:45",
+   "2026-06-29T23:56",
+   "2026-07-29T14:35",
+   "2026-08-28T04:18",
+   "2026-09-26T16:49",
+   "2026-10-26T04:11",
+   "2026-11-24T14:53",
+   "2026-12-24T01:28",
+   "2027-01-22T12:17",
+   "2027-02-20T23:23",
+   "2027-03-22T10:43",
+   "2027-04-20T22:27",
+   "2027-05-20T10:59",
+   "2027-06-19T00:44",
+   "2027-07-18T15:44",
+   "2027-08-17T07:28",
+   "2027-09-15T23:03",
+   "2027-10-15T13:47",
+   "2027-11-14T03:25",
+   "2027-12-13T16:08"
+  ]
+ },
+ "eclipses_utc": [
+  {
+   "tipo": "solar",
+   "subtipo": "anular",
+   "maximo": "2026-02-17T12:12:04"
+  },
+  {
+   "tipo": "lunar",
+   "subtipo": "total",
+   "maximo": "2026-03-03T11:33:46"
+  },
+  {
+   "tipo": "solar",
+   "subtipo": "total",
+   "maximo": "2026-08-12T17:46:06"
+  },
+  {
+   "tipo": "lunar",
+   "subtipo": "parcial",
+   "maximo": "2026-08-28T04:12:53"
+  },
+  {
+   "tipo": "solar",
+   "subtipo": "anular",
+   "maximo": "2027-02-06T15:59:37"
+  },
+  {
+   "tipo": "lunar",
+   "subtipo": "penumbral",
+   "maximo": "2027-02-20T23:12:52"
+  },
+  {
+   "tipo": "solar",
+   "subtipo": "total",
+   "maximo": "2027-08-02T10:06:40"
+  },
+  {
+   "tipo": "lunar",
+   "subtipo": "penumbral",
+   "maximo": "2027-08-17T07:13:49"
+  }
+ ],
+ "revolucao_lunar": {
+  "sp-1990": {
+   "lua": "Capricórnio 29°59'",
+   "local": [
+    "2027-01-08T19:11",
+    "2027-02-05T01:28",
+    "2027-03-04T08:32",
+    "2027-03-31T16:20",
+    "2027-04-28T00:23",
+    "2027-05-25T08:05",
+    "2027-06-21T15:00",
+    "2027-07-18T21:15",
+    "2027-08-15T03:19",
+    "2027-09-11T09:50",
+    "2027-10-08T17:10",
+    "2027-11-05T01:13",
+    "2027-12-02T09:26",
+    "2027-12-29T17:04"
+   ]
+  },
+  "rio-1995": {
+   "lua": "Touro 15°37'",
+   "local": [
+    "2027-01-17T05:10",
+    "2027-02-13T11:49",
+    "2027-03-12T17:13",
+    "2027-04-08T23:33",
+    "2027-05-06T07:50",
+    "2027-06-02T17:36",
+    "2027-06-30T03:25",
+    "2027-07-27T11:54",
+    "2027-08-23T18:31",
+    "2027-09-20T00:00",
+    "2027-10-17T06:04",
+    "2027-11-13T14:02",
+    "2027-12-10T23:48"
+   ]
+  }
+ }
+}

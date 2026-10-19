@@ -309,9 +309,10 @@ def _subtipo(flags: int) -> str:
     return "parcial"
 
 
-def eclipses(natal: dict, ini: date, fim: date) -> list[dict]:
-    jd_ini, jd_fim = jd_de(ini), jd_de(fim + timedelta(days=1))
-    pontos = natal["pontos"]
+def eclipses_entre(jd_ini: float, jd_fim: float) -> list[dict]:
+    """Os eclipses com o máximo em [jd_ini, jd_fim): tipo, subtipo, o instante do máximo
+    (JD UT) e a longitude do Sol (solar) ou da Lua (lunar) nele. Também usado pelo
+    calendário lunar (rodada 14), que mostra a hora."""
     out = []
     for tipo, buscar, corpo in (("solar", lambda j: swe.sol_eclipse_when_glob(j, swe.FLG_MOSEPH, 0, False),
                                  swe.SUN),
@@ -323,19 +324,33 @@ def eclipses(natal: dict, ini: date, fim: date) -> list[dict]:
             maximo = tret[0]
             if maximo >= jd_fim:
                 break
-            lon = swe.calc_ut(maximo, corpo, _F)[0][0]
-            signo, grau = mo.signo_de(lon)
-            e = {"tipo": tipo, "subtipo": _subtipo(flags), "data": data_de(maximo),
-                 "longitude": round(lon, 4), "signo": signo, "grau_texto": mo.grau_minuto(grau),
-                 "casa": mo.casa_de(lon, natal["casas"]["cuspides"]) if natal["tem_hora"] else None,
-                 "toca": []}
-            for p in PONTOS_NATAIS:
-                if _ponto_confiavel(natal, p):
-                    orbe = mo.distancia(lon, pontos[p]["longitude"])
-                    if orbe <= ORBE_ECLIPSE:
-                        e["toca"].append({"ponto": p, "orbe": round(orbe, 2)})
-            out.append(e)
+            out.append({"tipo": tipo, "subtipo": _subtipo(flags), "jd": maximo,
+                        "longitude": swe.calc_ut(maximo, corpo, _F)[0][0]})
             jd = maximo + 1
+    out.sort(key=lambda e: e["jd"])
+    return out
+
+
+def toques(natal: dict, lon: float, orbe_max: float = ORBE_ECLIPSE) -> list[dict]:
+    """Os pontos natais (confiáveis) em conjunção com a longitude, até orbe_max."""
+    out = []
+    for p in PONTOS_NATAIS:
+        if _ponto_confiavel(natal, p):
+            orbe = mo.distancia(lon, natal["pontos"][p]["longitude"])
+            if orbe <= orbe_max:
+                out.append({"ponto": p, "orbe": round(orbe, 2)})
+    return out
+
+
+def eclipses(natal: dict, ini: date, fim: date) -> list[dict]:
+    out = []
+    for b in eclipses_entre(jd_de(ini), jd_de(fim + timedelta(days=1))):
+        lon = b["longitude"]
+        signo, grau = mo.signo_de(lon)
+        out.append({"tipo": b["tipo"], "subtipo": b["subtipo"], "data": data_de(b["jd"]),
+                    "longitude": round(lon, 4), "signo": signo, "grau_texto": mo.grau_minuto(grau),
+                    "casa": mo.casa_de(lon, natal["casas"]["cuspides"]) if natal["tem_hora"] else None,
+                    "toca": toques(natal, lon)})
     out.sort(key=lambda e: e["data"])
     return out
 
