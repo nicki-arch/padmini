@@ -973,7 +973,8 @@ def pagina_live():
         return FileResponse(RAIZ / "static" / sistema.LIVE[versao])
     # rodada 17: a aba "O seu ano" só com o produto ativo no estado do site (ou "tudo liberado")
     return _pagina_montada(sistema.LIVE[versao], versao, "live",
-                           live_previsao=rotas_ocidental.live_mostra_previsao())
+                           live_previsao=rotas_ocidental.live_mostra_previsao(),
+                           live_calendario=rotas_ocidental.live_mostra_calendario())
 
 
 @app.get("/api/live/sessao")

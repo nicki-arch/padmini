@@ -411,6 +411,12 @@ function desenharResultado(d) {
             <p class="apoio">Os temas e as janelas do seu ano, a partir deste mesmo mapa: por onde os planetas lentos passam, mês a mês.</p></div>
           <a class="bt bt-2" href="/seu-ano">Ver os temas do meu ano</a></div>
         {%- endif %}
+        {%- if catalogo.vende("calendario") %}{# rodada 14: só com o produto ativo e à venda #}
+        <div class="cartao bloco" id="cartao-calendario" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center">
+          <div><span class="olho">A sua Lua no ano</span><h3 style="margin:6px 0">E as luas dos próximos 12 meses?</h3>
+            <p class="apoio">Cada lua nova e cheia, os eclipses e Mercúrio retrógrado no seu mapa, com dia e hora, direto na sua agenda.</p></div>
+          <a class="bt bt-2" href="/calendario-lunar">Ver as minhas luas</a></div>
+        {%- endif %}
         <div class="cartao feedback bloco" id="feedback-mapa"></div>
       </article>
       <aside class="cartao roda-lateral" aria-labelledby="titulo-roda">

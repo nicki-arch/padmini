@@ -162,11 +162,12 @@ def test_relatorio_sem_chave_ou_mes_errado(monkeypatch, capsys):
 
 
 # ------------------------------------------------------------------ smoke
-def test_smoke_com_a_cakto_continua_com_38_checagens():
+def test_smoke_com_a_cakto_continua_com_40_checagens():
     # rodada 16: + "sem texto por IA"; 16.1: + preço riscado do /mapa; 18: + 301 e webhook do
     # domínio antigo; 19: + /links; 15: + /painel sem login, ação sem login e "o público não
-    # vê o modo teste"; 17: + token de "O seu ano" do /live sem sessão
-    assert len(smoke.CHECAGENS) == 38
+    # vê o modo teste"; 17: + token de "O seu ano" do /live sem sessão; 14: + token de "A sua
+    # Lua no ano" do /live sem sessão e o calendário com token falso
+    assert len(smoke.CHECAGENS) == 40
     nomes = [n for n, _ in smoke.CHECAGENS_STRIPE]
     assert any("/webhook/stripe" in n for n in nomes)
 

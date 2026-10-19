@@ -346,6 +346,12 @@ function desenharResultado(d) {
           ${rs.ascendente ? `<div class="item-ano"><h3>Ascendente da Revolução em ${esc(rs.ascendente_pt)}</h3><p>${esc(rs.texto_ascendente)}</p></div>
           <div class="item-ano"><h3>O Sol na casa ${rs.casa_do_sol} da Revolução</h3><p>${esc(rs.texto_sol)}</p></div>` : `<p class="aviso">${esc(rs.aviso)}</p>`}</section>` : ""}
         <section class="dimensao bloco"><p class="lead">${esc(d.fechamento)}</p></section>
+        {%- if catalogo.vende("calendario") %}{# rodada 14: só com o produto ativo e à venda #}
+        <div class="cartao bloco" id="cartao-calendario" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center">
+          <div><span class="olho">A sua Lua no ano</span><h3 style="margin:6px 0">O ano, lua a lua</h3>
+            <p class="apoio">As luas novas e cheias, os eclipses e Mercúrio retrógrado do mesmo período, no seu mapa e na sua agenda.</p></div>
+          <a class="bt bt-2" href="/calendario-lunar">Ver as minhas luas</a></div>
+        {%- endif %}
         <div class="cartao feedback bloco" id="feedback-ano"></div>
       </article>
     </section>`;

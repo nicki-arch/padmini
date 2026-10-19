@@ -187,7 +187,7 @@ def test_tela_logado(banco):
     sessao, _ = entrar()
     html = tela(sessao)
     assert "<b>PRODUÇÃO</b> · padmini" in html
-    assert "Agora: aberto · venda aberta · 1 produto ativo, 3 em breve, 5 ocultos" in html
+    assert "Agora: aberto · venda aberta · 1 produto ativo, 3 em breve, 6 ocultos" in html
     for nome in ("Aberto", "Lista de espera", "Manutenção", "Tudo liberado"):
         assert f"<b>{nome}</b>" in html
     for p in catalogo.produtos_do_yaml():
