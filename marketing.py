@@ -64,7 +64,8 @@ def empacotar_sck(produto: str, dados: dict) -> str:
 
 PAGINA_DO_PRODUTO = {"compat": "compatibilidade", "mapa": "mapa", "numerologia": "numerologia", "tarot": "tarot",
                      "previsao": "seu-ano",  # rodada 13
-                     "calendario": "calendario-lunar"}  # rodada 14
+                     "calendario": "calendario-lunar",  # rodada 14
+                     "kit": "mapa"}  # rodada 20: o kit não tem página; a compra começa no mapa
 
 
 def link_checkout(produto: str, dados: dict | None, campanha: str, sistema: str = "vedica") -> str:
@@ -195,7 +196,8 @@ TEXTOS = {
         },
         "abandono_titulo": {"mapa": "o seu mapa natal completo", "compat": "a sinastria de vocês",
                             "numerologia": "a sua numerologia completa", "tarot": "a leitura completa da sua tiragem",
-                            "previsao": "o seu ano completo", "calendario": "o seu calendário lunar"},
+                            "previsao": "o seu ano completo", "calendario": "o seu calendário lunar",
+                            "kit": "os três: o mapa natal, O seu ano e a sua Lua no ano"},
     },
 }
 
@@ -421,16 +423,17 @@ TEXTO_VENDA_CRUZADA = {
 }
 
 
-def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedica") -> str:
+def bloco_venda_cruzada(produto_comprado: str, dados: dict, sistema: str = "vedica", ja_tem=()) -> str:
     """
     Oferta do outro produto (da mesma versão do site) no e-mail de entrega.
       - comprou o casal → o mapa individual de cada um, com o checkout já preenchido;
       - comprou o mapa → a compatibilidade (precisa dos dados do par: vai para o site).
     Cupom opcional: `cupom_pos_compra` da oferta em conteudo/<versão>/ofertas.yaml.
+    `ja_tem` (ocidental, rodada 20): o que a pessoa já tem (catalogo.que_tem): não é oferecido.
     """
     if sistema == "ocidental":
         # venda fechada: o e-mail de entrega (de uma compra antiga) não oferece nada
-        return _venda_cruzada_ocidental(produto_comprado, dados) if catalogo.vendas_abertas(sistema) else ""
+        return _venda_cruzada_ocidental(produto_comprado, dados, ja_tem) if catalogo.vendas_abertas(sistema) else ""
     textos = TEXTO_VENDA_CRUZADA[sistema]
     if produto_comprado == "compat":
         alvo = ofertas.oferta("mapa", sistema)
@@ -473,7 +476,7 @@ TEXTO_OUTRO_PRODUTO = {
 }
 
 
-def _venda_cruzada_ocidental(produto_comprado: str, dados: dict) -> str:
+def _venda_cruzada_ocidental(produto_comprado: str, dados: dict, ja_tem=()) -> str:
     sistema = "ocidental"
     linhas = []
     if produto_comprado == "compat":
@@ -487,7 +490,7 @@ def _venda_cruzada_ocidental(produto_comprado: str, dados: dict) -> str:
                        for rotulo, p in (("Pessoa A", dados.get("a") or {}), ("Pessoa B", dados.get("b") or {}))
                        if p]
     outros = [(k, ofertas.oferta(k, sistema)) for k in VENDA_CRUZADA_OCIDENTAL.get(produto_comprado, ())]
-    outros = [(k, o) for k, o in outros if o.get("checkout")]
+    outros = [(k, o) for k, o in outros if o.get("checkout") and k not in ja_tem]
     if outros:
         linhas.append(_p("Outras leituras da Valderez Astrologia, todas com amostra grátis:", f"margin:14px 0 6px;color:{_O['suave']}"))
         for k, o in outros:

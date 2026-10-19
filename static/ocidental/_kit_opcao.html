@@ -1,0 +1,15 @@
+{#- O KIT (rodada 20): a segunda opção, embaixo do botão de compra da amostra do mapa, de
+    "O seu ano" e do calendário. Usa os dados já digitados (o botão manda produto "kit" pelo
+    mesmo padCorpoCompra da página). Só com o kit À VENDA (catalogo.vende: o kit ativo e os
+    três que ele inclui à venda, pela Stripe); sem isso, nada aparece, nem desabilitado.
+    Este trecho vai DENTRO do template de JavaScript da amostra: nada de crase nem de
+    cifrão seguido de chave.
+    Copy: conteudo/ocidental/catalogo.yaml → kit. Preço: ofertas.yaml → kit. #}
+{%- if stripe and catalogo.vende("kit") %}
+{%- set tk = catalogo.textos().kit %}
+        <div class="kit-opcao" id="kit">
+          <p class="kit-titulo"><b>{{ tk.opcao_titulo }} {{ preco_de(ofertas.kit) }}R${{ ofertas.kit.preco | moeda }}</b>: {{ tk.opcao_texto }}</p>
+          <a class="bt bt-2 bt-cheio" href="#kit" data-comprar="kit" onclick="window.padTrack&&padTrack('checkout_click',{produto:'kit',sistema:'ocidental'})">{{ tk.opcao_botao }}</a>
+          <p class="miudo">{{ tk.opcao_miudo }}</p>
+        </div>
+{%- endif %}

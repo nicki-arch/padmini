@@ -42,6 +42,12 @@
     <a class="links-bt links-bt-1" href="{{ b.principal.rota }}{{ q }}" data-destino="{{ b.principal.destino }}">
       <b>{{ b.principal.titulo }}</b><span>{{ b.principal.linha }}</span>
     </a>
+    {%- for p in b.kits %}{# o kit (rodada 20): logo abaixo do principal, só à venda #}
+    <a class="links-bt links-bt-kit" href="{{ p.rota }}{{ q }}" data-destino="{{ p.chave }}">
+      <b>{{ p.titulo }}</b>
+      <span>{{ preco_de(ofertas[p.oferta]) }}R${{ ofertas[p.oferta].preco | moeda }} · {{ p.linha }}</span>
+    </a>
+    {%- endfor %}
     {%- for p in b.produtos %}
     <a class="links-bt" href="{{ p.rota }}{{ q }}" data-destino="{{ p.chave }}">
       <b>{{ p.titulo }}</b>

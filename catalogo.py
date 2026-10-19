@@ -46,20 +46,38 @@ def validar(dados: dict) -> dict:
         raise CatalogoInvalido("catalogo.yaml: `vendas_abertas` precisa ser true ou false.")
     chaves, rotas = set(), set()
     for p in dados.get("produtos") or []:
-        for campo in ("chave", "nome", "rota", "estado"):
+        kit = bool(p.get("inclui"))  # rodada 20: um pacote não tem rota (nem página): tem `entrada`
+        for campo in ("chave", "nome", "entrada" if kit else "rota", "estado"):
             if not p.get(campo):
                 raise CatalogoInvalido(f"catalogo.yaml: produto sem `{campo}`: {p!r}")
         if p["estado"] not in ESTADOS:
             raise CatalogoInvalido(f"catalogo.yaml: estado {p['estado']!r} de {p['chave']!r} não existe "
                                    f"(use {', '.join(ESTADOS)}).")
-        if p["chave"] in chaves or p["rota"] in rotas:
+        if kit:
+            p["rota"] = None
+            if not str(p["entrada"]).startswith("/"):
+                raise CatalogoInvalido(f"catalogo.yaml: entrada de {p['chave']!r} precisa começar com /.")
+            if not p.get("oferta") or not isinstance(p["inclui"], list) or len(set(p["inclui"])) < 2:
+                raise CatalogoInvalido(f"catalogo.yaml: o kit {p['chave']!r} precisa de `oferta` e de "
+                                       "`inclui` com dois produtos ou mais.")
+        if p["chave"] in chaves or (p["rota"] and p["rota"] in rotas):
             raise CatalogoInvalido(f"catalogo.yaml: chave ou rota repetida em {p['chave']!r}.")
-        if not str(p["rota"]).startswith("/"):
+        if p["rota"] and not str(p["rota"]).startswith("/"):
             raise CatalogoInvalido(f"catalogo.yaml: rota de {p['chave']!r} precisa começar com /.")
         for campo in ("oferta", "resumo", "vaga", "botao"):  # templates usam StrictUndefined
             p.setdefault(campo, None if campo == "oferta" else "")
+        p.setdefault("inclui", [])
+        p.setdefault("entrada", p["rota"])
         chaves.add(p["chave"])
-        rotas.add(p["rota"])
+        if p["rota"]:
+            rotas.add(p["rota"])
+    # o que um kit inclui: produtos de verdade, com oferta (que se vendem sozinhos), nunca outro kit
+    simples = {p["chave"]: p for p in dados.get("produtos") or [] if not p["inclui"]}
+    for p in dados.get("produtos") or []:
+        for chave in p["inclui"]:
+            if chave not in simples or not simples[chave].get("oferta"):
+                raise CatalogoInvalido(f"catalogo.yaml: o kit {p['chave']!r} inclui {chave!r}, que não é "
+                                       "um produto com oferta do catálogo.")
     for d in dados.get("dimensoes_mapa") or []:
         if d.get("estado") not in ("ativo", "em_breve"):
             raise CatalogoInvalido(f"catalogo.yaml: dimensão {d.get('chave')!r} com estado inválido.")
@@ -105,8 +123,9 @@ def produtos() -> list[dict]:
 
 
 def visiveis() -> list[dict]:
-    """O que aparece no menu, na home, no rodapé e em "Todas as leituras"."""
-    return [p for p in produtos() if p["estado"] != "oculto"]
+    """O que aparece no menu, na home, no rodapé e em "Todas as leituras". Kits nunca:
+    não têm página (a /links e "Todas as leituras" mostram o kit à parte, com `vende`)."""
+    return [p for p in produtos() if p["estado"] != "oculto" and not p["inclui"]]
 
 
 def produto(chave: str) -> dict | None:
@@ -114,7 +133,7 @@ def produto(chave: str) -> dict | None:
 
 
 def por_rota(rota: str) -> dict | None:
-    return next((p for p in produtos() if p["rota"] == rota), None)
+    return next((p for p in produtos() if p["rota"] and p["rota"] == rota), None)
 
 
 def estado(chave: str) -> str:
@@ -141,13 +160,52 @@ def estado_publico(chave: str) -> str:
 
 def vende(chave: str, sistema: str = "ocidental") -> bool:
     """Mostra preço e botão de compra deste produto? Só com a venda aberta e o produto
-    ativo para o público (o checkout pergunta a mesma coisa)."""
+    ativo para o público (o checkout pergunta a mesma coisa). Um KIT (rodada 20) também
+    exige que TODOS os produtos que ele inclui se vendam, e o checkout próprio (Stripe)."""
     if sistema != "ocidental":
         return True
     # produto sem `oferta` (comunidade, cursos, consulta…) não se vende: nem no "tudo liberado"
     # da prévia, que liga todos (rodada 15; antes a /links quebrava procurando o preço dele)
     p = next((x for x in produtos_do_yaml() if x["chave"] == chave), None)
-    return bool(p and p.get("oferta")) and vendas_abertas() and estado_publico(chave) == "ativo"
+    if not (p and p.get("oferta") and vendas_abertas() and estado_publico(chave) == "ativo"):
+        return False
+    if p["inclui"]:
+        return pagamento.stripe() and all(vende(c, sistema) for c in p["inclui"])
+    return True
+
+
+# ------------------------------------------------------------------ kits (rodada 20)
+def inclui(chave: str) -> list[str]:
+    """Os produtos de um kit (vazio para produto comum)."""
+    p = next((x for x in produtos_do_yaml() if x["chave"] == chave), None)
+    return list(p["inclui"]) if p else []
+
+
+def kits_a_venda() -> list[dict]:
+    """Os kits que se vendem agora (para a /links e "Todas as leituras")."""
+    return [p for p in produtos() if p["inclui"] and vende(p["chave"])]
+
+
+def faltam_para_o_kit(chave: str) -> list[dict]:
+    """Os produtos do kit que NÃO estão à venda agora (o aviso do /painel)."""
+    return [x for x in produtos_do_yaml() if x["chave"] in inclui(chave) and not vende(x["chave"])]
+
+
+def quem_inclui(chave: str) -> list[str]:
+    """O próprio produto e os kits que o incluem: comprar qualquer um deles é ter `chave`."""
+    return [chave] + [p["chave"] for p in produtos_do_yaml() if chave in p["inclui"]]
+
+
+def que_tem(comprados) -> set[str]:
+    """As chaves dos produtos que alguém TEM, a partir do que comprou ("ocidental:kit",
+    "mapa"…): quem comprou o kit tem cada produto dele; o combo do casal conta como mapa.
+    Para nenhum e-mail oferecer o que a pessoa já tem."""
+    tem = {str(c).split(":", 1)[-1] for c in comprados or []}
+    for k in list(tem):
+        tem.update(inclui(k))
+    if "mapas_casal" in tem:
+        tem.add("mapa")
+    return tem
 
 
 def colunas(quantos: int, maximo: int = 4) -> int:
@@ -168,5 +226,5 @@ def dimensoes_mapa() -> list[dict]:
 
 
 def textos() -> dict:
-    """A copy do catálogo (me avise, em breve, todas as leituras)."""
-    return {k: _dados.get(k) or {} for k in ("me_avise", "em_breve", "leituras", "dimensao_em_breve")}
+    """A copy do catálogo (me avise, em breve, todas as leituras, o kit)."""
+    return {k: _dados.get(k) or {} for k in ("me_avise", "em_breve", "leituras", "dimensao_em_breve", "kit")}

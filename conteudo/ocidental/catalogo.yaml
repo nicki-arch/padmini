@@ -22,6 +22,11 @@
 #
 # Preço e link de checkout NÃO ficam aqui: conteudo/ocidental/ofertas.yaml
 # (`oferta` = a chave do produto lá).
+#
+# KIT (rodada 20): um produto com `inclui: [chaves]` é um pacote (sem rota nem página;
+# `entrada` = onde a compra começa). Ele só se vende com ele mesmo ativo e TODOS os que
+# inclui à venda (catalogo.vende): ligar o kit no painel com um dos três oculto não
+# mostra o kit em lugar nenhum e o checkout dele recusa. Ver docs/kit.md.
 
 # INTERRUPTOR DE VENDA (decisão do Nicolas, 5/out). Com `false`: nenhuma página
 # nem e-mail mostra preço, botão de compra ou link da Cakto; o desbloqueio da
@@ -53,15 +58,30 @@ produtos:
     resumo: "Os temas e as janelas dos seus próximos 12 meses, a partir do seu mapa natal."
     vaga: capa-mapa
 
-  # Rodada 14 (19/out/2026): "A sua Lua no ano", o calendário lunar personalizado. OCULTO e
-  # SEM `oferta` (sem preço): a rota responde 404 e o produto nunca se vende, nem no "tudo
-  # liberado" (catalogo.vende exige oferta). Links com token abrem sempre. Ligar = pôr a
-  # oferta em ofertas.yaml e aqui, e trocar o estado no /painel.
+  # Rodada 14 (19/out/2026): "A sua Lua no ano", o calendário lunar personalizado. OCULTO
+  # (a rota responde 404; links com token abrem sempre). Rodada 20: com oferta (R$47 no
+  # ofertas.yaml, checkout só pela Stripe). Ligar = trocar o estado no /painel.
   - chave: calendario
     nome: A sua Lua no ano
     rota: /calendario-lunar
     estado: oculto
+    oferta: calendario
     resumo: "Luas novas e cheias, eclipses, Mercúrio retrógrado e as suas Revoluções Lunares, no seu mapa."
+    vaga: capa-mapa
+
+  # Rodada 20 (19/out/2026): o KIT, os três num pagamento só (R$97 no ofertas.yaml). Um
+  # kit é um produto com `inclui`: não tem rota nem página própria (`entrada` é a página
+  # onde a compra começa, para os botões da /links e de "Todas as leituras") e não entra
+  # no menu, na home, no rodapé nem no sitemap. A TRAVA: catalogo.vende("kit") só é
+  # verdadeiro com o próprio kit ativo E os três que ele inclui à venda (e com a Stripe).
+  # Assim, ligar o kit no /painel sem os três ativos não mostra nada nem abre o checkout.
+  - chave: kit
+    nome: "Os três: mapa, O seu ano e a sua Lua"
+    estado: oculto
+    oferta: kit
+    inclui: [mapa, previsao, calendario]
+    entrada: /mapa
+    resumo: "O mapa natal completo, O seu ano e a sua Lua no ano, num pagamento só."
     vaga: capa-mapa
 
   - chave: compat
@@ -166,6 +186,20 @@ me_avise:
 em_breve:
   eyebrow: Em breve
   enquanto_isso: Enquanto isso, veja o seu mapa natal grátis.
+
+# Rodada 20: a copy do KIT (os três num pagamento só), nas amostras do mapa, de "O seu
+# ano" e do calendário, na /links e em "Todas as leituras". O preço ("de R$141 por R$97")
+# vem do ofertas.yaml; aqui só as palavras. Sem "promoção", sem contador, sem prazo.
+kit:
+  # embaixo do botão "Desbloquear por R$47" das três amostras (usa os dados já digitados)
+  opcao_titulo: "Leve os três por"
+  opcao_texto: "o mapa completo, O seu ano e a sua Lua no ano"
+  opcao_botao: "Quero os três"
+  opcao_miudo: "Um pagamento só, com os dados que você já digitou. Os três links chegam juntos no seu e-mail."
+  # a /links e o cartão de "Todas as leituras" (os dois levam ao /mapa, onde a compra começa)
+  links_titulo: "Os três: mapa, O seu ano e a sua Lua"
+  links_linha: "três leituras num pagamento só"
+  leituras_botao: "Começar pelo mapa grátis"
 
 leituras:
   titulo: Todas as leituras

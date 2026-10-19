@@ -143,7 +143,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let ultimoPedido = null;
 let ultimoContato = null;
-window.padCorpoCompra = () => ultimoPedido && ({ produto: "previsao",
+window.padCorpoCompra = (produto) => ultimoPedido && ({ produto: produto === "kit" ? "kit" : "previsao",
   pessoa: { nome: ultimoPedido.nome, data: ultimoPedido.data, hora: ultimoPedido.hora, lat: ultimoPedido.lat, lon: ultimoPedido.lon, cidade: ultimoPedido.cidade },
   email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: !!(ultimoContato && ultimoContato.aceita_sequencia) });
 
@@ -286,6 +286,7 @@ function desenharAmostra(d) {
         <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
         ${PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="previsao">${esc(TA.botao_comprar)} {{ preco_de(ofertas.previsao) }}R${{ ofertas.previsao.preco | moeda }}</a>
           <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p>`}
+        {%- include "ocidental/_kit_opcao.html" %}
       {%- else %}
         <span class="olho">${esc(TA.lateral_olho)}</span>
         <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>
@@ -349,7 +350,8 @@ function desenharResultado(d) {
         {%- if catalogo.vende("calendario") %}{# rodada 14: só com o produto ativo e à venda #}
         <div class="cartao bloco" id="cartao-calendario" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center">
           <div><span class="olho">A sua Lua no ano</span><h3 style="margin:6px 0">O ano, lua a lua</h3>
-            <p class="apoio">As luas novas e cheias, os eclipses e Mercúrio retrógrado do mesmo período, no seu mapa e na sua agenda.</p></div>
+            <p class="apoio">As luas novas e cheias, os eclipses e Mercúrio retrógrado do mesmo período, no seu mapa e na sua agenda.</p>
+            <p class="preco-cartao">{{ preco_de(ofertas.calendario) }}R${{ ofertas.calendario.preco | moeda }}</p></div>
           <a class="bt bt-2" href="/calendario-lunar">Ver as minhas luas</a></div>
         {%- endif %}
         <div class="cartao feedback bloco" id="feedback-ano"></div>

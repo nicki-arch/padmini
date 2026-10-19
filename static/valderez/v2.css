@@ -211,6 +211,15 @@
 .cadeado { color: var(--vz-tinta-3); }
 .lateral { position: sticky; top: 100px; padding: 32px; display: flex; flex-direction: column; gap: 16px; border-color: var(--vz-rosa); }
 .lateral .me-avise { margin: 0; padding: 0; border: 0; box-shadow: none; }
+/* o kit (rodada 20): a segunda opção, embaixo do botão de compra da amostra */
+.kit-opcao { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--vz-linha); }
+.kit-opcao .kit-titulo { margin: 0; font-size: 15px; line-height: 1.5; color: var(--vz-tinta-2); }
+.kit-opcao .kit-titulo b { color: var(--vz-tinta); }
+.kit-opcao .preco-de { font-size: 1em; margin-right: .15em; }
+.kit-opcao .miudo { margin: 0; }
+/* o preço no cartão de outro produto dentro de uma leitura (rodada 20: "A sua Lua no ano") */
+.preco-cartao { margin: 8px 0 0; font: 500 22px/1.2 var(--vz-f-titulo); color: var(--vz-tinta); }
+.preco-cartao .preco-de { font-size: .7em; }
 .assina { border-top: 1px solid var(--vz-linha); padding-top: 14px; display: flex; gap: 12px; align-items: center; }
 .assina .foto { width: 44px; height: 56px; border-width: 0; box-shadow: none; }
 
@@ -412,6 +421,9 @@
 .obrigado { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; max-width: 640px; margin: 0 auto; }
 .obrigado .cartao { width: 100%; display: flex; flex-direction: column; gap: 14px; align-items: center; }
 .obrigado .chip { align-self: center; }
+/* o kit (rodada 20): um botão por leitura no "obrigado" */
+.obrigado-kit:not([hidden]) { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 360px; }
+.obrigado-kit .bt { justify-content: center; }
 @media (max-width: 1099px) {
   .checkout { grid-template-columns: 1fr; gap: 24px; }
   .checkout-resumo { position: static; }

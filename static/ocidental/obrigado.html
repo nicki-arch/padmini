@@ -28,6 +28,7 @@
       <div class="cartao">
         <p class="apoio">{{ pedido.produto | e }}{% if pedido.nome %} · {{ pedido.nome | e }}{% endif %} · R${{ pedido.valor }}</p>
         <a class="bt bt-1" id="acao" href="#" hidden></a>
+        <div class="obrigado-kit" id="acoes-kit" hidden></div>{# o kit (rodada 20): um botão por leitura #}
         <p class="miudo"><a href="/minhas-leituras">{{ t.obrigado.minhas_leituras }}</a></p>
       </div>
     </div>
@@ -60,6 +61,21 @@
       if (r.ok) c = await r.json();
     } catch (e) {}
     const demorando = Date.now() - inicio > 120000;
+    if (c && c.estado === "pago" && c.links && c.links.length) {
+      // o kit (rodada 20): as três leituras, cada uma com o seu botão (o nome vem do servidor)
+      mostrar("pago", T.confirmado_chip, NOME ? T.kit_titulo.replace("{nome}", NOME) : T.kit_titulo.replace(", {nome}", ""),
+              T.kit_texto);
+      const caixa = $("#acoes-kit");
+      caixa.replaceChildren(...c.links.map((l, i) => {
+        const a = document.createElement("a");
+        a.className = "bt " + (i === 0 ? "bt-1" : "bt-2");
+        a.href = l.link; a.textContent = l.nome;
+        return a;
+      }));
+      caixa.hidden = false;
+      if (window.padTrack) padTrack("compra_confirmada", { produto: "{{ pedido.chave }}", sistema: "ocidental" });
+      return;
+    }
     if (c && c.estado === "pago" && c.link) {
       mostrar("pago", T.confirmado_chip, NOME ? T.confirmado_titulo.replace("{nome}", NOME) : T.confirmado_titulo.replace(", {nome}", ""),
               T.confirmado_texto, T.confirmado_botao, c.link);

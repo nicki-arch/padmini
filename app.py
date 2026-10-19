@@ -57,6 +57,7 @@ import marca
 import ofertas
 import pagamento
 import pagina_links
+import pendentes
 import painel
 import paleta
 import seguranca
@@ -510,7 +511,7 @@ def _rota_do_catalogo(rota: str):
 
 
 for _p in catalogo.produtos():
-    if _p["rota"] not in ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras", "/seu-ano",
+    if _p["rota"] and _p["rota"] not in ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras", "/seu-ano",
                        "/calendario-lunar"):
         app.api_route(_p["rota"], methods=["GET", "HEAD"])(_rota_do_catalogo(_p["rota"]))
 
@@ -757,7 +758,7 @@ def _resumo_do_pedido(p: dict) -> dict:
     prod = catalogo.produto(item["chave"]) or {}
     return {"id": p["id"], "estado": p["estado"], "chave": item["chave"],
             "produto": ofertas.oferta(item["chave"], "ocidental").get("nome") or prod.get("nome", ""),
-            "rota": prod.get("rota") or "/mapa", "nome": p.get("nome") or "",
+            "rota": prod.get("entrada") or "/mapa", "nome": p.get("nome") or "",
             "valor": ofertas.moeda(p["valor_centavos"] / 100), "cupom": p.get("cupom"),
             "valor_de": _valor_de(item["chave"], p)}
 
@@ -1144,8 +1145,10 @@ def config():
         # o smoke se ajusta por estes dois campos.
         "modo_site": estado_site.modo(),
         "produtos_ativos": ([p["rota"] for p in catalogo.produtos_do_yaml()
-                             if catalogo.estado_publico(p["chave"]) == "ativo"]
+                             if p["rota"] and catalogo.estado_publico(p["chave"]) == "ativo"]
                             if sistema.ativo() == "ocidental" else []),
+        # rodada 20: os kits À VENDA para o público (o kit e os produtos dele); oculto = []
+        "kits_a_venda": ([p["chave"] for p in catalogo.kits_a_venda()] if sistema.ativo() == "ocidental" else []),
         # quem cobra na ocidental (rodada 11): cakto | stripe; o smoke usa
         "pagamento": pagamento.modo(),
         # Pixels de anúncio (rodada 6): só com a ocidental no ar, e o navegador só os
@@ -1414,15 +1417,22 @@ def _entregar_leitura(produto: str, versao: str, dados: dict, email: str, refere
     emite o token (link do completo), manda o e-mail de entrega (com a venda cruzada),
     grava o pedido (`registrar(link, enviado)`, cada origem grava os seus ids) e avisa a
     equipe se o e-mail não saiu."""
-    link = entrega.link_completo(produto, dados, versao)
     try:
-        extra = marketing.bloco_venda_cruzada(produto, dados, versao)
+        # rodada 20: a oferta extra nunca é de algo que a pessoa já tem (o kit conta como os três)
+        ja_tem = catalogo.que_tem(db.compras_do_email(email) + [produto]) if versao == "ocidental" else set()
+        extra = marketing.bloco_venda_cruzada(produto, dados, versao, ja_tem)
     except Exception:  # noqa: BLE001  (a oferta extra nunca pode travar a entrega)
         log.exception("venda cruzada: falha ao montar o bloco")
         extra = ""
-    enviado = entrega.enviar_email(
-        email, ASSUNTO_ENTREGA[versao],
-        entrega.email_completo_html(produto, link, dados.get("nome", ""), extra, versao))
+    if catalogo.inclui(produto):
+        # o kit (rodada 20): um pagamento, três links (um por linha no pedido) e um e-mail
+        links = entrega.links_do_kit(dados, versao, produto)
+        link = "\n".join(l for _, l in links)
+        corpo = entrega.email_kit_html(links, dados.get("nome", ""), extra)
+    else:
+        link = entrega.link_completo(produto, dados, versao)
+        corpo = entrega.email_completo_html(produto, link, dados.get("nome", ""), extra, versao)
+    enviado = entrega.enviar_email(email, ASSUNTO_ENTREGA[versao], corpo)
     registrar(link, enviado)
     if not enviado:
         alertas.alertar("E-mail de entrega NÃO saiu — mandar o link à mão",
@@ -1563,8 +1573,11 @@ def _entregar_stripe(tipo: str, p: dict) -> dict:
         return {"ok": True, "pedido": p["id"], "aguardando": sessao["payment_status"]}
     item = p["itens"][0]
     produto, versao = item["chave"], p.get("sistema") or "ocidental"
+    # os produtos do checkout próprio (pendentes.PRODUTOS), não os da Cakto: "O seu ano", o
+    # calendário e o kit só se vendem pela Stripe (rodada 20; antes um pagamento de "O seu
+    # ano" caía aqui como "valor diferente" e ficava sem entrega automática)
     if (sessao.get("amount_total") != p["valor_centavos"] or str(sessao.get("currency") or "").lower() != p["moeda"]
-            or produto not in cakto.PRODUTOS):
+            or produto not in pendentes.PRODUTOS):
         # pago, mas não o que pedimos: não entrega no escuro (como o `sck` divergente da Cakto)
         alertas.alertar("Pedido PAGO na Stripe com valor diferente — conferir e entregar à mão",
                         f"pedido {p['id']} · sessão {sessao['id']} · {produto}\n"
@@ -1839,6 +1852,9 @@ def enviar_lembretes(request: Request):
         versao = item.get("sistema") or "vedica"
         if not catalogo.vende(item["produto"], versao):
             continue  # o lembrete só existe para vender: com a venda fechada, espera (não é marcado)
+        if versao == "ocidental" and item["produto"] in catalogo.que_tem(db.compras_do_email(item["email"])):
+            db.marcar_lembrete_enviado(item["id"])  # rodada 20: já tem (o kit conta como os três): nunca
+            continue
         try:
             amostra = (rotas_ocidental.montar_amostra_email(item["produto"], item["dados"]) if versao == "ocidental"
                        else _montar_amostra(item["produto"], item["dados"]))

@@ -78,7 +78,7 @@ def _sitemap() -> list[str]:
 def test_catalogo_de_producao():
     assert catalogo.vendas_abertas() is True  # rodada 16: venda aberta (decisão do Nicolas, 16/out)
     assert [(p["chave"], p["estado"]) for p in catalogo.produtos()] == [
-        ("mapa", "ativo"), ("previsao", "oculto"), ("calendario", "oculto"), ("compat", "em_breve"), ("numerologia", "em_breve"), ("tarot", "em_breve"),
+        ("mapa", "ativo"), ("previsao", "oculto"), ("calendario", "oculto"), ("kit", "oculto"), ("compat", "em_breve"), ("numerologia", "em_breve"), ("tarot", "em_breve"),
         ("comunidade", "oculto"), ("cursos", "oculto"), ("astrologia-do-zero", "oculto"), ("consulta", "oculto")]
     dims = {d["nome"]: d["estado"] for d in catalogo.dimensoes_mapa()}
     # rodada 12: as 10 dimensões no ar (Carreira, Dinheiro, Família e Propósito saíram do "em breve")

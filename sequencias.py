@@ -188,14 +188,14 @@ def email_boas_vindas(passo: int, produto: str, dados: dict, email: str) -> tupl
 
 LEITURA_COMPRADA = {"mapa": "o seu mapa natal", "compat": "a sinastria de vocês", "numerologia": "a sua numerologia",
                     "tarot": "a leitura das suas cartas", "mapas_casal": "os mapas natais de vocês",
-                    "previsao": "o seu ano"}
+                    "previsao": "o seu ano", "calendario": "o seu calendário lunar",
+                    "kit": "as suas três leituras"}
 
 
 def proxima_da_escada(comprados: list[str]) -> str | None:
-    """O próximo degrau (mapa → sinastria → numerologia → tarot) que a pessoa não tem."""
-    tem = {p.split(":", 1)[-1] for p in comprados}
-    if "mapas_casal" in tem:
-        tem.add("mapa")
+    """O próximo degrau (mapa → sinastria → numerologia → tarot) que a pessoa não tem
+    (o kit conta como cada produto dele, rodada 20: catalogo.que_tem)."""
+    tem = catalogo.que_tem(comprados)
     return next((p for p in ESCADA if p not in tem), None)
 
 
@@ -305,7 +305,9 @@ def rodar_aniversarios(hoje, ja_hoje: set, contagem: dict) -> None:
     if not catalogo.vende("previsao", SISTEMA):
         return
     alvo = hoje + timedelta(days=DIAS_ANTES_DO_ANIVERSARIO)
-    for item in db.candidatos_aniversario(aniversarios_alvo(hoje)):
+    # rodada 20: quem comprou "O seu ano" (ou o kit, que o inclui) nos últimos 12 meses não recebe
+    ja_tem = [f"{SISTEMA}:{k}" for k in catalogo.quem_inclui("previsao")]
+    for item in db.candidatos_aniversario(aniversarios_alvo(hoje), ja_tem=ja_tem):
         if item["email"] in ja_hoje:
             continue
         # passo = o ano do aniversário: o índice único garante um por ano, nunca dois
@@ -344,6 +346,8 @@ def rodar(agora: datetime | None = None) -> dict:
             continue
         if item["produto"] not in COM_SEQUENCIA or not catalogo.vende(item["produto"], SISTEMA):
             continue  # boas-vindas só leva a produto que está à venda ("O seu ano" oculto: nada)
+        if item["produto"] in catalogo.que_tem(db.compras_do_email(item["email"])):
+            continue  # rodada 20: nunca oferece o que a pessoa já tem (o kit conta como os três)
         if not _vencido(item["criado_em"], DIAS_BOAS_VINDAS[passo], agora):
             continue
         r = _enviar(item["email"], "boas_vindas", passo, item["id"],

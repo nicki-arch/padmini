@@ -127,15 +127,14 @@ def test_tudo_liberado_na_previa_para_todos(base, monkeypatch):
     assert 'id="aba-lua"' in cliente.get("/live").text and _token().status_code == 200
 
 
-def test_tudo_liberado_nunca_vende_o_calendario(base, monkeypatch):
-    """Sem `oferta` no catálogo, nem o "tudo liberado" da prévia abre a venda."""
+def test_tudo_liberado_da_previa_vende_o_calendario(base, monkeypatch):
+    """Rodada 20: com a oferta (R$47), o "tudo liberado" da prévia abre a venda de teste do
+    calendário, como a dos outros produtos (antes, sem `oferta`, nunca vendia)."""
     monkeypatch.setenv("STRIPE_SECRET_KEY", "sk_test_" + "a" * 20)
-    _painel(monkeypatch, modo="tudo_liberado", **{"produto:calendario": "ativo"})
-    assert not catalogo.vende("calendario")
+    _painel(monkeypatch, modo="tudo_liberado")
+    assert catalogo.vende("calendario")
     html = cliente.get("/calendario-lunar", headers=HTML).text
-    assert 'data-comprar="calendario"' not in html
-    r = cliente.post("/api/checkout", json={"produto": "calendario", "pessoa": ANA, "email": "a@b.com"})
-    assert r.status_code in (403, 404, 409, 422), r.text
+    assert 'data-comprar="calendario"' in html and "R$47" in html
 
 
 def test_no_live_o_painel_vence_o_yaml(base, monkeypatch):
@@ -152,9 +151,11 @@ def test_no_live_o_painel_vence_o_yaml(base, monkeypatch):
 
 # ------------------------------------------------------------------ cartões (Fase 4)
 def test_cartoes_so_com_o_produto_ativo_e_a_venda(base, monkeypatch):
-    _painel(monkeypatch, **{"produto:calendario": "ativo"})
-    # ativo, mas sem preço: nada de cartão
+    # oculto: nada de cartão
     assert 'id="cartao-calendario"' not in cliente.get("/mapa", headers=HTML).text
-    monkeypatch.setattr(catalogo, "vende", lambda chave, sistema="ocidental": chave == "calendario")
-    app_mod._paginas_prontas.clear()
-    assert 'id="cartao-calendario"' in cliente.get("/mapa", headers=HTML).text
+    # rodada 20: ativo (com a oferta de R$47 e a venda aberta), o cartão aparece com o preço
+    _painel(monkeypatch, **{"produto:calendario": "ativo"})
+    html = cliente.get("/mapa", headers=HTML).text
+    assert 'id="cartao-calendario"' in html
+    cartao = html[html.index('id="cartao-calendario"'):]
+    assert "R$47" in cartao[:cartao.index("</a>")]

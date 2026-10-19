@@ -4,16 +4,16 @@ As luas novas e cheias, os eclipses, os períodos de Mercúrio retrógrado e as 
 Lunares dos 12 meses a partir do dia 1º do mês da compra (o mesmo período de "O seu ano"),
 lidos no mapa natal. Entrega: página (`/calendario-lunar`), PDF e arquivo de agenda (.ics).
 
-**Estado: OCULTO e SEM PREÇO.** O produto `calendario` está no `catalogo.yaml` com
-`estado: oculto` e sem `oferta`: a página responde 404 em produção (abre com `?previa=`,
-com um link pago ou com o produto ligado no `/painel`), e o produto nunca se vende, nem no
-"tudo liberado" (`catalogo.vende` exige oferta). O checkout (`pendentes.py`) e a entrega
-(`entrega.link_completo`) já aceitam o produto.
+**Estado: OCULTO, com preço (rodada 20).** O produto `calendario` está no `catalogo.yaml`
+com `estado: oculto` e `oferta: calendario` (R$47, "de R$97", no `ofertas.yaml`, decisão do
+Nicolas de 19/out): a página responde 404 em produção (abre com `?previa=`, com um link pago
+ou com o produto ligado no `/painel`). Checkout só pela Stripe, como "O seu ano": pedido
+pendente com os dados no servidor, entrega por e-mail com o link (só o token cifrado) e o
+`/obrigado` com o link.
 
-**Para ligar a venda:** decidir o preço; pôr `calendario` no `ofertas.yaml` (preço) e
-`oferta: calendario` no produto do `catalogo.yaml`; no `/painel`, A sua Lua no ano → Ativo.
-O cartão do mapa e de "O seu ano" e o botão de compra aparecem sozinhos. O kit de
-lançamento é outro brief.
+**Para ligar a venda:** no `/painel`, A sua Lua no ano → Ativo. O cartão do mapa e de "O seu
+ano" (agora com o preço) e o botão de compra aparecem sozinhos. O calendário também entra no
+kit dos três (rodada 20, `docs/kit.md`).
 
 ## Arquivos
 

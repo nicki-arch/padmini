@@ -17,7 +17,9 @@ O que este módulo garante (e os testes conferem):
     `cakto.dados_nascimento` (mapa, sinastria, numerologia, tarot);
   - o id é aleatório e opaco (não diz nada da pessoa nem do produto).
 
-Um produto por compra nesta rodada; o formato (`itens` é uma lista) já aceita vários.
+Um produto por compra; o formato (`itens` é uma lista) já aceita vários. O KIT (rodada 20)
+é UM item (`kit`, um preço só, R$97): o webhook entrega os três links a partir dos mesmos
+dados (entrega.links_do_kit).
 """
 
 import secrets
@@ -30,7 +32,7 @@ import ofertas
 from rotas_ocidental import EMAIL_RE, ORIGEM_ACEITA, PessoaOcidental
 
 SISTEMA = "ocidental"  # a Stripe vale só para a versão com catálogo (ver pagamento.py)
-PRODUTOS = ("mapa", "compat", "numerologia", "tarot", "previsao", "calendario")
+PRODUTOS = ("mapa", "compat", "numerologia", "tarot", "previsao", "calendario", "kit")
 MOEDA = "brl"
 
 
@@ -39,8 +41,8 @@ class PedidoCheckout(BaseModel):
     a mais (preco, valor, amount…) é ignorado."""
     model_config = ConfigDict(extra="ignore")
 
-    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot|previsao|calendario)$")
-    pessoa: PessoaOcidental | None = None             # mapa
+    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot|previsao|calendario|kit)$")
+    pessoa: PessoaOcidental | None = None             # mapa, previsão, calendário e o kit
     a: PessoaOcidental | None = None                  # sinastria
     b: PessoaOcidental | None = None
     nome: str | None = Field(None, max_length=120)    # numerologia: nome completo de registro
@@ -72,7 +74,9 @@ def dados_da_leitura(pedido: PedidoCheckout) -> dict:
         if not pedido.pessoa:
             raise PedidoInvalido("Faltam os dados de nascimento.")
         return _pessoa(pedido.pessoa)
-    if pedido.produto in ("previsao", "calendario"):  # rodadas 13 e 14: começa no mês da compra
+    # rodadas 13 e 14: começa no mês da compra. O kit (rodada 20) é UMA pessoa e UM mês de
+    # início para os três: o mapa, "O seu ano" e o calendário saem destes mesmos dados.
+    if pedido.produto in ("previsao", "calendario", "kit"):
         if not pedido.pessoa:
             raise PedidoInvalido("Faltam os dados de nascimento.")
         from datetime import datetime

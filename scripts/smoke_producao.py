@@ -333,6 +333,29 @@ def _():
             and req("/calendario-lunar/agenda.ics?token=" + falso["token"])[0] == 402)
 
 
+def _kits_a_venda() -> list:
+    """Rodada 20: os kits à venda para o público (/api/config → kits_a_venda). Site
+    anterior à rodada 20 (sem o campo) = nenhum."""
+    st, corpo = req("/api/config")
+    return (json.loads(corpo).get("kits_a_venda") or []) if st == 200 else []
+
+
+MARCAS_DO_KIT = (b'data-comprar="kit"', b"links-bt-kit", b"capa-kit", b'class="kit-opcao"')
+
+
+@checar("[kit] fora da venda, nenhuma página mostra o kit (/mapa, /seu-ano, /calendario-lunar, /links, /leituras)")
+def _():
+    if _versao_no_ar() != "ocidental":
+        return True
+    if "kit" in _kits_a_venda():
+        if not any("kit à venda" in a for a in AVISOS):
+            AVISOS.append("kit à venda (painel): conferido que ele aparece na /links, em vez de sumido")
+        st, corpo = req("/links")
+        return st == 404 or _captura_no_ar() or b"links-bt-kit" in corpo
+    paginas = ("/mapa", "/seu-ano", "/calendario-lunar", "/links", "/leituras")
+    return not any(m in req(p)[1] for p in paginas for m in MARCAS_DO_KIT)
+
+
 @checar("[ocidental] tiragem de tarot inventada é recusada (422)")
 def _():
     return req("/api/ocidental/tarot", {"tiragem": "AAAAAAAAAAAAAAAA"})[0] == 422
@@ -542,8 +565,23 @@ def _stripe_checkout_inexistente():
     return req("/checkout/" + "smoke" * 5)[0] == 404 and req("/api/checkout/" + "smoke" * 5 + "/estado")[0] == 404
 
 
+def _stripe_checkout_fora_da_venda():
+    """Rodada 20: o checkout de produto fora da venda recusa (404) sem criar pedido nem
+    sessão: "O seu ano" e o calendário enquanto ocultos, e o kit enquanto não vende. Os que
+    estão à venda NÃO são chamados (criariam um pedido de verdade na Stripe)."""
+    st, corpo = req("/api/config")
+    ativos = (json.loads(corpo).get("produtos_ativos") or []) if st == 200 else []
+    alvos = [p for p, rota in (("previsao", "/seu-ano"), ("calendario", "/calendario-lunar")) if rota not in ativos]
+    alvos += [] if "kit" in _kits_a_venda() else ["kit"]
+    pessoa = {k: PESSOA[k] for k in ("nome", "data", "hora", "lat", "lon", "cidade")}
+    return all(req("/api/checkout", {"produto": p, "pessoa": pessoa, "email": "smoke@padmini.com.br"})[0] == 404
+               for p in alvos)
+
+
 CHECAGENS_STRIPE += [
     ("[stripe] /webhook/stripe recusa evento sem assinatura (401)", _stripe_webhook_sem_assinatura),
+    ("[stripe] checkout de produto fora da venda recusa (404): O seu ano, calendário, kit",
+     _stripe_checkout_fora_da_venda),
     ("[stripe] pedido que não existe responde 404 (/checkout, /api/checkout)", _stripe_checkout_inexistente),
 ]
 
