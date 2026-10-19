@@ -147,7 +147,8 @@ const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 let ultimoPedido = null;
 let ultimoContato = null;  // e-mail + caixa da amostra (rodada 6)
 // checkout próprio (rodada 11): o que o botão manda para /api/checkout (comprar.js). Sem preço.
-window.padCorpoCompra = () => ultimoPedido && ({ produto: "mapa",
+// rodada 20: o mesmo corpo serve para o botão do kit: os mesmos dados, outro produto
+window.padCorpoCompra = (produto) => ultimoPedido && ({ produto: produto === "kit" ? "kit" : "mapa",
   pessoa: { nome: ultimoPedido.nome, data: ultimoPedido.data, hora: ultimoPedido.hora, lat: ultimoPedido.lat, lon: ultimoPedido.lon, cidade: ultimoPedido.cidade },
   email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: !!(ultimoContato && ultimoContato.aceita_sequencia) });
 
@@ -334,6 +335,7 @@ function desenharAmostra(d) {
         ${cta && PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="mapa" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} {{ preco_de(ofertas.mapa) }}R${{ ofertas.mapa.preco | moeda }}</a>
           <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : cta ? `<a class="bt bt-1 bt-cheio" href="${esc(cta)}" onclick="window.padTrack&&padTrack('checkout_click',{produto:'mapa',sistema:'ocidental'})">${esc(TA.botao_comprar)} {{ preco_de(ofertas.mapa) }}R${{ ofertas.mapa.preco | moeda }}</a>
           <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p><button type="button" class="bt bt-1 bt-cheio" disabled>Em breve</button>`}
+        {%- include "ocidental/_kit_opcao.html" %}
       {%- else %}
         {% set aviso_produto = catalogo.produto("mapa") %}{% set aviso_titulo = catalogo.textos().me_avise.titulo_venda_fechada %}{% include "ocidental/_me_avise.html" %}
       {%- endif %}
@@ -414,7 +416,8 @@ function desenharResultado(d) {
         {%- if catalogo.vende("calendario") %}{# rodada 14: só com o produto ativo e à venda #}
         <div class="cartao bloco" id="cartao-calendario" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center">
           <div><span class="olho">A sua Lua no ano</span><h3 style="margin:6px 0">E as luas dos próximos 12 meses?</h3>
-            <p class="apoio">Cada lua nova e cheia, os eclipses e Mercúrio retrógrado no seu mapa, com dia e hora, direto na sua agenda.</p></div>
+            <p class="apoio">Cada lua nova e cheia, os eclipses e Mercúrio retrógrado no seu mapa, com dia e hora, direto na sua agenda.</p>
+            <p class="preco-cartao">{{ preco_de(ofertas.calendario) }}R${{ ofertas.calendario.preco | moeda }}</p></div>
           <a class="bt bt-2" href="/calendario-lunar">Ver as minhas luas</a></div>
         {%- endif %}
         <div class="cartao feedback bloco" id="feedback-mapa"></div>

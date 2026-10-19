@@ -113,9 +113,12 @@ def test_regra_das_colunas_nao_deixa_cartao_sozinho(n):
 @pytest.mark.parametrize("visiveis", [3, 4, 5])
 def test_leituras_sem_cartao_sozinho(ocidental, visiveis):
     d = copy.deepcopy(catalogo.dados())
-    for i, p in enumerate(d["produtos"]):
+    for p in d["produtos"]:
+        p["estado"] = "oculto"
+    simples = [p for p in d["produtos"] if not p.get("inclui")]  # o kit não é cartão (rodada 20)
+    for i, p in enumerate(simples):
         p["estado"] = "em_breve" if i < visiveis else "oculto"
-    d["produtos"][0]["estado"] = "ativo"
+    simples[0]["estado"] = "ativo"
     catalogo.usar(d)
     app_mod._paginas_prontas.clear()
     html = cliente.get("/leituras").text

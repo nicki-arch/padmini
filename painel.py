@@ -154,9 +154,28 @@ def produtos() -> list[dict]:
             avisos.append("sem preço")
         if revisao.get(p["chave"]):
             avisos.append(f"textos sem revisão: {revisao[p['chave']]}")
-        linhas.append({"chave": p["chave"], "nome": p["nome"], "rota": p["rota"], "estado": estado,
-                       "do_painel": f"produto:{p['chave']}" in estado_site.salvo(), "avisos": avisos})
+        faltam = faltam_para_o_kit(p)
+        if faltam:
+            avisos.append(aviso_do_kit(p))
+        linhas.append({"chave": p["chave"], "nome": p["nome"], "rota": p["rota"] or p["entrada"], "estado": estado,
+                       "do_painel": f"produto:{p['chave']}" in estado_site.salvo(), "avisos": avisos,
+                       "kit_faltam": len(faltam)})
     return linhas
+
+
+def faltam_para_o_kit(p: dict) -> list[dict]:
+    """Rodada 20: os produtos de um kit que não estão ATIVOS como decidido aqui (painel → YAML).
+    Enquanto faltar algum, o kit não aparece em lugar nenhum nem se vende (catalogo.vende),
+    mesmo marcado como ativo. Vazio para produto comum."""
+    return [x for x in catalogo.produtos_do_yaml()
+            if x["chave"] in p["inclui"] and estado_site.estado_salvo(x["chave"], x["estado"]) != "ativo"]
+
+
+def aviso_do_kit(p: dict) -> str:
+    """"precisa de Mapa natal, O seu ano e A sua Lua no ano ativos"."""
+    nomes = [x["nome"] for x in catalogo.produtos_do_yaml() if x["chave"] in p["inclui"]]
+    lista = ", ".join(nomes[:-1]) + " e " + nomes[-1] if len(nomes) > 1 else "".join(nomes)
+    return f"precisa de {lista} ativos"
 
 
 def paginas() -> list[dict]:
@@ -168,15 +187,20 @@ def paginas() -> list[dict]:
 def resumo() -> str:
     """"Agora: aberto · venda aberta · 1 produto ativo, 3 em breve, 5 ocultos"."""
     contagem = {e: 0 for e in NOMES_ESTADO}
-    for p in produtos():
+    linhas = produtos()
+    for p in linhas:
         contagem[p["estado"]] += 1
 
     def n(qtd, um, varios):
         return f"{qtd} {um if qtd == 1 else varios}"
+    # o kit (rodada 20): ATIVO aqui, mas parado enquanto faltar um dos produtos dele
+    kits = [p for p in linhas if p["kit_faltam"] and p["estado"] == "ativo"]
+    parado = "".join(f" · kit {p['nome']} parado ({'falta' if p['kit_faltam'] == 1 else 'faltam'} "
+                     f"{n(p['kit_faltam'], 'produto ativo', 'produtos ativos')})" for p in kits)
     return (f"Agora: {estado_site.NOMES_MODO[estado_site.modo()].lower()} · "
             f"venda {'aberta' if vendas_decididas() else 'fechada'} · "
             f"{n(contagem['ativo'], 'produto ativo', 'produtos ativos')}, {contagem['em_breve']} em breve, "
-            f"{n(contagem['oculto'], 'oculto', 'ocultos')}")
+            f"{n(contagem['oculto'], 'oculto', 'ocultos')}{parado}")
 
 
 def ativos_sem_preco(mudando: dict | None = None) -> list[str]:

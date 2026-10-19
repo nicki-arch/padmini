@@ -31,7 +31,9 @@
   <section class="secao degrade">
     <div class="secao-cab"><div><span class="olho">Leituras</span>{%- set _t = tl.titulo.rsplit(" ", 1) %}<h1 class="t1">{{ _t[0] }} <em>{{ _t[1] }}</em></h1></div><p>{{ tl.sub }}</p></div>
     {%- set visiveis = catalogo.visiveis() %}
-    <div class="grade-capas" style="--colunas:{{ catalogo.colunas(visiveis | length) }}">
+    {#- o kit (rodada 20): um cartão só quando ele vende (o kit e os três à venda) #}
+    {%- set kits = catalogo.kits_a_venda() %}
+    <div class="grade-capas" style="--colunas:{{ catalogo.colunas(visiveis | length + kits | length) }}">
       {%- for p in visiveis %}
       <div class="cartao capa">
         <div class="capa-img">{{ ilustracao(p.vaga) if p.vaga else "" }}<span class="chip{% if p.estado != 'ativo' %} chip-breve{% endif %}">{{ tl.rotulo_ativo if p.estado == "ativo" else tl.rotulo_em_breve }}</span></div>
@@ -46,6 +48,17 @@
           {%- else %}
           <a class="bt bt-2 bt-p" href="{{ p.rota }}#me-avise">{{ tl.botao_em_breve }}<span class="sr-only">: {{ p.nome }}</span></a>
           {%- endif %}
+        </div>
+      </div>
+      {%- endfor %}
+      {%- for p in kits %}
+      <div class="cartao capa capa-kit">
+        <div class="capa-img">{{ ilustracao(p.vaga) if p.vaga else "" }}<span class="chip">{{ tl.rotulo_ativo }}</span></div>
+        <div class="capa-corpo">
+          <h2 class="t3">{{ p.nome }}</h2>
+          <p>{{ p.resumo }}</p>
+          <p class="preco" style="font-size:40px">{{ preco_de(ofertas[p.oferta]) }}R${{ ofertas[p.oferta].preco | moeda }}</p>
+          <a class="bt bt-1 bt-p" href="{{ p.entrada }}">{{ catalogo.textos().kit.leituras_botao }}</a>
         </div>
       </div>
       {%- endfor %}

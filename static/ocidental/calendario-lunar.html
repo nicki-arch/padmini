@@ -163,7 +163,7 @@ const maiuscula = (s) => String(s || "").charAt(0).toUpperCase() + String(s || "
 let ultimoPedido = null;
 let ultimoContato = null;
 let tokenPago = null;
-window.padCorpoCompra = () => ultimoPedido && ({ produto: "calendario",
+window.padCorpoCompra = (produto) => ultimoPedido && ({ produto: produto === "kit" ? "kit" : "calendario",
   pessoa: { nome: ultimoPedido.nome, data: ultimoPedido.data, hora: ultimoPedido.hora, lat: ultimoPedido.lat, lon: ultimoPedido.lon, cidade: ultimoPedido.cidade },
   email: (ultimoContato && ultimoContato.email) || "", aceita_sequencia: false });
 
@@ -316,6 +316,7 @@ function desenharAmostra(d) {
         <ul class="lista-ok">${TA.lateral_itens.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
         ${PAGAR_NA_STRIPE ? `<a class="bt bt-1 bt-cheio" href="#comprar" data-comprar="calendario">${esc(TA.botao_comprar)} {{ preco_de(ofertas.calendario) }}R${{ ofertas.calendario.preco | moeda }}</a>
           <p class="miudo" style="text-align:center">${esc(TA.pagamento)}</p>` : `<p class="miudo">O pagamento ainda está sendo configurado.</p>`}
+        {%- include "ocidental/_kit_opcao.html" %}
       {%- else %}
         <span class="olho">${esc(TA.lateral_olho)}</span>
         <h2 class="t3">{{ t.amostra.lateral_titulo }}</h2>

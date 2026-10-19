@@ -106,6 +106,16 @@ def link_da_leitura(p: dict) -> str:
     return entrega.link_completo(item["chave"], item["dados"], p.get("sistema") or pendentes.SISTEMA)
 
 
+def links_do_kit(p: dict) -> list[dict]:
+    """Kit (rodada 20): [{nome, link}] de cada leitura, como o e-mail de entrega manda; [] se não é kit."""
+    item = p["itens"][0]
+    if not catalogo.inclui(item["chave"]):
+        return []
+    return [{"nome": entrega.NOME_LEITURA["ocidental"].get(chave, chave), "link": link}
+            for chave, link in entrega.links_do_kit(item["dados"], p.get("sistema") or pendentes.SISTEMA,
+                                                    item["chave"])]
+
+
 @rotas.get("/api/checkout/{id_pedido}/estado")
 def estado_do_checkout(id_pedido: str, request: Request):
     """Para a página de "obrigado" (que pergunta a cada poucos segundos). O pagamento só
@@ -115,7 +125,10 @@ def estado_do_checkout(id_pedido: str, request: Request):
     p = pedido_ou_404(id_pedido)
     resposta = {"estado": p["estado"], "aguardando_pix": False, "link": None}
     if p["estado"] == "pago":
-        resposta["link"] = link_da_leitura(p)
+        links = links_do_kit(p)
+        resposta["link"] = links[0]["link"] if links else link_da_leitura(p)
+        if links:
+            resposta["links"] = links  # o kit: as três leituras, cada uma com o seu botão
     elif p["estado"] == "aberto" and p.get("stripe_session_id"):
         try:
             s = stripe_api.estado_da_sessao(p["stripe_session_id"])

@@ -73,6 +73,10 @@ coisa conta como produção: na dúvida, o "tudo liberado" não vale para o púb
 - Com a venda aberta, um produto sem preço não pode ficar ativo.
 - Produto sem `oferta` no catálogo (comunidade, cursos, consulta) nunca é vendido, nem no
   "tudo liberado".
+- **O kit (rodada 20)** é uma linha como as outras, mas só vende com ele ativo E os três
+  produtos dele ativos (mapa, O seu ano, A sua Lua no ano). Enquanto faltar algum, a linha
+  mostra "precisa de … ativos" e, com o kit ativo, o resumo diz "kit … parado". Ver
+  `docs/kit.md`.
 - Preço continua só no `ofertas.yaml` (PR + deploy). O painel não mexe em preço.
 
 ## Páginas

@@ -74,3 +74,20 @@ previsao:
   nome: O seu ano — previsão dos próximos 12 meses
   preco: 47
   preco_de: 97  # rodada 16.1, como o mapa: só na tela, a Stripe cobra o `preco`
+
+# Rodada 20 (19/out/2026, decisão do Nicolas): "A sua Lua no ano", o calendário lunar.
+# R$47 com o mesmo "de R$97" dos outros. Checkout só pela Stripe. O produto continua
+# `oculto` no catalogo.yaml: ter preço aqui não liga nada (ligar é no /painel).
+calendario:
+  nome: A sua Lua no ano — calendário lunar dos próximos 12 meses
+  preco: 47
+  preco_de: 97  # só na tela, a Stripe cobra o `preco`
+
+# Rodada 20: o KIT, os três num pagamento só (mapa natal + O seu ano + a sua Lua no ano).
+# Decisão do Nicolas (19/out): R$97. O "de" riscado é a soma dos PREÇOS dos três
+# (3 × R$47 = R$141), não a soma dos "de" (proposta do Cowork, aceita): para trocar, é só
+# esta linha. O que o kit inclui mora no catalogo.yaml (`inclui`). Só pela Stripe.
+kit:
+  nome: "Os três: mapa natal, O seu ano e a sua Lua no ano"
+  preco: 97
+  preco_de: 141

@@ -19,6 +19,7 @@ import catalogo
 import entrega
 import mapa_ocidental as mo
 import marketing
+import ofertas
 import montar_calendario as mc
 import montar_texto_ocidental as mt
 import revisao
@@ -102,9 +103,12 @@ def test_link_de_entrega_leva_so_o_token():
 
 
 # ------------------------------------------------------------------ o produto oculto
-def test_oculto_e_sem_preco(ocidental):
+def test_oculto_e_com_preco(ocidental):
+    """Rodada 20: o preço foi decidido (R$47, "de R$97"), mas o produto continua OCULTO."""
     p = next(x for x in catalogo.produtos_do_yaml() if x["chave"] == "calendario")
-    assert p["estado"] == "oculto" and not p.get("oferta")
+    assert p["estado"] == "oculto" and p.get("oferta") == "calendario"
+    oferta = ofertas.oferta("calendario", "ocidental")
+    assert (oferta["preco"], oferta["preco_de"]) == (47, 97) and not oferta.get("checkout")
     assert not catalogo.vende("calendario")
     assert cliente.get("/calendario-lunar", headers=HTML).status_code == 404
 

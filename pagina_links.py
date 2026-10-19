@@ -42,9 +42,16 @@ def sufixo(o: dict) -> str:
 
 def botoes(t: dict, captura: bool) -> dict:
     """O que a página mostra, já filtrado pelo catálogo:
-    {"principal": {...}, "produtos": [...ativos que vendem], "em_breve": [...até 2]}."""
+    {"principal": {...}, "kits": [...à venda], "produtos": [...ativos que vendem], "em_breve": [...até 2]}.
+    O kit (rodada 20) vem logo abaixo do principal, só quando `catalogo.vende` (o kit ativo e
+    os produtos dele à venda); leva à `entrada` dele (o /mapa), onde a compra começa."""
     principal = dict(t["principal_lista"] if captura else t["principal"],
                      rota="/lista" if captura else "/mapa", destino="lista" if captura else "mapa_gratis")
+    tk = catalogo.textos()["kit"]
+    kits = [] if captura else [
+        {"chave": p["chave"], "rota": p["entrada"], "oferta": p["oferta"],
+         "titulo": tk.get("links_titulo") or p["nome"], "linha": tk.get("links_linha") or p["resumo"]}
+        for p in catalogo.kits_a_venda()]
     textos = t.get("produtos") or {}
     produtos, breve = [], []
     for p in catalogo.visiveis():
@@ -55,4 +62,4 @@ def botoes(t: dict, captura: bool) -> dict:
             produtos.append(item)
         elif p["estado"] == "em_breve" and len(breve) < MAX_EM_BREVE:
             breve.append(item)
-    return {"principal": principal, "produtos": produtos, "em_breve": breve}
+    return {"principal": principal, "kits": kits, "produtos": produtos, "em_breve": breve}

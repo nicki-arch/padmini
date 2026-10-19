@@ -58,11 +58,22 @@ def link_completo(produto: str, dados: dict, sistema: str = "vedica") -> str:
         token = acesso.emitir_token_calendario(dados["data"], dados["hora"], dados["lat"], dados["lon"],
                                                dados["inicio"])
         return f"{SITE_URL}/calendario-lunar?" + urllib.parse.urlencode({"token": token})
+    if produto == "kit":  # rodada 20: os três links, um por linha (como os mapas do casal)
+        return "\n".join(link for _, link in links_do_kit(dados, sistema))
     if produto == "tarot":
         chave = acesso.chave_tarot(dados["tiragem"])
         q = {"t": dados["tiragem"], "token": acesso.emitir_token(produto, chave, sistema)}
         return f"{SITE_URL}/tarot?" + urllib.parse.urlencode(q)
     raise ValueError(f"produto inválido: {produto}")
+
+
+def links_do_kit(dados: dict, sistema: str = "ocidental", kit: str = "kit") -> list[tuple[str, str]]:
+    """O kit (rodada 20): [(produto, link)] de cada produto que ele inclui, na ordem do
+    catálogo, todos dos MESMOS dados (uma pessoa e o mês de início da compra): o token do
+    mapa, o de "O seu ano" (o ano começa no mês da compra, como a compra avulsa) e o token
+    cifrado do calendário."""
+    import catalogo
+    return [(chave, link_completo(chave, dados, sistema)) for chave in catalogo.inclui(kit)]
 
 
 def _ola(nome: str) -> str:
@@ -76,7 +87,8 @@ TITULO_EMAIL = {
     "vedica": {"compat": "seu relatório de compatibilidade", "mapa": "seu mapa completo"},
     "ocidental": {"compat": "a sinastria de vocês", "mapa": "seu mapa natal completo",
                   "numerologia": "a sua numerologia completa", "tarot": "a leitura completa da sua tiragem",
-                  "previsao": "o seu ano completo", "calendario": "o seu calendário lunar"},
+                  "previsao": "o seu ano completo", "calendario": "o seu calendário lunar",
+                  "kit": "as suas três leituras"},
 }
 
 
@@ -96,7 +108,7 @@ def marca_do_email(c: dict, sistema: str) -> str:
 # ---------------------------------------------------------------------------
 CAPA_DO_PRODUTO = {"mapa": "capa-mapa", "compat": "capa-amor", "numerologia": "capa-numerologia",
                    "tarot": "capa-tarot", "mapas_casal": "capa-mapa", "previsao": "capa-mapa",
-                   "calendario": "capa-mapa"}
+                   "calendario": "capa-mapa", "kit": "capa-mapa"}
 
 
 def assinatura(sistema: str) -> str:
@@ -212,19 +224,49 @@ def email_mapas_do_casal_html(links: list, nome: str = "", sistema: str = "vedic
 </div>"""
 
 
+def email_kit_html(links: list, nome: str = "", extra: str = "") -> str:
+    """O e-mail de entrega do kit (rodada 20, só ocidental): um botão para cada leitura.
+    links: [(produto, link)], como links_do_kit devolve."""
+    c = paleta.email("ocidental")
+    primeiro = html.escape(str(nome or "").strip().split(" ")[0][:40]) if str(nome or "").strip() else ""
+    botoes = "".join(
+        f'<p style="margin:16px 0 4px"><a href="{html.escape(l, quote=True)}" style="{estilo_botao(c)}">'
+        f'{html.escape(NOME_LEITURA["ocidental"].get(p, p))}</a></p>'
+        f'<p style="color:{c["fraco"]};font-size:12px;word-break:break-all;margin:0 0 8px">{html.escape(l, quote=True)}</p>'
+        for p, l in links)
+    corpo = (titulo_email(f"As suas três leituras estão <em style=\"color:{c['acento']}\">prontas</em>"
+                          f"{', ' + primeiro if primeiro else ''}")
+             + f'<p style="margin:0 0 18px;color:{c["suave"]}">Seu pagamento foi confirmado. Cada leitura '
+               'tem o seu link: guarde este e-mail.</p>'
+             + capa_email("kit") + botoes + extra + _linha_minhas_leituras("ocidental", c))
+    return casca_ocidental(corpo, " · Estes links são pessoais; não os compartilhe.")
+
+
 # Nomes das leituras no e-mail de "minhas leituras". O `produto` do pedido é
 # "mapa", "compat" ou "mapas_casal" na védica e "ocidental:<produto>" na ocidental.
 NOME_LEITURA = {
     "vedica": {"mapa": "Mapa védico", "compat": "Compatibilidade do casal", "mapas_casal": "Mapas védicos do casal"},
     "ocidental": {"mapa": "Mapa natal", "compat": "Sinastria do casal", "numerologia": "Numerologia",
                   "tarot": "Tarot", "mapas_casal": "Mapas natais do casal", "previsao": "O seu ano",
-                  "calendario": "A sua Lua no ano"},
+                  "calendario": "A sua Lua no ano", "kit": "Os três: mapa, O seu ano e a sua Lua"},
 }
 
 
 def nome_da_leitura(produto: str) -> str:
     versao, _, nome = produto.partition(":") if ":" in produto else ("vedica", "", produto)
     return NOME_LEITURA.get(versao, {}).get(nome, f"Leitura {_sistema.MARCA.get(versao, 'Padmini')}")
+
+
+def _partes_do_kit(produto: str, links: list[str]) -> list[str]:
+    """O nome da leitura de cada link de um kit ("ocidental:kit"), pela página que o link
+    abre (/mapa, /seu-ano…); [] se não é kit ou se algum link não for reconhecido."""
+    versao, _, chave = produto.partition(":")
+    import catalogo
+    if versao != "ocidental" or not catalogo.inclui(chave):
+        return []
+    por_rota = {p["rota"]: p["chave"] for p in catalogo.produtos_do_yaml() if p["rota"]}
+    nomes = [NOME_LEITURA["ocidental"].get(por_rota.get(urllib.parse.urlparse(l).path, ""), "") for l in links]
+    return nomes if all(nomes) else []
 
 
 def email_minhas_leituras_html(leituras: list[dict]) -> str:
@@ -237,9 +279,13 @@ def email_minhas_leituras_html(leituras: list[dict]) -> str:
         links = [l for l in str(item["link"]).split("\n") if l.strip()]
         quando = item["criado_em"].strftime("%d/%m/%Y") if hasattr(item["criado_em"], "strftime") else ""
         titulo = html.escape(nome_da_leitura(item["produto"]))
+        # o kit (rodada 20): cada link com o nome da leitura que ele abre
+        partes = _partes_do_kit(item["produto"], links)
         botoes = "".join(
             f'<p style="margin:10px 0"><a href="{html.escape(l, quote=True)}" style="{estilo_botao(c)}">'
-            f'{"Abrir" if len(links) == 1 else f"Abrir o {i} de {len(links)}"} →</a></p>'
+            + (f"{html.escape(partes[i - 1])} →" if partes
+               else f'{"Abrir" if len(links) == 1 else f"Abrir o {i} de {len(links)}"} →')
+            + '</a></p>'
             for i, l in enumerate(links, 1))
         blocos.append(f'<div style="border-top:1px solid {c["linha"]};padding:16px 0 6px">'
                       f'<p style="margin:0;font-family:{c["fonte_marca"]};font-size:19px">{titulo}</p>'

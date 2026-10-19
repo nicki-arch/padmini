@@ -648,13 +648,16 @@ def candidatos_boas_vindas(limite: int = 200) -> list[dict]:
         return []
 
 
-def candidatos_aniversario(mes_dia: list[str], limite: int = 500) -> list[dict]:
+def candidatos_aniversario(mes_dia: list[str], limite: int = 500, ja_tem: list[str] | None = None) -> list[dict]:
     """E-mail de aniversário de "O seu ano" (rodada 13): a amostra mais recente (ocidental, com
     a data de nascimento: mapa ou previsão) de cada e-mail que MARCOU a caixa de marketing,
     dos últimos 24 meses (a retenção de marketing), sem descadastro, cujo aniversário cai em
-    um dos `mes_dia` ("MM-DD"). Sem a caixa marcada, nunca."""
+    um dos `mes_dia` ("MM-DD"). Sem a caixa marcada, nunca.
+    Rodada 20: fora quem comprou, nos últimos 12 meses, um dos produtos de `ja_tem` (os
+    rótulos de `pedidos.produto`: "O seu ano" e o kit que o inclui): o ano dele está coberto."""
     if not ativo() or not mes_dia:
         return []
+    ja_tem = list(ja_tem or [])
     try:
         with _conectar() as c:
             rows = c.execute(
@@ -668,8 +671,10 @@ def candidatos_aniversario(mes_dia: list[str], limite: int = 500) -> list[dict]:
                 ) u
                 WHERE NOT EXISTS (SELECT 1 FROM email_optout o WHERE o.email = u.lower)
                   AND substr(u.dados->>'data', 6, 5) = ANY(%s)
+                  AND NOT EXISTS (SELECT 1 FROM pedidos p WHERE lower(p.email) = u.lower
+                                  AND p.produto = ANY(%s) AND p.criado_em > now() - interval '12 months')
                 LIMIT %s
-                """, (list(mes_dia), limite)).fetchall()
+                """, (list(mes_dia), ja_tem, limite)).fetchall()
         return [{"id": r[0], "email": r[1], "produto": r[2], "dados": r[3]} for r in rows]
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao buscar os aniversários")
@@ -953,6 +958,22 @@ def marcar_pedido_stripe(stripe_pagamento: str, status: str) -> int:
     except Exception:  # noqa: BLE001
         log.exception("banco: falha ao marcar pedido da Stripe")
         return 0
+
+
+def compras_do_email(email: str) -> list[str]:
+    """Os produtos que este e-mail já comprou e recebeu ("ocidental:kit", "mapa"…), para
+    nenhum e-mail oferecer o que a pessoa já tem (rodada 20: o kit conta como os três,
+    catalogo.que_tem). Sem banco ou com erro, [] (quem chama decide)."""
+    if not (ativo() and email):
+        return []
+    try:
+        with _conectar() as c:
+            rows = c.execute("SELECT DISTINCT produto FROM pedidos WHERE lower(email) = lower(%s) "
+                             "AND coalesce(link, '') <> ''", (email,)).fetchall()
+        return [r[0] for r in rows]
+    except Exception:  # noqa: BLE001
+        log.exception("banco: falha ao buscar as compras de um e-mail")
+        return []
 
 
 def comprou_desde(email: str, quando) -> bool:

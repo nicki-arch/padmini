@@ -26,6 +26,9 @@ obrigado:
   confirmado_titulo: "Pronto, {nome}: sua leitura está liberada"
   confirmado_texto: "Mandamos o link também para o seu e-mail. Guarde: é ele que abre a sua leitura."
   confirmado_botao: Abrir a minha leitura
+  # o kit (rodada 20): um botão para cada leitura, com o nome dela
+  kit_titulo: "Pronto, {nome}: as suas três leituras estão liberadas"
+  kit_texto: "Mandamos os três links também para o seu e-mail. Guarde: são eles que abrem as suas leituras."
   pix_chip: Aguardando o Pix
   pix_titulo: Assim que o Pix cair, a leitura aparece aqui
   pix_texto: "Pode pagar com calma pelo app do seu banco. Esta página se atualiza sozinha, e o link também chega no seu e-mail."

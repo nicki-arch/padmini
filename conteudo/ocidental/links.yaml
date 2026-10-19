@@ -32,6 +32,9 @@ produtos:
   previsao:
     titulo: O seu ano
     linha: os temas dos seus próximos 12 meses
+  calendario:
+    titulo: A sua Lua no ano
+    linha: as luas dos seus próximos 12 meses, na sua agenda
   compat:
     titulo: Sinastria do casal
     linha: os mapas de vocês dois juntos
