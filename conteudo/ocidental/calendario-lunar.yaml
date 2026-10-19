@@ -1,0 +1,105 @@
+# Valderez Astrologia (versão OCIDENTAL) — texto da página /calendario-lunar, "A sua Lua
+# no ano" (rodada 14): o calendário lunar dos próximos 12 meses lido no mapa natal. Os
+# estados (formulário → calculando → amostra ou, com token, o completo) são a mesma página
+# (static/ocidental/calendario-lunar.html). OCULTO e SEM PREÇO no catalogo.yaml até o
+# Nicolas ligar. Os textos de interpretação ficam no repositório privado
+# (textos/calendario/); aqui é só a moldura. Tom: "boa lua para", "pede", "tende a".
+
+seo:
+  titulo: Valderez Astrologia — A sua Lua no ano
+  descricao: >-
+    As luas novas e cheias, os eclipses, Mercúrio retrógrado e as suas Revoluções Lunares dos
+    próximos 12 meses, lidos no seu mapa natal. As luas dos próximos 30 dias de graça.
+  og_titulo: A sua Lua no ano — Valderez Astrologia
+  og_descricao: O calendário lunar dos seus próximos 12 meses, no seu mapa. Amostra grátis.
+
+passos: [Seus dados, Calculando, Sua amostra]
+
+# Os fusos do Brasil (calendario_lunar.FUSOS; a API só aceita estes quatro)
+fusos:
+  - {valor: America/Sao_Paulo, rotulo: Horário de Brasília}
+  - {valor: America/Manaus, rotulo: "Amazonas, Mato Grosso, Rondônia e Roraima (−1 h)"}
+  - {valor: America/Rio_Branco, rotulo: Acre (−2 h)}
+  - {valor: America/Noronha, rotulo: Fernando de Noronha (+1 h)}
+
+form:
+  olho: A sua Lua no ano
+  titulo: O calendário da <em>sua Lua</em>
+  lede: >-
+    Com os dados do seu nascimento, colocamos no seu mapa as luas novas e cheias, os eclipses,
+    os períodos de Mercúrio retrógrado e as suas Revoluções Lunares dos próximos 12 meses. Não é
+    previsão de acontecimentos: é um ritmo para acompanhar, com dia e hora.
+  itens:
+    - {icone: lua, titulo: As luas dos próximos 30 dias, sub: "Dia, hora e onde cada uma cai no seu mapa"}
+    - {icone: horizonte, titulo: 12 meses na sua agenda, sub: "Página, PDF e arquivo para o Google Agenda ou o iPhone"}
+    - {icone: cadeado, titulo: O resto fica guardado, sub_venda: Você desbloqueia se quiser o ano todo,
+       sub_fechada: O calendário completo abre em breve}
+  titulo_cartao: Seus dados de nascimento
+  nome: Seu nome
+  nome_ajuda: Só para a gente falar com você; ele não vai para o arquivo da agenda.
+  data: Data
+  hora: Hora
+  sem_hora: Não sei a hora em que nasci
+  hora_ajuda: Use a hora da certidão. Com ela, você vê a casa do seu mapa onde cada lua cai e a sua Revolução Lunar.
+  cidade: Cidade de nascimento
+  cidade_ajuda: Escolha a cidade na lista para acertarmos o fuso.
+  fuso: Horários no fuso
+  fuso_ajuda: Os horários das luas aparecem neste fuso. Dá para trocar depois.
+  botao: Ver as minhas luas
+  miudo: Usamos seus dados só para calcular e enviar a sua leitura.
+
+calculando:
+  titulo: Calculando a sua Lua, a partir de
+  sub: Leva só alguns segundos.
+  etapas:
+    - O seu mapa natal
+    - As luas novas e cheias de 12 meses
+    - Eclipses e Mercúrio retrógrado
+    - As suas Revoluções Lunares
+
+amostra:
+  olho: A sua Lua,
+  subtitulo: As luas dos próximos 30 dias
+  # O texto desfocado é ENFEITE (o mesmo em todo cartão): o texto pago nunca vai para o navegador.
+  fumo: >-
+    Esta fase da Lua pede atenção a um assunto do seu mapa; há um começo que vale plantar,
+    uma conversa que tende a amadurecer e um cuidado para os dias em volta da data.
+  desbloquear: Desbloquear os 12 meses
+  avisar: Me avise quando abrir
+  corrigir: Corrigir os dados
+  email_foi: O texto inteiro da primeira lua foi para
+  email_reenviar: Reenviar
+  vazio: Nenhuma lua nova ou cheia nos próximos 30 dias? Isso não acontece; confira os dados.
+  lateral_olho: A sua Lua no ano
+  lateral_titulo: Os 12 meses, lua a lua
+  lateral_itens:
+    - Cada lua nova e cheia, com dia, hora e o texto no seu mapa
+    - Os eclipses e os períodos de Mercúrio retrógrado
+    - As suas Revoluções Lunares, cerca de 13 no ano
+    - O PDF, um mês por página
+    - O arquivo para a sua agenda (Google Agenda e iPhone)
+  pagamento_unico: pagamento único
+  botao_comprar: Quero a minha Lua no ano —
+  pagamento: Cartão ou Pix. O link chega no seu e-mail.
+  pagamento_stripe: Cartão ou Pix, sem sair do site. O link chega no seu e-mail.
+  nao_vende: O calendário completo ainda não está à venda.
+
+completo:
+  olho: A sua Lua no ano
+  titulo: A sua Lua no ano
+  pdf: Baixar PDF
+  agenda: Colocar na minha agenda
+  agenda_ajuda: >-
+    No iPhone, toque e escolha "Adicionar tudo". No Google Agenda (computador), baixe o arquivo
+    e use Configurações › Importar e exportar › Importar. O arquivo não leva nenhum dado do seu
+    nascimento.
+  proxima_lua: A próxima lua
+  proxima_revolucao: A sua próxima Revolução Lunar
+  sem_proxima: Fora do período deste calendário.
+  meses: Mês a mês
+  revolucao: A sua Revolução Lunar
+  datas_revolucao: As datas no período
+  link_falhou_titulo: Este link do calendário <em>não abriu</em>
+  link_falhou: >-
+    Ele pode ter sido copiado pela metade. Se você já pagou, peça os seus links de novo: chegam no
+    e-mail da compra.

@@ -70,6 +70,8 @@ PAGINAS = {
         "/leituras": ("ocidental/leituras.html", "leituras"),
         # "O seu ano", previsão dos próximos 12 meses (rodada 13): oculto no catálogo até ligar
         "/seu-ano": ("ocidental/seu-ano.html", "seu-ano"),
+        # "A sua Lua no ano", o calendário lunar (rodada 14): oculto no catálogo até ligar
+        "/calendario-lunar": ("ocidental/calendario-lunar.html", "calendario-lunar"),
     },
 }
 

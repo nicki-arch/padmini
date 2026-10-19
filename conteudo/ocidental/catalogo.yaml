@@ -53,6 +53,17 @@ produtos:
     resumo: "Os temas e as janelas dos seus próximos 12 meses, a partir do seu mapa natal."
     vaga: capa-mapa
 
+  # Rodada 14 (19/out/2026): "A sua Lua no ano", o calendário lunar personalizado. OCULTO e
+  # SEM `oferta` (sem preço): a rota responde 404 e o produto nunca se vende, nem no "tudo
+  # liberado" (catalogo.vende exige oferta). Links com token abrem sempre. Ligar = pôr a
+  # oferta em ofertas.yaml e aqui, e trocar o estado no /painel.
+  - chave: calendario
+    nome: A sua Lua no ano
+    rota: /calendario-lunar
+    estado: oculto
+    resumo: "Luas novas e cheias, eclipses, Mercúrio retrógrado e as suas Revoluções Lunares, no seu mapa."
+    vaga: capa-mapa
+
   - chave: compat
     nome: Sinastria do casal
     # A tela do pacote usa /sinastria; a rota que existe (e que já foi compartilhada)

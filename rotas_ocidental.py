@@ -20,6 +20,7 @@ import os
 import re
 import unicodedata
 from datetime import date
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Body, HTTPException, Request, Response
 from pydantic import ValidationError
@@ -352,6 +353,132 @@ def previsao_pdf(p: PedidoPrevisao, request: Request):
 
 
 # --------------------------------------------------------------------------
+# "A SUA LUA NO ANO" — calendário lunar personalizado (rodada 14). O mesmo formulário do
+# mapa, mais o fuso (um dos quatro do Brasil). O período vai do dia 1º do mês da compra até
+# 12 meses depois. O link pago leva SÓ o token cifrado (acesso.emitir_token_calendario): a
+# data, a hora e o local de nascimento nunca aparecem na URL, no arquivo de agenda nem no
+# log de acesso; o completo, o PDF e o .ics recebem o token e o fuso, mais nada.
+# Amostra: os próximos 30 dias, o 1º evento com metade do texto aberta, os outros só com
+# dia, hora e título; o texto inteiro do 1º só por e-mail.
+# --------------------------------------------------------------------------
+FUSO_RE = r"^America/(Sao_Paulo|Manaus|Rio_Branco|Noronha)$"
+
+
+class PedidoCalendario(PedidoMapaOcidental):
+    fuso: str = Field("America/Sao_Paulo", pattern=FUSO_RE)
+
+
+class PedidoCalendarioPago(BaseModel):
+    token: str = Field(..., max_length=300)
+    fuso: str = Field("America/Sao_Paulo", pattern=FUSO_RE)
+
+
+def _natal_do_pedido(d: dict) -> dict:
+    """O mapa natal a partir dos dados (de dentro do token ou do formulário)."""
+    mapa, _ = calcular(PedidoMapaOcidental(data=d["data"], hora=d["hora"], lat=d["lat"], lon=d["lon"]))
+    return mapa
+
+
+def calcular_calendario(d: dict, inicio: date, fuso: str) -> dict:
+    import calendario_lunar as cl
+    return cl.calcular_calendario(_natal_do_pedido(d), inicio, fuso)
+
+
+def _calendario_pago(p: PedidoCalendarioPago) -> tuple[dict, dict]:
+    """(dados de dentro do token, calendário). Token que não abre = 402."""
+    d = acesso.abrir_token_calendario(p.token)
+    if not d:
+        raise HTTPException(402, "A sua Lua no ano completo requer pagamento.")
+    return d, calcular_calendario(d, date.fromisoformat(d["inicio"] + "-01"), p.fuso)
+
+
+def _link_calendario(token: str, request: Request | None = None) -> str:
+    import entrega
+    return f"{entrega.SITE_URL}/calendario-lunar?" + urlencode({"token": token})
+
+
+@rotas.post("/api/ocidental/calendario")
+def calendario_amostra(p: PedidoCalendario, request: Request):
+    import montar_calendario as mc
+    limites.exigir(limites.CALCULO, request)
+    recusar_texto_ia(p)
+    if len(p.nome.strip()) < 2:
+        raise HTTPException(422, "Preencha o seu nome.")
+    email = exigir_email(p)
+    inicio = _inicio_da_amostra()
+    dados = {**_pessoa_para_dados(p), "inicio": inicio.strftime("%Y-%m"), "fuso": p.fuso}
+    cal = calcular_calendario(dados, inicio, p.fuso)
+    a = mc.amostra(cal)
+    cab = {"nivel": "amostra", "sistema": VERSAO, "nome": p.nome.strip(), "tem_hora": cal["tem_hora"],
+           "inicio_mes": inicio.strftime("%Y-%m")}
+    # sem lembrete nem sequência de boas-vindas (rodada 14: nenhum e-mail de marketing novo)
+    p.aceita_sequencia = False
+    return entregar_amostra(request, p, email, "calendario", dados, dados["nome"],
+                            {**cab, "amostra": mc.tela(a)}, {**cab, "amostra": a})
+
+
+@rotas.post("/api/ocidental/calendario/completo")
+def calendario_completo(p: PedidoCalendarioPago, request: Request):
+    import montar_calendario as mc
+    limites.exigir(limites.CALCULO, request)
+    d, cal = _calendario_pago(p)
+    return {"nivel": "completo", "sistema": VERSAO, **mc.completo(cal),
+            "agenda": "/calendario-lunar/agenda.ics?" + urlencode({"token": p.token, "fuso": cal["fuso"]})}
+
+
+@rotas.post("/api/ocidental/calendario/pdf")
+def calendario_pdf(p: PedidoCalendarioPago, request: Request):
+    import montar_calendario as mc
+    from gerar_pdf_ocidental import gerar_pdf_calendario
+    limites.exigir(limites.PDF, request)
+    _, cal = _calendario_pago(p)
+    conteudo = gerar_pdf_calendario(c=mc.completo(cal))
+    return Response(conteudo, media_type="application/pdf",
+                    headers={"Content-Disposition": 'attachment; filename="a-sua-lua-no-ano.pdf"'})
+
+
+@rotas.get("/calendario-lunar/agenda.ics")
+def calendario_agenda(request: Request, token: str = "", fuso: str = "America/Sao_Paulo"):
+    """O arquivo de agenda (Google Agenda, iPhone, Outlook). GET, para o celular abrir direto
+    do link. Sem dado de nascimento: nem no arquivo, nem na URL (só o token cifrado)."""
+    import montar_calendario as mc
+    limites.exigir(limites.PDF, request)
+    if not re.match(FUSO_RE, fuso):
+        fuso = "America/Sao_Paulo"
+    p = PedidoCalendarioPago(token=token[:300] or "-", fuso=fuso)
+    _, cal = _calendario_pago(p)
+    corpo = mc.ics(cal, _link_calendario(p.token))
+    return Response(corpo, media_type="text/calendar; charset=utf-8",
+                    headers={"Content-Disposition": 'attachment; filename="a-sua-lua-no-ano.ics"',
+                             "Cache-Control": "private, no-store"})
+
+
+def live_mostra_calendario() -> bool:
+    """A aba "A sua Lua no ano" do /live (rodada 14), como a de "O seu ano": só com o produto
+    ATIVO no estado do site (painel → catalogo.yaml) ou no "tudo liberado"."""
+    import catalogo
+    return catalogo.estado("calendario") == "ativo"
+
+
+@rotas.post("/api/live/ocidental/token/calendario")
+def live_token_calendario(p: PedidoPrevisao, request: Request):
+    """Token (cifrado) do calendário para o /live. Sem `inicio`, o mês de hoje. O registro em
+    live_geracoes vai SEM nome, data e local (rodada 14: nada de nascimento em log)."""
+    if not acesso.sessao_valida("live", request.cookies.get("pad_live")):
+        raise HTTPException(401, "Sessão do modo live expirada. Entre de novo.")
+    if not live_mostra_calendario():
+        raise HTTPException(404, "A sua Lua no ano ainda não está ligada.")
+    if p.hora:
+        validar_datetime(p.data, p.hora)
+    else:
+        validar_data(p.data)
+    inicio = p.inicio or _inicio_da_amostra().strftime("%Y-%m")
+    db.registrar_live(f"{VERSAO}:calendario", "", "", "")
+    token = acesso.emitir_token_calendario(p.data.isoformat(), p.hora, p.lat, p.lon, inicio)
+    return {"token": token, "inicio": inicio, "link": "/calendario-lunar?" + urlencode({"token": token})}
+
+
+# --------------------------------------------------------------------------
 # Modo live (Pedro): token do completo sem pagamento, com a sessão do /live
 # (mesmo cookie assinado da védica, ver app.py) e registro em live_geracoes.
 # --------------------------------------------------------------------------
@@ -633,7 +760,7 @@ def live_token_tarot(p: PedidoTarot, request: Request):
 # --------------------------------------------------------------------------
 class PedidoAmostraEmailOcidental(BaseModel):
     email: str = Field(..., max_length=160)
-    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot|previsao)$")
+    produto: str = Field(..., pattern=r"^(mapa|compat|numerologia|tarot|previsao|calendario)$")
     pessoa: PessoaOcidental | None = None          # mapa
     a: PessoaOcidental | None = None               # sinastria
     b: PessoaOcidental | None = None
@@ -659,11 +786,11 @@ def dados_da_amostra_email(p: PedidoAmostraEmailOcidental) -> tuple[dict, str]:
     tarot) nunca chega aqui."""
     import numerologia as nu
     import tarot
-    if p.produto in ("mapa", "previsao"):
+    if p.produto in ("mapa", "previsao", "calendario"):
         if not p.pessoa:
             raise HTTPException(422, "Faltam os dados de nascimento.")
         dados = _dados_pessoa(p.pessoa)
-        if p.produto == "previsao":
+        if p.produto in ("previsao", "calendario"):
             dados["inicio"] = _inicio_da_amostra().strftime("%Y-%m")
         return dados, dados["nome"]
     if p.produto == "compat":
@@ -703,6 +830,11 @@ def montar_amostra_email(produto: str, dados: dict) -> dict:
         inicio = date.fromisoformat(dados["inicio"] + "-01")
         pessoa = {k: v for k, v in dados.items() if k != "inicio"}
         return mp.amostra(calcular_previsao(PedidoMapaOcidental(**pessoa), inicio))
+    if produto == "calendario":  # rodada 14
+        import montar_calendario as mc
+        inicio = date.fromisoformat(dados["inicio"] + "-01")
+        fuso = dados.get("fuso") or "America/Sao_Paulo"
+        return mc.amostra(calcular_calendario(dados, inicio, fuso))
     if produto == "compat":
         ma, _ = calcular(PedidoMapaOcidental(**dados["a"]))
         mb, _ = calcular(PedidoMapaOcidental(**dados["b"]))

@@ -560,3 +560,169 @@ def gerar_pdf_tarot(*, rel: dict, hoje: date | None = None) -> bytes:
                 "substitui orientação profissional.</b>"))
     doc.build(h, onFirstPage=rodape, onLaterPages=rodape)
     return buf.getvalue()
+
+
+# --------------------------------------------------------------------------
+# "A sua Lua no ano" (rodada 14): A4 retrato, um mês por página (a grade do mês com o
+# ícone de cada evento e, embaixo, os eventos com o texto). Sem nome nem dado de
+# nascimento no arquivo: só o período, o fuso e as lunações.
+# --------------------------------------------------------------------------
+SEMANA_CURTA = ("seg", "ter", "qua", "qui", "sex", "sáb", "dom")
+# o texto dos eventos um pouco menor que o corpo dos outros relatórios: um mês cabe numa página
+E["mes_texto"] = ParagraphStyle("oc_mes_texto", parent=E["corpo"], fontSize=8.8, leading=12.4, spaceAfter=4)
+
+
+class IconeLua(Flowable):
+    """O ícone de cada evento, desenhado (as fontes do PDF não têm os círculos das fases):
+    nova = disco cheio; cheia = círculo vazado; eclipse = o disco com o anel; Mercúrio
+    retrógrado e Revolução Lunar = os glifos ☿ e ☽."""
+
+    def __init__(self, tipo: str, tamanho: float = 9, eclipse: bool = False):
+        super().__init__()
+        self.tipo, self.t, self.eclipse = tipo, tamanho, eclipse
+
+    def wrap(self, *_):
+        return self.t, self.t
+
+    def draw(self):
+        c, r = self.canv, self.t / 2
+        c.saveState()
+        c.setStrokeColor(NOITE)
+        c.setFillColor(NOITE)
+        c.setLineWidth(0.8)
+        if self.tipo == "nova":
+            c.circle(r, r, r * 0.8, stroke=1, fill=1)
+        elif self.tipo == "cheia":
+            c.setFillColor(colors.white)
+            c.circle(r, r, r * 0.8, stroke=1, fill=1)
+        else:
+            c.setFont(GLIFOS, self.t * 1.05)
+            c.drawCentredString(r, r * 0.25, "☿" if self.tipo.startswith("mercurio") else "☽")
+        if self.eclipse:
+            c.setStrokeColor(ACENTO)
+            c.setLineWidth(1.1)
+            c.circle(r, r, r * 1.08, stroke=1, fill=0)
+        c.restoreState()
+
+
+def _grade_do_mes(m: dict) -> Table:
+    """A grade de segunda a domingo, com o dia e os ícones dos eventos daquele dia."""
+    import calendar
+    por_dia: dict[int, list] = {}
+    for e in m["eventos"]:
+        d = date.fromisoformat(e["data"])
+        if (d.year, d.month) == (m["ano"], m["numero"]):
+            por_dia.setdefault(d.day, []).append(e)
+    larg = LARGURA_UTIL / 7
+    linhas = [[_p(f"<b>{s}</b>", "celula_suave") for s in SEMANA_CURTA]]
+    for semana in calendar.Calendar(firstweekday=0).monthdayscalendar(m["ano"], m["numero"]):
+        linha = []
+        for dia in semana:
+            if not dia:
+                linha.append("")
+                continue
+            icones = [IconeLua(e["tipo"], 9, eclipse=bool(e.get("eclipse"))) for e in por_dia.get(dia, [])]
+            horas = " ".join(e["hora"] for e in por_dia.get(dia, []))
+            celula = [_p(f"<b>{dia}</b>", "celula")]
+            if icones:
+                t = Table([icones], colWidths=[12] * len(icones), hAlign="LEFT")
+                t.setStyle(TableStyle([("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 2),
+                                       ("TOPPADDING", (0, 0), (-1, -1), 1), ("BOTTOMPADDING", (0, 0), (-1, -1), 1)]))
+                celula += [t, _p(horas, "celula_suave")]
+            linha.append(celula)
+        linhas.append(linha)
+    t = Table(linhas, colWidths=[larg] * 7, rowHeights=[None] + [12.5 * mm] * (len(linhas) - 1))
+    t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("GRID", (0, 1), (-1, -1), 0.4, LINHA),
+                           ("LINEBELOW", (0, 0), (-1, 0), 0.9, NOITE),
+                           ("LEFTPADDING", (0, 0), (-1, -1), 4), ("TOPPADDING", (0, 0), (-1, -1), 3)]))
+    return t
+
+
+def _assinatura_pdf() -> Table:
+    """A assinatura (rodada 19.1): o rosto da Dona Valderez no arco quando a foto existe
+    (a vaga foto-valderez-rosto, como marca.retrato na tela); sem a foto, a roda. A frase é
+    a de revisao.yaml que é verdade hoje (regra de honestidade)."""
+    import tempfile
+
+    import ilustracoes
+    import textos
+    from reportlab.platypus import Image as Imagem
+    arq = ilustracoes.caminho("foto-valderez-rosto")
+    figura = Lotus(30)
+    if arq:
+        if str(arq) not in _CAPA_JPEG:
+            from PIL import Image
+            destino = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+            Image.open(arq).convert("RGB").save(destino, "JPEG", quality=85)
+            destino.close()
+            _CAPA_JPEG[str(arq)] = destino.name
+        figura = Imagem(_CAPA_JPEG[str(arq)], width=36, height=45)
+    t = Table([[figura, _p(escape(textos.frase_revisao("assinatura")), "celula_suave")]],
+              colWidths=[46, LARGURA_UTIL - 46], hAlign="LEFT")
+    t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+    return t
+
+
+def gerar_pdf_calendario(*, c: dict, hoje: date | None = None) -> bytes:
+    """O calendário de montar_calendario.completo, um mês por página."""
+    hoje = hoje or date.today()
+    ini, fim = date.fromisoformat(c["inicio"]), date.fromisoformat(c["fim"])
+    q = c["contagem"]
+    buf, doc, h, rodape = _capa(
+        "A sua Lua no ano", "",
+        f"De <b>{ini.strftime('%d/%m/%Y')}</b> a <b>{fim.strftime('%d/%m/%Y')}</b> · horários em "
+        f"{escape(c['fuso_nome'])} · gerado em {hoje.strftime('%d/%m/%Y')}",
+        [("Luas novas e cheias", str(q["lunacoes"])), ("Eclipses", str(q["eclipses"])),
+         ("Revoluções Lunares", str(q["revolucoes"])) if q["revolucoes"] else
+         ("Mercúrio retrógrado", f"{q['mercurio']}×")],
+        "Calendário lunar dos próximos 12 meses")
+    for par in [c["abertura"], c["como_ler"]] + c["avisos"]:
+        h.append(_p(escape(par)))
+    for chave, titulo in (("lunacoes", "Luas novas e cheias"), ("eclipses", "Eclipses"),
+                          ("mercurio", "Mercúrio retrógrado"), ("revolucao_lunar", "A sua Revolução Lunar")):
+        if chave == "revolucao_lunar" and not c["revolucao_lunar"]:
+            continue
+        h.append(CondPageBreak(35 * mm))
+        h.append(_p(titulo, "h2"))
+        h.append(_p(escape(c["intro"][chave])))
+    rl = c["revolucao_lunar"]
+    if rl:
+        h.append(_p(escape(rl["texto"]), "intro"))
+        h.append(_p("Datas: " + escape("; ".join(f"{x['dia']} às {x['hora']}" for x in rl["datas"])) + ".",
+                    "celula_suave"))
+    for m in c["meses"]:
+        h.append(PageBreak())
+        h.append(_p(escape(m["rotulo"].capitalize()), "h1"))
+        h.append(_grade_do_mes(m))
+        h.append(Spacer(1, 3 * mm))
+        for e in m["eventos"]:
+            h.append(CondPageBreak(22 * mm))
+            cab = Table([[IconeLua(e["tipo"], 11, eclipse=bool(e.get("eclipse"))),
+                          _p(f"<b>{escape(e['titulo'])}</b>", "celula")]],
+                        colWidths=[16, LARGURA_UTIL - 16], hAlign="LEFT")
+            cab.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+            h.append(cab)
+            detalhe = f"{e['dia']} às {e['hora']}"
+            if e.get("periodo"):
+                detalhe = f"{e['periodo']} (estaciona às {e['hora']}, volta direto às {e['hora_fim']})"
+            if e.get("casa"):
+                detalhe += f" · na sua casa {e['casa']}"
+            if e.get("toca"):
+                detalhe += " · sobre " + ", ".join(t["do_ponto"] for t in e["toca"])
+            if e.get("eclipse"):
+                detalhe += f" · máximo do eclipse às {e['eclipse']['hora']}"
+            h.append(_p(escape(detalhe), "celula_suave"))
+            for par in e.get("textos") or []:
+                h.append(_p(escape(par), "mes_texto"))
+            if e.get("eclipse") and e["eclipse"]["texto"]:
+                h.append(_p(escape(e["eclipse"]["texto"]), "mes_texto"))
+    h.append(PageBreak())
+    h.append(_p("Para fechar", "h1"))
+    h.append(_p(escape(c["fechamento"])))
+    h.append(Spacer(1, 6 * mm))
+    h.append(_assinatura_pdf())
+    h.append(Spacer(1, 6 * mm))
+    h.append(_p("<b>Este calendário é uma ferramenta de autoconhecimento. Descreve o clima de cada fase da Lua, "
+                "não acontecimentos, e não substitui orientação profissional.</b>"))
+    doc.build(h, onFirstPage=rodape, onLaterPages=rodape)
+    return buf.getvalue()

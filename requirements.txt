@@ -11,3 +11,4 @@ pyyaml
 jinja2
 openpyxl
 stripe==16.0.0
+cryptography  # acesso.py: o token cifrado do calendário lunar (rodada 14)

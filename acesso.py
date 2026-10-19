@@ -61,6 +61,55 @@ def chave_previsao(data: str, hora: str, lat, lon, inicio: str) -> str:
     return f"ano|{inicio}|" + chave_mapa(data, hora, lat, lon)
 
 
+# --------------------------------------------------------------------------
+# "A sua Lua no ano" (rodada 14): o link leva SÓ o token, sem nenhum dado de nascimento
+# na URL, no arquivo de agenda ou no log de acesso. O token é o próprio pedido cifrado e
+# autenticado (AES-GCM com uma chave derivada do PADMINI_SECRET): quem não tem o segredo
+# não lê a data, a hora nem o local, e não forja um token. "oc-cal-" = ocidental.
+# --------------------------------------------------------------------------
+PREFIXO_CALENDARIO = "oc-cal-"
+
+
+def _chave_calendario() -> bytes:
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+    return HKDF(algorithm=hashes.SHA256(), length=32, salt=None,
+                info=b"padmini|calendario-lunar|v1").derive(SEGREDO.encode("utf-8"))
+
+
+def emitir_token_calendario(data: str, hora: str, lat, lon, inicio: str) -> str:
+    """Token do calendário lunar: (data ISO, hora HH:MM ou "", lat, lon, início AAAA-MM)."""
+    import base64
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    if not SEGREDO:
+        raise RuntimeError("PADMINI_SECRET não configurado — não é possível emitir token.")
+    claro = "|".join([data, hora or "", f"{float(lat):.4f}", f"{float(lon):.4f}", inicio]).encode("utf-8")
+    nonce = os.urandom(12)
+    cifrado = AESGCM(_chave_calendario()).encrypt(nonce, claro, PREFIXO_CALENDARIO.encode())
+    return PREFIXO_CALENDARIO + base64.urlsafe_b64encode(nonce + cifrado).decode().rstrip("=")
+
+
+def abrir_token_calendario(token: str | None) -> dict | None:
+    """O pedido de dentro do token, ou None (sem segredo, token alterado ou de outro
+    segredo, formato errado). Nunca levanta exceção."""
+    import base64
+    from datetime import date
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    token = str(token or "")
+    if not (SEGREDO and token.startswith(PREFIXO_CALENDARIO)) or len(token) > 300:
+        return None
+    try:
+        corpo = token[len(PREFIXO_CALENDARIO):]
+        bruto = base64.urlsafe_b64decode(corpo + "=" * (-len(corpo) % 4))
+        claro = AESGCM(_chave_calendario()).decrypt(bruto[:12], bruto[12:], PREFIXO_CALENDARIO.encode())
+        data, hora, lat, lon, inicio = claro.decode("utf-8").split("|")
+        date.fromisoformat(data)
+        date.fromisoformat(inicio + "-01")
+        return {"data": data, "hora": hora, "lat": float(lat), "lon": float(lon), "inicio": inicio}
+    except Exception:
+        return None
+
+
 def emitir_token(produto: str, chave: str, sistema: str = "vedica") -> str:
     """Assina (produto, chave) de uma versão. produto ∈ {'mapa','compat'}. Precisa de PADMINI_SECRET."""
     if not SEGREDO:
