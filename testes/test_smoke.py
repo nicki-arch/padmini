@@ -57,7 +57,9 @@ SEM_REDE = ("preço do ofertas.yaml bate", "cabeçalhos de segurança")
 
 
 def _req_local(caminho, corpo=None, timeout=90):
-    r = cliente.post(caminho, json=corpo) if corpo is not None else cliente.get(caminho)
+    # com o cabeçalho do smoke, como o req de verdade (rodada 20.2: sem alerta por e-mail)
+    r = (cliente.post(caminho, json=corpo, headers=smoke.SMOKE) if corpo is not None
+         else cliente.get(caminho, headers=smoke.SMOKE))
     return r.status_code, r.content
 
 
