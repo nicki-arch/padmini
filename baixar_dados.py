@@ -11,7 +11,10 @@ BASE = "https://download.geonames.org/export/dump/"
 
 def baixar(nome: str) -> bytes:
     print(f"baixando {nome}...")
-    with urllib.request.urlopen(BASE + nome, timeout=120) as r:
+    # o mesmo User-Agent das outras chamadas para fora (rodada 20.1), em vez do do Python
+    import enderecos
+    pedido = urllib.request.Request(BASE + nome, headers={"User-Agent": enderecos.USER_AGENT})
+    with urllib.request.urlopen(pedido, timeout=120) as r:
         return r.read()
 
 

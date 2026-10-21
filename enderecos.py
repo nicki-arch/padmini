@@ -31,6 +31,10 @@ SITE_URL = (os.environ.get("PADMINI_SITE_URL") or _MARCA["site"]).strip().rstrip
 # só o domínio ("padmini.com.br"), para o texto que a pessoa lê (termos, card do casal)
 SITE_HOST = urlparse(SITE_URL).netloc or SITE_URL
 CONTATO = str(_MARCA["contato"]).strip()
+# Rodada 20.1: o User-Agent de toda chamada nossa para fora (Resend, GeoNames). O padrão do
+# Python ("Python-urllib/3.x") é barrado pela proteção na frente da API do Resend (403,
+# "error code: 1010") antes de chegar à conta: nenhum e-mail do site saía.
+USER_AGENT = f"ValderezAstrologia/1.0 (+{SITE_URL})"
 # todas as redes do YAML, ligadas ou não (a validação abaixo vale para as duas)
 TODAS_AS_REDES: list[dict] = [dict(r) for r in _MARCA.get("redes") or []]
 # rede com ícone que não existe ou endereço sem https quebra na subida, não na página no ar
@@ -50,6 +54,17 @@ def ativas(redes: list[dict]) -> list[dict]:
 # Rodada 19.1: só as redes ATIVAS. Rodapé, "quem revisa", /links e o sameAs do JSON-LD
 # leem daqui, então uma rede com `ativa: false` some de todos de uma vez.
 REDES: list[dict] = ativas(TODAS_AS_REDES)
+
+
+def arroba_principal(redes: list[dict]) -> str:
+    """O @ que vale para "as redes" num texto só (a linha do @ da /links): o que mais redes
+    ativas usam; no empate, o da primeira. Rodada 20.1: o Instagram tem um @ próprio
+    (com sublinhado), então "redes[0].arroba" escreveria o do Instagram para o TikTok também."""
+    arrobas = [r["arroba"] for r in redes if r.get("arroba")]
+    return max(arrobas, key=arrobas.count) if arrobas else ""
+
+
+ARROBA = arroba_principal(REDES)
 
 # Domínios antigos que passam a só redirecionar (o registro continua: é ele que
 # segura os links antigos e o webhook).

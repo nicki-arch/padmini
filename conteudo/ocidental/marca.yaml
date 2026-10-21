@@ -34,12 +34,12 @@ contato: contato@pedrosperbmonteiro.com.br
 redes:
   - nome: Instagram
     icone: instagram
-    arroba: "@astrologiavalderez"
-    url: https://www.instagram.com/astrologiavalderez/
-    # 18/out/2026: sem login, o Instagram responde "Profile não está disponível" (conta
-    # privada, nome não trocado ou recém-criada; a correção é do Pedro, no app). Volta para
-    # true quando o Nicolas confirmar que o perfil abre sem login.
-    ativa: false
+    # Rodada 20.1: o perfil certo, confirmado pelo Nicolas em 20/out, tem um SUBLINHADO no fim
+    # (o @ é diferente do TikTok e do YouTube). O endereço sem o sublinhado é que dava
+    # "Profile não está disponível" (rodada 19.1, quando a rede foi desligada).
+    arroba: "@astrologiavalderez_"
+    url: https://www.instagram.com/astrologiavalderez_/
+    ativa: true
   - nome: TikTok
     icone: tiktok
     arroba: "@astrologiavalderez"

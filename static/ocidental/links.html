@@ -36,7 +36,7 @@
   <div class="foto arco links-foto" aria-hidden="true">{{ marca.retrato(vaga_foto, 104, 130, carregar="eager", roda_tamanho=64) }}</div>
   <h1 class="links-nome">{{ t.nome }}</h1>
   <p class="links-linha">{{ t.linha }}</p>
-  {%- if redes %}<p class="links-arroba">{{ redes[0].arroba }}</p>{% endif %}
+  {%- if arroba %}<p class="links-arroba">{{ arroba }}</p>{% endif %}
 
   <nav class="links-botoes" aria-label="Leituras">
     <a class="links-bt links-bt-1" href="{{ b.principal.rota }}{{ q }}" data-destino="{{ b.principal.destino }}">

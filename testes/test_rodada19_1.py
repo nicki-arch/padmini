@@ -166,25 +166,13 @@ def test_ativas_filtra_e_o_padrao_e_ligada():
     assert [r["nome"] for r in enderecos.ativas(redes)] == ["A", "C"]
 
 
-def test_instagram_desligado_no_marca_yaml():
-    insta = next(r for r in enderecos.TODAS_AS_REDES if r["nome"] == "Instagram")
-    assert insta["ativa"] is False
-    assert [r["nome"] for r in enderecos.REDES] == ["TikTok", "YouTube"]
-
-
-@pytest.mark.parametrize("rota", ["/", "/mapa", "/links", "/leituras", "/termos", "/tarot"])
-def test_rede_inativa_nao_aparece_em_lugar_nenhum(ocidental, rota):
-    html = _pagina(rota)
-    assert "instagram.com" not in html, rota
-    assert "tiktok.com/@astrologiavalderez" in html and "youtube.com/@astrologiavalderez" in html, rota
-
-
-def test_rede_inativa_fora_do_same_as(ocidental):
-    html = _pagina("/")
-    bloco = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.S).group(1)
-    org = next(g for g in json.loads(bloco)["@graph"] if g["@type"] == "Organization")
-    assert org["sameAs"] == [r["url"] for r in enderecos.REDES]
-    assert not any("instagram" in u for u in org["sameAs"])
+def test_rede_inativa_sai_das_redes():
+    """O mecanismo da rodada 19.1 continua: `ativa: false` tira a rede de enderecos.REDES
+    (e daí de todo o site). Desde a rodada 20.1 o Instagram está ligado de novo, com o
+    endereço certo; os testes dele estão em test_rodada20_1.py."""
+    redes = [dict(r) for r in enderecos.TODAS_AS_REDES]
+    redes[0]["ativa"] = False
+    assert redes[0]["nome"] not in [r["nome"] for r in enderecos.ativas(redes)]
 
 
 def test_ativa_precisa_ser_booleano(monkeypatch, tmp_path):
