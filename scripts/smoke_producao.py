@@ -27,10 +27,20 @@ PESSOA = {"nome": "Smoke", "data": "1990-05-15", "hora": "14:30",
 PESSOA_B = {**PESSOA, "nome": "Smoke B", "data": "1992-03-10", "hora": "08:00"}
 
 
+# Rodada 20.2: o smoke se identifica em toda chamada. Os webhooks recusam o evento sem
+# assinatura igual (401), mas não mandam o e-mail de alerta: sem isso, a rodada de hora em
+# hora do pos-deploy.yml gerava ~2 alertas falsos por hora. O cabeçalho só desliga o
+# e-mail; nenhuma resposta muda (app._do_smoke).
+SMOKE = {"X-Padmini-Smoke": "1"}
+
+
+def _cabecalhos(dados) -> dict:
+    return {**SMOKE, **({"Content-Type": "application/json"} if dados else {})}
+
+
 def req(caminho, corpo=None, timeout=90):
     dados = json.dumps(corpo).encode() if corpo is not None else None
-    r = urllib.request.Request(BASE + caminho, data=dados,
-                               headers={"Content-Type": "application/json"} if dados else {})
+    r = urllib.request.Request(BASE + caminho, data=dados, headers=_cabecalhos(dados))
     try:
         with urllib.request.urlopen(r, timeout=timeout) as resp:
             return resp.status, resp.read()
@@ -604,7 +614,7 @@ def _dominio_novo_no_ar() -> bool:
 def _sem_seguir(url, corpo=None, timeout=90):
     """(status, Location) de `url` (absoluta) SEM seguir o redirecionamento."""
     dados = json.dumps(corpo).encode() if corpo is not None else None
-    r = urllib.request.Request(url, data=dados, headers={"Content-Type": "application/json"} if dados else {})
+    r = urllib.request.Request(url, data=dados, headers=_cabecalhos(dados))
     try:
         with urllib.request.build_opener(_SemSeguir).open(r, timeout=timeout) as resp:
             return resp.status, ""

@@ -1334,12 +1334,14 @@ async def webhook_cakto(request: Request):
                                          os.environ.get("PADMINI_CAKTO_WEBHOOK_SECRET", ""),
                                          secret_do_corpo)
     if not metodo:
-        log.warning("webhook: origem NÃO provada (assinatura %s, timestamp %r) — recusado",
-                    "presente" if assinatura else "ausente", timestamp[:20])
-        alertas.alertar("Webhook da Cakto recusado (assinatura inválida)",
-                        "Se foi uma venda real, o segredo do webhook na Render pode estar errado "
-                        "(PADMINI_CAKTO_WEBHOOK_SECRET). Se não, é alguém testando o endereço.",
-                        chave="webhook401", intervalo=60 * 60)
+        log.warning("webhook: origem NÃO provada (assinatura %s, timestamp %r) — recusado%s",
+                    "presente" if assinatura else "ausente", timestamp[:20],
+                    " (smoke: sem alerta)" if _do_smoke(request) else "")
+        if not _do_smoke(request):
+            alertas.alertar("Webhook da Cakto recusado (assinatura inválida)",
+                            "Se foi uma venda real, o segredo do webhook na Render pode estar errado "
+                            "(PADMINI_CAKTO_WEBHOOK_SECRET). Se não, é alguém testando o endereço.",
+                            chave="webhook401", intervalo=60 * 60)
         raise HTTPException(401, "assinatura inválida")
     # Serve para decidir quando ligar PADMINI_CAKTO_EXIGIR_ASSINATURA=1 (docs/seguranca.md).
     log.info("webhook: origem provada por %s", metodo)
@@ -1501,6 +1503,14 @@ def _alertar_pendente(evento: dict, produto: str, email: str, motivo: str, pd: d
 # 401. Idempotente pelo id do evento (eventos_stripe) e pelo pedido (a transição para
 # `pago` acontece uma vez só). Nada de dado pessoal no log: só ids.
 # ---------------------------------------------------------------------------
+def _do_smoke(request: Request) -> bool:
+    """A chamada veio do smoke de produção (cabeçalho X-Padmini-Smoke: 1, rodada 20.2)? Só
+    serve para NÃO mandar o e-mail de alerta de uma recusa que o smoke provoca de propósito
+    (de hora em hora). A resposta é a mesma, com ou sem ele: quem forjar o cabeçalho continua
+    recebendo 401 e só deixa de nos avisar por e-mail; o log registra a recusa igual."""
+    return request.headers.get("x-padmini-smoke") == "1"
+
+
 EVENTOS_STRIPE = ("checkout.session.completed", "checkout.session.async_payment_succeeded",
                   "checkout.session.async_payment_failed", "checkout.session.expired",
                   "charge.refunded", "charge.dispute.created")
@@ -1513,11 +1523,12 @@ async def webhook_stripe(request: Request):
         evento = stripe_api.verificar_evento(corpo, request.headers.get("stripe-signature") or "",
                                              pagamento.segredo_webhook())
     except stripe_api.AssinaturaInvalida as erro:
-        log.warning("webhook stripe: recusado (%s)", erro)
-        alertas.alertar("Webhook da Stripe recusado (assinatura inválida)",
-                        "Se foi um pagamento de verdade, o STRIPE_WEBHOOK_SECRET na Render pode estar errado "
-                        "ou faltando. Se não, é alguém testando o endereço.",
-                        chave="webhook_stripe401", intervalo=60 * 60)
+        log.warning("webhook stripe: recusado (%s)%s", erro, " (smoke: sem alerta)" if _do_smoke(request) else "")
+        if not _do_smoke(request):
+            alertas.alertar("Webhook da Stripe recusado (assinatura inválida)",
+                            "Se foi um pagamento de verdade, o STRIPE_WEBHOOK_SECRET na Render pode estar errado "
+                            "ou faltando. Se não, é alguém testando o endereço.",
+                            chave="webhook_stripe401", intervalo=60 * 60)
         raise HTTPException(401, "assinatura inválida")
     tipo, id_evento = str(evento["type"]), str(evento["id"])
     if tipo not in EVENTOS_STRIPE:
