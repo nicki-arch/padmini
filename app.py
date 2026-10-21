@@ -319,6 +319,7 @@ _jinja.globals["site"] = enderecos.SITE_URL
 _jinja.globals["site_host"] = enderecos.SITE_HOST
 _jinja.globals["contato"] = enderecos.CONTATO
 _jinja.globals["redes"] = enderecos.REDES
+_jinja.globals["arroba"] = enderecos.ARROBA  # o @ de "as redes" num texto só (rodada 20.1)
 # Páginas que o /painel pode esconder (rodada 15): o menu, o rodapé e os links perguntam.
 _jinja.globals["pagina_visivel"] = estado_site.pagina_visivel
 # A faixa "Modo teste: só você está vendo assim" (navegador logado no painel em "tudo

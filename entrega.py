@@ -10,8 +10,10 @@ não envia e devolve False (o chamador registra o link para envio manual).
 
 import html
 import json
+import logging
 import re
 import os
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -19,6 +21,8 @@ import acesso
 import enderecos
 import paleta
 import sistema as _sistema
+
+log = logging.getLogger("padmini.entrega")
 
 # Endereço público do site (rodada 18): PADMINI_SITE_URL ou o `site` de conteudo/ocidental/marca.yaml.
 SITE_URL = enderecos.SITE_URL
@@ -322,12 +326,52 @@ def enviar_email(destino: str, assunto: str, html: str, responder_para: str | No
     corpo = {"from": remetente, "to": [destino], "subject": assunto, "html": html}
     if responder_para:
         corpo["reply_to"] = responder_para
-    payload = json.dumps(corpo).encode("utf-8")
-    req = urllib.request.Request(
-        "https://api.resend.com/emails", data=payload,
-        headers={"Authorization": f"Bearer {chave}", "Content-Type": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=15) as r:
-            return 200 <= r.status < 300
-    except Exception:
+        with urllib.request.urlopen(pedido_resend(chave, corpo), timeout=15) as r:
+            if 200 <= r.status < 300:
+                return True
+            log.warning("e-mail não saiu: Resend respondeu %s (%s) para @%s", r.status,
+                        _trecho_seguro(r.read()), _dominio(destino))
+            return False
+    except urllib.error.HTTPError as erro:
+        # rodada 20.1: o motivo vai para o log (antes era engolido: 403 "error code: 1010"
+        # por semanas, sem ninguém saber). Só o status e o começo da resposta, sem a chave,
+        # sem o destinatário completo e sem o conteúdo do e-mail.
+        try:
+            resposta = erro.read()
+        except Exception:  # noqa: BLE001
+            resposta = b""
+        log.warning("e-mail não saiu: Resend respondeu %s (%s) para @%s", erro.code,
+                    _trecho_seguro(resposta), _dominio(destino))
         return False
+    except Exception as erro:  # noqa: BLE001  (rede, timeout)
+        log.warning("e-mail não saiu: falha ao falar com o Resend (%s) para @%s",
+                    type(erro).__name__, _dominio(destino))
+        return False
+
+
+URL_RESEND = "https://api.resend.com/emails"
+
+
+def pedido_resend(chave: str, corpo: dict) -> urllib.request.Request:
+    """O POST para o Resend, com o NOSSO User-Agent (rodada 20.1, enderecos.USER_AGENT): o do
+    Python é barrado antes de chegar à conta (403, "error code: 1010")."""
+    return urllib.request.Request(
+        URL_RESEND, data=json.dumps(corpo).encode("utf-8"), method="POST",
+        headers={"Authorization": f"Bearer {chave}", "Content-Type": "application/json",
+                 "User-Agent": enderecos.USER_AGENT})
+
+
+_EMAIL_NO_TEXTO = re.compile(r"[^\s\"'<>@]+@[^\s\"'<>@]+")
+
+
+def _trecho_seguro(resposta: bytes, limite: int = 200) -> str:
+    """O começo da resposta do Resend para o log, numa linha, sem nenhum e-mail dentro."""
+    texto = (resposta or b"").decode("utf-8", "replace")
+    texto = _EMAIL_NO_TEXTO.sub("[e-mail]", " ".join(texto.split()))
+    return texto[:limite] or "sem corpo"
+
+
+def _dominio(email: str) -> str:
+    """Só o domínio do destinatário ("gmail.com"), nunca o endereço."""
+    return str(email or "").rsplit("@", 1)[-1][:60] if "@" in str(email or "") else "?"
