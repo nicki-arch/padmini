@@ -130,7 +130,12 @@ def test_live_ocidental(versao, monkeypatch):
     assert cliente.post("/api/live/ocidental/token/mapa", json=PESSOA).status_code == 401
     cookie = acesso.emitir_sessao("live", 2_000_000_000)
     r = cliente.post("/api/live/ocidental/token/mapa", json=SEM_HORA, cookies={"pad_live": cookie})
-    assert r.status_code == 200 and r.json()["token"] == _token(SEM_HORA)
+    # rodada 20.3: o token novo (só ele no link), com o pedido dentro
+    t = r.json()
+    assert r.status_code == 200 and t["token"].startswith("oc-mapa-") and t["link"] == "/mapa?token=" + t["token"]
+    d = acesso.abrir_token_cifrado("mapa", t["token"])
+    assert (d["data"], d["hora"], d["lat"], d["lon"]) == (SEM_HORA["data"], "", SEM_HORA["lat"], SEM_HORA["lon"])
+    assert cliente.post("/api/ocidental/mapa", json={"token": t["token"], "nivel": "completo"}).status_code == 200
 
 
 # ------------------------------------------------------------------ webhook
@@ -150,10 +155,11 @@ def _evento(sck, pid):
 def test_webhook_entrega_mapa_ocidental_sem_hora(oferta_mapa_ocidental):
     """Na ocidental, 'não sei a hora' é um pedido válido (sck com a hora vazia)."""
     c = _postar_webhook(_evento("m~1990-05-15~~-23.5505~-46.6333~Ana~Sao Paulo", "oc-sem-hora")).json()
-    assert c["produto"] == "mapa" and "token=oc-" in c["link"] and "hora=&" in c["link"]
+    assert c["produto"] == "mapa" and "/mapa?token=oc-mapa-" in c["link"] and "hora=" not in c["link"]
     tok = c["link"].split("token=")[1]
-    r = cliente.post("/api/ocidental/mapa", json={**SEM_HORA, "nivel": "completo", "token": tok})
-    assert r.status_code == 200
+    assert acesso.abrir_token_cifrado("mapa", tok)["hora"] == ""
+    r = cliente.post("/api/ocidental/mapa", json={"nivel": "completo", "token": tok})
+    assert r.status_code == 200 and r.json()["tem_hora"] is False
 
 
 def test_webhook_vedico_continua_exigindo_hora():

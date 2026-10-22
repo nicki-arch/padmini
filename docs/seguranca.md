@@ -112,6 +112,35 @@ Sem isso, o bump agora é ignorado (antes, qualquer bump virava os 2 mapas).
   `session_recording: { maskAllInputs: true, maskTextSelector: "#resultado" }` no
   `analytics.js`.
 
+## Links pagos sem dado de nascimento (rodada 20.3, 22/out/2026)
+
+Antes, o link do mapa natal e o de "O seu ano" eram `/mapa?data=…&hora=…&lat=…&lon=…&cidade=…&nome=…&token=oc-…`.
+Esses dados iam para o log de acesso da Render, para o histórico do navegador e para qualquer
+pixel de anúncio. Agora:
+
+- **Link só com o token:** `/mapa?token=oc-mapa-…` e `/seu-ano?token=oc-ano-…`
+  (`acesso.emitir_token_cifrado`). O pedido vai dentro do token, cifrado e autenticado:
+  AES-GCM, chave do `PADMINI_SECRET` por HKDF com `info` própria de cada produto e o prefixo
+  como dado associado. Nome cortado em 40 caracteres e cidade em 60; o token fica abaixo de
+  400 caracteres. Um token de um produto não abre o outro.
+  Vale em todo lugar que emite link: `entrega.link_completo`, o kit, os mapas do casal, o
+  e-mail de entrega, o `/obrigado`, "Minhas leituras" (que usa `pedidos.link`), o `/live` e o
+  modo teste do painel.
+- **As APIs** (`/api/ocidental/mapa`, `/pdf`, `/previsao`, `/previsao/pdf`) aceitam o token
+  sozinho. O pedido sai de dentro do token, nunca do corpo. Token alterado, de outro segredo,
+  de outro produto ou malformado = 402.
+- **Links antigos continuam abrindo** (token HMAC + dados). A resposta traz `link_novo`, e a
+  página troca a barra com `history.replaceState`.
+- **O calendário (`oc-cal-`) não mudou:** mesmo formato e mesma chave.
+- **Log de acesso sem query:** `app.SemQueryNoLog` no logger `uvicorn.access`. A linha sai
+  como `GET /mapa`, em todas as rotas.
+- **Pendências:**
+  - a sinastria e a numerologia (ocultas) ainda usam o formato antigo;
+  - conferir se o log de requisições da própria Render (o painel de "HTTP requests", fora do
+    app) mostra a query.
+- **Não trocar o `PADMINI_SECRET`:** isso quebra todo link já entregue, inclusive os do
+  calendário.
+
 ## Checklist ao mexer em segurança
 - [ ] `python -m pytest -q testes` verde (com `TEST_DATABASE_URL` para os testes do banco).
 - [ ] Caminho de **rejeição** testado, não só o de aceite (regra 4 do CLAUDE.md).

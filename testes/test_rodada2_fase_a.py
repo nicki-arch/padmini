@@ -78,8 +78,10 @@ def test_bump_ocidental_entrega_dois_mapas_natais(ocidental_com_bump):
     assert c["produto"] == "ocidental:mapas_casal" and len(c["links"]) == 2
     for link in c["links"]:
         q = urllib.parse.parse_qs(urllib.parse.urlparse(link).query, keep_blank_values=True)
-        assert q["token"][0].startswith("oc-")
-        chave = acesso.chave_mapa(q["data"][0], q["hora"][0], q["lat"][0], q["lon"][0])
+        # rodada 20.3: só o token cifrado, com o pedido dentro
+        assert list(q) == ["token"] and q["token"][0].startswith("oc-mapa-")
+        d = acesso.abrir_token_cifrado("mapa", q["token"][0])
+        chave = acesso.chave_mapa(d["data"], d["hora"], d["lat"], d["lon"])
         assert acesso.completo_liberado("mapa", chave, q["token"][0], "ocidental")
 
 

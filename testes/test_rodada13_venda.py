@@ -13,6 +13,7 @@ import pytest
 import test_app as base  # configura o ambiente e o app
 from test_rodada11_fase2 import banco, modo_stripe, precisa_banco, stripe_falsa  # noqa: F401  (fixtures)
 
+import acesso  # noqa: E402
 import app as app_mod  # noqa: E402
 import catalogo  # noqa: E402
 import db  # noqa: E402
@@ -111,9 +112,10 @@ def test_link_de_entrega_abre_o_ano_comprado(ocidental):
     link = entrega.link_completo("previsao", dados, "ocidental")
     u = urlparse(link)
     q = {k: v[0] for k, v in parse_qs(u.query).items()}
-    assert u.path == "/seu-ano" and q["inicio"] == "2026-10" and q["token"].startswith("oc-")
-    r = cliente.post("/api/ocidental/previsao", json={**PESSOA, "nivel": "completo", "inicio": "2026-10",
-                                                      "token": q["token"]})
+    # rodada 20.3: só o token (oc-ano-), com o ano comprado dentro
+    assert u.path == "/seu-ano" and list(q) == ["token"] and q["token"].startswith("oc-ano-")
+    assert acesso.abrir_token_cifrado("previsao", q["token"])["inicio"] == "2026-10"
+    r = cliente.post("/api/ocidental/previsao", json={"nivel": "completo", "token": q["token"]})
     assert r.status_code == 200 and r.json()["inicio"] == "2026-10-01"
     assert cliente.get(f"/seu-ano?{u.query}", headers=HTML).status_code == 200  # abre mesmo oculto
 

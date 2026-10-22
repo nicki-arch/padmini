@@ -30,7 +30,11 @@ SITE_URL = enderecos.SITE_URL
 
 def link_completo(produto: str, dados: dict, sistema: str = "vedica") -> str:
     """Monta a URL do completo (com token) para o e-mail. produto: 'mapa'|'compat'.
-    As rotas são as mesmas nas duas versões: é o token que diz qual versão abrir."""
+    As rotas são as mesmas nas duas versões: é o token que diz qual versão abrir.
+    Na ocidental, o mapa e "O seu ano" saem só com o token cifrado (rodada 20.3), como o
+    calendário; a védica continua igual."""
+    if sistema == "ocidental" and produto in acesso.CIFRADOS:
+        return SITE_URL + caminho_cifrado(produto, dados)
     if produto == "mapa":
         chave = acesso.chave_mapa(dados["data"], dados["hora"], dados["lat"], dados["lon"])
         token = acesso.emitir_token("mapa", chave, sistema)
@@ -69,6 +73,17 @@ def link_completo(produto: str, dados: dict, sistema: str = "vedica") -> str:
         q = {"t": dados["tiragem"], "token": acesso.emitir_token(produto, chave, sistema)}
         return f"{SITE_URL}/tarot?" + urllib.parse.urlencode(q)
     raise ValueError(f"produto inválido: {produto}")
+
+
+# Rodada 20.3: a página de cada produto com token cifrado (acesso.CIFRADOS).
+PAGINA_CIFRADA = {"mapa": "/mapa", "previsao": "/seu-ano"}
+
+
+def caminho_cifrado(produto: str, dados: dict) -> str:
+    """O link do completo SÓ com o token (/mapa?token=oc-mapa-…), relativo ao site: nenhum
+    dado de nascimento na URL, no histórico do navegador ou no log de acesso."""
+    token = acesso.emitir_token_cifrado(produto, dados)
+    return f"{PAGINA_CIFRADA[produto]}?" + urllib.parse.urlencode({"token": token})
 
 
 def links_do_kit(dados: dict, sistema: str = "ocidental", kit: str = "kit") -> list[tuple[str, str]]:

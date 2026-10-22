@@ -381,16 +381,29 @@ async function baixarPDF() {
 }
 
 // ---------- entrega do completo por link (pós-pagamento) ----------
-// /seu-ano?data=AAAA-MM-DD&hora=HH:MM&lat=..&lon=..&cidade=..&nome=..&inicio=AAAA-MM&token=oc-...
+// /seu-ano?token=oc-ano-... (rodada 20.3); antes, /seu-ano?data=AAAA-MM-DD&hora=HH:MM&lat=..&lon=..&cidade=..&nome=..&inicio=AAAA-MM&token=oc-...
 (function abrirCompletoPorLink() {
   const p = new URLSearchParams(location.search);
   const token = p.get("token"), data = p.get("data"), hora = p.get("hora") || "", inicio = p.get("inicio");
   const lat = parseFloat(p.get("lat")), lon = parseFloat(p.get("lon"));
-  if (!token || !data || !inicio || isNaN(lat) || isNaN(lon)) return;
+  // rodada 20.3: o link novo leva SÓ o token (oc-ano-…); o servidor abre e calcula
+  const soToken = !!token && token.startsWith("oc-ano-");
+  if (!soToken && (!token || !data || !inicio || isNaN(lat) || isNaN(lon))) return;
   ultimoPedido = { nome: p.get("nome") || "", data, hora, lat, lon, cidade: p.get("cidade") || "", inicio, token };
+  if (soToken) ultimoPedido = { token };
   $("#titulo-carregando").textContent = "Abrindo o seu ano completo";
   mostrarEstado("estado-carregando"); animarEtapas();
-  pedir("/api/ocidental/previsao", { ...ultimoPedido, nivel: "completo" }).then((d) => { clearInterval(timerEtapas); desenharResultado(d); }).catch((e) => {
+  pedir("/api/ocidental/previsao", { ...ultimoPedido, nivel: "completo" }).then((d) => {
+    clearInterval(timerEtapas);
+    // os dados vêm da resposta (o link novo não os tem); o link antigo ganha o formato novo
+    // na barra e no histórico, sem os dados de nascimento (rodada 20.3)
+    ultimoPedido = { ...ultimoPedido, nome: d.nome, data: d.data, hora: d.hora, cidade: d.cidade };
+    if (d.link_novo) {
+      try { history.replaceState(null, "", d.link_novo); } catch {}
+      ultimoPedido = { token: new URLSearchParams(d.link_novo.split("?")[1]).get("token"), nome: d.nome, data: d.data, hora: d.hora, cidade: d.cidade };
+    }
+    desenharResultado(d);
+  }).catch((e) => {
     clearInterval(timerEtapas);
     $("#resultado").innerHTML = `<section class="erro-topo"><div><span class="chip chip-breve">Link de leitura</span>
       <h1 class="t2" id="titulo-resultado" tabindex="-1">Este link de leitura <em>não abriu</em></h1>

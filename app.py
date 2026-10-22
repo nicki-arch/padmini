@@ -91,6 +91,25 @@ async def _ciclo_de_vida(_app):
 
 log = logging.getLogger("padmini.app")
 
+
+class SemQueryNoLog(logging.Filter):
+    """Rodada 20.3: a linha de acesso do uvicorn (`"GET /mapa?data=…&nome=… HTTP/1.1" 200`)
+    sai só com o caminho (`GET /mapa`), nunca com `?…`, em todas as rotas. Os links antigos
+    do mapa e de "O seu ano" (dados de nascimento na URL) continuam chegando por um tempo, e
+    a query também pode levar e-mail (descadastro) ou tokens. O uvicorn monta a linha com
+    record.args = (cliente, método, caminho com query, versão HTTP, status)."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        args = record.args
+        if isinstance(args, tuple) and len(args) >= 3 and isinstance(args[2], str) and "?" in args[2]:
+            record.args = args[:2] + (args[2].split("?", 1)[0],) + args[3:]
+        return True
+
+
+# O uvicorn configura os loggers dele antes de importar o app: o filtro entra no logger de
+# acesso já configurado (e em qualquer handler que vier depois, por ser no logger).
+logging.getLogger("uvicorn.access").addFilter(SemQueryNoLog())
+
 # Qual versão do site está no ar (PADMINI_SISTEMA, ver sistema.py). Lido aqui,
 # na subida: valor desconhecido derruba a subida com erro claro, em vez de pôr
 # no ar um site meio montado.
