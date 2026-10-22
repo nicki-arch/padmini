@@ -28,6 +28,7 @@ import pytest
 import test_app as base  # configura o ambiente e o app
 from test_rodada11_fase2 import banco, modo_stripe, precisa_banco, stripe_falsa  # noqa: F401  (fixtures)
 
+import acesso  # noqa: E402
 import alertas  # noqa: E402
 import app as app_mod  # noqa: E402
 import catalogo  # noqa: E402
@@ -369,14 +370,17 @@ def _abre_os_tres(links: list[str]):
     import html as _html
     por_rota = {urlparse(_html.unescape(l)).path: _html.unescape(l) for l in links}
     assert set(por_rota) == {"/mapa", "/seu-ano", "/calendario-lunar"}
+    for l in por_rota.values():  # rodada 20.3: nenhum dado de nascimento em link nenhum
+        assert not set(parse_qs(urlparse(l).query)) & {"data", "hora", "lat", "lon", "nome", "cidade", "inicio"}
+    # rodada 20.3: os três links levam SÓ o token
     q = {k: v[0] for k, v in parse_qs(urlparse(por_rota["/mapa"]).query).items()}
-    r = cliente.post("/api/ocidental/mapa", json={**PESSOA, "nivel": "completo", "token": q["token"]})
+    assert list(q) == ["token"] and q["token"].startswith("oc-mapa-")
+    r = cliente.post("/api/ocidental/mapa", json={"nivel": "completo", "token": q["token"]})
     assert r.status_code == 200, r.text
     q = {k: v[0] for k, v in parse_qs(urlparse(por_rota["/seu-ano"]).query).items()}
     hoje = datetime.now(previsao.FUSO_DATAS).strftime("%Y-%m")
-    assert q["inicio"] == hoje
-    r = cliente.post("/api/ocidental/previsao", json={**PESSOA, "nivel": "completo", "inicio": q["inicio"],
-                                                      "token": q["token"]})
+    assert list(q) == ["token"] and acesso.abrir_token_cifrado("previsao", q["token"])["inicio"] == hoje
+    r = cliente.post("/api/ocidental/previsao", json={"nivel": "completo", "token": q["token"]})
     assert r.status_code == 200, r.text
     q = parse_qs(urlparse(por_rota["/calendario-lunar"]).query)
     assert list(q) == ["token"] and q["token"][0].startswith("oc-cal-")  # só o token cifrado

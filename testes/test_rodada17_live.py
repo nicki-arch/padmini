@@ -95,8 +95,9 @@ def test_token_do_live_respeita_o_inicio_pedido(base, monkeypatch):
     _painel(monkeypatch, **{"produto:previsao": "ativo"})
     t = cliente.post("/api/live/ocidental/token/previsao", json={**ANA, "inicio": "2027-01"}, headers=LIVE).json()
     assert t["inicio"] == "2027-01"
-    assert t["token"] == acesso.emitir_token(
-        "previsao", acesso.chave_previsao(ANA["data"], ANA["hora"], ANA["lat"], ANA["lon"], "2027-01"), "ocidental")
+    # rodada 20.3: o token novo leva o ano pedido dentro
+    assert acesso.abrir_token_cifrado("previsao", t["token"])["inicio"] == "2027-01"
+    assert t["link"] == "/seu-ano?token=" + t["token"]
 
 
 # ------------------------------------------------------------------ tudo liberado

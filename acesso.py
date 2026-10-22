@@ -110,6 +110,99 @@ def abrir_token_calendario(token: str | None) -> dict | None:
         return None
 
 
+# --------------------------------------------------------------------------
+# Rodada 20.3: o mesmo desenho do calendário para o mapa natal e "O seu ano". O link
+# leva SÓ o token (/mapa?token=oc-mapa-…, /seu-ano?token=oc-ano-…): nome, data, hora,
+# cidade e coordenadas vão cifrados e autenticados dentro dele (AES-GCM, chave do
+# PADMINI_SECRET por HKDF com `info` própria de cada produto, prefixo como dado
+# associado). Um token de um produto não abre o outro. O calendário (oc-cal-) fica como
+# está: formato e chave iguais, para os links já entregues continuarem abrindo.
+# Os links antigos (token HMAC + dados na URL) continuam valendo (completo_liberado).
+# --------------------------------------------------------------------------
+CIFRADOS = {
+    # produto: (prefixo, info do HKDF, campos na ordem em que vão dentro do token)
+    "mapa": ("oc-mapa-", b"padmini|mapa|v1", ("nome", "data", "hora", "lat", "lon", "cidade")),
+    "previsao": ("oc-ano-", b"padmini|seu-ano|v1", ("nome", "data", "hora", "lat", "lon", "cidade", "inicio")),
+}
+# nome e cidade cortados para o token não passar de ~400 caracteres
+LIMITE_NOME, LIMITE_CIDADE, LIMITE_TOKEN = 40, 60, 500
+
+
+def _chave_cifrada(produto: str) -> bytes:
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+    return HKDF(algorithm=hashes.SHA256(), length=32, salt=None,
+                info=CIFRADOS[produto][1]).derive(SEGREDO.encode("utf-8"))
+
+
+def token_cifrado(token: str | None) -> bool:
+    """O token é do formato novo (só ele no link)? Pelo prefixo, sem abrir."""
+    return any(str(token or "").startswith(pref) for pref, _, _ in CIFRADOS.values())
+
+
+def emitir_token_cifrado(produto: str, dados: dict) -> str:
+    """Token de `produto` ("mapa" | "previsao") com os dados do pedido dentro."""
+    import base64
+    import json
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    if not SEGREDO:
+        raise RuntimeError("PADMINI_SECRET não configurado — não é possível emitir token.")
+    prefixo, _, campos = CIFRADOS[produto]
+    corte = {"nome": LIMITE_NOME, "cidade": LIMITE_CIDADE}
+    valores = []
+    for c in campos:
+        v = dados.get(c)
+        if c in ("lat", "lon"):
+            v = float(v)
+        else:
+            v = " ".join(str(v or "").split())[:corte.get(c, 20)]
+        valores.append(v)
+    claro = json.dumps(valores, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    nonce = os.urandom(12)
+    cifrado = AESGCM(_chave_cifrada(produto)).encrypt(nonce, claro, prefixo.encode())
+    return prefixo + base64.urlsafe_b64encode(nonce + cifrado).decode().rstrip("=")
+
+
+def abrir_token_cifrado(produto: str, token: str | None) -> dict | None:
+    """Os dados de dentro do token de `produto`, ou None (sem segredo, de outro produto,
+    alterado, de outro segredo, malformado). Nunca levanta exceção."""
+    import base64
+    import json
+    import re
+    from datetime import date
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    token = str(token or "")
+    if produto not in CIFRADOS or not SEGREDO or len(token) > LIMITE_TOKEN:
+        return None
+    prefixo, _, campos = CIFRADOS[produto]
+    if not token.startswith(prefixo):
+        return None
+    try:
+        corpo = token[len(prefixo):]
+        bruto = base64.urlsafe_b64decode(corpo + "=" * (-len(corpo) % 4))
+        claro = AESGCM(_chave_cifrada(produto)).decrypt(bruto[:12], bruto[12:], prefixo.encode())
+        valores = json.loads(claro.decode("utf-8"))
+        if not (isinstance(valores, list) and len(valores) == len(campos)):
+            return None
+        d = dict(zip(campos, valores))
+        date.fromisoformat(d["data"])
+        if not re.fullmatch(r"(\d{2}:\d{2})?", d["hora"]):
+            return None
+        if not (-90 <= float(d["lat"]) <= 90 and -180 <= float(d["lon"]) <= 180):
+            return None
+        if "inicio" in d:
+            date.fromisoformat(d["inicio"] + "-01")
+        return d
+    except Exception:
+        return None
+
+
+def _chave_do_cifrado(produto: str, d: dict) -> str:
+    if produto == "previsao":
+        return chave_previsao(d["data"], d["hora"], d["lat"], d["lon"], d["inicio"])
+    return chave_mapa(d["data"], d["hora"], d["lat"], d["lon"])
+
+
 def emitir_token(produto: str, chave: str, sistema: str = "vedica") -> str:
     """Assina (produto, chave) de uma versão. produto ∈ {'mapa','compat'}. Precisa de PADMINI_SECRET."""
     if not SEGREDO:
@@ -161,6 +254,9 @@ def completo_liberado(produto: str, chave: str, token: str | None, sistema: str 
         return True
     if not SEGREDO or not token:
         return False
+    if token_cifrado(token):  # rodada 20.3: o token traz o pedido; vale se abre E é o mesmo pedido
+        d = abrir_token_cifrado(produto, token)
+        return sistema == "ocidental" and d is not None and _chave_do_cifrado(produto, d) == chave
     try:
         return hmac.compare_digest(token, emitir_token(produto, chave, sistema))
     except Exception:

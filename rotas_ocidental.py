@@ -24,7 +24,7 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter, Body, HTTPException, Request, Response
 from pydantic import ValidationError
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 import acesso
 import db
@@ -167,7 +167,32 @@ class PedidoMapaOcidental(ComEmail):
     cidade: str = Field("", max_length=200)
     texto_ia: bool = False
     nivel: str = Field("amostra", pattern=r"^(amostra|completo)$")
-    token: str | None = Field(None, max_length=64)
+    # rodada 20.3: o token cifrado (oc-mapa-, oc-ano-) tem ~400 caracteres
+    token: str | None = Field(None, max_length=acesso.LIMITE_TOKEN)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _dados_do_token(cls, corpo):
+        """Rodada 20.3: com o token novo (o link leva só ele), o pedido sai de DENTRO do
+        token, nunca do que o navegador mandou. Token novo que não abre (alterado, de outro
+        segredo, malformado) vira um pedido vazio que o completo_liberado recusa (402)."""
+        if not (isinstance(corpo, dict) and acesso.token_cifrado(corpo.get("token"))):
+            return corpo
+        token = str(corpo["token"])
+        d = next((x for x in (acesso.abrir_token_cifrado(prod, token) for prod in acesso.CIFRADOS) if x), None)
+        if not d:  # só o prefixo: abre para nenhum produto (402), qualquer que fosse o tamanho
+            d, token = {"nome": "", "data": "2000-01-01", "hora": "", "lat": 0.0, "lon": 0.0, "cidade": ""}, token[:8]
+        return {**corpo, **d, "token": token, "nivel": "completo"}
+
+
+def link_novo(produto: str, p: "PedidoMapaOcidental") -> dict:
+    """Rodada 20.3: o link antigo (token HMAC + dados na URL) abriu? A resposta leva também o
+    link novo (só o token), e a página troca a barra com history.replaceState."""
+    if not p.token or acesso.token_cifrado(p.token) or not acesso.SEGREDO:
+        return {}
+    import entrega
+    dados = {**_pessoa_para_dados(p), "inicio": getattr(p, "inicio", None) or ""}
+    return {"link_novo": entrega.caminho_cifrado(produto, dados)}
 
 
 def chave_do_pedido(p: PedidoMapaOcidental) -> str:
@@ -213,6 +238,8 @@ def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
         # token e o /live continuam aceitando sem nome: links já entregues)
         raise HTTPException(422, "Preencha o seu nome.")
     email = exigir_email(p) if p.nivel == "amostra" else None
+    if p.nivel == "completo" and not acesso.completo_liberado("mapa", chave_do_pedido(p), p.token, VERSAO):
+        raise HTTPException(402, "O mapa completo requer pagamento.")  # antes de calcular
     mapa, aviso = calcular(p)
 
     if p.nivel == "amostra":
@@ -228,9 +255,6 @@ def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
         return entregar_amostra(request, p, email, "mapa", dados, dados["nome"],
                                 {**cab, "amostra": tela_mapa(amostra)}, {**cab, "amostra": amostra})
 
-    chave = chave_do_pedido(p)
-    if not acesso.completo_liberado("mapa", chave, p.token, VERSAO):
-        raise HTTPException(402, "O mapa completo requer pagamento.")
     secoes = mt.montar_secoes(mapa)
     import ilustracoes
     import roda_mapa
@@ -243,6 +267,8 @@ def mapa_ocidental(p: PedidoMapaOcidental, request: Request):
     na_tela = tuple(d["ponto"] for d in dims if d.get("ponto"))
     return {
         **_cabecalho(p, mapa, aviso, "completo"),
+        # rodada 20.3: com o link só de token, a página não tem a data e a hora na URL
+        "data": p.data.isoformat(), "hora": p.hora, **link_novo("mapa", p),
         # rodada 9 (tela Site-Leitura): as dimensões inteiras, a roda desenhada no
         # servidor e o resto do mapa (sem repetir o que as dimensões já mostram)
         "dimensoes": dims,
@@ -335,6 +361,7 @@ def previsao_ocidental(p: PedidoPrevisao, request: Request):
         raise HTTPException(402, "O seu ano completo requer pagamento.")
     prev = calcular_previsao(p, _inicio_do_completo(p))
     return {"nivel": "completo", "sistema": VERSAO, "nome": p.nome.strip(), "cidade": p.cidade,
+            "data": p.data.isoformat(), "hora": p.hora, "inicio": p.inicio, **link_novo("previsao", p),
             **mp.completo(prev)}
 
 
@@ -491,7 +518,10 @@ def live_token_mapa_ocidental(p: PedidoMapaOcidental, request: Request):
     else:
         validar_data(p.data)
     db.registrar_live(f"{VERSAO}:mapa", p.nome.strip(), p.cidade, f"{p.data.isoformat()} {p.hora}".strip())
-    return {"token": acesso.emitir_token("mapa", chave_do_pedido(p), VERSAO)}
+    # rodada 20.3: o token novo (só ele no link), como o do calendário
+    import entrega
+    link = entrega.caminho_cifrado("mapa", _pessoa_para_dados(p))
+    return {"token": link.split("token=", 1)[1], "link": link}
 
 
 def live_mostra_previsao() -> bool:
@@ -516,8 +546,9 @@ def live_token_previsao(p: PedidoPrevisao, request: Request):
         validar_data(p.data)
     inicio = p.inicio or _inicio_da_amostra().strftime("%Y-%m")
     db.registrar_live(f"{VERSAO}:previsao", p.nome.strip(), p.cidade, f"{p.data.isoformat()} {p.hora}".strip())
-    chave = acesso.chave_previsao(p.data.isoformat(), p.hora, p.lat, p.lon, inicio)
-    return {"token": acesso.emitir_token("previsao", chave, VERSAO), "inicio": inicio}
+    import entrega
+    link = entrega.caminho_cifrado("previsao", {**_pessoa_para_dados(p), "inicio": inicio})
+    return {"token": link.split("token=", 1)[1], "inicio": inicio, "link": link}
 
 
 # --------------------------------------------------------------------------

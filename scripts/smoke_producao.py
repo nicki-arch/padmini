@@ -399,6 +399,14 @@ def _():
             and req("/calendario-lunar/agenda.ics?token=" + falso["token"])[0] == 402)
 
 
+@checar("[mapa e O seu ano] link novo com token falso: 402 (completo e PDF)")
+def _():
+    # rodada 20.3: o link leva só o token cifrado (oc-mapa-, oc-ano-); um inventado não abre
+    mapa, ano = {"token": "oc-mapa-" + "A" * 80, "nivel": "completo"}, {"token": "oc-ano-" + "A" * 80, "nivel": "completo"}
+    return (req("/api/ocidental/mapa", mapa)[0] == 402 and req("/api/ocidental/pdf", mapa)[0] == 402
+            and req("/api/ocidental/previsao", ano)[0] == 402 and req("/api/ocidental/previsao/pdf", ano)[0] == 402)
+
+
 def _kits_a_venda() -> list:
     """Rodada 20: os kits à venda para o público (/api/config → kits_a_venda). Site
     anterior à rodada 20 (sem o campo) = nenhum."""

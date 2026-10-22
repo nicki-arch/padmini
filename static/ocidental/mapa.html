@@ -455,18 +455,31 @@ async function baixarPDF() {
 }
 
 // ---------- entrega do completo por link (pós-pagamento) ----------
-// /mapa?data=AAAA-MM-DD&hora=HH:MM (ou vazia)&lat=..&lon=..&cidade=..&nome=..&token=oc-...
+// /mapa?token=oc-mapa-... (rodada 20.3); antes, /mapa?data=AAAA-MM-DD&hora=HH:MM (ou vazia)&lat=..&lon=..&cidade=..&nome=..&token=oc-...
 (function abrirCompletoPorLink() {
   const p = new URLSearchParams(location.search);
   const token = p.get("token"), data = p.get("data"), hora = p.get("hora") || "";
   const lat = parseFloat(p.get("lat")), lon = parseFloat(p.get("lon"));
-  if (!token || !data || isNaN(lat) || isNaN(lon)) return;
+  // rodada 20.3: o link novo leva SÓ o token (oc-mapa-…); o servidor abre e calcula
+  const soToken = !!token && token.startsWith("oc-mapa-");
+  if (!soToken && (!token || !data || isNaN(lat) || isNaN(lon))) return;
   ultimoPedido = { nome: p.get("nome") || "", data, hora, lat, lon, cidade: p.get("cidade") || "", token };
+  if (soToken) ultimoPedido = { token };
   // O completo só é desenhado com a resposta autorizada do servidor (token válido);
   // sem ela, nada do pago aparece.
   $("#titulo-carregando").textContent = "Abrindo o seu mapa completo";
   mostrarEstado("estado-carregando"); animarEtapas();
-  pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "completo" }).then((d) => { clearInterval(timerEtapas); desenharResultado(d); }).catch((e) => {
+  pedir("/api/ocidental/mapa", { ...ultimoPedido, nivel: "completo" }).then((d) => {
+    clearInterval(timerEtapas);
+    // os dados vêm da resposta (o link novo não os tem); o link antigo ganha o formato novo
+    // na barra e no histórico, sem os dados de nascimento (rodada 20.3)
+    ultimoPedido = { ...ultimoPedido, nome: d.nome, data: d.data, hora: d.hora, cidade: d.cidade };
+    if (d.link_novo) {
+      try { history.replaceState(null, "", d.link_novo); } catch {}
+      ultimoPedido = { token: new URLSearchParams(d.link_novo.split("?")[1]).get("token"), nome: d.nome, data: d.data, hora: d.hora, cidade: d.cidade };
+    }
+    desenharResultado(d);
+  }).catch((e) => {
     clearInterval(timerEtapas);
     // tela "Este link de leitura não abriu" (Sistema-Erros)
     $("#resultado").innerHTML = `<section class="erro-topo"><div><span class="chip chip-breve">Link de leitura</span>

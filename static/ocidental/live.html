@@ -290,7 +290,7 @@ $("#form-mapa").addEventListener("submit", async (e) => {
   try {
     const t = await pedir("/api/live/ocidental/token/mapa", base);
     const r = await pedir("/api/ocidental/mapa", { ...base, nivel: "completo", token: t.token });
-    desenharMapa(r);
+    desenharMapa(r); linkDoCompleto(t.link);
   } catch (err) { erro("#erro-mapa", err.message); }
   finally { botao.disabled = false; botao.textContent = "Gerar leitura"; }
 });
@@ -302,6 +302,14 @@ async function pedir(url, corpo) {
   return dados;
 }
 
+// rodada 20.3: o link do completo, como o do calendário: só o token, sem dado de nascimento
+function linkDoCompleto(link) {
+  if (!link) return;
+  const p = document.createElement("p");
+  p.className = "sub";
+  p.innerHTML = `Link do completo (só o token, sem dados de nascimento): <a href="${esc(link)}" target="_blank" rel="noreferrer">abrir</a>`;
+  $("#resultado").appendChild(p);
+}
 function desenharMapa(d) {
   const a = d.amostra;
   const paragrafos = (c) => (Array.isArray(c) ? c : [c]).map((p) => `<p>${esc(p)}</p>`).join("");
@@ -437,6 +445,7 @@ if ($("#form-ano")) {
     try {
       const t = await pedir("/api/live/ocidental/token/previsao", base);
       desenharAno(await pedir("/api/ocidental/previsao", { ...base, inicio: t.inicio, nivel: "completo", token: t.token }));
+      linkDoCompleto(t.link);
     } catch (err) { erro("#erro-ano", err.message); }
     finally { botao.disabled = false; botao.textContent = "Gerar O seu ano"; }
   });
