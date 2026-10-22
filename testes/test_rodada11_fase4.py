@@ -162,13 +162,16 @@ def test_relatorio_sem_chave_ou_mes_errado(monkeypatch, capsys):
 
 
 # ------------------------------------------------------------------ smoke
-def test_smoke_com_a_cakto_continua_com_41_checagens():
+def test_smoke_com_a_cakto_continua_com_40_checagens():
     # rodada 16: + "sem texto por IA"; 16.1: + preço riscado do /mapa; 18: + 301 e webhook do
     # domínio antigo; 19: + /links; 15: + /painel sem login, ação sem login e "o público não
     # vê o modo teste"; 17: + token de "O seu ano" do /live sem sessão; 14: + token de "A sua
     # Lua no ano" do /live sem sessão e o calendário com token falso; 20: + o kit fora da venda
     # não aparece. Com a Stripe no ar, + 3 (rodada 20: o checkout fora da venda recusa) = 44.
-    assert len(smoke.CHECAGENS) == 41
+    # Rodada 20.3: as páginas de produto seguem o painel. "/mapa 200", "/compatibilidade 200"
+    # e "numerologia e tarot 200" viram UMA checagem (todas as rotas do catálogo); entra
+    # "páginas em breve mostram em breve" (antes só a sinastria, dentro da de venda fechada) = 40.
+    assert len(smoke.CHECAGENS) == 40
     nomes = [n for n, _ in smoke.CHECAGENS_STRIPE]
     assert len(nomes) == 3
     assert any("/webhook/stripe" in n for n in nomes) and any("fora da venda" in n for n in nomes)
