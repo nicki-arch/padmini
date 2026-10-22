@@ -101,9 +101,14 @@ mostra dado de cliente.
 
 ## Smoke
 
-O `/api/config` traz `modo_site` e `produtos_ativos` (só o que está ativo para o público).
+O `/api/config` traz `modo_site`, `produtos_ativos` e (rodada 20.3) `produtos_em_breve`: as
+rotas de produto ativas e "em breve" para o público. Oculto nunca aparece ali.
 O smoke se ajusta:
 
+- **páginas de produto** (rodada 20.3): as rotas vêm do `catalogo.yaml` do repositório e o
+  estado do `/api/config`: ativo ou em breve → 200, oculto → 404, toda página "em breve" mostra
+  "em breve", e a checagem de 404 usa um produto oculto naquele momento (nenhum = passa com o
+  aviso "nenhum oculto"). Esconder ou ligar produto no painel não derruba mais o smoke;
 - **manutenção**: confere o 503 e o que continua de pé;
 - **tudo liberado na produção**: confere que o público não vê nada a mais;
 - **sempre**: o `/painel` sem login mostra só o formulário de senha (ou 404 sem a variável),

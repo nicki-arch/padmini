@@ -48,6 +48,8 @@ def test_cakto_fora_do_ar_avisa_sem_reprovar():
 # O smoke inteiro contra o app local, nas duas versões (sem rede: a conferência
 # com a Cakto e os cabeçalhos HTTPS ficam de fora).
 # ---------------------------------------------------------------------------
+import json  # noqa: E402
+
 import pytest  # noqa: E402
 
 from test_app import app_mod, cliente  # noqa: E402
@@ -118,7 +120,9 @@ def test_smoke_cobre_os_4_produtos():
     nomes = " ".join(n for n, _ in smoke.CHECAGENS)
     # rodada 6: as amostras pedem e-mail (o smoke confere o 422); o tarot completo
     # sai do 402 do smoke (sem sorteio não há tiragem) e fica em test_tarot
-    for trecho in ("amostras dos 4 produtos pedem o e-mail", "completos e PDFs trancados", "numerologia e tarot"):
+    # rodada 20.3: as páginas (numerologia e tarot inclusive) seguem o estado no painel
+    for trecho in ("amostras dos 4 produtos pedem o e-mail", "completos e PDFs trancados",
+                   "páginas de produto seguem o painel"):
         assert trecho in nomes
 
 
@@ -257,3 +261,130 @@ def test_valor_solto_no_yaml_nao_derruba_a_conferencia():
 def test_conferencia_roda_com_o_yaml_de_verdade(versao):
     smoke.AVISOS.clear()
     smoke.conferir_precos_na_cakto(smoke._ofertas_do_yaml(versao), baixar=lambda url: "")
+
+
+# ---------------------------------------------------------------------------
+# Rodada 20.3: o smoke segue o estado do painel. Em 22/out o Nicolas deixou só o mapa à
+# venda (sinastria, numerologia, tarot e comunidade Ocultos) e o smoke caiu para 41/44:
+# "/compatibilidade responde 200", "numerologia e tarot: 200" e "/comunidade 404" tinham
+# o produto fixo. Agora: ativo ou em breve → 200, oculto → 404, conforme o /api/config.
+# ---------------------------------------------------------------------------
+TODAS = [p["chave"] for p in catalogo.carregar()["produtos"]]
+ESTADOS = {
+    # 22/out/2026: só o mapa (e a home); o resto Oculto no painel
+    "hoje": {"mapa": "ativo"},
+    "tudo_ativo": {c: "ativo" for c in TODAS},
+    "tudo_oculto_menos_o_mapa": {"mapa": "ativo"},
+    "misturado": {"mapa": "ativo", "compat": "em_breve", "numerologia": "ativo", "comunidade": "ativo",
+                  "previsao": "em_breve"},
+}
+
+
+def _no_painel(monkeypatch, estados: dict, vendas=True):
+    """O estado do painel (o que o público vê) só com `estados`; o resto oculto."""
+    import copy
+    dados = copy.deepcopy(catalogo.carregar())
+    dados["vendas_abertas"] = vendas
+    for p in dados["produtos"]:
+        p["estado"] = estados.get(p["chave"], "oculto")
+    catalogo.usar(dados)
+    app_mod._paginas_prontas.clear()
+
+
+@pytest.mark.parametrize("cenario", list(ESTADOS))
+def test_smoke_segue_o_painel(cenario, monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    monkeypatch.delenv("PADMINI_CAPTURA", raising=False)
+    _local(monkeypatch)
+    _no_painel(monkeypatch, ESTADOS[cenario])
+    smoke.AVISOS.clear()
+    falhas = [n for n, f in smoke.CHECAGENS if not any(t in n for t in SEM_REDE) and not f()]
+    app_mod._paginas_prontas.clear()
+    assert falhas == []
+    estados = smoke.estados_no_ar()
+    assert {r for r, e in estados.items() if e == "ativo"} >= {"/mapa"}
+    # "nenhum oculto" só aparece quando de fato não há oculto
+    assert any("nenhum oculto" in a for a in smoke.AVISOS) == ("oculto" not in estados.values())
+
+
+def test_config_informa_em_breve_e_nunca_oculto(monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    _no_painel(monkeypatch, ESTADOS["misturado"])
+    cfg = cliente.get("/api/config").json()
+    assert set(cfg["produtos_ativos"]) == {"/mapa", "/numerologia", "/comunidade"}
+    assert set(cfg["produtos_em_breve"]) == {"/compatibilidade", "/seu-ano"}
+    assert "/tarot" not in cfg["produtos_ativos"] + cfg["produtos_em_breve"]
+
+
+def test_config_da_vedica_sem_catalogo(monkeypatch):
+    monkeypatch.setenv("PADMINI_SISTEMA", "vedica")
+    cfg = cliente.get("/api/config").json()
+    assert cfg["produtos_ativos"] == [] and cfg["produtos_em_breve"] == []
+
+
+@pytest.mark.parametrize("cenario", list(ESTADOS))
+def test_smoke_reprova_pagina_fora_do_estado(cenario, monkeypatch):
+    """O smoke continua pegando defeito de verdade: oculto que abre (200) ou ativo que some (404)."""
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    _local(monkeypatch)
+    _no_painel(monkeypatch, ESTADOS[cenario])
+    estados = smoke.estados_no_ar()
+    errada = next(r for r, e in estados.items() if e != "ativo") if "oculto" in estados.values() else "/mapa"
+
+    def req(caminho, corpo=None, timeout=90):
+        if caminho == errada:
+            return (200 if estados[errada] == "oculto" else 404), b""
+        return _req_local(caminho, corpo, timeout)
+    monkeypatch.setattr(smoke, "req", req)
+    assert _checagem("páginas de produto seguem o painel")() is False
+
+
+# Os três estados do brief simulados só no /api/config (sem app): o que o smoke espera.
+CONFIG_HOJE = {"sistema": "ocidental", "produtos_ativos": ["/mapa"], "produtos_em_breve": []}
+CONFIG_TUDO = {"sistema": "ocidental", "produtos_em_breve": [],
+               "produtos_ativos": [p["rota"] for p in catalogo.carregar()["produtos"] if p.get("rota")]}
+
+
+@pytest.mark.parametrize("config, esperado", [
+    (CONFIG_HOJE, {"/mapa": 200, "/compatibilidade": 404, "/numerologia": 404, "/tarot": 404,
+                   "/comunidade": 404, "/seu-ano": 404, "/calendario-lunar": 404}),
+    (CONFIG_TUDO, {"/mapa": 200, "/compatibilidade": 200, "/numerologia": 200, "/tarot": 200,
+                   "/comunidade": 200, "/seu-ano": 200, "/calendario-lunar": 200}),
+    ({"sistema": "ocidental", "produtos_ativos": ["/mapa"], "produtos_em_breve": ["/tarot"]},
+     {"/mapa": 200, "/tarot": 200, "/compatibilidade": 404, "/comunidade": 404}),
+    ({"sistema": "vedica", "produtos_ativos": []},
+     {"/mapa": 200, "/compatibilidade": 200, "/numerologia": 404, "/tarot": 404, "/comunidade": 404}),
+])
+def test_status_esperado_pelo_config(config, esperado):
+    estados = smoke.estados_no_ar(config)
+    assert {r: smoke.status_esperado(estados[r]) for r in esperado} == {r: (st,) for r, st in esperado.items()}
+
+
+def test_site_sem_produtos_em_breve_aceita_200_ou_404():
+    """Site anterior à rodada 20.3 (sem o campo): em breve e oculto não se distinguem; fora os
+    ativos, a página passa com 200 ou 404 e o smoke avisa (o YAML não é o estado no ar)."""
+    smoke.AVISOS.clear()
+    estados = smoke.estados_no_ar({"sistema": "ocidental", "produtos_ativos": ["/mapa"]})
+    assert estados["/mapa"] == "ativo" and smoke.status_esperado(estados["/mapa"]) == (200,)
+    assert all(smoke.status_esperado(e) == (200, 404) for r, e in estados.items() if r != "/mapa")
+    assert any("produtos_em_breve" in a for a in smoke.AVISOS)
+
+
+def test_site_sem_produtos_em_breve_passa_com_o_estado_de_hoje(monkeypatch):
+    """O smoke desta rodada contra a produção ANTES do deploy dela (22/out: só o mapa ativo,
+    sinastria, numerologia, tarot e comunidade ocultos, e o /api/config sem o campo novo)."""
+    monkeypatch.setenv("PADMINI_SISTEMA", "ocidental")
+    _local(monkeypatch)
+    _no_painel(monkeypatch, ESTADOS["hoje"])
+
+    def req(caminho, corpo=None, timeout=90):
+        st, corpo_r = _req_local(caminho, corpo, timeout)
+        if caminho == "/api/config":
+            cfg = json.loads(corpo_r)
+            cfg.pop("produtos_em_breve")
+            return st, json.dumps(cfg).encode()
+        return st, corpo_r
+    monkeypatch.setattr(smoke, "req", req)
+    smoke.AVISOS.clear()
+    for trecho in ("páginas de produto seguem o painel", "um produto oculto", "em breve\" mostram"):
+        assert _checagem(trecho)() is True, trecho

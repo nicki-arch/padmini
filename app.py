@@ -1124,6 +1124,14 @@ def saude():
             "versao": os.environ.get("RENDER_GIT_COMMIT", "")[:7]}
 
 
+def _rotas_no_estado(estado: str) -> list[str]:
+    """Rotas dos produtos da ocidental neste estado PARA O PÚBLICO (/api/config)."""
+    if sistema.ativo() != "ocidental":
+        return []
+    return [p["rota"] for p in catalogo.produtos_do_yaml()
+            if p["rota"] and catalogo.estado_publico(p["chave"]) == estado]
+
+
 @app.get("/api/config")
 def config():
     # Rodada 16: a ocidental não tem mais texto por IA, então a chave nem aparece com ela
@@ -1145,9 +1153,10 @@ def config():
         # PARA O PÚBLICO (oculto nunca aparece aqui). Nunca o estado do cookie de quem pede:
         # o smoke se ajusta por estes dois campos.
         "modo_site": estado_site.modo(),
-        "produtos_ativos": ([p["rota"] for p in catalogo.produtos_do_yaml()
-                             if p["rota"] and catalogo.estado_publico(p["chave"]) == "ativo"]
-                            if sistema.ativo() == "ocidental" else []),
+        "produtos_ativos": _rotas_no_estado("ativo"),
+        # rodada 20.3: as que o público vê como "em breve" (o smoke espera 200 nas duas listas
+        # e 404 no resto do catálogo, seguindo o painel em vez de produtos fixos)
+        "produtos_em_breve": _rotas_no_estado("em_breve"),
         # rodada 20: os kits À VENDA para o público (o kit e os produtos dele); oculto = []
         "kits_a_venda": ([p["chave"] for p in catalogo.kits_a_venda()] if sistema.ativo() == "ocidental" else []),
         # quem cobra na ocidental (rodada 11): cakto | stripe; o smoke usa

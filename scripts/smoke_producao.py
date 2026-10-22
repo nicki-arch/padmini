@@ -58,8 +58,72 @@ def checar(nome):
     return deco
 
 
-for rota in ("/", "/mapa", "/compatibilidade", "/privacidade", "/termos"):
+for rota in ("/", "/privacidade", "/termos"):
     checar(f"página {rota} responde 200")(lambda rota=rota: req(rota)[0] == 200)
+
+
+# ---------------------------------------------------------------------------
+# Rodada 20.3: as páginas de produto seguem o estado NO AR (o /painel), não uma lista
+# fixa. Antes, ocultar a sinastria, a numerologia e o tarot no painel (22/out) derrubava
+# três checagens de hora em hora sem nada quebrado. As rotas vêm do catalogo.yaml do
+# repositório; o estado, do /api/config (produtos_ativos + produtos_em_breve):
+# ativo ou em breve → 200, oculto → 404.
+# ---------------------------------------------------------------------------
+PAGINAS_DA_VEDICA = ("/mapa", "/compatibilidade")
+
+
+def _config() -> dict:
+    st, corpo = req("/api/config")
+    return json.loads(corpo) if st == 200 else {}
+
+
+def _catalogo_do_repo() -> list:
+    """Os produtos do catalogo.yaml do repositório que têm página (rota)."""
+    import yaml
+    dados = yaml.safe_load((_raiz() / "conteudo" / "ocidental" / "catalogo.yaml").read_text(encoding="utf-8")) or {}
+    return [p for p in dados.get("produtos") or [] if p.get("rota")]
+
+
+def estados_no_ar(config: dict | None = None) -> dict:
+    """{rota: ativo | em_breve | oculto | ?} de cada página de produto, como o público vê agora.
+    Com a védica no ar não há catálogo: o mapa e o casal abrem, o resto é 404 (oculto).
+    Site anterior à rodada 20.3 (sem `produtos_em_breve`): o que não está ativo fica "?"
+    (em breve e oculto não se distinguem pelo /api/config) e aceita 200 ou 404."""
+    config = _config() if config is None else config
+    produtos = _catalogo_do_repo()
+    if (config.get("sistema") or "vedica") != "ocidental":
+        return {p["rota"]: "ativo" if p["rota"] in PAGINAS_DA_VEDICA else "oculto" for p in produtos}
+    ativos = config.get("produtos_ativos")
+    ativos = set(ativos) if isinstance(ativos, list) else {p["rota"] for p in produtos if p.get("estado") == "ativo"}
+    em_breve = config.get("produtos_em_breve")
+    if not isinstance(em_breve, list):
+        if not any("produtos_em_breve" in a for a in AVISOS):
+            AVISOS.append("o /api/config ainda não informa produtos_em_breve (site anterior à rodada 20.3): "
+                          "fora os ativos, as páginas de produto foram aceitas com 200 ou 404")
+        return {p["rota"]: "ativo" if p["rota"] in ativos else "?" for p in produtos}
+    return {p["rota"]: "ativo" if p["rota"] in ativos else "em_breve" if p["rota"] in set(em_breve) else "oculto"
+            for p in produtos}
+
+
+def status_esperado(estado: str) -> tuple:
+    return {"oculto": (404,), "?": (200, 404)}.get(estado, (200,))
+
+
+def nao_ocultas(rotas) -> list:
+    """As rotas da lista que o público vê (ativo ou em breve) agora."""
+    estados = estados_no_ar()
+    return [r for r in rotas if estados.get(r, "ativo") in ("ativo", "em_breve")]
+
+
+@checar("páginas de produto seguem o painel (ativo ou em breve → 200, oculto → 404)")
+def _():
+    ok = True
+    for rota, estado in estados_no_ar().items():
+        st = req(rota)[0]
+        if st not in status_esperado(estado):
+            print(f"       {rota}: {st} (no ar: {estado}, esperado {' ou '.join(map(str, status_esperado(estado)))})")
+            ok = False
+    return ok
 
 
 class _SemSeguir(urllib.request.HTTPRedirectHandler):
@@ -100,9 +164,8 @@ ORIGEM = "utm_source=smoke&utm_campaign=pos-deploy&ref=SMOKE"
 def _():
     if not _captura_no_ar():
         return True
-    paginas = ["/", "/mapa", "/compatibilidade"]
-    if _versao_no_ar() == "ocidental":
-        paginas += ["/numerologia", "/tarot"]  # com a védica no ar, 404 (conferido abaixo)
+    # oculto = 404 mesmo com a captura (conferido em "páginas de produto seguem o painel")
+    paginas = ["/"] + nao_ocultas(["/mapa", "/compatibilidade", "/numerologia", "/tarot"])
     ok = True
     for p in paginas:
         st, onde = destino(f"{p}?{ORIGEM}")
@@ -132,17 +195,10 @@ def _pagamento_no_ar() -> str:
 def _ativo_no_catalogo(rota: str) -> bool:
     """Na ocidental, a página só tem botão de compra se o produto está `ativo` para o
     público (em breve = "me avise"). Desde a rodada 15 quem decide é o /painel: vale o
-    `produtos_ativos` do /api/config; site anterior (sem o campo), o catalogo.yaml.
-    A védica não tem catálogo."""
+    `produtos_ativos` do /api/config (estados_no_ar). A védica não tem catálogo."""
     if _versao_no_ar() != "ocidental":
         return True
-    st, corpo = req("/api/config")
-    ativos = json.loads(corpo).get("produtos_ativos") if st == 200 else None
-    if isinstance(ativos, list):
-        return rota in ativos
-    import yaml
-    catalogo = yaml.safe_load((_raiz() / "conteudo" / "ocidental" / "catalogo.yaml").read_text(encoding="utf-8")) or {}
-    return any(p.get("rota") == rota and p.get("estado") == "ativo" for p in catalogo.get("produtos") or [])
+    return estados_no_ar().get(rota) == "ativo"
 
 
 def _botoes_de_compra(paginas) -> bool:
@@ -371,12 +427,6 @@ def _():
     return req("/api/ocidental/tarot", {"tiragem": "AAAAAAAAAAAAAAAA"})[0] == 422
 
 
-@checar("páginas de numerologia e tarot: 200 com a ocidental no ar, 404 com a védica")
-def _():
-    esperado = 200 if _versao_no_ar() == "ocidental" else 404
-    return req("/numerologia")[0] == esperado and req("/tarot")[0] == esperado
-
-
 @checar("[ocidental no ar] /links responde 200 e repassa a origem aos botões (404 com a védica)")
 def _():
     # rodada 19: o link da bio. Todo link interno leva utm_source/utm_medium da chegada.
@@ -407,20 +457,43 @@ def _():
 PAGINAS_PUBLICAS = ("/", "/mapa", "/compatibilidade", "/numerologia", "/tarot", "/leituras")
 
 
-@checar("[ocidental] produto oculto responde 404 (/comunidade)")
+@checar("[ocidental] um produto oculto agora responde 404")
 def _():
-    if _versao_no_ar() != "ocidental" or _tudo_liberado_para_todos():
+    # rodada 20.3: o produto sai do estado no ar (antes era sempre /comunidade, que foi
+    # ligada e desligada no painel e reprovou o smoke no meio do caminho)
+    if _versao_no_ar() != "ocidental":
         return True
-    return req("/comunidade")[0] == 404
+    estados = estados_no_ar()
+    ocultos = [r for r, e in estados.items() if e == "oculto"]
+    if not ocultos and "?" in estados.values():
+        return True  # site anterior à rodada 20.3: não dá para saber qual está oculto (aviso acima)
+    if not ocultos:
+        if not any("nenhum oculto" in a for a in AVISOS):
+            AVISOS.append("nenhum oculto: todos os produtos do catálogo estão ativos ou em breve no painel; "
+                          "o 404 de produto oculto não foi conferido")
+        return True
+    return req(ocultos[0])[0] == 404
 
 
-@checar("[venda fechada] /, /mapa e /leituras respondem 200; a sinastria mostra \"em breve\"")
+@checar("[ocidental] páginas \"em breve\" mostram \"em breve\"")
+def _():
+    if _versao_no_ar() != "ocidental" or _captura_no_ar():
+        return True
+    em_breve = [r for r, e in estados_no_ar().items() if e == "em_breve"]
+    ok = True
+    for rota in em_breve:
+        st, corpo = req(rota)
+        if not (st == 200 and "em breve" in corpo.decode("utf-8", "replace").lower()):
+            print(f"       {rota}: {st}, sem \"em breve\"")
+            ok = False
+    return ok
+
+
+@checar("[venda fechada] /, /mapa e /leituras respondem 200")
 def _():
     if _versao_no_ar() != "ocidental" or _captura_no_ar() or _vendas_abertas():
         return True
-    st, sinastria = req("/compatibilidade")
-    return (all(req(p)[0] == 200 for p in ("/", "/mapa", "/leituras"))
-            and st == 200 and "em breve" in sinastria.decode("utf-8", "replace").lower())
+    return all(req(p)[0] == 200 for p in ("/", "/mapa", "/leituras"))
 
 
 @checar("[venda fechada] nenhuma página mostra preço nem link da Cakto")
